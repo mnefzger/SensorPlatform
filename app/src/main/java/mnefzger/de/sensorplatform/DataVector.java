@@ -9,8 +9,12 @@ public class DataVector {
     public double accY;
     public double accZ;
 
-    public DataVector(long timestamp) {
-        this.timestamp = timestamp;
+    public DataVector() {
+
+    }
+
+    public void setTimestamp(long time) {
+        this.timestamp = time;
     }
 
     public void setAcc(double x, double y, double z) {

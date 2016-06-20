@@ -4,13 +4,13 @@ import android.content.Context;
 import android.hardware.Sensor;
 import android.hardware.SensorEvent;
 
-public class Accelerometer extends SensorProvider {
+public class AccelerometerProvider extends SensorProvider {
     private Sensor accSensor;
 
     private double[] gravity = new double[3];
     private double[] linear_acceleration = new double[3];
 
-    public Accelerometer(Context c, SensorModule m) {
+    public AccelerometerProvider(Context c, SensorModule m) {
         super(c, m);
     }
 
@@ -31,7 +31,7 @@ public class Accelerometer extends SensorProvider {
         linear_acceleration[0] = event.values[0] - gravity[0];
         linear_acceleration[1] = event.values[1] - gravity[1];
         linear_acceleration[2] = event.values[2] - gravity[2];
-        sensorCallback.onDataSensed(linear_acceleration);
+        sensorCallback.onAccelerometerData(linear_acceleration);
     }
 
     @Override

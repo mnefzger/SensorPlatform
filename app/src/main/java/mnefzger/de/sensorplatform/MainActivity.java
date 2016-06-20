@@ -13,6 +13,7 @@ public class MainActivity extends AppCompatActivity implements IDataCallback{
         setContentView(R.layout.activity_main);
 
         sPC = new SensorPlatformController(this);
+        sPC.subscribeTo(DataType.ACCELERATION_RAW, false);
     }
 
 

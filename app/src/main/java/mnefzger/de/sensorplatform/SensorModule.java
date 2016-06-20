@@ -41,7 +41,7 @@ public class SensorModule implements ISensorCallback{
      * The onRawData() reporting sampling rate in milliseconds
      */
     private final int SAMPLINGRATE = 500;
-    
+
 
     public SensorModule(SensorPlatformController controller, Activity app) {
         callback = (IDataCallback)controller;
@@ -69,19 +69,23 @@ public class SensorModule implements ISensorCallback{
         current = new DataVector();
 
         /**
-        * add last recorded DataVector to Buffer
-        * init new DataVector with average acceleration of previous;
-        */
+         * add last recorded DataVector to Buffer
+         * init new DataVector with average acceleration of previous;
+         */
         if(last != null) {
             dataBuffer.add(last);
             current.setAcc(last.accX, last.accY, last.accZ);
         }
-        // only store last 100 DataVectors
+        /**
+         * only store last 100 DataVectors
+         */
         if(dataBuffer.size() > BUFFERSIZE) {
             dataBuffer.remove(0);
         }
 
-        // report raw data after SAMPLINGRATE milliseconds
+        /**
+         * report raw data after SAMPLINGRATE milliseconds
+         */
         new Timer().schedule(new TimerTask() {
             @Override
             public void run() {

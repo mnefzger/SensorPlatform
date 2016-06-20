@@ -14,11 +14,21 @@ public class SensorPlatformController implements IDataCallback{
     public SensorPlatformController(Activity app) {
         this.sm = new SensorModule(this, app);
         this.appCallback = (IDataCallback) app;
-        //start getting accelerometer data
-        sm.startSensing(SensorType.ACCELERATION);
     }
 
-    public void subscribeTo() {
+    public void subscribeTo(DataType type, boolean log) {
+        switch (type) {
+            case ACCELERATION_RAW:
+                sm.startSensing(SensorType.ACCELERATION);
+                // add subscription
+                break;
+            case ACCELERATION_EVENT:
+                sm.startSensing(SensorType.ACCELERATION);
+                // add subscription
+                break;
+            default:
+                break;
+        }
 
     }
 

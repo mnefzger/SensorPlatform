@@ -2,6 +2,7 @@ package mnefzger.de.sensorplatform;
 
 
 import android.app.Activity;
+import android.util.Log;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -24,6 +25,9 @@ public class SensorModule implements ISensorCallback{
     /**
      * Vector containing the most recent raw data
      */
+
+    private List<SensorProvider> activeProviders;
+
     private DataVector current;
     /**
      * A list containing the last BUFFERSIZE DataVectors
@@ -46,10 +50,12 @@ public class SensorModule implements ISensorCallback{
     public SensorModule(SensorPlatformController controller, Activity app) {
         callback = (IDataCallback)controller;
 
+        activeProviders = new ArrayList<>();
         accelerometer = new AccelerometerProvider(app, this);
 
         current = new DataVector();
         dataBuffer = new ArrayList<>();
+
     }
 
     public void startSensing(SensorType t) {
@@ -60,6 +66,23 @@ public class SensorModule implements ISensorCallback{
 
         if(t == SensorType.ACCELERATION) {
             accelerometer.start();
+            activeProviders.add(accelerometer);
+        }
+
+    }
+
+    public void StopSensing(DataType type) {
+        SensorType t = getSensorTypeFromDataType(type);
+
+
+        if(t == SensorType.ACCELERATION) {
+            Log.d("Unsubscribe", t.toString());
+            accelerometer.stop();
+            activeProviders.remove(accelerometer);
+        }
+
+        if(activeProviders.size() == 0) {
+            sensing = false;
         }
 
     }
@@ -91,7 +114,9 @@ public class SensorModule implements ISensorCallback{
             public void run() {
                 current.setTimestamp(System.currentTimeMillis());
                 callback.onRawData(current);
-                aggregateData(ms);
+                if(sensing) {
+                    aggregateData(ms);
+                }
             }
         }, ms);
     }
@@ -105,5 +130,15 @@ public class SensorModule implements ISensorCallback{
             current.setAcc( dataValues[0], dataValues[1], dataValues[2]);
         }
 
+    }
+
+    public SensorType getSensorTypeFromDataType(DataType t) {
+        switch (t) {
+            case ACCELERATION_EVENT:
+            case ACCELERATION_RAW:
+                return SensorType.ACCELERATION;
+            default:
+                return null;
+        }
     }
 }

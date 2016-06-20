@@ -15,7 +15,7 @@ public abstract class SensorProvider implements SensorEventListener{
     SensorProvider(Context c, SensorModule m) {
         this.context = c;
         sensorManager = (SensorManager) context.getSystemService(Context.SENSOR_SERVICE);
-        sensorCallback = (ISensorCallback) m;
+        sensorCallback = m;
     }
 
     @Override

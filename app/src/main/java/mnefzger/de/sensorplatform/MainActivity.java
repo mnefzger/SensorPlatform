@@ -1,5 +1,6 @@
 package mnefzger.de.sensorplatform;
 
+import android.os.Handler;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
@@ -14,6 +15,13 @@ public class MainActivity extends AppCompatActivity implements IDataCallback{
 
         sPC = new SensorPlatformController(this);
         sPC.subscribeTo(DataType.ACCELERATION_RAW, false);
+
+        Handler handler = new Handler();
+        handler.postDelayed(new Runnable() {
+            public void run() {
+                sPC.unsubscribe(DataType.ACCELERATION_RAW);
+            }
+        }, 5000);
     }
 
 

@@ -1,26 +1,41 @@
 package mnefzger.de.sensorplatform;
 
 import android.app.Activity;
-import android.util.Log;
 
-/**
- * Created by matthias on 20/06/16.
- */
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
+
 public class SensorPlatformController implements IDataCallback{
 
     private SensorModule sm;
     private IDataCallback appCallback;
+    private List<Subscription> activeSubscriptions;
 
     public SensorPlatformController(Activity app) {
         this.sm = new SensorModule(this, app);
         this.appCallback = (IDataCallback) app;
+
+        activeSubscriptions = new ArrayList<>();
     }
 
-    public void subscribeTo(DataType type, boolean log) {
+    public boolean subscribeTo(DataType type, boolean log) {
+        /**
+         * If a subscription with the same type already exists, return
+         */
+        Iterator<Subscription> it = activeSubscriptions.iterator();
+        while(it.hasNext()) {
+            if(it.next().getType() == type) {
+                return false;
+            }
+        }
+
+        Subscription s = new Subscription(type, log);
+
         switch (type) {
             case ACCELERATION_RAW:
                 sm.startSensing(SensorType.ACCELERATION);
-                // add subscription
+
                 break;
             case ACCELERATION_EVENT:
                 sm.startSensing(SensorType.ACCELERATION);
@@ -30,10 +45,23 @@ public class SensorPlatformController implements IDataCallback{
                 break;
         }
 
+        activeSubscriptions.add(s);
+
+        return true;
     }
 
-    public void unsubscribe() {
-
+    public boolean unsubscribe(DataType type) {
+        Iterator<Subscription> it = activeSubscriptions.iterator();
+        while(it.hasNext()) {
+            Subscription temp = it.next();
+            if(temp.getType() == type) {
+                it.remove();
+                activeSubscriptions.remove(temp);
+                sm.StopSensing(type);
+                return true;
+            }
+        }
+        return false;
     }
 
 

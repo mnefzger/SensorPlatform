@@ -137,7 +137,7 @@ public class SensorModule implements ISensorCallback, IEventCallback{
             /**
              * Only process the previous xx entries of driving data
              */
-            int lastSamplingIndex = dataBuffer.size() - SAMPLINGRATE / SAMPLINGRATE;
+            int lastSamplingIndex = dataBuffer.size() - 1000 / SAMPLINGRATE;
             lastSamplingIndex = lastSamplingIndex < 0 ? 0 : lastSamplingIndex;
             drivingBehProc.processData(dataBuffer.subList(lastSamplingIndex, dataBuffer.size()));
         }

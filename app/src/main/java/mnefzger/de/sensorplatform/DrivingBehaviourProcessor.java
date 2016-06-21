@@ -19,16 +19,21 @@ public class DrivingBehaviourProcessor extends EventProcessor {
     private void checkForHardAcc() {
         Iterator<DataVector> it = data.iterator();
         DataVector d;
+        double avg = 0.0;
         while(it.hasNext()) {
             d = it.next();
-            if(d.accZ > 2.0) {
-                EventVector ev = new EventVector(d.timestamp, "Hard brake", d.accZ);
-                callback.onEventDetected(ev);
-            }
-            if(d.accZ < -2.0) {
-                EventVector ev = new EventVector(d.timestamp, "Hard acceleration", d.accZ);
-                callback.onEventDetected(ev);
-            }
+            avg += d.accZ;
+        }
+
+        avg = avg/data.size();
+
+        if(avg > 1.0) {
+            EventVector ev = new EventVector(data.get(0).timestamp, "Hard brake", avg);
+            callback.onEventDetected(ev);
+        }
+        if(avg < -1.0) {
+            EventVector ev = new EventVector(data.get(0).timestamp, "Hard acceleration", avg);
+            callback.onEventDetected(ev);
         }
     }
 

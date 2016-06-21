@@ -6,6 +6,7 @@ import android.util.Log;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 import java.util.Timer;
 import java.util.TimerTask;
 
@@ -23,16 +24,21 @@ public class SensorModule implements ISensorCallback{
      */
     private SensorProvider orientation;
     /**
+     * List of all currently running SensorProviders
+     */
+    private List<SensorProvider> activeProviders;
+    /**
      * Vector containing the most recent raw data
      */
-
-    private List<SensorProvider> activeProviders;
-
     private DataVector current;
     /**
      * A list containing the last BUFFERSIZE DataVectors
      */
     private List<DataVector> dataBuffer;
+    /**
+     * A list containing the events that this SensorModule should monitor
+     */
+    private Set<DataType> events;
     /**
      * Indicator if a SensorProvider is currently active
      */
@@ -55,7 +61,6 @@ public class SensorModule implements ISensorCallback{
 
         current = new DataVector();
         dataBuffer = new ArrayList<>();
-
     }
 
     public void startSensing(SensorType t) {
@@ -64,16 +69,15 @@ public class SensorModule implements ISensorCallback{
             sensing = true;
         }
 
-        if(t == SensorType.ACCELERATION) {
+        if(t == SensorType.ACCELERATION && !activeProviders.contains(accelerometer)) {
             accelerometer.start();
             activeProviders.add(accelerometer);
         }
-
     }
+
 
     public void StopSensing(DataType type) {
         SensorType t = getSensorTypeFromDataType(type);
-
 
         if(t == SensorType.ACCELERATION) {
             Log.d("Unsubscribe", t.toString());
@@ -84,7 +88,6 @@ public class SensorModule implements ISensorCallback{
         if(activeProviders.size() == 0) {
             sensing = false;
         }
-
     }
 
     private void aggregateData(final int ms) {
@@ -125,11 +128,14 @@ public class SensorModule implements ISensorCallback{
     public void onAccelerometerData(double[] dataValues) {
         // store average acceleration in current DataVector
         if(dataBuffer.size() > 0) {
-            current.setAcc( (current.accX+dataValues[0]) / 2.0, (current.accY+dataValues[1]) / 2.0, (current.accZ+dataValues[2]) / 2.0);
+            current.setAcc( (current.accX+dataValues[0]) / 2.0, (current.accY+dataValues[1]) / 2.0, (current.accZ+dataValues[2]) / 2.0 );
         } else {
-            current.setAcc( dataValues[0], dataValues[1], dataValues[2]);
+            current.setAcc( dataValues[0], dataValues[1], dataValues[2] );
         }
 
+        if(events.contains(DataType.ACCELERATION_EVENT)) {
+            // TODO: process data to extract events
+        }
     }
 
     public SensorType getSensorTypeFromDataType(DataType t) {
@@ -141,4 +147,15 @@ public class SensorModule implements ISensorCallback{
                 return null;
         }
     }
+
+    public void addEvent(DataType t) {
+        events.add(t);
+    }
+
+    public void removeEvent(DataType t) {
+        if(events.contains(t)) {
+            events.remove(t);
+        }
+    }
+
 }

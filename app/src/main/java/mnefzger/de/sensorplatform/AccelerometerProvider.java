@@ -34,7 +34,6 @@ public class AccelerometerProvider extends SensorProvider {
         sensorCallback.onAccelerometerData(linear_acceleration);
     }
 
-    @Override
     public void start() {
         super.start();
         if (sensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER) != null){
@@ -44,7 +43,6 @@ public class AccelerometerProvider extends SensorProvider {
         sensorManager.registerListener(this, accSensor, sensorManager.SENSOR_DELAY_NORMAL);
     }
 
-    @Override
     public void stop() {
         super.stop();
     }

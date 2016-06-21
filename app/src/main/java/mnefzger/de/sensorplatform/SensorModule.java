@@ -5,12 +5,13 @@ import android.app.Activity;
 import android.util.Log;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.Timer;
 import java.util.TimerTask;
 
-public class SensorModule implements ISensorCallback{
+public class SensorModule implements ISensorCallback, IEventCallback{
     /**
      * Callback implemented by SensorPlatformController
      */
@@ -43,6 +44,10 @@ public class SensorModule implements ISensorCallback{
      * Indicator if a SensorProvider is currently active
      */
     private boolean sensing = false;
+    private DrivingBehaviourProcessor drivingBehProc;
+    private DriverBehaviourProcessor driverBehProc;
+
+
     /**
      * The size of the dataBuffer
      */
@@ -50,7 +55,7 @@ public class SensorModule implements ISensorCallback{
     /**
      * The onRawData() reporting sampling rate in milliseconds
      */
-    private final int SAMPLINGRATE = 500;
+    private final int SAMPLINGRATE = 200;
 
 
     public SensorModule(SensorPlatformController controller, Activity app) {
@@ -58,9 +63,11 @@ public class SensorModule implements ISensorCallback{
 
         activeProviders = new ArrayList<>();
         accelerometer = new AccelerometerProvider(app, this);
+        drivingBehProc = new DrivingBehaviourProcessor(this);
 
         current = new DataVector();
         dataBuffer = new ArrayList<>();
+        events = new HashSet<DataType>();
     }
 
     public void startSensing(SensorType t) {
@@ -103,7 +110,7 @@ public class SensorModule implements ISensorCallback{
             current.setAcc(last.accX, last.accY, last.accZ);
         }
         /**
-         * only store last 100 DataVectors
+         * only store last BUFFERSIZE DataVectors
          */
         if(dataBuffer.size() > BUFFERSIZE) {
             dataBuffer.remove(0);
@@ -116,6 +123,7 @@ public class SensorModule implements ISensorCallback{
             @Override
             public void run() {
                 current.setTimestamp(System.currentTimeMillis());
+                startEventProcessing();
                 callback.onRawData(current);
                 if(sensing) {
                     aggregateData(ms);
@@ -124,6 +132,22 @@ public class SensorModule implements ISensorCallback{
         }, ms);
     }
 
+    private void startEventProcessing() {
+        if(events.contains(DataType.ACCELERATION_EVENT)) {
+            /**
+             * Only process the previous xx entries of driving data
+             */
+            int lastSamplingIndex = dataBuffer.size() - SAMPLINGRATE / SAMPLINGRATE;
+            lastSamplingIndex = lastSamplingIndex < 0 ? 0 : lastSamplingIndex;
+            drivingBehProc.processData(dataBuffer.subList(lastSamplingIndex, dataBuffer.size()));
+        }
+    }
+
+    /**
+     * This method is the accelerometer callback function.
+     * It receives raw data values and stores them in the current DataVector
+     * @param dataValues: the values sensed by the accelerometer
+     */
     @Override
     public void onAccelerometerData(double[] dataValues) {
         // store average acceleration in current DataVector
@@ -132,12 +156,22 @@ public class SensorModule implements ISensorCallback{
         } else {
             current.setAcc( dataValues[0], dataValues[1], dataValues[2] );
         }
-
-        if(events.contains(DataType.ACCELERATION_EVENT)) {
-            // TODO: process data to extract events
-        }
     }
 
+    /**
+     * Hands the EventVector to the SensorPlatformController
+     * @param v: the EventVector containing the event
+     */
+    @Override
+    public void onEventDetected(EventVector v) {
+        callback.onEventData(v);
+    }
+
+    /**
+     * Helper function to convert a DataType to a SensorType
+     * @param t: the DataType to be converted
+     * @return returns the according SensorType (e.g. SensorType.ACCELERATION)
+     */
     public SensorType getSensorTypeFromDataType(DataType t) {
         switch (t) {
             case ACCELERATION_EVENT:
@@ -157,5 +191,6 @@ public class SensorModule implements ISensorCallback{
             events.remove(t);
         }
     }
+
 
 }

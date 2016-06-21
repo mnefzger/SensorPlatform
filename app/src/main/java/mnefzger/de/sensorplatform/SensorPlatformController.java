@@ -66,12 +66,12 @@ public class SensorPlatformController implements IDataCallback{
 
 
     @Override
-    public void onRawData(DataVector v) {
-        appCallback.onRawData(v);
+    public void onRawData(DataVector dv) {
+        appCallback.onRawData(dv);
     }
 
     @Override
     public void onEventData(EventVector ev) {
-
+        appCallback.onEventData(ev);
     }
 }

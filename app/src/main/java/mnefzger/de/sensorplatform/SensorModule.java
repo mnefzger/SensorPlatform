@@ -5,9 +5,7 @@ import android.app.Activity;
 import android.util.Log;
 
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 import java.util.Timer;
 import java.util.TimerTask;
 
@@ -37,17 +35,17 @@ public class SensorModule implements ISensorCallback, IEventCallback{
      */
     private List<DataVector> dataBuffer;
     /**
-     * A list containing the events that this SensorModule should monitor
-     */
-    private Set<DataType> events;
-    /**
      * Indicator if a SensorProvider is currently active
      */
     private boolean sensing = false;
+    /**
+     * The EventProcessor for Driving Behaviour
+     */
     private DrivingBehaviourProcessor drivingBehProc;
+    /**
+     * The EventProcessor for Driver Behaviour
+     */
     private DriverBehaviourProcessor driverBehProc;
-
-
     /**
      * The size of the dataBuffer
      */
@@ -67,7 +65,6 @@ public class SensorModule implements ISensorCallback, IEventCallback{
 
         current = new DataVector();
         dataBuffer = new ArrayList<>();
-        events = new HashSet<DataType>();
     }
 
     public void startSensing(SensorType t) {
@@ -76,20 +73,27 @@ public class SensorModule implements ISensorCallback, IEventCallback{
             sensing = true;
         }
 
-        if(t == SensorType.ACCELERATION && !activeProviders.contains(accelerometer)) {
+        if(t == SensorType.ACCELEROMETER && !activeProviders.contains(accelerometer)) {
             accelerometer.start();
             activeProviders.add(accelerometer);
         }
     }
 
-
+    /**
+     * This method stops the sensor after checking that no active subscriptions depend on it
+     * @param type: The unsubscribed DataType
+     */
     public void StopSensing(DataType type) {
         SensorType t = getSensorTypeFromDataType(type);
 
-        if(t == SensorType.ACCELERATION) {
-            Log.d("Unsubscribe", t.toString());
-            accelerometer.stop();
-            activeProviders.remove(accelerometer);
+        if(t == SensorType.ACCELEROMETER) {
+            if(!ActiveSubscriptions.usingAccelerometer()) {
+                Log.d("Unsubscribe", t.toString());
+                accelerometer.stop();
+                activeProviders.remove(accelerometer);
+            }
+        } else if(t == SensorType.ALL) {
+            //TODO: loop through sensors, check if sensor is needed, stop it if not
         }
 
         if(activeProviders.size() == 0) {
@@ -124,7 +128,9 @@ public class SensorModule implements ISensorCallback, IEventCallback{
             public void run() {
                 current.setTimestamp(System.currentTimeMillis());
                 startEventProcessing();
-                callback.onRawData(current);
+                if(ActiveSubscriptions.rawActive()){
+                    callback.onRawData(current);
+                }
                 if(sensing) {
                     aggregateData(ms);
                 }
@@ -133,7 +139,7 @@ public class SensorModule implements ISensorCallback, IEventCallback{
     }
 
     private void startEventProcessing() {
-        if(events.contains(DataType.ACCELERATION_EVENT)) {
+        if(ActiveSubscriptions.drivingBehaviourActive()) {
             /**
              * Only process the previous xx entries of driving data
              */
@@ -176,21 +182,12 @@ public class SensorModule implements ISensorCallback, IEventCallback{
         switch (t) {
             case ACCELERATION_EVENT:
             case ACCELERATION_RAW:
-                return SensorType.ACCELERATION;
+                return SensorType.ACCELEROMETER;
+            case RAW:
+                return SensorType.ALL;
             default:
                 return null;
         }
     }
-
-    public void addEvent(DataType t) {
-        events.add(t);
-    }
-
-    public void removeEvent(DataType t) {
-        if(events.contains(t)) {
-            events.remove(t);
-        }
-    }
-
 
 }

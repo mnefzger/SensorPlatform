@@ -2,28 +2,24 @@ package mnefzger.de.sensorplatform;
 
 import android.app.Activity;
 
-import java.util.ArrayList;
 import java.util.Iterator;
-import java.util.List;
 
 public class SensorPlatformController implements IDataCallback{
 
     private SensorModule sm;
     private IDataCallback appCallback;
-    private List<Subscription> activeSubscriptions;
+
 
     public SensorPlatformController(Activity app) {
         this.sm = new SensorModule(this, app);
         this.appCallback = (IDataCallback) app;
-
-        activeSubscriptions = new ArrayList<>();
     }
 
     public boolean subscribeTo(DataType type, boolean log) {
         /**
          * If a subscription with the same type already exists, return
          */
-        Iterator<Subscription> it = activeSubscriptions.iterator();
+        Iterator<Subscription> it = ActiveSubscriptions.get().iterator();
         while(it.hasNext()) {
             if(it.next().getType() == type) {
                 return false;
@@ -34,30 +30,28 @@ public class SensorPlatformController implements IDataCallback{
 
         switch (type) {
             case ACCELERATION_RAW:
-                sm.startSensing(SensorType.ACCELERATION);
+                sm.startSensing(SensorType.ACCELEROMETER);
                 break;
             case ACCELERATION_EVENT:
-                sm.startSensing(SensorType.ACCELERATION);
-                sm.addEvent(type);
+                sm.startSensing(SensorType.ACCELEROMETER);
                 break;
             default:
                 break;
         }
 
-        activeSubscriptions.add(s);
+        ActiveSubscriptions.add(s);
 
         return true;
     }
 
     public boolean unsubscribe(DataType type) {
-        Iterator<Subscription> it = activeSubscriptions.iterator();
+        Iterator<Subscription> it = ActiveSubscriptions.get().iterator();
         while(it.hasNext()) {
-            Subscription temp = it.next();
-            if(temp.getType() == type) {
+            Subscription sub = it.next();
+            if(sub.getType() == type) {
                 it.remove();
-                activeSubscriptions.remove(temp);
+                ActiveSubscriptions.remove(sub);
                 sm.StopSensing(type);
-                sm.removeEvent(type);
                 return true;
             }
         }
@@ -74,4 +68,7 @@ public class SensorPlatformController implements IDataCallback{
     public void onEventData(EventVector ev) {
         appCallback.onEventData(ev);
     }
+
+
+
 }

@@ -2,12 +2,11 @@ package mnefzger.de.sensorplatform;
 
 import java.util.ArrayList;
 import java.util.Iterator;
-import java.util.List;
 
-public class ActiveSubscriptions {
+class ActiveSubscriptions {
     private static ArrayList<Subscription> activeSubscriptions = new ArrayList<>();
 
-    public static List get() {
+    public static ArrayList<Subscription> get() {
         return activeSubscriptions;
     }
 

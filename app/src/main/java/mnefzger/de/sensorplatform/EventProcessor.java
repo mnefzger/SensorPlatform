@@ -5,8 +5,8 @@ import java.util.List;
 
 public abstract class EventProcessor {
 
-    protected List<DataVector> data;
-    protected IEventCallback callback;
+    List<DataVector> data;
+    IEventCallback callback;
 
     public EventProcessor(SensorModule m) {
         callback = m;

@@ -5,13 +5,17 @@ import android.hardware.Sensor;
 
 import java.util.Iterator;
 
+import mnefzger.de.sensorplatform.Logger.LoggingModule;
+
 public class SensorPlatformController implements IDataCallback{
 
     private SensorModule sm;
+    private LoggingModule lm;
     private IDataCallback appCallback;
 
     public SensorPlatformController(Activity app) {
         this.sm = new SensorModule(this, app);
+        this.lm = new LoggingModule(app);
         this.appCallback = (IDataCallback) app;
     }
 
@@ -62,6 +66,9 @@ public class SensorPlatformController implements IDataCallback{
     @Override
     public void onRawData(DataVector dv) {
         appCallback.onRawData(dv);
+        if(ActiveSubscriptions.loggingActive()) {
+            lm.writeRawToCSV(dv);
+        }
     }
 
     @Override

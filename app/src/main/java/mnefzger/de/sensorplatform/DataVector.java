@@ -27,4 +27,8 @@ public class DataVector {
     public String toString() {
         return "time: " + timestamp + ", accX: " + accX + ", accY: " + accY + ", accZ: " + accZ;
     }
+
+    public String toCSVString() {
+        return timestamp + ";" + accX + ";" + accY + ";" + accZ;
+    }
 }

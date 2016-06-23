@@ -15,7 +15,7 @@ public class AccelerometerProvider extends SensorProvider {
     private double[] gravity = new double[3];
     private double[] linear_acceleration = new double[3];
     private ArrayList<double[]> lastValues = new ArrayList<>();
-    private final int WINDOW = 20;
+    private final int WINDOW = 5;
 
     public AccelerometerProvider(Context c, SensorModule m) {
         super(c, m);
@@ -49,7 +49,14 @@ public class AccelerometerProvider extends SensorProvider {
         linear_acceleration[1] = event.values[1] - gravity[1];
         linear_acceleration[2] = event.values[2] - gravity[2];
 
+        /**
+         * report back filtered values
+         */
         reportEMAValues(linear_acceleration);
+        /**
+         * report back unfiltered values (only gravity influence eliminated)
+         */
+        //sensorCallback.onAccelerometerData(linear_acceleration);
     }
 
     private void reportEMAValues(double[] newest) {

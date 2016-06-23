@@ -45,4 +45,18 @@ class ActiveSubscriptions {
         }
         return false;
     }
+
+    public static boolean loggingActive() {
+        Iterator<Subscription> it = activeSubscriptions.iterator();
+        while(it.hasNext()) {
+            Subscription sub = it.next();
+            DataType type = sub.getType();
+            if( (type == DataType.ACCELERATION_RAW ||
+                 type == DataType.RAW) &&
+                 sub.includesLogging()) {
+                return true;
+            }
+        }
+        return false;
+    }
 }

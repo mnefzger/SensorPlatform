@@ -1,13 +1,15 @@
 package mnefzger.de.sensorplatform;
 
-
 import android.app.Activity;
+import android.hardware.Sensor;
 import android.util.Log;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Timer;
 import java.util.TimerTask;
+
+import mnefzger.de.sensorplatform.Utilities.MathFunctions;
 
 public class SensorModule implements ISensorCallback, IEventCallback{
     /**
@@ -33,7 +35,7 @@ public class SensorModule implements ISensorCallback, IEventCallback{
     /**
      * A list containing the last BUFFERSIZE DataVectors
      */
-    private List<DataVector> dataBuffer;
+    private ArrayList<DataVector> dataBuffer;
     /**
      * Indicator if a SensorProvider is currently active
      */
@@ -51,9 +53,9 @@ public class SensorModule implements ISensorCallback, IEventCallback{
      */
     private final int BUFFERSIZE = 100;
     /**
-     * The onRawData() reporting sampling rate in milliseconds
+     * The onRawData() and event detection sampling rate in milliseconds
      */
-    private final int SAMPLINGRATE = 200;
+    private final int SAMPLINGRATE = 50;
 
 
     public SensorModule(SensorPlatformController controller, Activity app) {
@@ -67,13 +69,13 @@ public class SensorModule implements ISensorCallback, IEventCallback{
         dataBuffer = new ArrayList<>();
     }
 
-    public void startSensing(SensorType t) {
+    public void startSensing(int t) {
         if(!sensing) {
             aggregateData(SAMPLINGRATE);
             sensing = true;
         }
 
-        if(t == SensorType.ACCELEROMETER && !activeProviders.contains(accelerometer)) {
+        if(t == Sensor.TYPE_ACCELEROMETER && !activeProviders.contains(accelerometer)) {
             accelerometer.start();
             activeProviders.add(accelerometer);
         }
@@ -84,15 +86,15 @@ public class SensorModule implements ISensorCallback, IEventCallback{
      * @param type: The unsubscribed DataType
      */
     public void StopSensing(DataType type) {
-        SensorType t = getSensorTypeFromDataType(type);
+        int t = getSensorTypeFromDataType(type);
 
-        if(t == SensorType.ACCELEROMETER) {
+        if(t == Sensor.TYPE_ACCELEROMETER) {
             if(!ActiveSubscriptions.usingAccelerometer()) {
-                Log.d("Unsubscribe", t.toString());
+                Log.d("Sensor Stop", "" + Sensor.TYPE_ACCELEROMETER);
                 accelerometer.stop();
                 activeProviders.remove(accelerometer);
             }
-        } else if(t == SensorType.ALL) {
+        } else if(t == Sensor.TYPE_ALL) {
             //TODO: loop through sensors, check if sensor is needed, stop it if not
         }
 
@@ -142,10 +144,11 @@ public class SensorModule implements ISensorCallback, IEventCallback{
         if(ActiveSubscriptions.drivingBehaviourActive()) {
             /**
              * Only process the previous xx entries of driving data
+             * e.g. SAMPLINGRATE = 50ms, then 1000ms/50ms  = 20 entries
              */
             int lastSamplingIndex = dataBuffer.size() - 1000 / SAMPLINGRATE;
             lastSamplingIndex = lastSamplingIndex < 0 ? 0 : lastSamplingIndex;
-            drivingBehProc.processData(dataBuffer.subList(lastSamplingIndex, dataBuffer.size()));
+            drivingBehProc.processData( dataBuffer.subList(lastSamplingIndex, dataBuffer.size()) );
         }
     }
 
@@ -156,12 +159,7 @@ public class SensorModule implements ISensorCallback, IEventCallback{
      */
     @Override
     public void onAccelerometerData(double[] dataValues) {
-        // store average acceleration in current DataVector
-        if(dataBuffer.size() > 0) {
-            current.setAcc( (current.accX+dataValues[0]) / 2.0, (current.accY+dataValues[1]) / 2.0, (current.accZ+dataValues[2]) / 2.0 );
-        } else {
-            current.setAcc( dataValues[0], dataValues[1], dataValues[2] );
-        }
+        current.setAcc( dataValues[0], dataValues[1], dataValues[2] );
     }
 
     /**
@@ -174,19 +172,19 @@ public class SensorModule implements ISensorCallback, IEventCallback{
     }
 
     /**
-     * Helper function to convert a DataType to a SensorType
+     * Helper function to convert a DataType to a Sensor
      * @param t: the DataType to be converted
-     * @return returns the according SensorType (e.g. SensorType.ACCELERATION)
+     * @return returns the according Sensor Type (e.g. Sensor.TYPE_ACCELEROMETER)
      */
-    public SensorType getSensorTypeFromDataType(DataType t) {
+    public int getSensorTypeFromDataType(DataType t) {
         switch (t) {
             case ACCELERATION_EVENT:
             case ACCELERATION_RAW:
-                return SensorType.ACCELEROMETER;
+                return Sensor.TYPE_ACCELEROMETER;
             case RAW:
-                return SensorType.ALL;
+                return Sensor.TYPE_ALL;
             default:
-                return null;
+                return -1;
         }
     }
 

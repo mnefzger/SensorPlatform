@@ -15,17 +15,18 @@ public class MainActivity extends AppCompatActivity implements IDataCallback{
 
         sPC = new SensorPlatformController(this);
         sPC.subscribeTo(DataType.ACCELERATION_EVENT, false);
-
+        sPC.subscribeTo(DataType.ACCELERATION_RAW, false);
         /**
          * Mock unsubscribe, to be removed
 
         Handler handler = new Handler();
         handler.postDelayed(new Runnable() {
             public void run() {
-                sPC.unsubscribe(DataType.ACCELERATION_RAW);
+                sPC.unsubscribe(DataType.ACCELERATION_EVENT);
             }
         }, 5000);
          */
+
     }
 
 

@@ -11,6 +11,8 @@ public class DrivingBehaviourProcessor extends EventProcessor {
         super(m);
     }
 
+    private final double ACC_THRESHOLD = 0.75;
+
     public void processData(List<DataVector> data) {
         super.processData(data);
         checkForHardAcc();
@@ -27,11 +29,11 @@ public class DrivingBehaviourProcessor extends EventProcessor {
 
         avg = avg/data.size();
 
-        if(avg > 1.0) {
+        if(avg > ACC_THRESHOLD) {
             EventVector ev = new EventVector(data.get(0).timestamp, "Hard brake", avg);
             callback.onEventDetected(ev);
         }
-        if(avg < -1.0) {
+        if(avg < -ACC_THRESHOLD) {
             EventVector ev = new EventVector(data.get(0).timestamp, "Hard acceleration", avg);
             callback.onEventDetected(ev);
         }

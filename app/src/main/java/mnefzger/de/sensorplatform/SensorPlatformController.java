@@ -1,6 +1,7 @@
 package mnefzger.de.sensorplatform;
 
 import android.app.Activity;
+import android.hardware.Sensor;
 
 import java.util.Iterator;
 
@@ -8,7 +9,6 @@ public class SensorPlatformController implements IDataCallback{
 
     private SensorModule sm;
     private IDataCallback appCallback;
-
 
     public SensorPlatformController(Activity app) {
         this.sm = new SensorModule(this, app);
@@ -30,10 +30,10 @@ public class SensorPlatformController implements IDataCallback{
 
         switch (type) {
             case ACCELERATION_RAW:
-                sm.startSensing(SensorType.ACCELEROMETER);
+                sm.startSensing(Sensor.TYPE_ACCELEROMETER);
                 break;
             case ACCELERATION_EVENT:
-                sm.startSensing(SensorType.ACCELEROMETER);
+                sm.startSensing(Sensor.TYPE_ACCELEROMETER);
                 break;
             default:
                 break;

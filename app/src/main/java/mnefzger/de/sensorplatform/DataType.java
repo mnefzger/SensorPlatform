@@ -13,5 +13,13 @@ public enum DataType {
     /**
      *
      */
-    ACCELERATION_EVENT
+    ACCELERATION_EVENT,
+    /**
+     * includes lat, lon, current speed
+     */
+    LOCATION_RAW,
+    /**
+     * includes events of speeding
+     */
+    LOCATION_EVENT
 }

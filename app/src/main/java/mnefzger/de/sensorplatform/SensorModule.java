@@ -2,6 +2,7 @@ package mnefzger.de.sensorplatform;
 
 import android.app.Activity;
 import android.hardware.Sensor;
+import android.location.Location;
 import android.util.Log;
 
 import java.util.ArrayList;
@@ -25,9 +26,13 @@ public class SensorModule implements ISensorCallback, IEventCallback{
      */
     private SensorProvider orientation;
     /**
+     * PositionProvider to collect geolocation
+     */
+    private PositionProvider location;
+    /**
      * List of all currently running SensorProviders
      */
-    private List<SensorProvider> activeProviders;
+    private List<DataProvider> activeProviders;
     /**
      * Vector containing the most recent raw data
      */
@@ -57,27 +62,37 @@ public class SensorModule implements ISensorCallback, IEventCallback{
      */
     private final int SAMPLINGRATE = 20;
 
+    private final int GPS_IDENTIFIER = 100;
+
 
     public SensorModule(SensorPlatformController controller, Activity app) {
         callback = (IDataCallback)controller;
 
         activeProviders = new ArrayList<>();
         accelerometer = new AccelerometerProvider(app, this);
+        location = new PositionProvider(app, this);
         drivingBehProc = new DrivingBehaviourProcessor(this);
 
         current = new DataVector();
         dataBuffer = new ArrayList<>();
     }
 
-    public void startSensing(int t) {
+    public void startSensing(DataType type) {
         if(!sensing) {
             aggregateData(SAMPLINGRATE);
             sensing = true;
         }
 
+        int t = getSensorTypeFromDataType(type);
+
         if(t == Sensor.TYPE_ACCELEROMETER && !activeProviders.contains(accelerometer)) {
             accelerometer.start();
             activeProviders.add(accelerometer);
+        }
+
+        if(t == GPS_IDENTIFIER && !activeProviders.contains(location)) {
+            location.start();
+            activeProviders.add(location);
         }
     }
 
@@ -167,6 +182,12 @@ public class SensorModule implements ISensorCallback, IEventCallback{
         }
     }
 
+    @Override
+    public void onLocationData(Location location, double speed) {
+        current.setLocation(location);
+        current.setSpeed(speed);
+    }
+
     /**
      * Hands the EventVector to the SensorPlatformController
      * @param v: the EventVector containing the event
@@ -186,6 +207,9 @@ public class SensorModule implements ISensorCallback, IEventCallback{
             case ACCELERATION_EVENT:
             case ACCELERATION_RAW:
                 return Sensor.TYPE_ACCELEROMETER;
+            case LOCATION_RAW:
+            case LOCATION_EVENT:
+                return GPS_IDENTIFIER;
             case RAW:
                 return Sensor.TYPE_ALL;
             default:

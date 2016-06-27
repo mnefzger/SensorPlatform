@@ -19,7 +19,7 @@ public class SensorPlatformController implements IDataCallback{
         this.appCallback = (IDataCallback) app;
     }
 
-    public boolean subscribeTo(DataType type, boolean log) {
+    public boolean subscribeTo(DataType type) {
         /**
          * If a subscription with the same type already exists, return
          */
@@ -30,18 +30,20 @@ public class SensorPlatformController implements IDataCallback{
             }
         }
 
-        Subscription s = new Subscription(type, log);
+        Subscription s = new Subscription(type);
 
-        switch (type) {
+        /*switch (type) {
             case ACCELERATION_RAW:
-                sm.startSensing(Sensor.TYPE_ACCELEROMETER);
+                sm.startSensing(type);
                 break;
             case ACCELERATION_EVENT:
-                sm.startSensing(Sensor.TYPE_ACCELEROMETER);
+                sm.startSensing(type);
                 break;
+
             default:
                 break;
-        }
+        }*/
+        sm.startSensing(type);
 
         ActiveSubscriptions.add(s);
 
@@ -62,14 +64,23 @@ public class SensorPlatformController implements IDataCallback{
         return false;
     }
 
+    public void logRawData(boolean log) {
+        ActiveSubscriptions.setLogRaw(log);
+    }
+
+    public void logEventData(boolean log) {
+        ActiveSubscriptions.setLogEvent(log);
+    }
 
     @Override
     public void onRawData(DataVector dv) {
         appCallback.onRawData(dv);
-        if(ActiveSubscriptions.loggingActive()) {
+        if(ActiveSubscriptions.rawLoggingActive()) {
             lm.writeRawToCSV(dv);
         }
     }
+
+
 
     @Override
     public void onEventData(EventVector ev) {

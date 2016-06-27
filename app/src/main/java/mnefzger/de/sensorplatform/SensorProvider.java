@@ -6,7 +6,7 @@ import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
 
-public abstract class SensorProvider implements SensorEventListener{
+public abstract class SensorProvider extends DataProvider implements SensorEventListener{
     private Context context;
     protected ISensorCallback sensorCallback;
 
@@ -29,10 +29,11 @@ public abstract class SensorProvider implements SensorEventListener{
     }
 
     public void start() {
-
+        super.start();
     }
 
     public  void stop() {
+        super.stop();
         sensorManager.unregisterListener(this);
     }
 }

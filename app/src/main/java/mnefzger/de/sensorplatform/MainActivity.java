@@ -14,8 +14,12 @@ public class MainActivity extends AppCompatActivity implements IDataCallback{
         setContentView(R.layout.activity_main);
 
         sPC = new SensorPlatformController(this);
-        sPC.subscribeTo(DataType.ACCELERATION_EVENT, false);
-        sPC.subscribeTo(DataType.ACCELERATION_RAW, true);
+        sPC.subscribeTo(DataType.ACCELERATION_EVENT);
+        sPC.subscribeTo(DataType.ACCELERATION_RAW);
+        sPC.subscribeTo(DataType.LOCATION_RAW);
+
+        sPC.logRawData(false);
+        sPC.logEventData(false);
         /**
          * Mock unsubscribe, to be removed
 
@@ -32,7 +36,7 @@ public class MainActivity extends AppCompatActivity implements IDataCallback{
 
     @Override
     public void onRawData(DataVector v) {
-        Log.d("RawData @ App  ", v.toString());
+        //Log.d("RawData @ App  ", v.toString());
     }
 
     @Override

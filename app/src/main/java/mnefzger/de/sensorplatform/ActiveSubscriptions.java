@@ -5,6 +5,8 @@ import java.util.Iterator;
 
 class ActiveSubscriptions {
     private static ArrayList<Subscription> activeSubscriptions = new ArrayList<>();
+    private static boolean logRaw = false;
+    private static boolean logEvent = false;
 
     public static ArrayList<Subscription> get() {
         return activeSubscriptions;
@@ -18,6 +20,22 @@ class ActiveSubscriptions {
         if(activeSubscriptions.contains(s)) {
             activeSubscriptions.remove(s);
         }
+    }
+
+    public static void setLogRaw(boolean log) {
+        logRaw = log;
+    }
+
+    public static void setLogEvent(boolean log) {
+        logEvent = log;
+    }
+
+    public static boolean rawLoggingActive() {
+        return logRaw;
+    }
+
+    public static boolean eventLoggingActive() {
+        return logEvent;
     }
 
     public static boolean rawActive() {
@@ -41,20 +59,6 @@ class ActiveSubscriptions {
                 if(type == t) {
                     return true;
                 }
-            }
-        }
-        return false;
-    }
-
-    public static boolean loggingActive() {
-        Iterator<Subscription> it = activeSubscriptions.iterator();
-        while(it.hasNext()) {
-            Subscription sub = it.next();
-            DataType type = sub.getType();
-            if( (type == DataType.ACCELERATION_RAW ||
-                 type == DataType.RAW) &&
-                 sub.includesLogging()) {
-                return true;
             }
         }
         return false;

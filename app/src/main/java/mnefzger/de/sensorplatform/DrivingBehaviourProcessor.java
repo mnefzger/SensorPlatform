@@ -28,6 +28,7 @@ public class DrivingBehaviourProcessor extends EventProcessor {
         }
 
         avg = avg/data.size();
+        Log.d("AVG ", ""+avg);
 
         if(avg > ACC_THRESHOLD) {
             EventVector ev = new EventVector(data.get(0).timestamp, "Hard brake", avg);

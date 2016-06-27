@@ -55,7 +55,7 @@ public class SensorModule implements ISensorCallback, IEventCallback{
     /**
      * The onRawData() and event detection sampling rate in milliseconds
      */
-    private final int SAMPLINGRATE = 50;
+    private final int SAMPLINGRATE = 20;
 
 
     public SensorModule(SensorPlatformController controller, Activity app) {
@@ -146,7 +146,7 @@ public class SensorModule implements ISensorCallback, IEventCallback{
              * Only process the previous xx entries of driving data
              * e.g. SAMPLINGRATE = 50ms, then 1000ms/50ms  = 20 entries
              */
-            int lastSamplingIndex = dataBuffer.size() - 1000 / SAMPLINGRATE;
+            int lastSamplingIndex = dataBuffer.size() - 500 / SAMPLINGRATE;
             lastSamplingIndex = lastSamplingIndex < 0 ? 0 : lastSamplingIndex;
             drivingBehProc.processData( dataBuffer.subList(lastSamplingIndex, dataBuffer.size()) );
         }
@@ -159,7 +159,12 @@ public class SensorModule implements ISensorCallback, IEventCallback{
      */
     @Override
     public void onAccelerometerData(double[] dataValues) {
-        current.setAcc( dataValues[0], dataValues[1], dataValues[2] );
+        // store average acceleration in current DataVector
+        if(dataBuffer.size() > 0) {
+            current.setAcc( (current.accX+dataValues[0]) / 2.0, (current.accY+dataValues[1]) / 2.0, (current.accZ+dataValues[2]) / 2.0 );
+        } else {
+            current.setAcc( dataValues[0], dataValues[1], dataValues[2] );
+        }
     }
 
     /**

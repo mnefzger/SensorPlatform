@@ -4,6 +4,8 @@ import android.content.Context;
 import android.hardware.Sensor;
 import android.hardware.SensorEvent;
 import android.hardware.SensorManager;
+import android.os.Debug;
+import android.util.Log;
 
 import java.util.ArrayList;
 
@@ -16,6 +18,16 @@ public class AccelerometerProvider extends SensorProvider {
     private double[] linear_acceleration = new double[3];
     private ArrayList<double[]> lastValues = new ArrayList<>();
     private final int WINDOW = 5;
+
+    /**
+     * for accelerometer-gravity low-pass filter
+     */
+    private float timeConstant = 0.18f;
+    private float alpha = 0.5f;
+    private float dt = 0;
+    private float timestamp = System.nanoTime();
+    private float timestampOld = System.nanoTime();
+    private int count = 0;
 
     public AccelerometerProvider(Context c, SensorModule m) {
         super(c, m);
@@ -36,8 +48,13 @@ public class AccelerometerProvider extends SensorProvider {
 
     @Override
     public void onSensorChanged(SensorEvent event) {
-        // alpha value taken from Google Dev Docs
-        final float alpha = 0.8f;
+        timestamp = System.nanoTime();
+        // Find the sample period (between updates).
+        // Convert from nanoseconds to seconds
+        dt = 1 / (count / ((timestamp - timestampOld) / 1000000000.0f));
+        count ++;
+
+        alpha = timeConstant / (timeConstant + dt);
 
         // Isolate the force of gravity with the low-pass filter.
         gravity[0] = alpha * gravity[0] + (1 - alpha) * event.values[0];
@@ -49,8 +66,9 @@ public class AccelerometerProvider extends SensorProvider {
         linear_acceleration[1] = event.values[1] - gravity[1];
         linear_acceleration[2] = event.values[2] - gravity[2];
 
+
         /**
-         * report back filtered values
+         * report back smoothed values
          */
         reportEMAValues(linear_acceleration);
         /**

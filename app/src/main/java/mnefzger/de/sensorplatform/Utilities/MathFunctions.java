@@ -58,7 +58,7 @@ public class MathFunctions {
                 * Math.cos(Math.toRadians(lat2)) * Math.sin(dLon / 2)
                 * Math.sin(dLon / 2);
         double c = 2 * Math.asin(Math.sqrt(a));
-        double distanceInMeters = Math.round(6371000 * c);
+        double distanceInMeters = 6371000 * c;
         return distanceInMeters;
     }
 

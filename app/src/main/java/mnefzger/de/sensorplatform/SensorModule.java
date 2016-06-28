@@ -60,8 +60,10 @@ public class SensorModule implements ISensorCallback, IEventCallback{
     /**
      * The onRawData() and event detection sampling rate in milliseconds
      */
-    private final int SAMPLINGRATE = 20;
-
+    private final int SAMPLINGRATE = 250;
+    /**
+     * int identifier for GPS Sensor
+     */
     private final int GPS_IDENTIFIER = 100;
 
 
@@ -129,6 +131,7 @@ public class SensorModule implements ISensorCallback, IEventCallback{
         if(last != null) {
             dataBuffer.add(last);
             current.setAcc(last.accX, last.accY, last.accZ);
+            current.setSpeed(last.speed);
         }
         /**
          * only store last BUFFERSIZE DataVectors

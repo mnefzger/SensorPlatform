@@ -45,6 +45,10 @@ public class PositionProvider extends DataProvider implements LocationListener{
     }
 
     public void stop() {
+        int permission = ActivityCompat.checkSelfPermission(context, Manifest.permission.ACCESS_FINE_LOCATION);
+        if(permission == PackageManager.PERMISSION_GRANTED) {
+            locationManager.removeUpdates(this);
+        }
         super.stop();
     }
 
@@ -74,12 +78,12 @@ public class PositionProvider extends DataProvider implements LocationListener{
 
     @Override
     public void onLocationChanged(Location location) {
-        Log.v("LOCATION", "IN ON LOCATION CHANGE, lat=" + location.getLatitude());
-
         double speed = 0;
         double currentTime = System.currentTimeMillis();
+        
         if(lastLocation != null) {
             double distance = MathFunctions.calculateDistance(location.getLatitude(), location.getLongitude(), lastLocation.getLatitude(), lastLocation.getLongitude());
+            // time between updates in seconds
             double timeDelta = (currentTime-lastTimestamp) / 1000.0;
             // speed in m/s
             speed = distance / timeDelta;

@@ -32,17 +32,6 @@ public class SensorPlatformController implements IDataCallback{
 
         Subscription s = new Subscription(type);
 
-        /*switch (type) {
-            case ACCELERATION_RAW:
-                sm.startSensing(type);
-                break;
-            case ACCELERATION_EVENT:
-                sm.startSensing(type);
-                break;
-
-            default:
-                break;
-        }*/
         sm.startSensing(type);
 
         ActiveSubscriptions.add(s);

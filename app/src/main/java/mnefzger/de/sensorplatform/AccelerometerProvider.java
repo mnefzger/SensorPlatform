@@ -77,6 +77,11 @@ public class AccelerometerProvider extends SensorProvider {
         //sensorCallback.onAccelerometerData(linear_acceleration);
     }
 
+    /**
+     * calculates the exponentially moving average of the last WINDOW values,
+     * then notifies the callback function
+     * @param newest The most recent accelerometer reading
+     */
     private void reportEMAValues(double[] newest) {
         lastValues.add(newest);
         if(lastValues.size() > WINDOW) {

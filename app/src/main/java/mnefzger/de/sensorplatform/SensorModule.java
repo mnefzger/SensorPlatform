@@ -60,7 +60,7 @@ public class SensorModule implements ISensorCallback, IEventCallback{
     /**
      * The onRawData() and event detection sampling rate in milliseconds
      */
-    private final int SAMPLINGRATE = 250;
+    private final int SAMPLINGRATE = 1000;
     /**
      * int identifier for GPS Sensor
      */
@@ -111,6 +111,9 @@ public class SensorModule implements ISensorCallback, IEventCallback{
                 accelerometer.stop();
                 activeProviders.remove(accelerometer);
             }
+        } else if(t == GPS_IDENTIFIER) {
+            location.stop();
+            activeProviders.remove(location);
         } else if(t == Sensor.TYPE_ALL) {
             //TODO: loop through sensors, check if sensor is needed, stop it if not
         }

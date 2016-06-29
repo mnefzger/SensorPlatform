@@ -18,8 +18,9 @@ public class MainActivity extends AppCompatActivity implements IDataCallback{
         sPC.subscribeTo(DataType.ACCELERATION_RAW);
         sPC.subscribeTo(DataType.LOCATION_RAW);
 
-        sPC.logRawData(false);
+        sPC.logRawData(true);
         sPC.logEventData(false);
+
         /**
          * Mock unsubscribe, to be removed
 

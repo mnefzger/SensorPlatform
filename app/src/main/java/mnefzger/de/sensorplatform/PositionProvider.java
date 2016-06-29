@@ -9,11 +9,8 @@ import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
 import android.os.Bundle;
-import android.os.Debug;
 import android.support.v4.app.ActivityCompat;
 import android.util.Log;
-
-import java.util.ArrayList;
 
 import mnefzger.de.sensorplatform.Utilities.MathFunctions;
 
@@ -40,7 +37,6 @@ public class PositionProvider extends DataProvider implements LocationListener{
         if(permission == PackageManager.PERMISSION_GRANTED) {
             locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, LOCATION_REFRESH_TIME,
                     LOCATION_REFRESH_DISTANCE, this);
-            //locationManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, 0,0,this);
         }
     }
 
@@ -52,35 +48,11 @@ public class PositionProvider extends DataProvider implements LocationListener{
         super.stop();
     }
 
-
-    private static final int REQUEST_LOCATION = 1;
-    private static String[] PERMISSIONS_LOCATION = {
-            Manifest.permission.ACCESS_FINE_LOCATION,
-            Manifest.permission.ACCESS_COARSE_LOCATION
-    };
-    /**
-     * Checks if the app has permission to write to device storage
-     *
-     * If the app does not has permission then the user will be prompted to grant permissions
-     *
-     * @param activity
-     */
-    public static void verifyStoragePermissions(Activity activity) {
-        // Check if we have write permission
-        int permission = ActivityCompat.checkSelfPermission(activity, Manifest.permission.ACCESS_FINE_LOCATION);
-
-        if (permission != PackageManager.PERMISSION_GRANTED) {
-            // We don't have permission so prompt the user
-            ActivityCompat.requestPermissions(activity,
-                    PERMISSIONS_LOCATION, REQUEST_LOCATION);
-        }
-    }
-
     @Override
     public void onLocationChanged(Location location) {
         double speed = 0;
         double currentTime = System.currentTimeMillis();
-        
+
         if(lastLocation != null) {
             double distance = MathFunctions.calculateDistance(location.getLatitude(), location.getLongitude(), lastLocation.getLatitude(), lastLocation.getLongitude());
             // time between updates in seconds
@@ -110,6 +82,27 @@ public class PositionProvider extends DataProvider implements LocationListener{
     @Override
     public void onProviderDisabled(String provider) {
 
+    }
+
+    private static final int REQUEST_LOCATION = 1;
+    private static String[] PERMISSIONS_LOCATION = {
+            Manifest.permission.ACCESS_FINE_LOCATION,
+            Manifest.permission.ACCESS_COARSE_LOCATION
+    };
+    /**
+     * Checks if the app has permission to write to device storage
+     * If the app does not has permission then the user will be prompted to grant permissions
+     * @param activity
+     */
+    public static void verifyStoragePermissions(Activity activity) {
+        // Check if we have write permission
+        int permission = ActivityCompat.checkSelfPermission(activity, Manifest.permission.ACCESS_FINE_LOCATION);
+
+        if (permission != PackageManager.PERMISSION_GRANTED) {
+            // We don't have permission so prompt the user
+            ActivityCompat.requestPermissions(activity,
+                    PERMISSIONS_LOCATION, REQUEST_LOCATION);
+        }
     }
 
 

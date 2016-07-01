@@ -21,5 +21,9 @@ public enum DataType {
     /**
      * includes events of speeding
      */
-    LOCATION_EVENT
+    LOCATION_EVENT,
+    /**
+     *
+     */
+    CAMERA_RAW
 }

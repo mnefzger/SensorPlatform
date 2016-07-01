@@ -25,7 +25,7 @@ public class PositionProvider extends DataProvider implements LocationListener{
     private final int LOCATION_REFRESH_DISTANCE = 0;
 
     public PositionProvider(Activity app, SensorModule m) {
-        verifyStoragePermissions(app);
+        verifyLocationPermissions(app);
         context = app;
         callback = (ISensorCallback) m;
     }
@@ -94,7 +94,7 @@ public class PositionProvider extends DataProvider implements LocationListener{
      * If the app does not has permission then the user will be prompted to grant permissions
      * @param activity
      */
-    public static void verifyStoragePermissions(Activity activity) {
+    public static void verifyLocationPermissions(Activity activity) {
         // Check if we have write permission
         int permission = ActivityCompat.checkSelfPermission(activity, Manifest.permission.ACCESS_FINE_LOCATION);
 

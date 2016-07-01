@@ -11,11 +11,14 @@ public class SensorPlatformController implements IDataCallback{
 
     private SensorModule sm;
     private LoggingModule lm;
+    private ImageModule im;
     private IDataCallback appCallback;
 
     public SensorPlatformController(Activity app) {
         this.sm = new SensorModule(this, app);
         this.lm = new LoggingModule(app);
+
+        this.im = new ImageModule(this, app);
         this.appCallback = (IDataCallback) app;
     }
 
@@ -32,7 +35,11 @@ public class SensorPlatformController implements IDataCallback{
 
         Subscription s = new Subscription(type);
 
-        sm.startSensing(type);
+        if(type == DataType.CAMERA_RAW) {
+            im.startCapture();
+        } else {
+            sm.startSensing(type);
+        }
 
         ActiveSubscriptions.add(s);
 
@@ -76,6 +83,10 @@ public class SensorPlatformController implements IDataCallback{
         appCallback.onEventData(ev);
     }
 
+    @Override
+    public void onImageData() {
+
+    }
 
 
 }

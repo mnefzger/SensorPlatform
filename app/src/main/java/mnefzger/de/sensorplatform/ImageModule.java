@@ -5,6 +5,8 @@ import android.app.Activity;
 import android.content.Context;
 import android.content.pm.PackageManager;
 import android.graphics.ImageFormat;
+import android.graphics.Rect;
+import android.graphics.YuvImage;
 import android.hardware.camera2.CameraAccessException;
 import android.hardware.camera2.CameraCaptureSession;
 import android.hardware.camera2.CameraDevice;
@@ -17,6 +19,7 @@ import android.os.HandlerThread;
 import android.support.v4.app.ActivityCompat;
 import android.util.Log;
 
+import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -40,7 +43,7 @@ public class ImageModule implements IEventCallback{
     private HandlerThread mBackgroundThread;
     private Handler mBackgroundHandler;
 
-    private final String TAG = "CAMERA";
+    private final String TAG = "CAMERA_SENSORPLATFORM";
 
     public ImageModule(SensorPlatformController controller, Activity app) {
         verifyCameraPermissions(app);
@@ -68,13 +71,13 @@ public class ImageModule implements IEventCallback{
             if(permission == PackageManager.PERMISSION_GRANTED) {
                 if(id == "0") {
                     cameraManager.openCamera(id, backCameraStateCallback, null );
-                    imageReader_front = ImageReader.newInstance(240, 320, ImageFormat.JPEG, 15);
-                    imageReader_front.setOnImageAvailableListener(onImageAvailableListener, mBackgroundHandler);
+                    imageReader_back = ImageReader.newInstance(480, 640, ImageFormat.YUV_420_888, 15);
+                    imageReader_back.setOnImageAvailableListener(onImageAvailableListener, mBackgroundHandler);
                 }
                 if(id == "1") {
                     cameraManager.openCamera(id, frontCameraStateCallback, null );
-                    imageReader_back = ImageReader.newInstance(240, 320, ImageFormat.JPEG, 15);
-                    imageReader_back.setOnImageAvailableListener(onImageAvailableListener, mBackgroundHandler);
+                    imageReader_front = ImageReader.newInstance(480, 640, ImageFormat.YUV_420_888, 15);
+                    imageReader_front.setOnImageAvailableListener(onImageAvailableListener, mBackgroundHandler);
                 }
             }
         } catch (CameraAccessException e) {
@@ -160,10 +163,17 @@ public class ImageModule implements IEventCallback{
         public void onConfigureFailed(CameraCaptureSession session) {}
     };
 
+    private long now;
+    private long delta = 0;
+    private long prevTime = 0;
     private ImageReader.OnImageAvailableListener onImageAvailableListener = new ImageReader.OnImageAvailableListener() {
         @Override
         public void onImageAvailable(ImageReader reader){
             mBackgroundHandler.post(new ImageSaver(reader.acquireNextImage()));
+            now = System.currentTimeMillis();
+            delta = now - prevTime;
+            Log.i("IO_IMAGE", "deltaTime:" + delta);
+            prevTime = now;
         }
     };
 
@@ -205,7 +215,6 @@ public class ImageModule implements IEventCallback{
         public ImageSaver(Image image) {
             mImage = image;
             mFile = new File(filePath + File.separator + fileName);
-            Log.i("IO_IMAGE", "writing to:" + filePath);
             try {
                 File folder = new File(filePath);
                 if (!folder.exists()) {
@@ -221,13 +230,29 @@ public class ImageModule implements IEventCallback{
 
         @Override
         public void run() {
-            ByteBuffer buffer = mImage.getPlanes()[0].getBuffer();
-            byte[] bytes = new byte[buffer.remaining()];
-            buffer.get(bytes);
+            // get YUV buffer data
+            ByteBuffer buffer0 = mImage.getPlanes()[0].getBuffer();
+            ByteBuffer buffer2 = mImage.getPlanes()[2].getBuffer();
+            int buffer0_size = buffer0.remaining();
+            int buffer2_size = buffer2.remaining();
+
+            byte[] bytes = new byte[buffer0_size + buffer2_size];
+            buffer0.get(bytes, 0, buffer0_size);
+            buffer2.get(bytes, buffer0_size, buffer2_size);
+
+            // Convert to JPG
+            YuvImage yuvimage = new YuvImage(bytes, ImageFormat.NV21, mImage.getWidth(), mImage.getHeight(), null);
+
+            ByteArrayOutputStream baos = new ByteArrayOutputStream();
+
+            yuvimage.compressToJpeg(new Rect(0, 0, yuvimage.getWidth(),yuvimage.getHeight()), 100, baos);
+
+            byte[] jpgdata = baos.toByteArray();
+
             FileOutputStream output = null;
             try {
                 output = new FileOutputStream(mFile);
-                output.write(bytes);
+                output.write(jpgdata);
             } catch (IOException e) {
                 e.printStackTrace();
             } finally {
@@ -243,6 +268,7 @@ public class ImageModule implements IEventCallback{
         }
 
     }
+
 
     /**
      * Starts a background thread and its {@link Handler}.
@@ -266,6 +292,8 @@ public class ImageModule implements IEventCallback{
             e.printStackTrace();
         }
     }
+
+
 
     private static final int REQUEST_CAMERA = 1;
     private static String[] PERMISSIONS_CAMERA = {

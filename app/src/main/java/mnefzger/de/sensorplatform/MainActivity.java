@@ -1,9 +1,7 @@
 package mnefzger.de.sensorplatform;
 
-import android.database.ContentObserver;
-import android.os.Handler;
-import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 
 

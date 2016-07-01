@@ -3,42 +3,26 @@ package mnefzger.de.sensorplatform;
 import android.Manifest;
 import android.app.Activity;
 import android.content.Context;
-import android.content.Intent;
 import android.content.pm.PackageManager;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.graphics.ImageFormat;
-import android.graphics.PixelFormat;
-import android.graphics.Rect;
-import android.graphics.YuvImage;
-import android.graphics.drawable.BitmapDrawable;
 import android.hardware.camera2.CameraAccessException;
 import android.hardware.camera2.CameraCaptureSession;
-import android.hardware.camera2.CameraCharacteristics;
 import android.hardware.camera2.CameraDevice;
 import android.hardware.camera2.CameraManager;
-import android.hardware.camera2.CameraMetadata;
 import android.hardware.camera2.CaptureRequest;
-import android.hardware.camera2.CaptureResult;
-import android.hardware.camera2.TotalCaptureResult;
-import android.hardware.camera2.params.StreamConfigurationMap;
 import android.media.Image;
 import android.media.ImageReader;
-import android.os.Environment;
 import android.os.Handler;
 import android.os.HandlerThread;
-import android.os.IBinder;
 import android.support.v4.app.ActivityCompat;
 import android.util.Log;
 
-import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.nio.Buffer;
 import java.nio.ByteBuffer;
 import java.util.Arrays;
-import java.util.Random;
+
 
 
 public class ImageModule implements IEventCallback{
@@ -84,12 +68,12 @@ public class ImageModule implements IEventCallback{
             if(permission == PackageManager.PERMISSION_GRANTED) {
                 if(id == "0") {
                     cameraManager.openCamera(id, backCameraStateCallback, null );
-                    imageReader_front = ImageReader.newInstance(240, 320, ImageFormat.JPEG, 5);
+                    imageReader_front = ImageReader.newInstance(240, 320, ImageFormat.JPEG, 15);
                     imageReader_front.setOnImageAvailableListener(onImageAvailableListener, mBackgroundHandler);
                 }
                 if(id == "1") {
                     cameraManager.openCamera(id, frontCameraStateCallback, null );
-                    imageReader_back = ImageReader.newInstance(240, 320, ImageFormat.JPEG, 5);
+                    imageReader_back = ImageReader.newInstance(240, 320, ImageFormat.JPEG, 15);
                     imageReader_back.setOnImageAvailableListener(onImageAvailableListener, mBackgroundHandler);
                 }
             }
@@ -115,7 +99,9 @@ public class ImageModule implements IEventCallback{
         }
 
         @Override
-        public void onDisconnected(CameraDevice camera) {}
+        public void onDisconnected(CameraDevice camera) {
+            stopCapture();
+        }
 
         @Override
         public void onError(CameraDevice camera, int error) {}
@@ -136,7 +122,9 @@ public class ImageModule implements IEventCallback{
         }
 
         @Override
-        public void onDisconnected(CameraDevice camera) {}
+        public void onDisconnected(CameraDevice camera) {
+            stopCapture();
+        }
 
         @Override
         public void onError(CameraDevice camera, int error) {}
@@ -189,9 +177,6 @@ public class ImageModule implements IEventCallback{
             return null;
         }
     }
-
-
-
 
 
     @Override

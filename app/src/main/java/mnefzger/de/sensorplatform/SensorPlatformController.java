@@ -1,7 +1,6 @@
 package mnefzger.de.sensorplatform;
 
 import android.app.Activity;
-import android.hardware.Sensor;
 
 import java.util.Iterator;
 

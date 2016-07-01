@@ -1,11 +1,7 @@
 package mnefzger.de.sensorplatform.Utilities;
 
-import android.util.Log;
-
 import java.util.Iterator;
 import java.util.List;
-
-import mnefzger.de.sensorplatform.DataVector;
 
 public class MathFunctions {
 

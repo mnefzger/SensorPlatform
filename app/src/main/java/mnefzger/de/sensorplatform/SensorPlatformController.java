@@ -76,7 +76,6 @@ public class SensorPlatformController implements IDataCallback{
     }
 
 
-
     @Override
     public void onEventData(EventVector ev) {
         appCallback.onEventData(ev);

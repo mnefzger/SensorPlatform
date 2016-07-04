@@ -1,5 +1,7 @@
 package mnefzger.de.sensorplatform.Utilities;
 
+import android.hardware.SensorManager;
+
 import java.util.Iterator;
 import java.util.List;
 
@@ -20,6 +22,25 @@ public class MathFunctions {
                 result = ema.average(v);
             }
         }
+        return result;
+    }
+
+    public static double[] calculateEulerAngles(float[] values) {
+        float[] rMatrix = new float[9];
+        float[] temp = new float[3];
+        double[] result = new double[3];
+
+        //caculate rotation matrix from rotation vector first
+        SensorManager.getRotationMatrixFromVector(rMatrix, values);
+
+        //calculate Euler angles now
+        SensorManager.getOrientation(rMatrix, temp);
+
+        //The results are in radians, need to convert it to degrees
+        for (int i = 0; i < temp.length; i++){
+            result[i] = Math.round(Math.toDegrees(temp[i]));
+        }
+
         return result;
     }
 

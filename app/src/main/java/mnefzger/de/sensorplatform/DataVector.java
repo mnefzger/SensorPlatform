@@ -14,6 +14,12 @@ public class DataVector {
     public double accY;
     public double accZ;
     /**
+     * Three axis acceleration
+     */
+    public double rotX;
+    public double rotY;
+    public double rotZ;
+    /**
      * vehicle location in lat, lon
      */
     public Location location;
@@ -36,6 +42,12 @@ public class DataVector {
         this.accZ = z;
     }
 
+    public void setRot(double x, double y, double z) {
+        this.rotX = x;
+        this.rotY = y;
+        this.rotZ = z;
+    }
+
     public void setLocation(Location l) {
         this.location = l;
     }
@@ -46,13 +58,15 @@ public class DataVector {
 
     @Override
     public String toString() {
-        return "time: " + timestamp + ", accX: " + accX + ", accY: " + accY + ", accZ: " + accZ + ", speed: " + speed;
+        return "time: " + timestamp + ", accX: " + accX + ", accY: " + accY + ", accZ: " + accZ +
+                ", rotX: " + rotX + ", rotY: " + rotY + ", rotZ: " + rotZ +", speed: " + speed;
     }
 
     public String toCSVString() {
-        double lat = location == null ? 0 : location.getLatitude();
-        double lon = location == null ? 0 : location.getLongitude();
+        double lat = (location == null) ? 0 : location.getLatitude();
+        double lon = (location == null) ? 0 : location.getLongitude();
         return timestamp + ";" + accX + ";" + accY + ";" + accZ + ";" +
-               lat + ";" + lon + ";" + speed;
+                rotX + ";" + rotY + ";" + rotZ + ";" +
+                lat + ";" + lon + ";" + speed;
     }
 }

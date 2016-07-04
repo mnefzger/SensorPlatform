@@ -18,7 +18,7 @@ import mnefzger.de.sensorplatform.DataVector;
 public class LoggingModule {
 
     String baseDir = android.os.Environment.getExternalStorageDirectory().getAbsolutePath();
-    String fileName = "RawAccelerometer.csv";
+    String fileName = "RawData.csv";
     String filePath = baseDir + File.separator + fileName;
 
     public LoggingModule(Activity app) {

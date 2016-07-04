@@ -58,7 +58,7 @@ public class SensorModule implements ISensorCallback, IEventCallback{
     /**
      * The onRawData() and event detection sampling rate in milliseconds
      */
-    private final int SAMPLINGRATE = 1000;
+    private final int SAMPLINGRATE = 100;
     /**
      * int identifier for GPS Sensor
      */
@@ -70,6 +70,7 @@ public class SensorModule implements ISensorCallback, IEventCallback{
 
         activeProviders = new ArrayList<>();
         accelerometer = new AccelerometerProvider(app, this);
+        orientation = new OrientationProvider(app, this);
         location = new PositionProvider(app, this);
         drivingBehProc = new DrivingBehaviourProcessor(this);
 
@@ -88,6 +89,11 @@ public class SensorModule implements ISensorCallback, IEventCallback{
         if(t == Sensor.TYPE_ACCELEROMETER && !activeProviders.contains(accelerometer)) {
             accelerometer.start();
             activeProviders.add(accelerometer);
+        }
+
+        if(t == Sensor.TYPE_ROTATION_VECTOR && !activeProviders.contains(orientation)) {
+            orientation.start();
+            activeProviders.add(orientation);
         }
 
         if(t == GPS_IDENTIFIER && !activeProviders.contains(location)) {
@@ -109,10 +115,19 @@ public class SensorModule implements ISensorCallback, IEventCallback{
                 accelerometer.stop();
                 activeProviders.remove(accelerometer);
             }
+
+        } else if(t == Sensor.TYPE_ROTATION_VECTOR) {
+            if(!ActiveSubscriptions.usingRotation()) {
+                Log.d("Sensor Stop", "" + Sensor.TYPE_ROTATION_VECTOR);
+                orientation.stop();
+                activeProviders.remove(orientation);
+            }
+
         } else if(t == GPS_IDENTIFIER) {
             location.stop();
             activeProviders.remove(location);
-        } else if(t == Sensor.TYPE_ALL) {
+
+         } else if(t == Sensor.TYPE_ALL) {
             //TODO: loop through sensors, check if sensor is needed, stop it if not
         }
 
@@ -187,6 +202,11 @@ public class SensorModule implements ISensorCallback, IEventCallback{
     }
 
     @Override
+    public void onRotationData(double[] values) {
+       current.setRot( values[0], values[1], values[2] );
+    }
+
+    @Override
     public void onLocationData(Location location, double speed) {
         current.setLocation(location);
         current.setSpeed(speed);
@@ -211,6 +231,9 @@ public class SensorModule implements ISensorCallback, IEventCallback{
             case ACCELERATION_EVENT:
             case ACCELERATION_RAW:
                 return Sensor.TYPE_ACCELEROMETER;
+            case ROTATION_EVENT:
+            case ROTATION_RAW:
+                return Sensor.TYPE_ROTATION_VECTOR;
             case LOCATION_RAW:
             case LOCATION_EVENT:
                 return GPS_IDENTIFIER;

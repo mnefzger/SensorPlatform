@@ -9,6 +9,7 @@ public class MathFunctions {
 
     /**
      * Calculates the Exponential Moving Average for the newest acceleration values based on the previous values
+     * with dynamic alpha value
      * @param buffer
      * @return
      */
@@ -25,6 +26,30 @@ public class MathFunctions {
         return result;
     }
 
+    /**
+     * Calculates the Exponential Moving Average for the newest acceleration values based on the previous values
+     * with predefined alpha value
+     * @param buffer
+     * @return
+     */
+    public static double[] getAccEMA(List<double[]> buffer, double alpha) {
+        ExponentialMovingAverage ema = new ExponentialMovingAverage( alpha );
+        Iterator<double[]> it = buffer.iterator();
+        double[] result = new double[3];
+        while(it.hasNext()) {
+            double[] v = it.next();
+            if(v != null) {
+                result = ema.average(v);
+            }
+        }
+        return result;
+    }
+
+    /**
+     * Returns the Euler representation of a quaternion rotation vector
+     * @param values
+     * @return
+     */
     public static double[] calculateEulerAngles(float[] values) {
         float[] rMatrix = new float[9];
         float[] temp = new float[3];
@@ -44,6 +69,9 @@ public class MathFunctions {
         return result;
     }
 
+    /**
+     * Class representing the Exponential Moving Average
+     */
     static class ExponentialMovingAverage {
         private double alpha;
         private double[] oldValue = new double[3];
@@ -67,6 +95,14 @@ public class MathFunctions {
         }
     }
 
+    /**
+     * Returns the distance between two geopositions
+     * @param lat1
+     * @param lng1
+     * @param lat2
+     * @param lng2
+     * @return
+     */
     public static double calculateDistance(double lat1, double lng1, double lat2, double lng2) {
         double dLat = Math.toRadians(lat2 - lat1);
         double dLon = Math.toRadians(lng2 - lng1);

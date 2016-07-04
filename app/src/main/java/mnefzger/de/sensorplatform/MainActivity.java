@@ -23,7 +23,7 @@ public class MainActivity extends AppCompatActivity implements IDataCallback{
         sPC.logEventData(false);
 
         /**
-         * Mock unsubscribe, to be removed
+         * Mock unsubscribe
 
         Handler handler = new Handler();
         handler.postDelayed(new Runnable() {

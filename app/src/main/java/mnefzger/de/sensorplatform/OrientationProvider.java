@@ -17,6 +17,7 @@ public class OrientationProvider extends SensorProvider {
 
     private ArrayList<double[]> lastValues = new ArrayList<>();
     private final int WINDOW = 5;
+    private double[] initValues;
 
     public OrientationProvider(Context c, SensorModule m) {
         super(c,m);
@@ -43,21 +44,7 @@ public class OrientationProvider extends SensorProvider {
 
         double[] eulerValues = MathFunctions.calculateEulerAngles(values);
 
-        //reportEMAValues(values);
         sensorCallback.onRotationData(eulerValues);
     }
 
-    /**
-     * calculates the exponentially moving average of the last WINDOW values,
-     * then notifies the callback function
-     * @param newest The most recent accelerometer reading
-     */
-    private void reportEMAValues(double[] newest) {
-        lastValues.add(newest);
-        if(lastValues.size() > WINDOW) {
-            lastValues.remove(0);
-        }
-        double[] emaValues = MathFunctions.getAccEMA(lastValues);
-        sensorCallback.onRotationData(emaValues);
-    }
 }

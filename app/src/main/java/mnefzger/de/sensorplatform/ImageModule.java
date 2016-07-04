@@ -247,12 +247,12 @@ public class ImageModule implements IEventCallback{
 
             yuvimage.compressToJpeg(new Rect(0, 0, yuvimage.getWidth(),yuvimage.getHeight()), 100, baos);
 
-            byte[] jpgdata = baos.toByteArray();
+            byte[] jpgData = baos.toByteArray();
 
             FileOutputStream output = null;
             try {
                 output = new FileOutputStream(mFile);
-                output.write(jpgdata);
+                output.write(jpgData);
             } catch (IOException e) {
                 e.printStackTrace();
             } finally {

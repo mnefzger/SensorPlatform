@@ -11,7 +11,78 @@
     tools:context="mnefzger.de.sensorplatform.MainActivity">
 
     <TextView
-        android:text="Hello World!"
+        android:text="AccX:"
         android:layout_width="wrap_content"
-        android:layout_height="wrap_content" />
+        android:layout_height="wrap_content"
+        android:id="@+id/accXText" />
+
+    <TextView
+        android:text="AccY:"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/accYText"
+        android:layout_below="@+id/accXText"
+        android:layout_marginTop="11dp" />
+
+    <TextView
+        android:text="AccZ:"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/accZText"
+        android:layout_below="@+id/accYText"
+        android:layout_alignParentStart="true"
+        android:layout_marginTop="10dp" />
+
+    <TextView
+        android:text="RotX:"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/rotXText"
+        android:layout_below="@+id/accZText"
+        android:layout_alignParentStart="true"
+        android:layout_marginTop="36dp" />
+
+    <TextView
+        android:text="RotY:"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/rotYText"
+        android:layout_marginTop="10dp"
+        android:layout_below="@+id/rotXText"
+        android:layout_alignParentStart="true" />
+
+    <TextView
+        android:text="RotZ:"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/rotZText"
+        android:layout_marginTop="10dp"
+        android:layout_below="@+id/rotYText"
+        android:layout_alignParentStart="true" />
+
+    <TextView
+        android:text="Lat:"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/latText"
+        android:layout_centerVertical="true"
+        android:layout_alignStart="@+id/accYText" />
+
+    <TextView
+        android:text="Lon:"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/lonText"
+        android:layout_marginTop="10dp"
+        android:layout_below="@+id/latText"
+        android:layout_alignStart="@+id/latText" />
+
+    <TextView
+        android:text="Speed:"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/speedText"
+        android:layout_marginTop="25dp"
+        android:layout_below="@+id/lonText"
+        android:layout_alignStart="@+id/lonText" />
 </RelativeLayout>

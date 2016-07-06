@@ -58,7 +58,7 @@ public class SensorModule implements ISensorCallback, IEventCallback{
     /**
      * The onRawData() and event detection sampling rate in milliseconds
      */
-    private final int SAMPLINGRATE = 100;
+    private final int SAMPLING_MS = 100;
     /**
      * int identifier for GPS Sensor
      */
@@ -75,12 +75,13 @@ public class SensorModule implements ISensorCallback, IEventCallback{
         drivingBehProc = new DrivingBehaviourProcessor(this);
 
         current = new DataVector();
+        current.setTimestamp(System.currentTimeMillis());
         dataBuffer = new ArrayList<>();
     }
 
     public void startSensing(DataType type) {
         if(!sensing) {
-            aggregateData(SAMPLINGRATE);
+            aggregateData(SAMPLING_MS);
             sensing = true;
         }
 
@@ -157,7 +158,7 @@ public class SensorModule implements ISensorCallback, IEventCallback{
         }
 
         /**
-         * report raw data after SAMPLINGRATE milliseconds
+         * report raw data after SAMPLING_MS milliseconds
          */
         new Timer().schedule(new TimerTask() {
             @Override
@@ -176,13 +177,8 @@ public class SensorModule implements ISensorCallback, IEventCallback{
 
     private void startEventProcessing() {
         if(ActiveSubscriptions.drivingBehaviourActive()) {
-            /**
-             * Only process the previous xx entries of driving data
-             * e.g. SAMPLINGRATE = 50ms, then 1000ms/50ms  = 20 entries
-             */
-            int lastSamplingIndex = dataBuffer.size() - 500 / SAMPLINGRATE;
-            lastSamplingIndex = lastSamplingIndex < 0 ? 0 : lastSamplingIndex;
-            drivingBehProc.processData( dataBuffer.subList(lastSamplingIndex, dataBuffer.size()) );
+
+            drivingBehProc.processData( dataBuffer );
         }
     }
 

@@ -5,6 +5,8 @@ import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.widget.TextView;
 
+import java.text.DecimalFormat;
+
 
 public class MainActivity extends AppCompatActivity implements IDataCallback{
     SensorPlatformController sPC;
@@ -21,6 +23,8 @@ public class MainActivity extends AppCompatActivity implements IDataCallback{
     TextView lon;
     TextView speed;
 
+    DecimalFormat df = new DecimalFormat("#.####");
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -31,6 +35,7 @@ public class MainActivity extends AppCompatActivity implements IDataCallback{
         sPC.subscribeTo(DataType.ACCELERATION_RAW);
         sPC.subscribeTo(DataType.LOCATION_RAW);
         sPC.subscribeTo(DataType.ROTATION_RAW);
+        //sPC.subscribeTo(DataType.CAMERA_RAW);
 
         sPC.logRawData(false);
         sPC.logEventData(false);
@@ -45,6 +50,7 @@ public class MainActivity extends AppCompatActivity implements IDataCallback{
             }
         }, 5000);
          */
+
         accX = (TextView) findViewById(R.id.accXText);
         accY = (TextView) findViewById(R.id.accYText);
         accZ = (TextView) findViewById(R.id.accZText);
@@ -81,9 +87,9 @@ public class MainActivity extends AppCompatActivity implements IDataCallback{
             @Override
             public void run() {
 
-                accX.setText("AccX: " + v.accX);
-                accY.setText("AccY: " + v.accY);
-                accZ.setText("AccZ: " + v.accZ);
+                accX.setText("AccX: " + df.format(v.accX) );
+                accY.setText("AccY: " + df.format(v.accY) );
+                accZ.setText("AccZ: " + df.format(v.accZ) );
 
                 rotX.setText("RotX: " + v.rotX);
                 rotY.setText("RotY: " + v.rotY);
@@ -92,12 +98,12 @@ public class MainActivity extends AppCompatActivity implements IDataCallback{
                 if(v.location == null && ActiveSubscriptions.usingGPS()) {
                     lat.setText("Lat: Acquiring position…");
                     lon.setText("Lon: Acquiring position…");
-                    speed.setText("Speed: 0");
+                    speed.setText("Speed: Acquiring position…");
                 }
                 if(v.location != null) {
                     lat.setText("Lat: " + v.location.getLatitude());
                     lon.setText("Lon: " + v.location.getLongitude());
-                    speed.setText("Speed: " + v.speed);
+                    speed.setText("Speed: " + df.format(v.speed) + " km/h");
                 }
 
 

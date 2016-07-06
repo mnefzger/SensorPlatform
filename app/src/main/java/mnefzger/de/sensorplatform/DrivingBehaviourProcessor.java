@@ -77,12 +77,13 @@ public class DrivingBehaviourProcessor extends EventProcessor {
                 float[] angleChange = new float[3];
                 // calculate the angle change between rotation matrices
                 SensorManager.getAngleChange(angleChange, prevMatrix, v.rotMatrix);
-                // convert to euler angles
-                float[] euler = MathFunctions.calculateEulerAngles(angleChange);
 
+                // convert to euler angles
+                //float[] euler = MathFunctions.calculateEulerAngles(angleChange);
+
+                // convert to radians
                 float[] rad = MathFunctions.calculateRadAngles(angleChange);
 
-                //TODO: check what is actually left and right
                 if(rad[2] > leftDelta) leftDelta = rad[2];
                 if(rad[2] < rightDelta) rightDelta = rad[2];
 

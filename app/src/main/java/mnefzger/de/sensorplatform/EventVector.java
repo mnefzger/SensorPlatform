@@ -16,4 +16,8 @@ public class EventVector {
     public String toString() {
         return "Timestamp: " + timestamp + " -> " + eventDescription + " @ " + value;
     }
+
+    public String toCSVString() {
+        return timestamp + ";" + eventDescription + ";" + value;
+    }
 }

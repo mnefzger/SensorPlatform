@@ -13,16 +13,39 @@ import java.io.FileWriter;
 import java.io.IOException;
 
 import mnefzger.de.sensorplatform.DataVector;
+import mnefzger.de.sensorplatform.EventVector;
 
 
 public class LoggingModule {
 
     String baseDir = android.os.Environment.getExternalStorageDirectory().getAbsolutePath();
-    String fileName = "RawData.csv";
-    String filePath = baseDir + File.separator + fileName;
+    String filePath = baseDir + "/SensorPlatform/logs";
+
+    String fileNameRaw = "RawData.csv";
+    String fileNameEvent = "EventData.csv";
+
+    File rawFile;
+    File eventFile;
 
     public LoggingModule(Activity app) {
         verifyStoragePermissions(app);
+        try {
+            File folder = new File(filePath);
+            if (!folder.exists()) {
+                folder.mkdir();
+            }
+            rawFile = new File(filePath + File.separator + fileNameRaw);
+            if(!rawFile.exists()) {
+                rawFile.createNewFile();
+            }
+            eventFile = new File(filePath + File.separator + fileNameEvent);
+            if(!rawFile.exists()) {
+                eventFile.createNewFile();
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
     }
 
     public void writeRawToCSV(DataVector v) {
@@ -32,7 +55,22 @@ public class LoggingModule {
             if(!isExternalStorageWritable())  {
                 throw new IOException("External storage not writable!");
             }
-            CSVWriter writer = new CSVWriter(new FileWriter(filePath, true), CSVWriter.DEFAULT_SEPARATOR, CSVWriter.NO_QUOTE_CHARACTER,CSVWriter.DEFAULT_LINE_END);
+            CSVWriter writer = new CSVWriter(new FileWriter(rawFile, true), CSVWriter.DEFAULT_SEPARATOR, CSVWriter.NO_QUOTE_CHARACTER,CSVWriter.DEFAULT_LINE_END);
+            writer.writeNext(line);
+            writer.close();
+        } catch (IOException e) {
+            System.err.println("Caught IOException: " +  e.getMessage());
+        }
+    }
+
+    public void writeEventToCSV(EventVector v) {
+        String[] line = { v.toCSVString() };
+
+        try {
+            if(!isExternalStorageWritable())  {
+                throw new IOException("External storage not writable!");
+            }
+            CSVWriter writer = new CSVWriter(new FileWriter(eventFile, true), CSVWriter.DEFAULT_SEPARATOR, CSVWriter.NO_QUOTE_CHARACTER,CSVWriter.DEFAULT_LINE_END);
             writer.writeNext(line);
             writer.close();
         } catch (IOException e) {

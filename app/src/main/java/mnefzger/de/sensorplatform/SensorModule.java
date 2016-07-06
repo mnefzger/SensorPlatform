@@ -148,6 +148,7 @@ public class SensorModule implements ISensorCallback, IEventCallback{
         if(last != null) {
             dataBuffer.add(last);
             current.setAcc(last.accX, last.accY, last.accZ);
+            current.setRotMatrix(last.rotMatrix);
             current.setSpeed(last.speed);
         }
         /**
@@ -177,7 +178,6 @@ public class SensorModule implements ISensorCallback, IEventCallback{
 
     private void startEventProcessing() {
         if(ActiveSubscriptions.drivingBehaviourActive()) {
-
             drivingBehProc.processData( dataBuffer );
         }
     }
@@ -198,8 +198,9 @@ public class SensorModule implements ISensorCallback, IEventCallback{
     }
 
     @Override
-    public void onRotationData(double[] values) {
-       current.setRot( values[0], values[1], values[2] );
+    public void onRotationData(float[][] values) {
+        current.setRot( values[0][0], values[0][1], values[0][2] );
+        current.setRotMatrix( values[1] );
     }
 
     @Override

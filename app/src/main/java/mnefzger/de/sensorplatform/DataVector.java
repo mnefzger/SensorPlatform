@@ -19,6 +19,7 @@ public class DataVector {
     public double rotX;
     public double rotY;
     public double rotZ;
+    public float[] rotMatrix;
     /**
      * vehicle location in lat, lon
      */
@@ -46,6 +47,10 @@ public class DataVector {
         this.rotX = x;
         this.rotY = y;
         this.rotZ = z;
+    }
+
+    public void setRotMatrix(float[] matrix) {
+        this.rotMatrix = matrix;
     }
 
     public void setLocation(Location l) {

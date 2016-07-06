@@ -50,12 +50,12 @@ public class MathFunctions {
      * @param values
      * @return
      */
-    public static double[] calculateEulerAngles(float[] values) {
+    public static float[] calculateEulerAngles(float[] values) {
         float[] rMatrix = new float[9];
         float[] temp = new float[3];
-        double[] result = new double[3];
+        float[] result = new float[3];
 
-        //caculate rotation matrix from rotation vector first
+        //calculate rotation matrix from rotation vector first
         SensorManager.getRotationMatrixFromVector(rMatrix, values);
 
         //calculate Euler angles now
@@ -65,6 +65,20 @@ public class MathFunctions {
         for (int i = 0; i < temp.length; i++){
             result[i] = Math.round(Math.toDegrees(temp[i]));
         }
+
+        return result;
+    }
+
+    public static float[] calculateRadAngles(float[] values) {
+        float[] rMatrix = new float[9];
+        float[] result = new float[3];
+
+        //calculate rotation matrix from rotation vector first
+        SensorManager.getRotationMatrixFromVector(rMatrix, values);
+
+        //calculate Euler angles now
+        SensorManager.getOrientation(rMatrix, result);
+
 
         return result;
     }

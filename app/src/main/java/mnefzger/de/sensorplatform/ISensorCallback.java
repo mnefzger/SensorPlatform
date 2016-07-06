@@ -6,7 +6,8 @@ import android.location.Location;
 public interface ISensorCallback {
     void onAccelerometerData(double[] values);
 
-    void onRotationData(double[] values);
+    // we need float to store the rotation matrix
+    void onRotationData(float[][] values);
 
     void onLocationData(Location location, double speed);
 }

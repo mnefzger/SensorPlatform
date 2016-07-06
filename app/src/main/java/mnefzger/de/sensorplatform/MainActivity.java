@@ -89,6 +89,11 @@ public class MainActivity extends AppCompatActivity implements IDataCallback{
                 rotY.setText("RotY: " + v.rotY);
                 rotZ.setText("RotZ: " + v.rotZ);
 
+                if(v.location == null && ActiveSubscriptions.usingGPS()) {
+                    lat.setText("Lat: Acquiring position…");
+                    lon.setText("Lon: Acquiring position…");
+                    speed.setText("Speed: 0");
+                }
                 if(v.location != null) {
                     lat.setText("Lat: " + v.location.getLatitude());
                     lon.setText("Lon: " + v.location.getLongitude());

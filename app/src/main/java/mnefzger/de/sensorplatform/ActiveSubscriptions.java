@@ -54,6 +54,10 @@ class ActiveSubscriptions {
         return isActive(new DataType[]{DataType.RAW, DataType.ROTATION_RAW, DataType.ROTATION_EVENT});
     }
 
+    public static boolean usingGPS() {
+        return isActive(new DataType[]{DataType.LOCATION_RAW, DataType.LOCATION_EVENT});
+    }
+
     private static boolean isActive(DataType[] types) {
         Iterator<Subscription> it = activeSubscriptions.iterator();
         while(it.hasNext()) {

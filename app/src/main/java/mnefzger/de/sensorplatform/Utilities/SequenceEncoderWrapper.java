@@ -35,7 +35,7 @@ public class SequenceEncoderWrapper {
     private int frameNo;
     private MP4Muxer muxer;
 
-    public SequenceEncoderWrapper(File out) throws IOException {
+    public SequenceEncoderWrapper(File out, int numberOfImages, int FPS) throws IOException {
         if (!out.exists()) {
             out.createNewFile();
         }
@@ -49,10 +49,10 @@ public class SequenceEncoderWrapper {
         muxer = new MP4Muxer(ch, Brand.MP4);
 
         // Add video track to muxer
-        outTrack = muxer.addTrackForCompressed(TrackType.VIDEO, 25);
+        outTrack = muxer.addTrackForCompressed(TrackType.VIDEO, FPS);
 
         // Allocate a buffer big enough to hold output frames
-        _out = ByteBuffer.allocate(640 * 480 * 150);
+        _out = ByteBuffer.allocate(640 * 480 * numberOfImages);
 
         // Create an instance of encoder
         encoder = new H264Encoder();

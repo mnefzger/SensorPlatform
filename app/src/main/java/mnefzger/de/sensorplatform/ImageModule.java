@@ -18,8 +18,10 @@ import android.media.Image;
 import android.media.ImageReader;
 import android.os.Handler;
 import android.os.HandlerThread;
+import android.os.SystemClock;
 import android.support.v4.app.ActivityCompat;
 import android.util.Log;
+import android.widget.Toast;
 
 import java.io.ByteArrayOutputStream;
 import java.io.File;
@@ -49,6 +51,9 @@ public class ImageModule implements IEventCallback{
     private List<YuvImage> backImages = new ArrayList<>();
     private List<YuvImage> frontImages = new ArrayList<>();
 
+    private int FRONT_FPS = 15;
+    private int BACK_FPS = 15;
+
     private HandlerThread mBackgroundThread;
     private Handler mBackgroundHandler;
 
@@ -67,8 +72,8 @@ public class ImageModule implements IEventCallback{
 
     public void startCapture() {
         startBackgroundThread();
-        //open("0");
-        open("1");
+        open("0");
+        //open("1");
     }
 
     public void stopCapture() {
@@ -195,12 +200,12 @@ public class ImageModule implements IEventCallback{
         @Override
         public void onImageAvailable(ImageReader reader){
             handleImageBack(reader.acquireNextImage());
-            /*
+
             now = System.currentTimeMillis();
             delta = now - prevTime;
             Log.i("IO_IMAGE", "deltaTime:" + delta);
             prevTime = now;
-            */
+
         }
     };
 
@@ -220,7 +225,7 @@ public class ImageModule implements IEventCallback{
         callback.onEventData(v);
     }
 
-    private void createVideoFile(List<YuvImage> images) {
+    private void createVideoFile(List<YuvImage> images, int FPS) {
         saving = true;
         SequenceEncoderWrapper encoder;
         String baseDir = android.os.Environment.getExternalStorageDirectory().getAbsolutePath();
@@ -235,20 +240,29 @@ public class ImageModule implements IEventCallback{
         File mFile = new File(filePath + File.separator + fileName);
 
         try {
-            encoder = new SequenceEncoderWrapper(mFile);
+            Log.d("VIDEO", "Trying to save..." + images.size() + " frames");
+            double start = System.currentTimeMillis();
+            encoder = new SequenceEncoderWrapper(mFile, images.size(), FPS);
             for (int i = 0; i < images.size(); i++) {
                 YuvImage image = images.get(i);
                 Bitmap bi = getBitmapImageFromYUV(image, image.getWidth(), image.getHeight());
                 encoder.encodeImage(bi);
             }
             encoder.finish();
-            Log.d("VIDEO", "Saving finished!");
+            double delta = (System.currentTimeMillis() - start)/1000;
+
+            CharSequence text = "Saving finished in " + delta + "s!";
+            int duration = Toast.LENGTH_LONG;
+            Toast toast = Toast.makeText(context, text, duration);
+            toast.show();
+            Log.d("VIDEO", "Saving finished in " + delta + "s!" );
 
         } catch (IOException e) {
             e.printStackTrace();
         }
     }
 
+    private double lastFront = 0;
     private void handleImageFront(Image img) {
         if(img != null) {
             byte[] bytes = getBytes(img);
@@ -256,13 +270,17 @@ public class ImageModule implements IEventCallback{
             byte[] processedImg = imgProc.processImage(bytes, img.getWidth(), img.getHeight());
             YuvImage yuvimage = new YuvImage(processedImg, ImageFormat.NV21, img.getWidth(), img.getHeight(), null);
 
-            frontImages.add(yuvimage);
-            if(frontImages.size() > (4*30) ) {
+            double now = System.currentTimeMillis();
+            if(now - lastFront >= (1000/(1+FRONT_FPS)) ) {
+                frontImages.add(yuvimage);
+                lastFront = now;
+            }
+
+            if(frontImages.size() > (10*FRONT_FPS) ) {
                 frontImages.remove(0);
 
                 if(!saving) {
-                    Log.d("VIDEO", "Trying to save..." + frontImages.size());
-                    createVideoFile(frontImages);
+                    createVideoFile(frontImages, FRONT_FPS);
                 }
 
             }
@@ -272,6 +290,7 @@ public class ImageModule implements IEventCallback{
         img.close();
     }
 
+    private double lastBack = 0;
     private void handleImageBack(Image img) {
         if(img != null) {
             byte[] bytes = getBytes(img);
@@ -279,12 +298,21 @@ public class ImageModule implements IEventCallback{
             byte[] processedImg = imgProc.processImage(bytes, img.getWidth(), img.getHeight());
             YuvImage yuvimage = new YuvImage(processedImg, ImageFormat.NV21, img.getWidth(), img.getHeight(), null);
 
-            backImages.add(yuvimage);
-            if(backImages.size() > (12*30) ) {
-                backImages.remove(0);
+            double now = System.currentTimeMillis();
+            if(now - lastBack >= (1000/(1+BACK_FPS)) ) {
+                backImages.add(yuvimage);
+                lastBack = now;
             }
 
-            mBackgroundHandler.post( new ImageSaver(yuvimage, "back") );
+            if(backImages.size() > (10*BACK_FPS) ) {
+                backImages.remove(0);
+
+                if(!saving) {
+                    createVideoFile(backImages, BACK_FPS);
+                }
+            }
+
+           // mBackgroundHandler.post( new ImageSaver(yuvimage, "back") );
         }
         img.close();
     }

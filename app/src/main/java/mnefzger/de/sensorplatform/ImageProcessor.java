@@ -26,7 +26,7 @@ public class ImageProcessor{
 
         Mat gray = new Mat();
         Imgproc.cvtColor(mBgr, gray, Imgproc.COLOR_BGR2GRAY);
-        Imgproc.Canny(gray,gray, 150, 280);
+        //Imgproc.Canny(gray,gray, 150, 280);
 
 
         Mat yuvout = new Mat();

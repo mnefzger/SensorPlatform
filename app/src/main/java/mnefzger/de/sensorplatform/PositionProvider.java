@@ -61,7 +61,6 @@ public class PositionProvider extends DataProvider implements LocationListener{
             speed = distance / timeDelta;
             // speed in km/h
             speed = speed * 3.6;
-            Log.d("DISTANCE", "d: " + distance + ", dt: " + timeDelta + ", speed: " + speed);
         }
         lastLocation = location;
         lastTimestamp = currentTime;

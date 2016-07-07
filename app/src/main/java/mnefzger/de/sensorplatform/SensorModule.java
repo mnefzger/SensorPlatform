@@ -149,6 +149,7 @@ public class SensorModule implements ISensorCallback, IEventCallback{
             dataBuffer.add(last);
             current.setAcc(last.accX, last.accY, last.accZ);
             current.setRotMatrix(last.rotMatrix);
+            current.setLocation(last.location);
             current.setSpeed(last.speed);
         }
         /**

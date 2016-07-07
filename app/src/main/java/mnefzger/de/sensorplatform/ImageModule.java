@@ -26,8 +26,11 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.nio.ByteBuffer;
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
 
+import mnefzger.de.sensorplatform.Utilities.SequenceEncoderWrapper;
 
 
 public class ImageModule implements IEventCallback{
@@ -43,10 +46,15 @@ public class ImageModule implements IEventCallback{
     private ImageReader imageReader_front;
     private ImageReader imageReader_back;
 
+    private List<YuvImage> backImages = new ArrayList<>();
+    private List<YuvImage> frontImages = new ArrayList<>();
+
     private HandlerThread mBackgroundThread;
     private Handler mBackgroundHandler;
 
     private final String TAG = "CAMERA_SENSORPLATFORM";
+
+    boolean saving = false;
 
 
     public ImageModule(SensorPlatformController controller, Activity app) {
@@ -59,7 +67,7 @@ public class ImageModule implements IEventCallback{
 
     public void startCapture() {
         startBackgroundThread();
-        open("0");
+        //open("0");
         open("1");
     }
 
@@ -76,12 +84,12 @@ public class ImageModule implements IEventCallback{
                 if(id == "0") {
                     cameraManager.openCamera(id, backCameraStateCallback, null );
                     imageReader_back = ImageReader.newInstance(480, 640, ImageFormat.YUV_420_888, 15);
-                    imageReader_back.setOnImageAvailableListener(onImageAvailableListener, mBackgroundHandler);
+                    imageReader_back.setOnImageAvailableListener(onBackImageAvailableListener, mBackgroundHandler);
                 }
                 if(id == "1") {
                     cameraManager.openCamera(id, frontCameraStateCallback, null );
                     imageReader_front = ImageReader.newInstance(480, 640, ImageFormat.YUV_420_888, 15);
-                    imageReader_front.setOnImageAvailableListener(onImageAvailableListener, mBackgroundHandler);
+                    imageReader_front.setOnImageAvailableListener(onFrontImageAvailableListener, mBackgroundHandler);
                 }
             }
         } catch (CameraAccessException e) {
@@ -170,10 +178,23 @@ public class ImageModule implements IEventCallback{
     private long now;
     private long delta = 0;
     private long prevTime = 0;
-    private ImageReader.OnImageAvailableListener onImageAvailableListener = new ImageReader.OnImageAvailableListener() {
+    private ImageReader.OnImageAvailableListener onFrontImageAvailableListener = new ImageReader.OnImageAvailableListener() {
         @Override
         public void onImageAvailable(ImageReader reader){
-            handleImage(reader.acquireNextImage());
+            handleImageFront(reader.acquireNextImage());
+            /*
+            now = System.currentTimeMillis();
+            delta = now - prevTime;
+            Log.i("IO_IMAGE", "deltaTime:" + delta);
+            prevTime = now;
+            */
+        }
+    };
+
+    private ImageReader.OnImageAvailableListener onBackImageAvailableListener = new ImageReader.OnImageAvailableListener() {
+        @Override
+        public void onImageAvailable(ImageReader reader){
+            handleImageBack(reader.acquireNextImage());
             /*
             now = System.currentTimeMillis();
             delta = now - prevTime;
@@ -199,24 +220,99 @@ public class ImageModule implements IEventCallback{
         callback.onEventData(v);
     }
 
-    private void handleImage(Image img) {
-        if(img != null) {
-            ByteBuffer buffer0 = img.getPlanes()[0].getBuffer();
-            ByteBuffer buffer2 = img.getPlanes()[2].getBuffer();
-            int buffer0_size = buffer0.remaining();
-            int buffer2_size = buffer2.remaining();
+    private void createVideoFile(List<YuvImage> images) {
+        saving = true;
+        SequenceEncoderWrapper encoder;
+        String baseDir = android.os.Environment.getExternalStorageDirectory().getAbsolutePath();
+        String fileName = "Video-" + System.nanoTime() + ".mp4";
+        String filePath = baseDir + "/SensorPlatform/videos/";
 
-            byte[] bytes = new byte[buffer0_size + buffer2_size];
-            buffer0.get(bytes, 0, buffer0_size);
-            buffer2.get(bytes, buffer0_size, buffer2_size);
+        File folder = new File(filePath);
+        if (!folder.exists()) {
+            folder.mkdir();
+        }
+
+        File mFile = new File(filePath + File.separator + fileName);
+
+        try {
+            encoder = new SequenceEncoderWrapper(mFile);
+            for (int i = 0; i < images.size(); i++) {
+                YuvImage image = images.get(i);
+                Bitmap bi = getBitmapImageFromYUV(image, image.getWidth(), image.getHeight());
+                encoder.encodeImage(bi);
+            }
+            encoder.finish();
+            Log.d("VIDEO", "Saving finished!");
+
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    private void handleImageFront(Image img) {
+        if(img != null) {
+            byte[] bytes = getBytes(img);
 
             byte[] processedImg = imgProc.processImage(bytes, img.getWidth(), img.getHeight());
             YuvImage yuvimage = new YuvImage(processedImg, ImageFormat.NV21, img.getWidth(), img.getHeight(), null);
 
-            mBackgroundHandler.post( new ImageSaver(yuvimage) );
+            frontImages.add(yuvimage);
+            if(frontImages.size() > (4*30) ) {
+                frontImages.remove(0);
+
+                if(!saving) {
+                    Log.d("VIDEO", "Trying to save..." + frontImages.size());
+                    createVideoFile(frontImages);
+                }
+
+            }
+
+            mBackgroundHandler.post( new ImageSaver(yuvimage, "front") );
         }
         img.close();
     }
+
+    private void handleImageBack(Image img) {
+        if(img != null) {
+            byte[] bytes = getBytes(img);
+
+            byte[] processedImg = imgProc.processImage(bytes, img.getWidth(), img.getHeight());
+            YuvImage yuvimage = new YuvImage(processedImg, ImageFormat.NV21, img.getWidth(), img.getHeight(), null);
+
+            backImages.add(yuvimage);
+            if(backImages.size() > (12*30) ) {
+                backImages.remove(0);
+            }
+
+            mBackgroundHandler.post( new ImageSaver(yuvimage, "back") );
+        }
+        img.close();
+    }
+
+    private byte[] getBytes(Image img) {
+        ByteBuffer buffer0 = img.getPlanes()[0].getBuffer();
+        ByteBuffer buffer2 = img.getPlanes()[2].getBuffer();
+        int buffer0_size = buffer0.remaining();
+        int buffer2_size = buffer2.remaining();
+
+        byte[] bytes = new byte[buffer0_size + buffer2_size];
+        buffer0.get(bytes, 0, buffer0_size);
+        buffer2.get(bytes, buffer0_size, buffer2_size);
+
+        return bytes;
+    }
+
+    public static Bitmap getBitmapImageFromYUV(YuvImage img, int width, int height) {
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        img.compressToJpeg(new Rect(0, 0, width, height), 80, baos);
+
+        byte[] jdata = baos.toByteArray();
+        BitmapFactory.Options bitmapFatoryOptions = new BitmapFactory.Options();
+        bitmapFatoryOptions.inPreferredConfig = Bitmap.Config.RGB_565;
+        Bitmap bmp = BitmapFactory.decodeByteArray(jdata, 0, jdata.length, bitmapFatoryOptions);
+        return bmp;
+    }
+
 
     /**
      * Saves a JPEG {@link Image} into the specified {@link File}.
@@ -234,15 +330,24 @@ public class ImageModule implements IEventCallback{
 
         String baseDir = android.os.Environment.getExternalStorageDirectory().getAbsolutePath();
         String fileName = "IMG-" + System.nanoTime() + ".jpg";
-        String filePath = baseDir + "/SensorPlatform/images";
+        String filePath;
 
-        public ImageSaver(YuvImage image) {
+        public ImageSaver(YuvImage image, String path) {
             mImage = image;
-            mFile = new File(filePath + File.separator + fileName);
+            // image directory
+            filePath = baseDir + "/SensorPlatform/images/";
             File folder = new File(filePath);
+            if (!folder.exists()) {
+                folder.mkdir();
+            }
+            // subdirectory /front or /back
+            filePath += path;
+            folder = new File(filePath);
             if (!folder.exists()) {
                  folder.mkdir();
             }
+
+            mFile = new File(filePath + File.separator + fileName);
         }
 
         @Override

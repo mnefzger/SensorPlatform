@@ -3,9 +3,8 @@ package mnefzger.de.sensorplatform;
 
 import org.opencv.core.CvType;
 import org.opencv.core.Mat;
-import org.opencv.core.Size;
-import org.opencv.imgcodecs.Imgcodecs;
 import org.opencv.imgproc.Imgproc;
+
 
 public class ImageProcessor{
     private IEventCallback callback;

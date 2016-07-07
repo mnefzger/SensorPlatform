@@ -11,6 +11,23 @@ android {
         versionCode 1
         versionName "1.0"
     }
+
+    // begin
+    sourceSets.main {
+        jni.srcDirs = [] //disable automatic ndk-build call
+    }
+    task ndkBuild(type: Exec, description: 'Compile JNI source via NDK') {
+        commandLine "/Users/matthias/Library/Android/sdk/ndk-bundle/ndk-build",
+                'NDK_PROJECT_PATH=build/intermediates/ndk',
+                'NDK_LIBS_OUT=src/main/jniLibs',
+                'APP_BUILD_SCRIPT=src/main/jni/Android.mk',
+                'NDK_APPLICATION_MK=src/main/jni/Application.mk'
+    }
+    tasks.withType(JavaCompile) {
+        compileTask -> compileTask.dependsOn ndkBuild
+    }
+    //end
+
     buildTypes {
         release {
             minifyEnabled false
@@ -24,4 +41,5 @@ dependencies {
     testCompile 'junit:junit:4.12'
     compile 'com.android.support:appcompat-v7:23.4.0'
     compile files('libs/opencsv-3.8.jar')
+    compile project(':openCVLibrary310')
 }

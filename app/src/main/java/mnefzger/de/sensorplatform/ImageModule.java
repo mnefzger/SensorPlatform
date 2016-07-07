@@ -4,6 +4,8 @@ import android.Manifest;
 import android.app.Activity;
 import android.content.Context;
 import android.content.pm.PackageManager;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.graphics.ImageFormat;
 import android.graphics.Rect;
 import android.graphics.YuvImage;
@@ -29,8 +31,9 @@ import java.util.Arrays;
 
 
 public class ImageModule implements IEventCallback{
-    private IDataCallback callback;
     private Context context;
+    protected ImageProcessor imgProc;
+    private IDataCallback callback;
 
     private CameraManager cameraManager;
     private CameraDevice camera_front;
@@ -45,12 +48,13 @@ public class ImageModule implements IEventCallback{
 
     private final String TAG = "CAMERA_SENSORPLATFORM";
 
+
     public ImageModule(SensorPlatformController controller, Activity app) {
         verifyCameraPermissions(app);
         context = app;
-        callback = (IDataCallback) controller;
+        callback = controller;
         cameraManager = (CameraManager) app.getSystemService(Activity.CAMERA_SERVICE);
-
+        imgProc = new ImageProcessor(this);
     }
 
     public void startCapture() {
@@ -169,11 +173,13 @@ public class ImageModule implements IEventCallback{
     private ImageReader.OnImageAvailableListener onImageAvailableListener = new ImageReader.OnImageAvailableListener() {
         @Override
         public void onImageAvailable(ImageReader reader){
-            mBackgroundHandler.post(new ImageSaver(reader.acquireNextImage()));
+            handleImage(reader.acquireNextImage());
+            /*
             now = System.currentTimeMillis();
             delta = now - prevTime;
             Log.i("IO_IMAGE", "deltaTime:" + delta);
             prevTime = now;
+            */
         }
     };
 
@@ -188,10 +194,28 @@ public class ImageModule implements IEventCallback{
         }
     }
 
-
     @Override
     public void onEventDetected(EventVector v) {
+        callback.onEventData(v);
+    }
 
+    private void handleImage(Image img) {
+        if(img != null) {
+            ByteBuffer buffer0 = img.getPlanes()[0].getBuffer();
+            ByteBuffer buffer2 = img.getPlanes()[2].getBuffer();
+            int buffer0_size = buffer0.remaining();
+            int buffer2_size = buffer2.remaining();
+
+            byte[] bytes = new byte[buffer0_size + buffer2_size];
+            buffer0.get(bytes, 0, buffer0_size);
+            buffer2.get(bytes, buffer0_size, buffer2_size);
+
+            byte[] processedImg = imgProc.processImage(bytes, img.getWidth(), img.getHeight());
+            YuvImage yuvimage = new YuvImage(processedImg, ImageFormat.NV21, img.getWidth(), img.getHeight(), null);
+
+            mBackgroundHandler.post( new ImageSaver(yuvimage) );
+        }
+        img.close();
     }
 
     /**
@@ -202,7 +226,7 @@ public class ImageModule implements IEventCallback{
         /**
          * The JPEG image
          */
-        private final Image mImage;
+        private final YuvImage mImage;
         /**
          * The file we save the image into.
          */
@@ -212,58 +236,35 @@ public class ImageModule implements IEventCallback{
         String fileName = "IMG-" + System.nanoTime() + ".jpg";
         String filePath = baseDir + "/SensorPlatform/images";
 
-        public ImageSaver(Image image) {
+        public ImageSaver(YuvImage image) {
             mImage = image;
             mFile = new File(filePath + File.separator + fileName);
-            try {
-                File folder = new File(filePath);
-                if (!folder.exists()) {
-                    folder.mkdir();
-                }
-                if (!mFile.exists()) {
-                    mFile.createNewFile();
-                }
-            } catch (IOException e) {
-                e.printStackTrace();
+            File folder = new File(filePath);
+            if (!folder.exists()) {
+                 folder.mkdir();
             }
         }
 
         @Override
         public void run() {
-            // get YUV buffer data
-            ByteBuffer buffer0 = mImage.getPlanes()[0].getBuffer();
-            ByteBuffer buffer2 = mImage.getPlanes()[2].getBuffer();
-            int buffer0_size = buffer0.remaining();
-            int buffer2_size = buffer2.remaining();
-
-            byte[] bytes = new byte[buffer0_size + buffer2_size];
-            buffer0.get(bytes, 0, buffer0_size);
-            buffer2.get(bytes, buffer0_size, buffer2_size);
-
-            // Convert to JPG
-            YuvImage yuvimage = new YuvImage(bytes, ImageFormat.NV21, mImage.getWidth(), mImage.getHeight(), null);
 
             ByteArrayOutputStream baos = new ByteArrayOutputStream();
 
-            yuvimage.compressToJpeg(new Rect(0, 0, yuvimage.getWidth(),yuvimage.getHeight()), 100, baos);
+            mImage.compressToJpeg(new Rect(0, 0, mImage.getWidth(),mImage.getHeight()), 100, baos);
 
             byte[] jpgData = baos.toByteArray();
 
-            FileOutputStream output = null;
+            FileOutputStream output;
             try {
+                if (!mFile.exists()) {
+                    mFile.createNewFile();
+                }
                 output = new FileOutputStream(mFile);
                 output.write(jpgData);
+                output.getFD().sync();
+                output.close();
             } catch (IOException e) {
                 e.printStackTrace();
-            } finally {
-                mImage.close();
-                if (null != output) {
-                    try {
-                        output.close();
-                    } catch (IOException e) {
-                        e.printStackTrace();
-                    }
-                }
             }
         }
 

@@ -5,10 +5,22 @@ import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.widget.TextView;
 
+import org.opencv.android.OpenCVLoader;
+import org.opencv.core.Core;
+
 import java.text.DecimalFormat;
 
 
 public class MainActivity extends AppCompatActivity implements IDataCallback{
+
+    static {
+        try {
+            System.loadLibrary("opencv_java3");
+        } catch (UnsatisfiedLinkError e) {
+            Log.d("APPLICATION INIT", "Unsatisfied Link error: " + e.toString());
+        }
+    }
+
     SensorPlatformController sPC;
 
     TextView accX;
@@ -31,15 +43,15 @@ public class MainActivity extends AppCompatActivity implements IDataCallback{
         setContentView(R.layout.activity_main);
 
         sPC = new SensorPlatformController(this);
-        sPC.subscribeTo(DataType.ACCELERATION_EVENT);
-        sPC.subscribeTo(DataType.ROTATION_EVENT);
-        sPC.subscribeTo(DataType.ACCELERATION_RAW);
-        sPC.subscribeTo(DataType.LOCATION_RAW);
-        sPC.subscribeTo(DataType.ROTATION_RAW);
-        //sPC.subscribeTo(DataType.CAMERA_RAW);
+        //sPC.subscribeTo(DataType.ACCELERATION_EVENT);
+        //sPC.subscribeTo(DataType.ROTATION_EVENT);
+        //sPC.subscribeTo(DataType.ACCELERATION_RAW);
+        //sPC.subscribeTo(DataType.LOCATION_RAW);
+        //sPC.subscribeTo(DataType.ROTATION_RAW);
+        sPC.subscribeTo(DataType.CAMERA_RAW);
 
-        sPC.logRawData(true);
-        sPC.logEventData(true);
+        sPC.logRawData(false);
+        sPC.logEventData(false);
 
         /**
          * Mock unsubscribe

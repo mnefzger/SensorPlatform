@@ -1,7 +1,6 @@
 package mnefzger.de.sensorplatform.Utilities;
 
 import android.graphics.Bitmap;
-import android.graphics.YuvImage;
 
 import org.jcodec.codecs.h264.H264Encoder;
 import org.jcodec.codecs.h264.H264Utils;
@@ -52,6 +51,7 @@ public class SequenceEncoderWrapper {
         outTrack = muxer.addTrackForCompressed(TrackType.VIDEO, FPS);
 
         // Allocate a buffer big enough to hold output frames
+        //TODO somehow prevent OutOfMemoryException
         _out = ByteBuffer.allocate(640 * 480 * numberOfImages);
 
         // Create an instance of encoder

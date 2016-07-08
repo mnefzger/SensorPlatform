@@ -3,9 +3,9 @@ package mnefzger.de.sensorplatform;
 
 public class EventVector {
 
-    private long timestamp;
-    private String eventDescription;
-    private double value;
+    public long timestamp;
+    public String eventDescription;
+    public double value;
 
     public EventVector(long time, String event, double value) {
         this.timestamp = time;

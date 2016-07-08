@@ -93,7 +93,16 @@
             android:id="@+id/speedText"
             android:layout_marginTop="25dp"
             android:layout_below="@+id/lonText"
-            android:layout_alignStart="@+id/lonText" />
+            android:layout_alignStart="@+id/lonText"
+            android:layout_weight="0.10" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="17dp"
+            android:textAppearance="?android:attr/textAppearanceLarge"
+            android:text="Face detected: NO"
+            android:id="@+id/faceText"
+            android:layout_weight="0.09" />
     </LinearLayout>
 
 </RelativeLayout>

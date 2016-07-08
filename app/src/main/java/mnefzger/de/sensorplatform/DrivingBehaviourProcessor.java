@@ -1,7 +1,6 @@
 package mnefzger.de.sensorplatform;
 
 import android.hardware.SensorManager;
-import android.util.Log;
 
 import java.util.Iterator;
 import java.util.List;

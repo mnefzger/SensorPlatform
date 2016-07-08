@@ -13,6 +13,7 @@ public class MainActivity extends AppCompatActivity implements IDataCallback{
     static {
         try {
             System.loadLibrary("opencv_java3");
+            System.loadLibrary("imgProc");
         } catch (UnsatisfiedLinkError e) {
             Log.d("APPLICATION INIT", "Unsatisfied Link error: " + e.toString());
         }
@@ -32,6 +33,8 @@ public class MainActivity extends AppCompatActivity implements IDataCallback{
     TextView lon;
     TextView speed;
 
+    TextView face;
+
     DecimalFormat df = new DecimalFormat("#.####");
 
     @Override
@@ -49,6 +52,8 @@ public class MainActivity extends AppCompatActivity implements IDataCallback{
 
         sPC.logRawData(false);
         sPC.logEventData(false);
+
+        Log.d("PATH", android.os.Environment.getExternalStorageDirectory().getAbsolutePath());
 
         /**
          * Mock unsubscribe
@@ -73,6 +78,8 @@ public class MainActivity extends AppCompatActivity implements IDataCallback{
         lon = (TextView) findViewById(R.id.lonText);
         speed = (TextView) findViewById(R.id.speedText);
 
+        face = (TextView) findViewById(R.id.faceText);
+
     }
 
     @Override
@@ -83,7 +90,9 @@ public class MainActivity extends AppCompatActivity implements IDataCallback{
 
     @Override
     public void onEventData(EventVector v) {
+
         Log.d("EventData @ App  ", v.toString());
+        updateUI(v);
     }
 
     @Override
@@ -116,6 +125,20 @@ public class MainActivity extends AppCompatActivity implements IDataCallback{
                     speed.setText("Speed: " + df.format(v.speed) + " km/h");
                 }
 
+
+            }
+        });
+
+    }
+
+    public void updateUI(EventVector vector) {
+        EventVector v = vector;
+        final String text = (v.eventDescription == "Face detected") ? "Face detected: YES" : "Face detected: NO";
+
+        runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                face.setText(text);
 
             }
         });

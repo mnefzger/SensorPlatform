@@ -18,7 +18,6 @@ import android.media.Image;
 import android.media.ImageReader;
 import android.os.Handler;
 import android.os.HandlerThread;
-import android.os.SystemClock;
 import android.support.v4.app.ActivityCompat;
 import android.util.Log;
 import android.widget.Toast;
@@ -32,6 +31,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+import mnefzger.de.sensorplatform.Utilities.MathFunctions;
 import mnefzger.de.sensorplatform.Utilities.SequenceEncoderWrapper;
 
 
@@ -72,8 +72,8 @@ public class ImageModule implements IEventCallback{
 
     public void startCapture() {
         startBackgroundThread();
-        open("0");
-        //open("1");
+        //open("0");
+        open("1");
     }
 
     public void stopCapture() {
@@ -285,7 +285,7 @@ public class ImageModule implements IEventCallback{
 
             }
 
-            mBackgroundHandler.post( new ImageSaver(yuvimage, "front") );
+            //mBackgroundHandler.post( new ImageSaver(yuvimage, "front") );
         }
         img.close();
     }
@@ -308,7 +308,7 @@ public class ImageModule implements IEventCallback{
                 backImages.remove(0);
 
                 if(!saving) {
-                    createVideoFile(backImages, BACK_FPS);
+                    //createVideoFile(backImages, BACK_FPS);
                 }
             }
 

@@ -1,8 +1,6 @@
 package mnefzger.de.sensorplatform;
 
 
-import android.util.Log;
-
 import java.util.List;
 
 public abstract class EventProcessor {

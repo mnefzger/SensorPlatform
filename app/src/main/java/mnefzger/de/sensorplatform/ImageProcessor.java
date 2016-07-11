@@ -26,15 +26,25 @@ public class ImageProcessor{
         callback = im;
     }
 
-    private native int[] nAsmFindFace(long adress);
+    private native int[] nAsmFindFace(long adress1, long adress2, int width, int height);
 
-
+    /*
     public byte[] processImage(byte[] image, int width, int height) {
         Mat imgMat = new Mat(height + height/2, width, CvType.CV_8UC1);
         imgMat.put(0,0,image);
 
-        Mat gray = new Mat(height, width, CvType.CV_8UC1);
-        Imgproc.cvtColor(imgMat, gray, Imgproc.COLOR_YUV2GRAY_I420);
+        //Mat gray = new Mat(height, width, CvType.CV_8UC1);
+        //Imgproc.cvtColor(imgMat, gray, Imgproc.COLOR_YUV2GRAY_I420);
+
+        if(!faceProcRunning) {
+            int[] faces = findFaceInImage(gray);
+            if(faces.length == 4) {
+                public byte[] processImage(byte[] image, int width, int height) {
+        Mat imgMat = new Mat(height + height/2, width, CvType.CV_8UC1);
+        imgMat.put(0,0,image);
+
+        //Mat gray = new Mat(height, width, CvType.CV_8UC1);
+        //Imgproc.cvtColor(imgMat, gray, Imgproc.COLOR_YUV2GRAY_I420);
 
         if(!faceProcRunning) {
             int[] faces = findFaceInImage(gray);
@@ -64,13 +74,57 @@ public class ImageProcessor{
         yuvout.get(0, 0, return_buff);
 
         return return_buff;
+    });
+                //Imgproc.rectangle(dst, new Point(faces[0]-faces[2]/2,faces[1]-faces[3]/2), new Point(faces[0]+faces[2]/2,faces[1]+faces[3]/2), new Scalar(0,255,0), 5);
+            } else {
+                Imgproc.rectangle(gray, new Point(0,0), new Point(80,80), new Scalar(255,0,0), 5);
+            }
+        } else {
+                Imgproc.circle(gray, new Point(0,0), 25, new Scalar(255,0,0), 5);
+        }
+
+        Point center = new Point(gray.width()/2, gray.height()/2);
+        Mat rotationMatrix = Imgproc.getRotationMatrix2D(center, -90, 1);
+
+        Mat dst = gray.clone();
+        Imgproc.warpAffine(gray, dst, rotationMatrix, gray.size());
+
+        Mat rgb = new Mat(height, width, CvType.CV_8UC3);
+        Imgproc.cvtColor( dst, rgb, Imgproc.COLOR_GRAY2RGB);
+
+        Mat yuvout = new Mat(height + height/2, width, CvType.CV_8UC1);
+        Imgproc.cvtColor( rgb, yuvout, Imgproc.COLOR_RGB2YUV_I420);
+
+        byte[] return_buff = new byte[(int) (yuvout.total() * yuvout.elemSize())];
+        yuvout.get(0, 0, return_buff);
+
+        return return_buff;
+    }*/
+
+    public byte[] processImage(byte[] image, int width, int height) {
+        Mat imgMat = new Mat(height + height/2, width, CvType.CV_8UC1);
+        imgMat.put(0,0,image);
+
+        Mat output = new Mat();
+
+        //Mat gray = new Mat(height, width, CvType.CV_8UC1);
+        //Imgproc.cvtColor(imgMat, gray, Imgproc.COLOR_YUV2GRAY_I420);
+
+        if(!faceProcRunning) {
+            int[] faces = findFaceInImage(imgMat.getNativeObjAddr(), output.getNativeObjAddr(), width, height);
+        }
+
+        byte[] return_buff = new byte[(int) (output.total() * output.elemSize())];
+        output.get(0, 0, return_buff);
+
+        return return_buff;
     }
 
 
-    private int[] findFaceInImage(Mat image) {
+    private int[] findFaceInImage(long adress1, long adress2, int width, int height) {
         faceProcRunning = true;
         double time = System.currentTimeMillis();
-        int[] faces = nAsmFindFace(image.getNativeObjAddr());
+        int[] faces = nAsmFindFace(adress1, adress2, width, height);
 
         if(faces.length == 4) {
             Log.d("FACE_DETECTION", "Detected at (" + faces[0] + "," + faces[1]+")");

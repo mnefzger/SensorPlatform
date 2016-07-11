@@ -93,7 +93,7 @@ public class ImageModule implements IEventCallback{
                 }
                 if(id == "1") {
                     cameraManager.openCamera(id, frontCameraStateCallback, null );
-                    imageReader_front = ImageReader.newInstance(480, 640, ImageFormat.YUV_420_888, 15);
+                    imageReader_front = ImageReader.newInstance(320, 240, ImageFormat.YUV_420_888, 15);
                     imageReader_front.setOnImageAvailableListener(onFrontImageAvailableListener, mBackgroundHandler);
                 }
             }
@@ -280,12 +280,12 @@ public class ImageModule implements IEventCallback{
                 frontImages.remove(0);
 
                 if(!saving) {
-                    createVideoFile(frontImages, FRONT_FPS);
+                    //createVideoFile(frontImages, FRONT_FPS);
                 }
 
             }
 
-            //mBackgroundHandler.post( new ImageSaver(yuvimage, "front") );
+            mBackgroundHandler.post( new ImageSaver(yuvimage, "front") );
         }
         img.close();
     }

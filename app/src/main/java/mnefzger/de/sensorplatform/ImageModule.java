@@ -31,7 +31,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-import mnefzger.de.sensorplatform.Utilities.MathFunctions;
 import mnefzger.de.sensorplatform.Utilities.SequenceEncoderWrapper;
 
 
@@ -51,8 +50,13 @@ public class ImageModule implements IEventCallback{
     private List<YuvImage> backImages = new ArrayList<>();
     private List<YuvImage> frontImages = new ArrayList<>();
 
-    private int FRONT_FPS = 15;
-    private int BACK_FPS = 15;
+    private int FRONT_MAX_FPS = 15;
+    private double FRONT_AVG_FPS = FRONT_MAX_FPS;
+    private int FRONT_PROCESSING_FPS = 5;
+
+    private int BACK_MAX_FPS = 15;
+    private double BACK_AVG_FPS  = BACK_MAX_FPS;
+    private int BACK_PROCESSING_FPS = 5;
 
     private HandlerThread mBackgroundThread;
     private Handler mBackgroundHandler;
@@ -180,19 +184,10 @@ public class ImageModule implements IEventCallback{
         public void onConfigureFailed(CameraCaptureSession session) {}
     };
 
-    private long now;
-    private long delta = 0;
-    private long prevTime = 0;
     private ImageReader.OnImageAvailableListener onFrontImageAvailableListener = new ImageReader.OnImageAvailableListener() {
         @Override
         public void onImageAvailable(ImageReader reader){
             handleImageFront(reader.acquireNextImage());
-            /*
-            now = System.currentTimeMillis();
-            delta = now - prevTime;
-            Log.i("IO_IMAGE", "deltaTime:" + delta);
-            prevTime = now;
-            */
         }
     };
 
@@ -200,12 +195,6 @@ public class ImageModule implements IEventCallback{
         @Override
         public void onImageAvailable(ImageReader reader){
             handleImageBack(reader.acquireNextImage());
-
-            now = System.currentTimeMillis();
-            delta = now - prevTime;
-            Log.i("IO_IMAGE", "deltaTime:" + delta);
-            prevTime = now;
-
         }
     };
 
@@ -225,91 +214,110 @@ public class ImageModule implements IEventCallback{
         callback.onEventData(v);
     }
 
-    private void createVideoFile(List<YuvImage> images, int FPS) {
-        saving = true;
-        SequenceEncoderWrapper encoder;
-        String baseDir = android.os.Environment.getExternalStorageDirectory().getAbsolutePath();
-        String fileName = "Video-" + System.nanoTime() + ".mp4";
-        String filePath = baseDir + "/SensorPlatform/videos/";
 
-        File folder = new File(filePath);
-        if (!folder.exists()) {
-            folder.mkdir();
-        }
-
-        File mFile = new File(filePath + File.separator + fileName);
-
-        try {
-            Log.d("VIDEO", "Trying to save..." + images.size() + " frames");
-            double start = System.currentTimeMillis();
-            encoder = new SequenceEncoderWrapper(mFile, images.size(), FPS);
-            for (int i = 0; i < images.size(); i++) {
-                YuvImage image = images.get(i);
-                Bitmap bi = getBitmapImageFromYUV(image, image.getWidth(), image.getHeight());
-                encoder.encodeImage(bi);
-            }
-            encoder.finish();
-            double delta = (System.currentTimeMillis() - start)/1000;
-
-            CharSequence text = "Saving finished in " + delta + "s!";
-            int duration = Toast.LENGTH_LONG;
-            Toast toast = Toast.makeText(context, text, duration);
-            toast.show();
-            Log.d("VIDEO", "Saving finished in " + delta + "s!" );
-
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-    }
-
-    private double lastFront = 0;
+    private double lastFront = System.currentTimeMillis();
+    private double lastFrontProc = System.currentTimeMillis();
+    private double lastFrontSaved = System.currentTimeMillis();
     private void handleImageFront(Image img) {
         if(img != null) {
             byte[] bytes = getBytes(img);
-
-            byte[] processedImg = imgProc.processImage(bytes, img.getWidth(), img.getHeight());
-            YuvImage yuvimage = new YuvImage(processedImg, ImageFormat.NV21, img.getWidth(), img.getHeight(), null);
+            YuvImage yuvimage;
 
             double now = System.currentTimeMillis();
-            if(now - lastFront >= (1000/(1+FRONT_FPS)) ) {
+
+            /**
+             * We do not want to process every frame
+             */
+            if(now - lastFrontProc >= (1000 / FRONT_PROCESSING_FPS) ) {
+                byte[] processedImg = imgProc.processImage(bytes, img.getWidth(), img.getHeight());
+                yuvimage = new YuvImage(processedImg, ImageFormat.NV21, img.getWidth(), img.getHeight(), null);
+                lastFrontProc = now;
+            } else {
+                yuvimage = new YuvImage(bytes, ImageFormat.NV21, img.getWidth(), img.getHeight(), null);
+            }
+
+            /**
+             * Store the received image (either processed or raw) and write it to file
+             */
+            if(now - lastFront >= (1000/(1+FRONT_MAX_FPS)) ) {
+                double latestFPS = 1000 / (now - lastFront);
+                FRONT_AVG_FPS = 0.9*FRONT_AVG_FPS + 0.1*latestFPS;
+
                 frontImages.add(yuvimage);
                 lastFront = now;
+
+                //mBackgroundHandler.post( new ImageSaver(yuvimage, "front") );
             }
 
-            if(frontImages.size() > (10*FRONT_FPS) ) {
+            /**
+             * Save video every ten seconds to file
+             */
+            if(now - lastFrontSaved >= 10000 ) {
+                //mBackgroundHandler.post( new VideoSaver(new ArrayList<YuvImage>(frontImages), (int)FRONT_AVG_FPS, "front") );
+                new VideoSaver(new ArrayList<YuvImage>(frontImages), (int)FRONT_AVG_FPS, "front");
+                lastFrontSaved = now;
+            }
+
+            /**
+             * Only store the last ten seconds in the image buffer
+             */
+            if(frontImages.size() > (10*FRONT_MAX_FPS) ) {
                 frontImages.remove(0);
-
-                if(!saving) {
-                    //createVideoFile(frontImages, FRONT_FPS);
-                }
-
             }
 
-            mBackgroundHandler.post( new ImageSaver(yuvimage, "front") );
         }
         img.close();
     }
 
-    private double lastBack = 0;
+    private double lastBack = System.currentTimeMillis();
+    private double lastBackProc = System.currentTimeMillis();
+    private double lastBackSaved = System.currentTimeMillis();
     private void handleImageBack(Image img) {
         if(img != null) {
             byte[] bytes = getBytes(img);
-
-            byte[] processedImg = imgProc.processImage(bytes, img.getWidth(), img.getHeight());
-            YuvImage yuvimage = new YuvImage(processedImg, ImageFormat.NV21, img.getWidth(), img.getHeight(), null);
+            YuvImage yuvimage;
 
             double now = System.currentTimeMillis();
-            if(now - lastBack >= (1000/(1+BACK_FPS)) ) {
-                backImages.add(yuvimage);
-                lastBack = now;
+
+
+            /**
+             * We do not want to process every frame
+             */
+            if(now - lastBackProc >= (1000 / BACK_PROCESSING_FPS) ) {
+                byte[] processedImg = imgProc.processImage(bytes, img.getWidth(), img.getHeight());
+                yuvimage = new YuvImage(processedImg, ImageFormat.NV21, img.getWidth(), img.getHeight(), null);
+                lastFrontProc = now;
+            } else {
+                yuvimage = new YuvImage(bytes, ImageFormat.NV21, img.getWidth(), img.getHeight(), null);
             }
 
-            if(backImages.size() > (10*BACK_FPS) ) {
-                backImages.remove(0);
+            /**
+             * Store the received image (either processed or raw) and write it to file
+             */
+            if(now - lastBack >= (1000/(1+BACK_MAX_FPS)) ) {
+                double latestFPS = 1000 / (now - lastBack);
+                BACK_AVG_FPS = 0.9*BACK_AVG_FPS + 0.1*latestFPS;
 
-                if(!saving) {
-                    //createVideoFile(backImages, BACK_FPS);
-                }
+                backImages.add(yuvimage);
+                lastBack = now;
+
+                //mBackgroundHandler.post( new ImageSaver(yuvimage, "front") );
+            }
+
+            /**
+             * Save video every ten seconds to file
+             */
+            if(now - lastBackSaved >= 10000 ) {
+                //mBackgroundHandler.post( new VideoSaver(new ArrayList<YuvImage>(frontImages), (int)FRONT_AVG_FPS, "front") );
+                new VideoSaver(new ArrayList<YuvImage>(backImages), (int)BACK_AVG_FPS, "back");
+                lastBackSaved = now;
+            }
+
+            /**
+             * Only store the last ten seconds in the image buffer
+             */
+            if(backImages.size() > (10*BACK_MAX_FPS) ) {
+                backImages.remove(0);
             }
 
            // mBackgroundHandler.post( new ImageSaver(yuvimage, "back") );
@@ -341,6 +349,62 @@ public class ImageModule implements IEventCallback{
         return bmp;
     }
 
+    private static class VideoSaver {
+
+        private ArrayList<YuvImage> images = new ArrayList<>();
+        private int FPS;
+        SequenceEncoderWrapper encoder;
+        String baseDir = android.os.Environment.getExternalStorageDirectory().getAbsolutePath();
+        String fileName = "Video-" + System.nanoTime() + ".mp4";
+        String filePath = baseDir + "/SensorPlatform/videos/";
+        File mFile;
+
+        public VideoSaver(ArrayList<YuvImage> list, int FPS, String mode) {
+            this.images = list;
+            this.FPS = FPS;
+
+            File folder = new File(filePath);
+            if (!folder.exists()) {
+                folder.mkdir();
+            }
+
+            // subdirectory /front or /back
+            filePath += mode;
+            folder = new File(filePath);
+            if (!folder.exists()) {
+                folder.mkdir();
+            }
+
+            mFile = new File(filePath + File.separator + fileName);
+
+            save();
+        }
+
+        private void save() {
+            new Thread(new Runnable() {
+                public void run() {
+                    try {
+                        Log.d("VIDEO", "Trying to save..." + images.size() + " frames");
+                        double start = System.currentTimeMillis();
+                        encoder = new SequenceEncoderWrapper(mFile, images.size(), FPS);
+                        for (int i = 0; i < images.size(); i++) {
+                            YuvImage image = images.get(i);
+                            Bitmap bi = getBitmapImageFromYUV(image, image.getWidth(), image.getHeight());
+                            encoder.encodeImage(bi);
+                        }
+                        encoder.finish();
+
+                        double delta = (System.currentTimeMillis() - start)/1000;
+                        Log.d("VIDEO", "Saving finished in " + delta + "s!" );
+
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+                }
+            }).start();
+        }
+
+    }
 
     /**
      * Saves a JPEG {@link Image} into the specified {@link File}.

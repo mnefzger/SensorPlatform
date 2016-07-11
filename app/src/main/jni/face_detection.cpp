@@ -12,7 +12,7 @@
 #define  LOGE(...)  __android_log_print(ANDROID_LOG_ERROR,LOG_TAG,__VA_ARGS__)
 
 extern "C" {
-    JNIEXPORT jintArray Java_mnefzger_de_sensorplatform_ImageProcessor_nAsmFindFace(JNIEnv *env, jobject obj, jlong address, jlong returnadress, jint height, jint width);
+    JNIEXPORT jintArray Java_mnefzger_de_sensorplatform_ImageProcessor_nAsmFindFace(JNIEnv *env, jobject obj, jlong address, jlong returnadress);
 }
 
 using namespace cv;
@@ -36,7 +36,7 @@ int initAsm() {
 	return 1;
 }
 
-JNIEXPORT jintArray Java_mnefzger_de_sensorplatform_ImageProcessor_nAsmFindFace(JNIEnv *env, jobject obj, jlong address, jlong returnadress, jint height, jint width) {
+JNIEXPORT jintArray Java_mnefzger_de_sensorplatform_ImageProcessor_nAsmFindFace(JNIEnv *env, jobject obj, jlong address, jlong returnadress) {
 	jintArray result;
 	Mat image = *((Mat*) address);
 
@@ -51,22 +51,18 @@ JNIEXPORT jintArray Java_mnefzger_de_sensorplatform_ImageProcessor_nAsmFindFace(
     Mat gray(image.rows, image.cols, image.depth());
     cvtColor(image, gray, COLOR_YUV2GRAY_I420);
 
+    /**
+    *   Rotating the image is only necessary certain device orientations
+    *
     Point2f center( gray.rows/2, gray.cols/2 );
     Mat rotationMatrix = getRotationMatrix2D(center, -180, 1);
-    /*
-    Rect bbox = RotatedRect(center, image.size(), 90).boundingRect();
-    int one = ceil(bbox.width/2);
-    int two = ceil(bbox.height/2);
-    if( fmod( (one - center.x), 2 ) != 0) one += 1;
-    if( fmod( (two - center.y), 2 ) != 0) two += 1;
-    rotationMatrix.at<double>(0,2) += one - center.x;
-    rotationMatrix.at<double>(1,2) += two - center.y;
-    */
     Mat rotated;
     warpAffine(gray, rotated, rotationMatrix, gray.size());
+    flip(gray, rotated, 0);
+    */
 
     vector< Rect > faces;
-    faceCascade.detectMultiScale(rotated, faces, 1.1, 2, 0 | CV_HAAR_SCALE_IMAGE, Size(30, 30));
+    faceCascade.detectMultiScale(gray, faces, 1.1, 2, 0 | CV_HAAR_SCALE_IMAGE, Size(30, 30));
 
     if (faces.size()) {
     	result = env->NewIntArray(4);
@@ -79,15 +75,15 @@ JNIEXPORT jintArray Java_mnefzger_de_sensorplatform_ImageProcessor_nAsmFindFace(
 
 		env->SetIntArrayRegion(result, 0, 4, tmp_array);
 
-        rectangle(rotated, faces[0], CV_RGB(255, 255, 255), 1);
+        rectangle(gray, faces[0], CV_RGB(255, 255, 255), 1);
 
     } else {
         result = env->NewIntArray(0);
     }
 
 
-    Mat bgr(rotated.rows, rotated.cols, CV_8UC3);
-    cvtColor(rotated, bgr, COLOR_GRAY2BGR);
+    Mat bgr(gray.rows, gray.cols, CV_8UC3);
+    cvtColor(gray, bgr, COLOR_GRAY2BGR);
 
     Mat yuv;
     cvtColor(bgr, yuv, COLOR_BGR2YUV_I420);

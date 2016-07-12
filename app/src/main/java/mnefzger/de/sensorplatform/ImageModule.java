@@ -23,10 +23,13 @@ import android.util.Log;
 import android.util.SparseArray;
 import android.widget.Toast;
 
+import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
 import java.nio.ByteBuffer;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -219,6 +222,7 @@ public class ImageModule implements IEventCallback{
     private double lastFront = System.currentTimeMillis();
     private double lastFrontProc = System.currentTimeMillis();
     private double lastFrontSaved = System.currentTimeMillis();
+    private int frontIt = 0;
     private void handleImageFront(Image img) {
         if(img != null) {
             byte[] bytes = getBytes(img);
@@ -244,7 +248,8 @@ public class ImageModule implements IEventCallback{
                 double latestFPS = 1000 / (now - lastFront);
                 FRONT_AVG_FPS = 0.9*FRONT_AVG_FPS + 0.1*latestFPS;
 
-                frontImages.put(frontImages.size(), yuvimage);
+                frontImages.append(frontIt, yuvimage);
+                frontIt++;
                 lastFront = now;
 
                 //mBackgroundHandler.post( new ImageSaver(yuvimage, "front") );
@@ -254,7 +259,6 @@ public class ImageModule implements IEventCallback{
              * Save video every ten seconds to file
              */
             if(now - lastFrontSaved >= 10000 ) {
-                //mBackgroundHandler.post( new VideoSaver(new ArrayList<YuvImage>(frontImages), (int)FRONT_AVG_FPS, "front") );
                 new VideoSaver(frontImages, (int)FRONT_AVG_FPS, 320, 240, "front");
                 lastFrontSaved = now;
             }
@@ -263,7 +267,8 @@ public class ImageModule implements IEventCallback{
              * Only store the last ten seconds in the image buffer
              */
             if(frontImages.size() > (10*FRONT_MAX_FPS) ) {
-                frontImages.removeAt(0);
+                int key = frontImages.keyAt(0);
+                frontImages.remove(key);
             }
 
         }
@@ -273,6 +278,7 @@ public class ImageModule implements IEventCallback{
     private double lastBack = System.currentTimeMillis();
     private double lastBackProc = System.currentTimeMillis();
     private double lastBackSaved = System.currentTimeMillis();
+    private int backIt = 0;
     private void handleImageBack(Image img) {
         if(img != null) {
             byte[] bytes = getBytes(img);
@@ -299,7 +305,8 @@ public class ImageModule implements IEventCallback{
                 double latestFPS = 1000 / (now - lastBack);
                 BACK_AVG_FPS = 0.9*BACK_AVG_FPS + 0.1*latestFPS;
 
-                backImages.put(backImages.size(), yuvimage);
+                backImages.put(backIt, yuvimage);
+                backIt++;
                 lastBack = now;
 
                 //mBackgroundHandler.post( new ImageSaver(yuvimage, "front") );
@@ -309,8 +316,7 @@ public class ImageModule implements IEventCallback{
              * Save video every ten seconds to file
              */
             if(now - lastBackSaved >= 10000 ) {
-                //mBackgroundHandler.post( new VideoSaver(new ArrayList<YuvImage>(frontImages), (int)FRONT_AVG_FPS, "front") );
-                new VideoSaver(backImages, (int)BACK_AVG_FPS, 640, 480, "back");
+                new VideoSaver(deepCopy(backImages), (int)BACK_AVG_FPS, 640, 480, "back");
                 lastBackSaved = now;
             }
 
@@ -318,7 +324,8 @@ public class ImageModule implements IEventCallback{
              * Only store the last ten seconds in the image buffer
              */
             if(backImages.size() > (10*BACK_MAX_FPS) ) {
-                backImages.removeAt(0);
+                int key = backImages.keyAt(0);
+                backImages.remove(key);
             }
 
            // mBackgroundHandler.post( new ImageSaver(yuvimage, "back") );
@@ -362,7 +369,7 @@ public class ImageModule implements IEventCallback{
         File mFile;
 
         public VideoSaver(SparseArray<YuvImage> list, int FPS, int width, int height, String mode) {
-            this.images = list;
+            this.images = copy(list);
             this.FPS = FPS;
             this.w = width;
             this.h = height;
@@ -408,6 +415,14 @@ public class ImageModule implements IEventCallback{
                     }
                 }
             }).start();
+        }
+
+        private SparseArray<YuvImage> copy(SparseArray<YuvImage> list) {
+            SparseArray<YuvImage> temp = new SparseArray<>();
+            for(int i=0; i<list.size(); i++) {
+                temp.put(i, list.valueAt(i));
+            }
+            return temp;
         }
 
     }
@@ -495,6 +510,15 @@ public class ImageModule implements IEventCallback{
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
+    }
+
+    private SparseArray<YuvImage> deepCopy(SparseArray<YuvImage> list) {
+        SparseArray<YuvImage> temp = new SparseArray<>();
+        for(int i=0; i<list.size(); i++) {
+            YuvImage img = list.get(i);
+            if(img !=null) temp.put(i, new YuvImage(img.getYuvData(), img.getYuvFormat(), img.getWidth(), img.getHeight(), img.getStrides()));
+        }
+        return temp;
     }
 
 

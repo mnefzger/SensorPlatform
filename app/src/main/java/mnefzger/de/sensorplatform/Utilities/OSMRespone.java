@@ -11,7 +11,8 @@ public class OSMRespone {
     class Element {
         public String type;
         public int id;
-        public Location center;
+        public double lat;
+        public double lon;
         public Array nodes;
         public TagContainer tags;
     }

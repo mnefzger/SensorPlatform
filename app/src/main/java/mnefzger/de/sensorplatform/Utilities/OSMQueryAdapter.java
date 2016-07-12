@@ -35,8 +35,8 @@ public class OSMQueryAdapter {
             double lat_e = location.getLatitude() + 0.001;
             double lon_n = location.getLongitude() + 0.001;
 
-           // search(generateSearchStringBounding(lat_w, lon_s, lat_e, lon_n));
-            search(generateSearchStringRadius(100,location.getLatitude(),location.getLongitude()));
+            //search(generateSearchStringBounding(lat_w, lon_s, lat_e, lon_n));
+            search(generateSearchStringRadius(100, location.getLatitude(), location.getLongitude()));
         }
     }
 
@@ -44,17 +44,16 @@ public class OSMQueryAdapter {
         String url ="http://overpass-api.de/api/interpreter?data=[out:json][timeout:15];";
         url += "(way[\"maxspeed\"]";
         url += "("+ lat_w +"," + lon_s + "," + lat_e + "," + lon_n + ");";
-        url += " <;);out;";
+        url += " <;);out body;";
 
         return url;
     }
 
     private String generateSearchStringRadius(double rad, double lat, double lon) {
         String url ="http://overpass-api.de/api/interpreter?data=[out:json][timeout:15];";
-        url += "way";
-        url += " around("+ rad +"," + lat + "," + lon + ");";
-        url += "[\"maxspeed\"];";
-        url += "(._;>;);out;";
+        url += "way[\"maxspeed\"]";
+        url += "(around:"+ rad +"," + lat + "," + lon + ");";
+        url += "(._;>;);out body;";
 
         return url;
     }
@@ -72,7 +71,9 @@ public class OSMQueryAdapter {
                         Gson gson = new Gson();
                         OSMRespone osmR = gson.fromJson(response, OSMRespone.class);
                         for(OSMRespone.Element e : osmR.elements) {
-                            Log.d("OSMResponse", e.tags.name + ", maxspeed: " + e.tags.maxspeed);
+                            if(e.tags != null)
+                                if(e.tags.maxspeed != null)
+                                    Log.d("OSMResponse", e.tags.name + ", maxspeed: " + e.tags.maxspeed);
                         }
                     }
                 }, new Response.ErrorListener() {

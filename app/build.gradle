@@ -43,6 +43,6 @@ dependencies {
     compile project(':openCVLibrary310')
     compile files('libs/opencsv-3.8.jar')
     compile files('libs/jcodec-0.1.5.jar')
-    compile 'hu.supercluster:overpasser:0.1.0'
-    compile 'hu.supercluster:overpasser-retrofit-adapter:0.1.0'
+    compile 'com.android.volley:volley:1.0.0'
+    compile group: 'com.google.code.gson', name: 'gson', version: '1.7.2'
 }

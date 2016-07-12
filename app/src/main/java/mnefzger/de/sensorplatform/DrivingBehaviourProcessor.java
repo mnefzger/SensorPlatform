@@ -7,7 +7,6 @@ import android.util.Log;
 import java.util.Iterator;
 import java.util.List;
 
-import hu.supercluster.overpasser.adapter.OverpassQueryResult;
 
 import mnefzger.de.sensorplatform.Utilities.MathFunctions;
 import mnefzger.de.sensorplatform.Utilities.OSMQueryAdapter;
@@ -108,14 +107,15 @@ public class DrivingBehaviourProcessor extends EventProcessor {
         }
     }
 
+    private long lastRequest = System.currentTimeMillis();
     private void checkForSpeeding(DataVector last) {
+        long now = System.currentTimeMillis();
         // without location, there is nothing to process
-        if(last.location != null) {
-            OverpassQueryResult result = qAdapter.startSearch(last.location);
-            if(result != null) {
-                for(OverpassQueryResult.Element e : result.elements) {
-                    Log.d("OSM RESULT", "" + e.type);
-                }
+        if( last.location != null ) {
+            // query every 5 seconds
+            if( now-lastRequest > 5000 ) {
+                qAdapter.startSearch(last.location);
+                lastRequest = now;
             }
 
         }

@@ -1,17 +1,23 @@
 package mnefzger.de.sensorplatform;
 
+import android.content.Context;
 import android.hardware.SensorManager;
 import android.util.Log;
 
 import java.util.Iterator;
 import java.util.List;
 
+import hu.supercluster.overpasser.adapter.OverpassQueryResult;
+
 import mnefzger.de.sensorplatform.Utilities.MathFunctions;
+import mnefzger.de.sensorplatform.Utilities.OSMQueryAdapter;
 
 public class DrivingBehaviourProcessor extends EventProcessor {
+    OSMQueryAdapter qAdapter;
 
-    public DrivingBehaviourProcessor(SensorModule m) {
+    public DrivingBehaviourProcessor(SensorModule m, Context c) {
         super(m);
+        qAdapter = new OSMQueryAdapter(c);
     }
 
     private final double ACC_THRESHOLD = 0.75;
@@ -32,8 +38,8 @@ public class DrivingBehaviourProcessor extends EventProcessor {
 
         if(data.size() >= 3) {
             checkForHardAcc(getLastData(500));
-            checkForSpeeding();
             checkForSharpTurn(getLastData(1000));
+            checkForSpeeding(data.get(data.size()-1));
         }
 
 
@@ -102,8 +108,19 @@ public class DrivingBehaviourProcessor extends EventProcessor {
         }
     }
 
-    private void checkForSpeeding() {
-        //TODO
+    private void checkForSpeeding(DataVector last) {
+        // without location, there is nothing to process
+        if(last.location != null) {
+            OverpassQueryResult result = qAdapter.startSearch(last.location);
+            if(result != null) {
+                for(OverpassQueryResult.Element e : result.elements) {
+                    Log.d("OSM RESULT", "" + e.type);
+                }
+            }
+
+        }
+
+
     }
 
 }

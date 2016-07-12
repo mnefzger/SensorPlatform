@@ -72,7 +72,7 @@ public class SensorModule implements ISensorCallback, IEventCallback{
         accelerometer = new AccelerometerProvider(app, this);
         orientation = new OrientationProvider(app, this);
         location = new PositionProvider(app, this);
-        drivingBehProc = new DrivingBehaviourProcessor(this);
+        drivingBehProc = new DrivingBehaviourProcessor(this, app);
 
         current = new DataVector();
         current.setTimestamp(System.currentTimeMillis());
@@ -80,6 +80,7 @@ public class SensorModule implements ISensorCallback, IEventCallback{
     }
 
     public void startSensing(DataType type) {
+
         if(!sensing) {
             aggregateData(SAMPLING_MS);
             sensing = true;
@@ -139,6 +140,10 @@ public class SensorModule implements ISensorCallback, IEventCallback{
 
     private void aggregateData(final int ms) {
         DataVector last = current;
+        Location mock = new Location("mock");
+        mock.setLatitude(153.029028);
+        mock.setLongitude(-27.473403);
+        last.setLocation(mock);
         current = new DataVector();
 
         /**

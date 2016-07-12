@@ -43,7 +43,7 @@ class ActiveSubscriptions {
     }
 
     public static boolean drivingBehaviourActive() {
-        return isActive( new DataType[]{DataType.ACCELERATION_EVENT, DataType.ROTATION_EVENT} );
+        return isActive( new DataType[]{DataType.ACCELERATION_EVENT, DataType.ROTATION_EVENT, DataType.LOCATION_EVENT} );
     }
 
     public static boolean usingAccelerometer() {

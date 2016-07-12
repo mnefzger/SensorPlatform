@@ -40,8 +40,9 @@ dependencies {
     compile fileTree(dir: 'libs', include: ['*.jar'])
     testCompile 'junit:junit:4.12'
     compile 'com.android.support:appcompat-v7:23.4.0'
-    compile files('libs/opencsv-3.8.jar')
     compile project(':openCVLibrary310')
-    compile 'com.writingminds:FFmpegAndroid:0.3.2'
+    compile files('libs/opencsv-3.8.jar')
     compile files('libs/jcodec-0.1.5.jar')
+    compile 'hu.supercluster:overpasser:0.1.0'
+    compile 'hu.supercluster:overpasser-retrofit-adapter:0.1.0'
 }

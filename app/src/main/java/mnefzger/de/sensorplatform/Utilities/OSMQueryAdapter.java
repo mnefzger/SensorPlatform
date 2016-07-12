@@ -35,16 +35,32 @@ public class OSMQueryAdapter {
             double lat_e = location.getLatitude() + 0.001;
             double lon_n = location.getLongitude() + 0.001;
 
-            search(lat_w, lon_s, lat_e, lon_n);
+           // search(generateSearchStringBounding(lat_w, lon_s, lat_e, lon_n));
+            search(generateSearchStringRadius(100,location.getLatitude(),location.getLongitude()));
         }
     }
 
-    private void search(double lat_w, double lon_s, double lat_e, double lon_n) {
-        RequestQueue queue = Volley.newRequestQueue(context);
-        String url ="http://overpass-api.de/api/interpreter?data=[out:json][timeout:15];(";
-        url += "way[\"maxspeed\"]";
+    private String generateSearchStringBounding(double lat_w, double lon_s, double lat_e, double lon_n) {
+        String url ="http://overpass-api.de/api/interpreter?data=[out:json][timeout:15];";
+        url += "(way[\"maxspeed\"]";
         url += "("+ lat_w +"," + lon_s + "," + lat_e + "," + lon_n + ");";
-        url += " <;);out body center qt 100;";
+        url += " <;);out;";
+
+        return url;
+    }
+
+    private String generateSearchStringRadius(double rad, double lat, double lon) {
+        String url ="http://overpass-api.de/api/interpreter?data=[out:json][timeout:15];";
+        url += "way";
+        url += " around("+ rad +"," + lat + "," + lon + ");";
+        url += "[\"maxspeed\"];";
+        url += "(._;>;);out;";
+
+        return url;
+    }
+
+    private void search(String url) {
+        RequestQueue queue = Volley.newRequestQueue(context);
 
         Log.d("VOLLEY", url);
 

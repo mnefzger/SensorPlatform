@@ -5,6 +5,8 @@ import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.widget.TextView;
 
+import org.w3c.dom.Text;
+
 import java.text.DecimalFormat;
 
 
@@ -33,6 +35,7 @@ public class MainActivity extends AppCompatActivity implements IDataCallback{
     TextView speed;
 
     TextView street;
+    TextView event;
 
     DecimalFormat df = new DecimalFormat("#.####");
 
@@ -42,12 +45,12 @@ public class MainActivity extends AppCompatActivity implements IDataCallback{
         setContentView(R.layout.activity_main);
 
         sPC = new SensorPlatformController(this);
-        //sPC.subscribeTo(DataType.ACCELERATION_EVENT);
+        sPC.subscribeTo(DataType.ACCELERATION_EVENT);
         sPC.subscribeTo(DataType.ROTATION_EVENT);
-        //sPC.subscribeTo(DataType.ACCELERATION_RAW);
+        sPC.subscribeTo(DataType.ACCELERATION_RAW);
         sPC.subscribeTo(DataType.LOCATION_RAW);
         sPC.subscribeTo(DataType.LOCATION_EVENT);
-        //sPC.subscribeTo(DataType.ROTATION_RAW);
+        sPC.subscribeTo(DataType.ROTATION_RAW);
         //sPC.subscribeTo(DataType.CAMERA_RAW);
 
         sPC.logRawData(false);
@@ -77,6 +80,7 @@ public class MainActivity extends AppCompatActivity implements IDataCallback{
         speed = (TextView) findViewById(R.id.speedText);
 
         street = (TextView) findViewById(R.id.osmText);
+        event = (TextView) findViewById(R.id.eventText);
 
     }
 
@@ -134,7 +138,8 @@ public class MainActivity extends AppCompatActivity implements IDataCallback{
             @Override
             public void run() {
 
-                street.setText(v.eventDescription);
+                if(v.eventDescription.contains("ROAD")) street.setText(v.eventDescription);
+                else event.setText("Last event: " + v.eventDescription);
 
 
             }

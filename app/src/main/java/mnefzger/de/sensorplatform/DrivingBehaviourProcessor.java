@@ -156,10 +156,10 @@ public class DrivingBehaviourProcessor extends EventProcessor implements IOSMRes
 
         OSMRespone.Element road = getCurrentRoad(response);
         if(road != null) {
-            callback.onEventDetected(new EventVector(System.currentTimeMillis(), "You might be on " + road.tags.name, 0));
+            callback.onEventDetected(new EventVector(System.currentTimeMillis(), "ROAD: You might be on " + road.tags.name, 0));
             lastRecognizedRoad = road;
         } else {
-            callback.onEventDetected(new EventVector(System.currentTimeMillis(), "No road detected", 0));
+            callback.onEventDetected(new EventVector(System.currentTimeMillis(), "ROAD: No road detected", 0));
         }
 
         // TODO request speeding data
@@ -200,7 +200,7 @@ public class DrivingBehaviourProcessor extends EventProcessor implements IOSMRes
     }
 
     private double getDistanceToRoad(OSMRespone.Element element, OSMRespone response) {
-        double distance = 10000;
+        double distance;
 
         // First, we have to find the two nearest nodes of this street (element)
         double min_dist1 = 10000;

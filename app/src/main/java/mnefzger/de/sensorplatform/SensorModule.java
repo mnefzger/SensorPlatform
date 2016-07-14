@@ -58,7 +58,7 @@ public class SensorModule implements ISensorCallback, IEventCallback{
     /**
      * The onRawData() and event detection sampling rate in milliseconds
      */
-    private final int SAMPLING_MS = 100;
+    private final int SAMPLING_MS = 500;
     /**
      * int identifier for GPS Sensor
      */
@@ -143,12 +143,12 @@ public class SensorModule implements ISensorCallback, IEventCallback{
 
     private void aggregateData(final int ms) {
         DataVector last = current;
-
+    /*
         Location mock = new Location("mock");
-        mock.setLongitude(153.014245);
-        mock.setLatitude(-27.451134);
+        mock.setLongitude(153.028013);
+        mock.setLatitude(-27.464979);
         last.setLocation(mock);
-
+    */
         current = new DataVector();
 
         /**

@@ -2,6 +2,7 @@ package mnefzger.de.sensorplatform.Utilities;
 
 import android.hardware.SensorManager;
 
+import java.lang.reflect.Array;
 import java.util.Iterator;
 import java.util.List;
 
@@ -83,6 +84,8 @@ public class MathFunctions {
         return result;
     }
 
+
+
     /**
      * Class representing the Exponential Moving Average
      */
@@ -127,6 +130,33 @@ public class MathFunctions {
         double c = 2 * Math.asin(Math.sqrt(a));
         double distanceInMeters = 6371000 * c;
         return distanceInMeters;
+    }
+
+/*
+    public static double calculateDistanceToLine(double lat1, double lon1, double lat2, double lon2, double lat3, double lon3) {
+        double[] vectorV = new double[2];
+        vectorV[0] = lat2-lat1;
+        vectorV[1] = -(lon2-lon1);
+
+        double[] vectorU = new double[2];
+        vectorU[0] = lat1-lat3;
+        vectorU[1] = lon1-lon3;
+
+        double distance = Math.abs( (vectorV[0]*vectorU[1]) - (vectorU[0]*vectorV[1]) );
+
+        return distance;
+    }
+    */
+
+    public static double calculateDistanceToLine(double lat1, double lon1, double lat2, double lon2, double lat3, double lon3) {
+        double XX = lat2-lat1;
+        double YY = lon2-lon1;
+
+        double shortest = ((XX * (lat3-lat1)) + (YY * (lon3-lon1))) / ((XX * XX) + (YY * YY));
+        double lat4 = lat1 + XX * shortest;
+        double lon4 = lon1 + YY * shortest;
+
+        return calculateDistance(lat3, lon3, lat4, lon4);
     }
 
 }

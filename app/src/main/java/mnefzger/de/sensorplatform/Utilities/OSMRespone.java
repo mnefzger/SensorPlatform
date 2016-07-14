@@ -13,7 +13,8 @@ public class OSMRespone {
         public int id;
         public double lat;
         public double lon;
-        public Array nodes;
+        public ArrayList<Integer> nodes;
+
         public TagContainer tags;
     }
 

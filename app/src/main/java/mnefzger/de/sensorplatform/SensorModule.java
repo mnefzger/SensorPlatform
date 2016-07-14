@@ -143,12 +143,12 @@ public class SensorModule implements ISensorCallback, IEventCallback{
 
     private void aggregateData(final int ms) {
         DataVector last = current;
-    /*
+
         Location mock = new Location("mock");
-        mock.setLongitude(153.014179);
-        mock.setLatitude(-27.451109);
+        mock.setLongitude(153.014245);
+        mock.setLatitude(-27.451134);
         last.setLocation(mock);
-    */
+
         current = new DataVector();
 
         /**

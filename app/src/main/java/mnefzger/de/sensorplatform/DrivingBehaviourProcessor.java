@@ -2,7 +2,9 @@ package mnefzger.de.sensorplatform;
 
 import android.content.Context;
 import android.hardware.SensorManager;
+import android.util.Log;
 import android.util.SparseArray;
+import java.lang.reflect.Array;
 
 import java.util.Iterator;
 import java.util.List;
@@ -17,6 +19,7 @@ public class DrivingBehaviourProcessor extends EventProcessor implements IOSMRes
     private OSMQueryAdapter qAdapter;
     private boolean turned = false;
     private OSMRespone.Element lastRecognizedRoad;
+    private DataVector lastVector;
 
     public DrivingBehaviourProcessor(SensorModule m, Context c) {
         super(m);
@@ -43,11 +46,12 @@ public class DrivingBehaviourProcessor extends EventProcessor implements IOSMRes
 
     public void processData(List<DataVector> data) {
         super.processData(data);
+        lastVector = data.get(data.size()-1);
 
         if(data.size() >= 3) {
             checkForHardAcc(getLastData(500));
             checkForSharpTurn(getLastData(1000));
-            checkForSpeeding(data.get(data.size()-1));
+            checkForSpeeding(lastVector);
         }
 
     }
@@ -164,8 +168,7 @@ public class DrivingBehaviourProcessor extends EventProcessor implements IOSMRes
     /**
      * Returns the best estimate for the current road
      * If only one road is detected, we assume that it is the correct one.
-     * If two roads are detected, we check if the vehicle turned during the last timeframe and base our decision on that.
-     * If more than two roads are detected, we have a problem. //TODO road detection: think about this
+     * If two or more roads are detected, we check which road is closest
      */
     private OSMRespone.Element getCurrentRoad(OSMRespone response) {
         SparseArray<OSMRespone.Element> roads = new SparseArray<>();
@@ -183,25 +186,51 @@ public class DrivingBehaviourProcessor extends EventProcessor implements IOSMRes
             currentRoad = roads.valueAt(0);
 
         } else if(roads.size() > 1) {
-            if(turned) {
-                    if(roads.valueAt(0).tags.name != lastRecognizedRoad.tags.name) {
-                        currentRoad = roads.valueAt(0);
-                    } else {
-                        currentRoad = roads.valueAt(1);
-                    }
-
-            } else {
-                // no turn -> road stays the same
-                if(roads.valueAt(0).tags.name == lastRecognizedRoad.tags.name ||
-                        roads.valueAt(1).tags.name == lastRecognizedRoad.tags.name) {
-                    currentRoad = lastRecognizedRoad;
-                } else {
-                    // no turn but lastRecognizedRoad is not in new data
-                    // TODO what do we do now?
+            double min_dist = 10000;
+            for(int i=0; i<roads.size(); i++) {
+                double temp_dist = getDistanceToRoad(roads.valueAt(i), response);
+                if(temp_dist < min_dist) {
+                    min_dist = temp_dist;
+                    currentRoad = roads.valueAt(i);
                 }
             }
         }
 
         return currentRoad;
+    }
+
+    private double getDistanceToRoad(OSMRespone.Element element, OSMRespone response) {
+        double distance = 10000;
+
+        // First, we have to find the two nearest nodes of this street (element)
+        double min_dist1 = 10000;
+        OSMRespone.Element near_elem1 = null;
+        double min_dist2 = 10000;
+        OSMRespone.Element near_elem2 = null;
+        for(int r=0; r<element.nodes.size(); r++) {
+            int id = element.nodes.get(r);
+            OSMRespone.Element el = null;
+            for(OSMRespone.Element e : response.elements) {
+                if(e.id == id) el = e;
+            }
+            double temp_dist = MathFunctions.calculateDistance(el.lat, el.lon, lastVector.location.getLatitude(), lastVector.location.getLongitude());
+
+            if(temp_dist < min_dist2) {
+                if(temp_dist < min_dist1) {
+                    min_dist1 = temp_dist;
+                    near_elem1 = el;
+
+                } else  {
+                    min_dist2 = temp_dist;
+                    near_elem2 = el;
+                }
+            }
+        }
+
+        // now, we calculate the distance between our position and the line between the two nearest nodes
+        distance = MathFunctions.calculateDistanceToLine(near_elem1.lat, near_elem1.lon, near_elem2.lat, near_elem2.lon, lastVector.location.getLatitude(), lastVector.location.getLongitude());
+        //Log.d("DISTANCE", "Distance to " + element.tags.name +":" + distance);
+
+        return distance;
     }
 }

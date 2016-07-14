@@ -156,7 +156,14 @@ public class MathFunctions {
         double lat4 = lat1 + XX * shortest;
         double lon4 = lon1 + YY * shortest;
 
-        return calculateDistance(lat3, lon3, lat4, lon4);
+        double minimumDistance = calculateDistance(lat3, lon3, lat4, lon4);
+        if(lat4 < lat2 && lat4 > lat1 && lon4 < lon2 && lon4 > lon1) {
+            return minimumDistance;
+        } else {
+            double min1 = Math.min(calculateDistance(lat3, lon3, lat1, lon1), calculateDistance(lat3, lon3, lat2, lon2));
+            return Math.min(min1, minimumDistance);
+        }
+
     }
 
 }

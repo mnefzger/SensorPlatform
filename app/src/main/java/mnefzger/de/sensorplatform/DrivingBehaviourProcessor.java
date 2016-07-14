@@ -229,7 +229,7 @@ public class DrivingBehaviourProcessor extends EventProcessor implements IOSMRes
 
         // now, we calculate the distance between our position and the line between the two nearest nodes
         distance = MathFunctions.calculateDistanceToLine(near_elem1.lat, near_elem1.lon, near_elem2.lat, near_elem2.lon, lastVector.location.getLatitude(), lastVector.location.getLongitude());
-        //Log.d("DISTANCE", "Distance to " + element.tags.name +":" + distance);
+        Log.d("DISTANCE", "Distance to " + element.tags.name +":" + distance);
 
         return distance;
     }

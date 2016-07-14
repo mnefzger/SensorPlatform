@@ -11,89 +11,124 @@
     tools:context="mnefzger.de.sensorplatform.MainActivity">
 
     <LinearLayout
-        android:orientation="vertical"
+        android:orientation="horizontal"
+        android:layout_width="match_parent"
+        android:layout_height="120dp"
+        android:id="@+id/linearLayout">
+
+        <LinearLayout
+            android:orientation="vertical"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:layout_centerHorizontal="true"
+            android:weightSum="1"
+            android:layout_weight="0.5">
+
+            <TextView
+                android:text="RotX:"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:id="@+id/rotXText"
+                android:layout_below="@+id/accZText"
+                android:layout_alignParentStart="true" />
+
+            <TextView
+                android:text="RotY:"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:id="@+id/rotYText"
+                android:layout_marginTop="10dp"
+                android:layout_below="@+id/rotXText"
+                android:layout_alignParentStart="true" />
+
+            <TextView
+                android:text="RotZ:"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:id="@+id/rotZText"
+                android:layout_marginTop="10dp"
+                android:layout_below="@+id/rotYText"
+                android:layout_alignParentStart="true"
+                android:layout_weight="0.18" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:orientation="vertical"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:layout_weight="0.5">
+
+            <TextView
+                android:text="AccX:"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:id="@+id/accXText" />
+
+            <TextView
+                android:text="AccY:"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:id="@+id/accYText"
+                android:layout_below="@+id/accXText"
+                android:layout_marginTop="11dp" />
+
+            <TextView
+                android:text="AccZ:"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:id="@+id/accZText"
+                android:layout_below="@+id/accYText"
+                android:layout_alignParentStart="true"
+                android:layout_marginTop="10dp" />
+        </LinearLayout>
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:orientation="horizontal"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_centerHorizontal="true"
-        android:weightSum="1">
+        android:layout_marginTop="120dp">
 
-        <TextView
-            android:text="AccX:"
-            android:layout_width="262dp"
-            android:layout_height="wrap_content"
-            android:id="@+id/accXText" />
+        <LinearLayout
+            android:orientation="vertical"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
 
-        <TextView
-            android:text="AccY:"
-            android:layout_width="256dp"
-            android:layout_height="wrap_content"
-            android:id="@+id/accYText"
-            android:layout_below="@+id/accXText"
-            android:layout_marginTop="11dp" />
+            <TextView
+                android:text="Lat:"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:id="@+id/latText"
+                android:layout_centerVertical="true"
+                android:layout_alignStart="@+id/accYText" />
 
-        <TextView
-            android:text="AccZ:"
-            android:layout_width="293dp"
-            android:layout_height="wrap_content"
-            android:id="@+id/accZText"
-            android:layout_below="@+id/accYText"
-            android:layout_alignParentStart="true"
-            android:layout_marginTop="10dp" />
+            <TextView
+                android:text="Lon:"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:id="@+id/lonText"
+                android:layout_below="@+id/latText"
+                android:layout_alignStart="@+id/latText"
+                android:layout_marginTop="10dp" />
 
-        <TextView
-            android:text="RotX:"
-            android:layout_width="288dp"
-            android:layout_height="wrap_content"
-            android:id="@+id/rotXText"
-            android:layout_below="@+id/accZText"
-            android:layout_alignParentStart="true"
-            android:layout_marginTop="36dp" />
+            <TextView
+                android:text="Speed:"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:id="@+id/speedText"
+                android:layout_below="@+id/lonText"
+                android:layout_alignStart="@+id/lonText"
+                android:layout_marginTop="10dp" />
 
-        <TextView
-            android:text="RotY:"
-            android:layout_width="287dp"
-            android:layout_height="wrap_content"
-            android:id="@+id/rotYText"
-            android:layout_marginTop="10dp"
-            android:layout_below="@+id/rotXText"
-            android:layout_alignParentStart="true" />
-
-        <TextView
-            android:text="RotZ:"
-            android:layout_width="114dp"
-            android:layout_height="wrap_content"
-            android:id="@+id/rotZText"
-            android:layout_marginTop="10dp"
-            android:layout_below="@+id/rotYText"
-            android:layout_alignParentStart="true"
-            android:layout_weight="0.18" />
-
-        <TextView
-            android:text="Lat:"
-            android:layout_width="288dp"
-            android:layout_height="wrap_content"
-            android:id="@+id/latText"
-            android:layout_centerVertical="true"
-            android:layout_alignStart="@+id/accYText" />
-
-        <TextView
-            android:text="Lon:"
-            android:layout_width="338dp"
-            android:layout_height="wrap_content"
-            android:id="@+id/lonText"
-            android:layout_marginTop="10dp"
-            android:layout_below="@+id/latText"
-            android:layout_alignStart="@+id/latText"
-            android:layout_weight="0.06" />
-
-        <TextView
-            android:text="Speed:"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:id="@+id/speedText"
-            android:layout_marginTop="25dp"
-            android:layout_below="@+id/lonText"
-            android:layout_alignStart="@+id/lonText" />
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textAppearance="?android:attr/textAppearanceLarge"
+                android:text=""
+                android:id="@+id/osmText"
+                android:layout_marginTop="15dp" />
+        </LinearLayout>
     </LinearLayout>
 
 </RelativeLayout>

@@ -32,6 +32,8 @@ public class MainActivity extends AppCompatActivity implements IDataCallback{
     TextView lon;
     TextView speed;
 
+    TextView street;
+
     DecimalFormat df = new DecimalFormat("#.####");
 
     @Override
@@ -41,7 +43,7 @@ public class MainActivity extends AppCompatActivity implements IDataCallback{
 
         sPC = new SensorPlatformController(this);
         //sPC.subscribeTo(DataType.ACCELERATION_EVENT);
-        //sPC.subscribeTo(DataType.ROTATION_EVENT);
+        sPC.subscribeTo(DataType.ROTATION_EVENT);
         //sPC.subscribeTo(DataType.ACCELERATION_RAW);
         sPC.subscribeTo(DataType.LOCATION_RAW);
         sPC.subscribeTo(DataType.LOCATION_EVENT);
@@ -74,6 +76,8 @@ public class MainActivity extends AppCompatActivity implements IDataCallback{
         lon = (TextView) findViewById(R.id.lonText);
         speed = (TextView) findViewById(R.id.speedText);
 
+        street = (TextView) findViewById(R.id.osmText);
+
     }
 
     @Override
@@ -85,6 +89,7 @@ public class MainActivity extends AppCompatActivity implements IDataCallback{
     @Override
     public void onEventData(EventVector v) {
         Log.d("EventData @ App  ", v.toString());
+        updateUI(v);
     }
 
     @Override
@@ -116,6 +121,20 @@ public class MainActivity extends AppCompatActivity implements IDataCallback{
                     lon.setText("Lon: " + v.location.getLongitude());
                     speed.setText("Speed: " + df.format(v.speed) + " km/h");
                 }
+
+
+            }
+        });
+
+    }
+
+    public void updateUI(EventVector vector) {
+        final EventVector v = vector;
+        runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+
+                street.setText(v.eventDescription);
 
 
             }

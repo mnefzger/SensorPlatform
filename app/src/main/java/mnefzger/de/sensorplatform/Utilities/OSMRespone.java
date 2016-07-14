@@ -8,7 +8,7 @@ import java.util.ArrayList;
 public class OSMRespone {
     public ArrayList<Element> elements;
 
-    class Element {
+    public class Element {
         public String type;
         public int id;
         public double lat;
@@ -17,10 +17,13 @@ public class OSMRespone {
         public TagContainer tags;
     }
 
-    class TagContainer {
+    public class TagContainer {
         public String name;
         public String maxspeed;
+        public String highway;
     }
+
+
 }
 
 

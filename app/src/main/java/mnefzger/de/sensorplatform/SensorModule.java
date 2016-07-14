@@ -101,6 +101,9 @@ public class SensorModule implements ISensorCallback, IEventCallback{
         if(t == GPS_IDENTIFIER && !activeProviders.contains(location)) {
             location.start();
             activeProviders.add(location);
+            // orientation is needed for road detection
+            orientation.start();
+            activeProviders.add(orientation);
         }
     }
 
@@ -140,10 +143,12 @@ public class SensorModule implements ISensorCallback, IEventCallback{
 
     private void aggregateData(final int ms) {
         DataVector last = current;
+    /*
         Location mock = new Location("mock");
-        mock.setLongitude(153.029028);
-        mock.setLatitude(-27.473403);
+        mock.setLongitude(153.014179);
+        mock.setLatitude(-27.451109);
         last.setLocation(mock);
+    */
         current = new DataVector();
 
         /**
@@ -229,7 +234,7 @@ public class SensorModule implements ISensorCallback, IEventCallback{
      * @param t: the DataType to be converted
      * @return returns the according Sensor Type (e.g. Sensor.TYPE_ACCELEROMETER)
      */
-    public int getSensorTypeFromDataType(DataType t) {
+    private int getSensorTypeFromDataType(DataType t) {
         switch (t) {
             case ACCELERATION_EVENT:
             case ACCELERATION_RAW:

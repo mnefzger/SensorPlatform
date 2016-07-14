@@ -20,9 +20,11 @@ import com.google.gson.Gson;
 
 public class OSMQueryAdapter {
     Context context;
+    IOSMResponse callback;
 
-    public OSMQueryAdapter(Context context) {
+    public OSMQueryAdapter(IOSMResponse caller, Context context) {
         this.context = context;
+        this.callback = caller;
         int permission = ActivityCompat.checkSelfPermission(context, Manifest.permission.ACCESS_FINE_LOCATION);
 
     }
@@ -36,13 +38,16 @@ public class OSMQueryAdapter {
             double lon_n = location.getLongitude() + 0.001;
 
             //search(generateSearchStringBounding(lat_w, lon_s, lat_e, lon_n));
-            search(generateSearchStringRadius(100, location.getLatitude(), location.getLongitude()));
+            search(generateSearchStringRadius(15, location.getLatitude(), location.getLongitude()));
         }
     }
 
     private String generateSearchStringBounding(double lat_w, double lon_s, double lat_e, double lon_n) {
         String url ="http://overpass-api.de/api/interpreter?data=[out:json][timeout:15];";
-        url += "(way[\"maxspeed\"]";
+        url += "(way";
+        url += "[\"highway\"~\"^primary|secondary|tertiary|residential\"]";
+        url += "[\"name\"]";
+        //url += "[\"maxspeed\"]";
         url += "("+ lat_w +"," + lon_s + "," + lat_e + "," + lon_n + ");";
         url += " <;);out body;";
 
@@ -51,9 +56,12 @@ public class OSMQueryAdapter {
 
     private String generateSearchStringRadius(double rad, double lat, double lon) {
         String url ="http://overpass-api.de/api/interpreter?data=[out:json][timeout:15];";
-        url += "way[\"maxspeed\"]";
+        url += "(way";
+        url += "[\"highway\"~\"^primary|secondary|tertiary|residential\"]";
+        url += "[\"name\"]";
+        //url += "[\"maxspeed\"]";
         url += "(around:"+ rad +"," + lat + "," + lon + ");";
-        url += "(._;>;);out body;";
+        url += ">;);out body;";
 
         return url;
     }
@@ -70,11 +78,7 @@ public class OSMQueryAdapter {
                     public void onResponse(String response) {
                         Gson gson = new Gson();
                         OSMRespone osmR = gson.fromJson(response, OSMRespone.class);
-                        for(OSMRespone.Element e : osmR.elements) {
-                            if(e.tags != null)
-                                if(e.tags.maxspeed != null)
-                                    Log.d("OSMResponse", e.tags.name + ", maxspeed: " + e.tags.maxspeed);
-                        }
+                        callback.onOSMResponseReceived(osmR);
                     }
                 }, new Response.ErrorListener() {
             @Override
@@ -82,7 +86,8 @@ public class OSMQueryAdapter {
                 Log.d("VOLLEY","That didn't work!");
             }
         });
-        // Add the request to the RequestQueue.
+
+        // Add the request to the RequestQueue
         queue.add(stringRequest);
     }
 

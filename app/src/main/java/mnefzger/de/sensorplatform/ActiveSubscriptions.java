@@ -51,7 +51,7 @@ class ActiveSubscriptions {
     }
 
     public static boolean usingRotation() {
-        return isActive(new DataType[]{DataType.RAW, DataType.ROTATION_RAW, DataType.ROTATION_EVENT});
+        return isActive(new DataType[]{DataType.RAW, DataType.ROTATION_RAW, DataType.ROTATION_EVENT, DataType.LOCATION_EVENT});
     }
 
     public static boolean usingGPS() {

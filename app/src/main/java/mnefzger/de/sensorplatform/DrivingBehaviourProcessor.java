@@ -2,21 +2,25 @@ package mnefzger.de.sensorplatform;
 
 import android.content.Context;
 import android.hardware.SensorManager;
-import android.util.Log;
+import android.util.SparseArray;
 
 import java.util.Iterator;
 import java.util.List;
 
 
+import mnefzger.de.sensorplatform.Utilities.IOSMResponse;
 import mnefzger.de.sensorplatform.Utilities.MathFunctions;
 import mnefzger.de.sensorplatform.Utilities.OSMQueryAdapter;
+import mnefzger.de.sensorplatform.Utilities.OSMRespone;
 
-public class DrivingBehaviourProcessor extends EventProcessor {
-    OSMQueryAdapter qAdapter;
+public class DrivingBehaviourProcessor extends EventProcessor implements IOSMResponse {
+    private OSMQueryAdapter qAdapter;
+    private boolean turned = false;
+    private OSMRespone.Element lastRecognizedRoad;
 
     public DrivingBehaviourProcessor(SensorModule m, Context c) {
         super(m);
-        qAdapter = new OSMQueryAdapter(c);
+        qAdapter = new OSMQueryAdapter(this, c);
     }
 
     private final double ACC_THRESHOLD = 0.75;
@@ -24,13 +28,18 @@ public class DrivingBehaviourProcessor extends EventProcessor {
      * Turn threshold in rad/s
      * Value based on literature
      */
-    private final double TURN_THRESHOLD = 0.5;
+    private final double TURN_THRESHOLD = 0.3;
+    private final double TURN_SHARP_THRESHOLD = 0.5;
     /**
      * Turn threshold in degrees / second
-     * Above this value, a turn is considered as unsafe
      * 0.5 rad/s = 0.5 * 360/2pi deg/s
      */
     private final double TURN_THRESHOLD_DEG = 28.6478897565;
+    /**
+     * Time between two OpenStreetMap requests in ms
+     */
+    private final double OSM_REQUEST_RATE = 5000;
+
 
     public void processData(List<DataVector> data) {
         super.processData(data);
@@ -40,7 +49,6 @@ public class DrivingBehaviourProcessor extends EventProcessor {
             checkForSharpTurn(getLastData(1000));
             checkForSpeeding(data.get(data.size()-1));
         }
-
 
     }
 
@@ -65,6 +73,7 @@ public class DrivingBehaviourProcessor extends EventProcessor {
         }
     }
 
+    private long lastTurn = System.currentTimeMillis();
     private void checkForSharpTurn(List<DataVector> lastData) {
         double leftDelta = 0.0;
         double rightDelta = 0.0;
@@ -83,9 +92,6 @@ public class DrivingBehaviourProcessor extends EventProcessor {
                 // calculate the angle change between rotation matrices
                 SensorManager.getAngleChange(angleChange, prevMatrix, v.rotMatrix);
 
-                // convert to euler angles
-                //float[] euler = MathFunctions.calculateEulerAngles(angleChange);
-
                 // convert to radians
                 float[] rad = MathFunctions.calculateRadAngles(angleChange);
 
@@ -97,13 +103,32 @@ public class DrivingBehaviourProcessor extends EventProcessor {
 
         }
 
-        if(leftDelta >= TURN_THRESHOLD) {
+        /**
+         * Did the data include a sharp turn?
+         */
+        if(leftDelta >= TURN_SHARP_THRESHOLD) {
             EventVector ev = new EventVector(lastData.get(0).timestamp, "Sharp Left Turn", leftDelta);
             callback.onEventDetected(ev);
         }
-        if(rightDelta <= -TURN_THRESHOLD) {
+        if(rightDelta <= -TURN_SHARP_THRESHOLD) {
             EventVector ev = new EventVector(lastData.get(0).timestamp, "Sharp Right Turn", rightDelta);
             callback.onEventDetected(ev);
+        }
+
+        /**
+         * Did the data include a normal turn?
+         */
+        if(leftDelta >= TURN_THRESHOLD) {
+            turned = true;
+            lastTurn = System.currentTimeMillis();
+        } else if(rightDelta <= -TURN_THRESHOLD) {
+            turned = true;
+            lastTurn = System.currentTimeMillis();
+        }
+
+        // if no turn occured in timeframe, reset variable
+        if(System.currentTimeMillis() - lastTurn > OSM_REQUEST_RATE) {
+            turned = false;
         }
     }
 
@@ -113,14 +138,70 @@ public class DrivingBehaviourProcessor extends EventProcessor {
         // without location, there is nothing to process
         if( last.location != null ) {
             // query every 5 seconds
-            if( now-lastRequest > 5000 ) {
+            if( now-lastRequest > OSM_REQUEST_RATE ) {
                 qAdapter.startSearch(last.location);
                 lastRequest = now;
             }
 
         }
-
-
     }
 
+    @Override
+    public void onOSMResponseReceived(OSMRespone response) {
+        if(response == null) return;
+
+        OSMRespone.Element road = getCurrentRoad(response);
+        if(road != null) {
+            callback.onEventDetected(new EventVector(System.currentTimeMillis(), "You might be on " + road.tags.name, 0));
+            lastRecognizedRoad = road;
+        } else {
+            callback.onEventDetected(new EventVector(System.currentTimeMillis(), "No road detected", 0));
+        }
+
+        // TODO request speeding data
+    }
+
+    /**
+     * Returns the best estimate for the current road
+     * If only one road is detected, we assume that it is the correct one.
+     * If two roads are detected, we check if the vehicle turned during the last timeframe and base our decision on that.
+     * If more than two roads are detected, we have a problem. //TODO road detection: think about this
+     */
+    private OSMRespone.Element getCurrentRoad(OSMRespone response) {
+        SparseArray<OSMRespone.Element> roads = new SparseArray<>();
+        OSMRespone.Element currentRoad = null;
+
+        for(OSMRespone.Element e : response.elements) {
+            if(e.tags != null) {
+                if (e.tags.name != null && e.tags.highway != null) {
+                    roads.put(roads.size(), e);
+                }
+            }
+        }
+
+        if(roads.size() == 1) {
+            currentRoad = roads.valueAt(0);
+
+        } else if(roads.size() > 1) {
+            if(turned) {
+                    if(roads.valueAt(0).tags.name != lastRecognizedRoad.tags.name) {
+                        currentRoad = roads.valueAt(0);
+                    } else {
+                        currentRoad = roads.valueAt(1);
+                    }
+
+            } else {
+                // no turn -> road stays the same
+                if(roads.valueAt(0).tags.name == lastRecognizedRoad.tags.name ||
+                        roads.valueAt(1).tags.name == lastRecognizedRoad.tags.name) {
+                    currentRoad = lastRecognizedRoad;
+                } else {
+                    // no turn but lastRecognizedRoad is not in new data
+                    // TODO what do we do now?
+                }
+            }
+        }
+
+        return currentRoad;
+    }
 }

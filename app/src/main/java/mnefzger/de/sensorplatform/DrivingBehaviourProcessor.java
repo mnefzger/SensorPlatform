@@ -4,7 +4,6 @@ import android.content.Context;
 import android.hardware.SensorManager;
 import android.util.Log;
 import android.util.SparseArray;
-import java.lang.reflect.Array;
 
 import java.util.Iterator;
 import java.util.List;
@@ -26,13 +25,17 @@ public class DrivingBehaviourProcessor extends EventProcessor implements IOSMRes
         qAdapter = new OSMQueryAdapter(this, c);
     }
 
-    private final double ACC_THRESHOLD = 0.75;
+    /**
+     * Hard acceleration / braking threshold
+     * Value of 0.4g based on: DriveSafe (Bergasa, 2014)
+     */
+    private final double ACC_THRESHOLD = 0.4 * 9.81;
     /**
      * Turn threshold in rad/s
-     * Value based on literature
+     * Value based on (Wang, 2013)
      */
-    private final double TURN_THRESHOLD = 0.3;
-    private final double TURN_SHARP_THRESHOLD = 0.5;
+    private final double TURN_THRESHOLD = 0.4;
+    private final double TURN_SHARP_THRESHOLD = 0.6;
     /**
      * Turn threshold in degrees / second
      * 0.5 rad/s = 0.5 * 360/2pi deg/s
@@ -99,8 +102,8 @@ public class DrivingBehaviourProcessor extends EventProcessor implements IOSMRes
                 // convert to radians
                 float[] rad = MathFunctions.calculateRadAngles(angleChange);
 
-                if(rad[2] > leftDelta) leftDelta = rad[2];
-                if(rad[2] < rightDelta) rightDelta = rad[2];
+                if(rad[2] < leftDelta) leftDelta = rad[2];
+                if(rad[2] > rightDelta) rightDelta = rad[2];
 
                 prevMatrix = v.rotMatrix;
             }
@@ -110,24 +113,23 @@ public class DrivingBehaviourProcessor extends EventProcessor implements IOSMRes
         /**
          * Did the data include a sharp turn?
          */
-        if(leftDelta >= TURN_SHARP_THRESHOLD) {
+        if(leftDelta <= -TURN_SHARP_THRESHOLD) {
             EventVector ev = new EventVector(lastData.get(0).timestamp, "Sharp Left Turn", leftDelta);
             callback.onEventDetected(ev);
         }
-        if(rightDelta <= -TURN_SHARP_THRESHOLD) {
+        if(rightDelta >= TURN_SHARP_THRESHOLD) {
             EventVector ev = new EventVector(lastData.get(0).timestamp, "Sharp Right Turn", rightDelta);
             callback.onEventDetected(ev);
         }
 
         /**
-         * Did the data include a normal turn?
+         * Did the data include a any turn (safe OR sharp)?
+         * If so, request new information on road and speed limits
          */
-        if(leftDelta >= TURN_THRESHOLD) {
+        if(leftDelta <= -TURN_THRESHOLD || rightDelta >= TURN_THRESHOLD) {
             turned = true;
             lastTurn = System.currentTimeMillis();
-        } else if(rightDelta <= -TURN_THRESHOLD) {
-            turned = true;
-            lastTurn = System.currentTimeMillis();
+            checkForSpeedingInstant(lastVector);
         }
 
         // if no turn occured in timeframe, reset variable
@@ -136,7 +138,11 @@ public class DrivingBehaviourProcessor extends EventProcessor implements IOSMRes
         }
     }
 
+
     private long lastRequest = System.currentTimeMillis();
+    /**
+     * To query new road and speed limits every xx seconds
+     */
     private void checkForSpeeding(DataVector last) {
         long now = System.currentTimeMillis();
         // without location, there is nothing to process
@@ -146,7 +152,18 @@ public class DrivingBehaviourProcessor extends EventProcessor implements IOSMRes
                 qAdapter.startSearch(last.location);
                 lastRequest = now;
             }
+        }
+    }
 
+    /**
+     * To query new road and speed limits after a turn
+     */
+    private void checkForSpeedingInstant(DataVector last) {
+        long now = System.currentTimeMillis();
+
+        if( last.location != null ) {
+            qAdapter.startSearch(last.location);
+            lastRequest = now;
         }
     }
 

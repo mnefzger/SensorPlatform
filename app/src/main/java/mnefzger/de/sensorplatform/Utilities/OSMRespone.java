@@ -1,8 +1,5 @@
 package mnefzger.de.sensorplatform.Utilities;
 
-import android.location.Location;
-
-import java.lang.reflect.Array;
 import java.util.ArrayList;
 
 public class OSMRespone {
@@ -10,10 +7,10 @@ public class OSMRespone {
 
     public class Element {
         public String type;
-        public int id;
+        public long id;
         public double lat;
         public double lon;
-        public ArrayList<Integer> nodes;
+        public ArrayList<Long> nodes;
 
         public TagContainer tags;
     }

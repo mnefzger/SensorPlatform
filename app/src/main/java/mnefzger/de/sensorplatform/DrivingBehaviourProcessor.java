@@ -221,31 +221,38 @@ public class DrivingBehaviourProcessor extends EventProcessor implements IOSMRes
 
         // First, we have to find the two nearest nodes of this street (element)
         double min_dist1 = 10000;
-        OSMRespone.Element near_elem1 = null;
+        OSMRespone.Element near_node1 = null;
         double min_dist2 = 10000;
-        OSMRespone.Element near_elem2 = null;
+        OSMRespone.Element near_node2 = null;
         for(int r=0; r<element.nodes.size(); r++) {
-            int id = element.nodes.get(r);
+            long id = element.nodes.get(r);
             OSMRespone.Element el = null;
             for(OSMRespone.Element e : response.elements) {
-                if(e.id == id) el = e;
+                if(e.id == id) {
+                    el = e;
+                    break;
+                }
             }
+
             double temp_dist = MathFunctions.calculateDistance(el.lat, el.lon, lastVector.location.getLatitude(), lastVector.location.getLongitude());
 
             if(temp_dist < min_dist2) {
                 if(temp_dist < min_dist1) {
+                    min_dist2 = min_dist1;
+                    near_node2 = near_node1;
+
                     min_dist1 = temp_dist;
-                    near_elem1 = el;
+                    near_node1 = el;
 
                 } else  {
                     min_dist2 = temp_dist;
-                    near_elem2 = el;
+                    near_node2 = el;
                 }
             }
         }
 
         // now, we calculate the distance between our position and the line between the two nearest nodes
-        distance = MathFunctions.calculateDistanceToLine(near_elem1.lat, near_elem1.lon, near_elem2.lat, near_elem2.lon, lastVector.location.getLatitude(), lastVector.location.getLongitude());
+        distance = MathFunctions.calculateDistanceToLine(near_node1.lat, near_node1.lon, near_node2.lat, near_node2.lon, lastVector.location.getLatitude(), lastVector.location.getLongitude());
         Log.d("DISTANCE", "Distance to " + element.tags.name +":" + distance);
 
         return distance;

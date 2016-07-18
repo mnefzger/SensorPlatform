@@ -52,8 +52,8 @@ public class MathFunctions {
      * @param buffer
      * @return
      */
-    public static double getAccEMASingle(List<Double> buffer) {
-        ExponentialMovingAverage ema = new ExponentialMovingAverage(2.0 / (buffer.size() + 1) );
+    public static double getAccEMASingle(List<Double> buffer, double alpha) {
+        ExponentialMovingAverage ema = new ExponentialMovingAverage( alpha );
         Iterator<Double> it = buffer.iterator();
         double result = 0;
         while(it.hasNext()) {

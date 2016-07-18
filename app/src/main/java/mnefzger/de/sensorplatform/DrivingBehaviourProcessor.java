@@ -17,35 +17,37 @@ import mnefzger.de.sensorplatform.Utilities.OSMRespone;
 public class DrivingBehaviourProcessor extends EventProcessor implements IOSMResponse {
     private OSMQueryAdapter qAdapter;
     private boolean turned = false;
+    private OSMRespone lastResponse;
     private OSMRespone.Element lastRecognizedRoad;
     private DataVector lastVector;
 
-    public DrivingBehaviourProcessor(SensorModule m, Context c) {
-        super(m);
-        qAdapter = new OSMQueryAdapter(this, c);
-    }
+    private enum DIRECTION {FORWARD, BACKWARD, UNDEFINDED};
+    private DIRECTION currentDirection = DIRECTION.UNDEFINDED;
+    private int lastClosestIndex = -1;
 
     /**
      * Hard acceleration / braking threshold
      * Value of 0.4g based on: DriveSafe (Bergasa, 2014)
      */
     private final double ACC_THRESHOLD = 0.4 * 9.81;
+
     /**
      * Turn threshold in rad/s
      * Value based on (Wang, 2013)
      */
     private final double TURN_THRESHOLD = 0.4;
     private final double TURN_SHARP_THRESHOLD = 0.6;
-    /**
-     * Turn threshold in degrees / second
-     * 0.5 rad/s = 0.5 * 360/2pi deg/s
-     */
-    private final double TURN_THRESHOLD_DEG = 28.6478897565;
+
     /**
      * Time between two OpenStreetMap requests in ms
      */
     private final double OSM_REQUEST_RATE = 5000;
 
+
+    public DrivingBehaviourProcessor(SensorModule m, Context c) {
+        super(m);
+        qAdapter = new OSMQueryAdapter(this, c);
+    }
 
     public void processData(List<DataVector> data) {
         super.processData(data);
@@ -141,7 +143,7 @@ public class DrivingBehaviourProcessor extends EventProcessor implements IOSMRes
 
     private long lastRequest = System.currentTimeMillis();
     /**
-     * To query new road and speed limits every xx seconds
+     * To query new road and speed limits every OSM_REQUEST_RATE seconds
      */
     private void checkForSpeeding(DataVector last) {
         long now = System.currentTimeMillis();
@@ -153,6 +155,13 @@ public class DrivingBehaviourProcessor extends EventProcessor implements IOSMRes
                 lastRequest = now;
             }
         }
+
+        // determine the direction of movement on the road, necessary for traffic_signs
+        if(lastRecognizedRoad != null) {
+            currentDirection = getDirectionOfMovement();
+            Log.d("DIRECTION", currentDirection+"");
+        }
+
     }
 
     /**
@@ -171,9 +180,17 @@ public class DrivingBehaviourProcessor extends EventProcessor implements IOSMRes
     public void onOSMRoadResponseReceived(OSMRespone response) {
         if(response == null) return;
 
+        lastResponse = response;
+
         OSMRespone.Element road = getCurrentRoad(response);
         if(road != null) {
-            //callback.onEventDetected(new EventVector(System.currentTimeMillis(), "ROAD: You are on " + road.tags.name, 0));
+            // if the road has changed, reset index for direction
+            if(lastRecognizedRoad != null)
+                if(!road.tags.name.equals(lastRecognizedRoad.tags.name)) {
+                    Log.d("CHANGE", road.tags.name + "," + lastRecognizedRoad.tags.name);
+                    lastClosestIndex = -1;
+                }
+
             lastRecognizedRoad = road;
             qAdapter.startSearchForSpeedLimit(lastVector.location);
         } else {
@@ -191,16 +208,25 @@ public class DrivingBehaviourProcessor extends EventProcessor implements IOSMRes
         for(long id : lastRecognizedRoad.nodes) {
             for(OSMRespone.Element e : response.elements) {
                 if(e.id == id) {
-                    speedLimits.put(speedLimits.size(), e);
+                    if(e.tags.maxspeed_forward != null && currentDirection == DIRECTION.FORWARD ||
+                       e.tags.maxspeed_backward != null && currentDirection == DIRECTION.BACKWARD ||
+                       e.tags.maxspeed != null)
+                        speedLimits.put(speedLimits.size(), e);
                 }
             }
         }
-        if(speedLimits.size() > 0)
-            callback.onEventDetected(new EventVector(System.currentTimeMillis(), "ROAD: You are on " + lastRecognizedRoad.tags.name + ", SpeedLimit: " + speedLimits.get(0).tags.maxspeed, 0));
+
+        if(speedLimits.size() > 0 && currentDirection == DIRECTION.FORWARD)
+            callback.onEventDetected(new EventVector(System.currentTimeMillis(), "ROAD: You are on " + lastRecognizedRoad.tags.name + ", SpeedLimit forward: " + speedLimits.get(0).tags.maxspeed_forward, 0));
+        else if(speedLimits.size() > 0 && currentDirection == DIRECTION.BACKWARD)
+            callback.onEventDetected(new EventVector(System.currentTimeMillis(), "ROAD: You are on " + lastRecognizedRoad.tags.name + ", SpeedLimit backward: " + speedLimits.get(0).tags.maxspeed_backward, 0));
+        else if(speedLimits.size() > 0)
+            callback.onEventDetected(new EventVector(System.currentTimeMillis(), "ROAD: You are on " + lastRecognizedRoad.tags.name + ", SpeedLimit both: " + speedLimits.get(0).tags.maxspeed, 0));
         else if(lastRecognizedRoad.tags.maxspeed != null)
-            callback.onEventDetected(new EventVector(System.currentTimeMillis(), "ROAD: You are on " + lastRecognizedRoad.tags.name + ", SpeedLimit: " + lastRecognizedRoad.tags.maxspeed, 0));
+            callback.onEventDetected(new EventVector(System.currentTimeMillis(), "ROAD: You are on " + lastRecognizedRoad.tags.name + ", SpeedLimit road: " + lastRecognizedRoad.tags.maxspeed, 0));
         else
             callback.onEventDetected(new EventVector(System.currentTimeMillis(), "ROAD: You are on " + lastRecognizedRoad.tags.name, 0));
+
         // TODO determine which speed sign is the right one for our current position
     }
 
@@ -246,6 +272,11 @@ public class DrivingBehaviourProcessor extends EventProcessor implements IOSMRes
         return currentRoad;
     }
 
+    /**
+     * Returns the distance from current position to a given OpenStreetMap road
+     * @param element   The road we want to calculate the distance
+     * @param response  Contains all the nodes defining the road
+     */
     private double getDistanceToRoad(OSMRespone.Element element, OSMRespone response) {
         double distance;
 
@@ -286,5 +317,48 @@ public class DrivingBehaviourProcessor extends EventProcessor implements IOSMRes
         Log.d("DISTANCE", "Distance to " + element.tags.name +":" + distance);
 
         return distance;
+    }
+
+    private DIRECTION getDirectionOfMovement() {
+        double lat = lastVector.location.getLatitude();
+        double lon = lastVector.location.getLongitude();
+
+        double minDist = 10000;
+        int index = 0;
+
+        for(int i=0; i<lastResponse.elements.size(); i++) {
+            OSMRespone.Element node = lastResponse.elements.get(i);
+            if(node.lat != 0 && node.lon != 0) {
+                double temp = MathFunctions.calculateDistance(node.lat, node.lon, lat, lon);
+                if(temp < minDist) {
+                    minDist = temp;
+                    index = i;
+                }
+            }
+        }
+
+        Log.d("INDEX", index+"");
+
+        if(lastClosestIndex == -1) {
+            lastClosestIndex = index;
+            Log.d("INDEX", index+" was -1");
+            return DIRECTION.UNDEFINDED;
+
+        } else if(lastClosestIndex < index) {
+            lastClosestIndex = index;
+            return DIRECTION.FORWARD;
+
+        } else if(lastClosestIndex > index) {
+            lastClosestIndex = index;
+            return DIRECTION.BACKWARD;
+
+        } else if(lastClosestIndex == index && currentDirection != DIRECTION.UNDEFINDED) {
+            return currentDirection;
+
+        } else {
+            Log.d("INDEX", index+" else");
+            lastClosestIndex = index;
+            return DIRECTION.UNDEFINDED;
+        }
     }
 }

@@ -66,11 +66,14 @@ public class PositionProvider extends DataProvider implements LocationListener{
             // speed in km/h
             speed = speed * 3.6;
 
-            if(lastSpeedValues.size() > 2) {
-                speed = MathFunctions.getAccEMASingle(lastSpeedValues);
-            }
             lastSpeedValues.add(speed);
-            if(lastSpeedValues.size() > 5) lastSpeedValues.remove(0);
+            if(lastSpeedValues.size() == 3) {
+                speed = MathFunctions.getAccEMASingle(lastSpeedValues, 0.8);
+                lastSpeedValues.set(lastSpeedValues.size()-1, speed);
+            }
+
+
+            if(lastSpeedValues.size() > 3) lastSpeedValues.remove(0);
         }
         lastLocation = location;
         lastTimestamp = currentTime;

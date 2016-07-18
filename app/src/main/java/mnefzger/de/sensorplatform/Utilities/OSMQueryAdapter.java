@@ -42,7 +42,7 @@ public class OSMQueryAdapter {
     }
 
     public void startSearchForSpeedLimit(Location location) {
-        search(generateSearchStringSpeed(200, location.getLatitude(), location.getLongitude()), "Speed");
+        search(generateSearchStringSpeed(300, location.getLatitude(), location.getLongitude()), "Speed");
     }
 
     private String generateSearchStringBounding(double lat_w, double lon_s, double lat_e, double lon_n) {
@@ -88,6 +88,10 @@ public class OSMQueryAdapter {
                 new Response.Listener<String>() {
                     @Override
                     public void onResponse(String response) {
+                        // variable names can not have colons
+                        response = response.replace("maxspeed:forward", "maxspeed_forward");
+                        response = response.replace("maxspeed:backward", "maxspeed_backward");
+
                         Gson gson = new Gson();
                         OSMRespone osmR = gson.fromJson(response, OSMRespone.class);
                         if(mode == "Road") callback.onOSMRoadResponseReceived(osmR);

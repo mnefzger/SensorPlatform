@@ -18,6 +18,8 @@ public class OSMRespone {
     public class TagContainer {
         public String name;
         public String maxspeed;
+        public String maxspeed_forward;
+        public String maxspeed_backward;
         public String highway;
         public String traffic_sign;
     }

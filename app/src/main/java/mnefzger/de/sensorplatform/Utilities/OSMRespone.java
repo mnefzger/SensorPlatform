@@ -19,6 +19,7 @@ public class OSMRespone {
         public String name;
         public String maxspeed;
         public String highway;
+        public String traffic_sign;
     }
 
 

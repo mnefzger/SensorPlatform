@@ -12,6 +12,9 @@ import android.os.Bundle;
 import android.support.v4.app.ActivityCompat;
 import android.util.Log;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import mnefzger.de.sensorplatform.Utilities.MathFunctions;
 
 public class PositionProvider extends DataProvider implements LocationListener{
@@ -20,6 +23,7 @@ public class PositionProvider extends DataProvider implements LocationListener{
     private ISensorCallback callback;
     private Location lastLocation;
     private double lastTimestamp = System.currentTimeMillis();
+    private List<Double> lastSpeedValues = new ArrayList<>();
 
     private final int LOCATION_REFRESH_TIME = 0;
     private final int LOCATION_REFRESH_DISTANCE = 0;
@@ -61,6 +65,12 @@ public class PositionProvider extends DataProvider implements LocationListener{
             speed = distance / timeDelta;
             // speed in km/h
             speed = speed * 3.6;
+
+            if(lastSpeedValues.size() > 2) {
+                speed = MathFunctions.getAccEMASingle(lastSpeedValues);
+            }
+            lastSpeedValues.add(speed);
+            if(lastSpeedValues.size() > 5) lastSpeedValues.remove(0);
         }
         lastLocation = location;
         lastTimestamp = currentTime;

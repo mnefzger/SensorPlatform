@@ -47,6 +47,23 @@ public class MathFunctions {
     }
 
     /**
+     * Calculates the Exponential Moving Average for the newest acceleration values based on the previous values
+     * with dynamic alpha value
+     * @param buffer
+     * @return
+     */
+    public static double getAccEMASingle(List<Double> buffer) {
+        ExponentialMovingAverage ema = new ExponentialMovingAverage(2.0 / (buffer.size() + 1) );
+        Iterator<Double> it = buffer.iterator();
+        double result = 0;
+        while(it.hasNext()) {
+            double v = it.next();
+            result = ema.average(v);
+        }
+        return result;
+    }
+
+    /**
      * Returns the Euler representation of a quaternion rotation vector
      * @param values
      * @return
@@ -92,6 +109,7 @@ public class MathFunctions {
     static class ExponentialMovingAverage {
         private double alpha;
         private double[] oldValue = new double[3];
+        private double oldValueSingle = 0.0;
 
         public ExponentialMovingAverage(double alpha) {
             this.alpha = alpha;
@@ -110,7 +128,21 @@ public class MathFunctions {
 
             return newValue;
         }
+
+        public double average(double value) {
+            double newValue = 0.0;
+            if (oldValueSingle == 0.0) {
+                oldValueSingle = value;
+                return oldValueSingle;
+            }
+            newValue = alpha * newValue + (1-alpha) * oldValueSingle;
+            oldValueSingle = newValue;
+
+            return newValue;
+        }
     }
+
+
 
     /**
      * Returns the distance between two geopositions

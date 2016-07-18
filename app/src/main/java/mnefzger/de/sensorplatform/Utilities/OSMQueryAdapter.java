@@ -25,11 +25,10 @@ public class OSMQueryAdapter {
     public OSMQueryAdapter(IOSMResponse caller, Context context) {
         this.context = context;
         this.callback = caller;
-        int permission = ActivityCompat.checkSelfPermission(context, Manifest.permission.ACCESS_FINE_LOCATION);
-
+        verifyInternetPermission((Activity)context);
     }
 
-    public void startSearch(Location location) {
+    public void startSearchForRoad(Location location) {
         int permission = ActivityCompat.checkSelfPermission(context, Manifest.permission.ACCESS_FINE_LOCATION);
         if(permission == PackageManager.PERMISSION_GRANTED) {
             double lat_w = location.getLatitude() - 0.001;
@@ -38,8 +37,12 @@ public class OSMQueryAdapter {
             double lon_n = location.getLongitude() + 0.001;
 
             //search(generateSearchStringBounding(lat_w, lon_s, lat_e, lon_n));
-            search(generateSearchStringRadius(15, location.getLatitude(), location.getLongitude()));
+            search(generateSearchStringRadius(15, location.getLatitude(), location.getLongitude()), "Road");
         }
+    }
+
+    public void startSearchForSpeedLimit(Location location) {
+        search(generateSearchStringSpeed(200, location.getLatitude(), location.getLongitude()), "Speed");
     }
 
     private String generateSearchStringBounding(double lat_w, double lon_s, double lat_e, double lon_n) {
@@ -47,7 +50,6 @@ public class OSMQueryAdapter {
         url += "(way";
         url += "[\"highway\"~\"^primary|secondary|tertiary|residential|service\"]";
         url += "[\"name\"]";
-        //url += "[\"maxspeed\"]";
         url += "("+ lat_w +"," + lon_s + "," + lat_e + "," + lon_n + ");";
         url += " <;);out body;";
 
@@ -59,15 +61,25 @@ public class OSMQueryAdapter {
         url += "(way";
         url += "[\"highway\"~\"^primary|secondary|tertiary|residential|service\"]";
         url += "[\"name\"]";
-        //url += "[\"maxspeed\"]";
         url += "(around:"+ rad +"," + lat + "," + lon + ");";
         url += ">;);out body;";
 
         return url;
     }
 
-    private void search(String url) {
+    private String generateSearchStringSpeed(double rad, double lat, double lon) {
+        String url ="http://overpass-api.de/api/interpreter?data=[out:json][timeout:5];";
+        url += "(node";
+        url += "[\"traffic_sign\"=\"maxspeed\"]";
+        url += "(around:"+ rad +"," + lat + "," + lon + ");";
+        url += ">;);out body;";
+
+        return url;
+    }
+
+    private void search(String url, String m) {
         RequestQueue queue = Volley.newRequestQueue(context);
+        final String mode = m;
 
         Log.d("VOLLEY", url);
 
@@ -78,7 +90,8 @@ public class OSMQueryAdapter {
                     public void onResponse(String response) {
                         Gson gson = new Gson();
                         OSMRespone osmR = gson.fromJson(response, OSMRespone.class);
-                        callback.onOSMResponseReceived(osmR);
+                        if(mode == "Road") callback.onOSMRoadResponseReceived(osmR);
+                        if(mode == "Speed") callback.onOSMSpeedResponseReceived(osmR);
                     }
                 }, new Response.ErrorListener() {
             @Override

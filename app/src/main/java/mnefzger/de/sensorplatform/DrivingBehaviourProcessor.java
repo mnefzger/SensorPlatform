@@ -149,7 +149,7 @@ public class DrivingBehaviourProcessor extends EventProcessor implements IOSMRes
         if( last.location != null ) {
             // query every 5 seconds
             if( now-lastRequest > OSM_REQUEST_RATE ) {
-                qAdapter.startSearch(last.location);
+                qAdapter.startSearchForRoad(last.location);
                 lastRequest = now;
             }
         }
@@ -162,24 +162,46 @@ public class DrivingBehaviourProcessor extends EventProcessor implements IOSMRes
         long now = System.currentTimeMillis();
 
         if( last.location != null ) {
-            qAdapter.startSearch(last.location);
+            qAdapter.startSearchForRoad(last.location);
             lastRequest = now;
         }
     }
 
     @Override
-    public void onOSMResponseReceived(OSMRespone response) {
+    public void onOSMRoadResponseReceived(OSMRespone response) {
         if(response == null) return;
 
         OSMRespone.Element road = getCurrentRoad(response);
         if(road != null) {
-            callback.onEventDetected(new EventVector(System.currentTimeMillis(), "ROAD: You might be on " + road.tags.name, 0));
+            //callback.onEventDetected(new EventVector(System.currentTimeMillis(), "ROAD: You are on " + road.tags.name, 0));
             lastRecognizedRoad = road;
+            qAdapter.startSearchForSpeedLimit(lastVector.location);
         } else {
             callback.onEventDetected(new EventVector(System.currentTimeMillis(), "ROAD: No road detected", 0));
         }
 
-        // TODO request speeding data
+    }
+
+    @Override
+    public void onOSMSpeedResponseReceived(OSMRespone response) {
+        if(response.elements.size() == 0) return;
+
+        // get only the speed limits for the current road
+        SparseArray<OSMRespone.Element> speedLimits = new SparseArray<>();
+        for(long id : lastRecognizedRoad.nodes) {
+            for(OSMRespone.Element e : response.elements) {
+                if(e.id == id) {
+                    speedLimits.put(speedLimits.size(), e);
+                }
+            }
+        }
+        if(speedLimits.size() > 0)
+            callback.onEventDetected(new EventVector(System.currentTimeMillis(), "ROAD: You are on " + lastRecognizedRoad.tags.name + ", SpeedLimit: " + speedLimits.get(0).tags.maxspeed, 0));
+        else if(lastRecognizedRoad.tags.maxspeed != null)
+            callback.onEventDetected(new EventVector(System.currentTimeMillis(), "ROAD: You are on " + lastRecognizedRoad.tags.name + ", SpeedLimit: " + lastRecognizedRoad.tags.maxspeed, 0));
+        else
+            callback.onEventDetected(new EventVector(System.currentTimeMillis(), "ROAD: You are on " + lastRecognizedRoad.tags.name, 0));
+        // TODO determine which speed sign is the right one for our current position
     }
 
     /**
@@ -206,8 +228,16 @@ public class DrivingBehaviourProcessor extends EventProcessor implements IOSMRes
             double min_dist = 10000;
             for(int i=0; i<roads.size(); i++) {
                 double temp_dist = getDistanceToRoad(roads.valueAt(i), response);
+                // if there was no turn detected, we assume it is more likely that we are still on the same road
+                // to express this likelyhood, we multiply the distance to lastRecognizedRoad by 0.75
+                if(lastRecognizedRoad == roads.valueAt(i)) {
+                    if(!turned) {
+                        temp_dist *= 0.75;
+                    }
+                }
                 if(temp_dist < min_dist) {
                     min_dist = temp_dist;
+
                     currentRoad = roads.valueAt(i);
                 }
             }

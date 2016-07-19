@@ -101,7 +101,13 @@ public class MathFunctions {
         return result;
     }
 
+    public static double dotProduct(double[] v1, double[] v2) {
+        return v1[0] * v2[0] + v1[1]*v2[1];
+    }
 
+    public static double crossProduct(double[] v1, double[] v2) {
+        return v1[0] * v2[1] - v1[1]*v2[0];
+    }
 
     /**
      * Class representing the Exponential Moving Average
@@ -164,21 +170,6 @@ public class MathFunctions {
         return distanceInMeters;
     }
 
-/*
-    public static double calculateDistanceToLine(double lat1, double lon1, double lat2, double lon2, double lat3, double lon3) {
-        double[] vectorV = new double[2];
-        vectorV[0] = lat2-lat1;
-        vectorV[1] = -(lon2-lon1);
-
-        double[] vectorU = new double[2];
-        vectorU[0] = lat1-lat3;
-        vectorU[1] = lon1-lon3;
-
-        double distance = Math.abs( (vectorV[0]*vectorU[1]) - (vectorU[0]*vectorV[1]) );
-
-        return distance;
-    }
-    */
 
     public static double calculateDistanceToLine(double lat1, double lon1, double lat2, double lon2, double lat3, double lon3) {
         double XX = lat2-lat1;

@@ -23,7 +23,7 @@ public class SensorPlatformController implements IDataCallback{
 
     public boolean subscribeTo(DataType type) {
         /**
-         * If a subscription with the same type already exists, return
+         * If a subscription of the same type already exists, return
          */
         Iterator<Subscription> it = ActiveSubscriptions.get().iterator();
         while(it.hasNext()) {

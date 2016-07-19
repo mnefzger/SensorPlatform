@@ -57,7 +57,7 @@ public class OSMQueryAdapter {
     }
 
     private String generateSearchStringRadius(double rad, double lat, double lon) {
-        String url ="http://overpass-api.de/api/interpreter?data=[out:json][timeout:5];";
+        String url ="http://overpass-api.de/api/interpreter?data=[out:json][timeout:15];";
         url += "(way";
         url += "[\"highway\"~\"^primary|secondary|tertiary|residential|service\"]";
         url += "[\"name\"]";
@@ -68,7 +68,7 @@ public class OSMQueryAdapter {
     }
 
     private String generateSearchStringSpeed(double rad, double lat, double lon) {
-        String url ="http://overpass-api.de/api/interpreter?data=[out:json][timeout:5];";
+        String url ="http://overpass-api.de/api/interpreter?data=[out:json][timeout:15];";
         url += "(node";
         url += "[\"traffic_sign\"=\"maxspeed\"]";
         url += "(around:"+ rad +"," + lat + "," + lon + ");";

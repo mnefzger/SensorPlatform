@@ -15,15 +15,12 @@ import mnefzger.de.sensorplatform.Utilities.MathFunctions;
 public class OrientationProvider extends SensorProvider {
     private Sensor rotationSensor;
 
-    private ArrayList<double[]> lastValues = new ArrayList<>();
-    private final int WINDOW = 5;
-    private double[] initValues;
-
     public OrientationProvider(Context c, SensorModule m) {
         super(c,m);
     }
 
     public void start() {
+
         super.start();
         if (sensorManager.getDefaultSensor(Sensor.TYPE_ROTATION_VECTOR) != null){
             rotationSensor = sensorManager.getDefaultSensor(Sensor.TYPE_ROTATION_VECTOR);

@@ -8,7 +8,6 @@ import android.util.SparseArray;
 import java.util.Iterator;
 import java.util.List;
 
-
 import mnefzger.de.sensorplatform.Utilities.IOSMResponse;
 import mnefzger.de.sensorplatform.Utilities.MathFunctions;
 import mnefzger.de.sensorplatform.Utilities.OSMQueryAdapter;
@@ -19,10 +18,11 @@ public class DrivingBehaviourProcessor extends EventProcessor implements IOSMRes
     private boolean turned = false;
     private OSMRespone lastResponse;
     private OSMRespone.Element lastRecognizedRoad;
-    private DataVector lastVector;
+    private DataVector currentVector;
+    private DataVector previousVector;
 
-    private enum DIRECTION {FORWARD, BACKWARD, UNDEFINDED};
-    private DIRECTION currentDirection = DIRECTION.UNDEFINDED;
+    private enum DIRECTION {FORWARD, BACKWARD, UNDEFINED};
+    private DIRECTION currentDirection = DIRECTION.UNDEFINED;
     private int lastClosestIndex = -1;
 
     /**
@@ -35,8 +35,8 @@ public class DrivingBehaviourProcessor extends EventProcessor implements IOSMRes
      * Turn threshold in rad/s
      * Value based on (Wang, 2013)
      */
-    private final double TURN_THRESHOLD = 0.4;
-    private final double TURN_SHARP_THRESHOLD = 0.6;
+    private final double TURN_THRESHOLD = 0.3;
+    private final double TURN_SHARP_THRESHOLD = 0.5;
 
     /**
      * Time between two OpenStreetMap requests in ms
@@ -51,12 +51,15 @@ public class DrivingBehaviourProcessor extends EventProcessor implements IOSMRes
 
     public void processData(List<DataVector> data) {
         super.processData(data);
-        lastVector = data.get(data.size()-1);
+
 
         if(data.size() >= 3) {
+            currentVector = data.get(data.size()-1);
+            previousVector = data.get(data.size()-2);
+
             checkForHardAcc(getLastData(500));
             checkForSharpTurn(getLastData(1000));
-            checkForSpeeding(lastVector);
+            checkForSpeeding(currentVector);
         }
 
     }
@@ -131,7 +134,7 @@ public class DrivingBehaviourProcessor extends EventProcessor implements IOSMRes
         if(leftDelta <= -TURN_THRESHOLD || rightDelta >= TURN_THRESHOLD) {
             turned = true;
             lastTurn = System.currentTimeMillis();
-            checkForSpeedingInstant(lastVector);
+            checkForSpeedingInstant(currentVector);
         }
 
         // if no turn occured in timeframe, reset variable
@@ -192,8 +195,9 @@ public class DrivingBehaviourProcessor extends EventProcessor implements IOSMRes
                 }
 
             lastRecognizedRoad = road;
-            qAdapter.startSearchForSpeedLimit(lastVector.location);
+            qAdapter.startSearchForSpeedLimit(currentVector.location);
         } else {
+            lastRecognizedRoad = null;
             callback.onEventDetected(new EventVector(System.currentTimeMillis(), "ROAD: No road detected", 0));
         }
 
@@ -281,47 +285,102 @@ public class DrivingBehaviourProcessor extends EventProcessor implements IOSMRes
         double distance;
 
         // First, we have to find the two nearest nodes of this street (element)
+        OSMRespone.Element[] closest = get2ClosestNodes(element, false);
+        OSMRespone.Element near_node1 = closest[0];
+        OSMRespone.Element near_node2 = closest[1];
+
+        // now, we calculate the distance between our position and the line between the two nearest nodes
+        distance = MathFunctions.calculateDistanceToLine(near_node1.lat, near_node1.lon, near_node2.lat, near_node2.lon, currentVector.location.getLatitude(), currentVector.location.getLongitude());
+        Log.d("DISTANCE", "Distance to " + element.tags.name +":" + distance);
+
+        return distance;
+    }
+
+    private OSMRespone.Element[] get2ClosestNodes(OSMRespone.Element element, boolean orderByIndex) {
         double min_dist1 = 10000;
         OSMRespone.Element near_node1 = null;
+        int index1 = -1;
         double min_dist2 = 10000;
         OSMRespone.Element near_node2 = null;
+        int index2 = -1;
         for(int r=0; r<element.nodes.size(); r++) {
             long id = element.nodes.get(r);
             OSMRespone.Element el = null;
-            for(OSMRespone.Element e : response.elements) {
+            for(OSMRespone.Element e : lastResponse.elements) {
                 if(e.id == id) {
                     el = e;
                     break;
                 }
             }
 
-            double temp_dist = MathFunctions.calculateDistance(el.lat, el.lon, lastVector.location.getLatitude(), lastVector.location.getLongitude());
+            double temp_dist = MathFunctions.calculateDistance(el.lat, el.lon, currentVector.location.getLatitude(), currentVector.location.getLongitude());
 
             if(temp_dist < min_dist2) {
                 if(temp_dist < min_dist1) {
                     min_dist2 = min_dist1;
                     near_node2 = near_node1;
+                    index2 = index1;
 
                     min_dist1 = temp_dist;
                     near_node1 = el;
+                    index1 = r;
 
                 } else  {
                     min_dist2 = temp_dist;
                     near_node2 = el;
+                    index2 = r;
                 }
             }
         }
 
-        // now, we calculate the distance between our position and the line between the two nearest nodes
-        distance = MathFunctions.calculateDistanceToLine(near_node1.lat, near_node1.lon, near_node2.lat, near_node2.lon, lastVector.location.getLatitude(), lastVector.location.getLongitude());
-        Log.d("DISTANCE", "Distance to " + element.tags.name +":" + distance);
+        OSMRespone.Element[] closest = {near_node1, near_node2};
 
-        return distance;
+        // if orderByIndex == true, node with the smaller index should come first
+        if(orderByIndex && index2 < index1) {
+            closest[0] = near_node2;
+            closest[1] = near_node1;
+        }
+
+        return closest;
     }
 
     private DIRECTION getDirectionOfMovement() {
-        double lat = lastVector.location.getLatitude();
-        double lon = lastVector.location.getLongitude();
+        OSMRespone.Element[] closest = get2ClosestNodes(lastRecognizedRoad, true);
+        OSMRespone.Element near_node1 = closest[0];
+        OSMRespone.Element near_node2 = closest[1];
+
+        Log.d("CLOSE", near_node1.lat + "," + near_node1.lon + "; " + near_node2.lat + "," + near_node2.lon);
+        Log.d("CLOSE", currentVector.location.getLatitude() + "," + currentVector.location.getLongitude() + "; " + previousVector.location.getLatitude() + "," + previousVector.location.getLongitude());
+
+        double[] delta_nodes = {(near_node1.lat - near_node2.lat), (near_node1.lon - near_node2.lon)};
+
+        double[] delta_pos = {( previousVector.location.getLatitude() - currentVector.location.getLatitude()),
+                               (previousVector.location.getLongitude() - currentVector.location.getLongitude())};
+
+        double dot = MathFunctions.dotProduct(delta_nodes, delta_pos);
+        //double cross = MathFunctions.crossProduct(delta_nodes, delta_pos);
+        double cos = dot / ( (Math.sqrt(delta_nodes[0]*delta_nodes[0] + delta_nodes[1]*delta_nodes[1])) *
+                               (Math.sqrt(delta_pos[0]*delta_pos[0] + delta_pos[1]*delta_pos[1])) );
+        double angle = Math.acos(cos) * (180/Math.PI);
+        //double angle = Math.atan2(cross, dot);
+        //angle += 180;
+        //angle /= 2;
+
+        Log.d("ANGLE", delta_nodes[0]+","+delta_nodes[1]+ "; " + delta_pos[0]+","+delta_pos[1] + "; " + angle);
+
+        if(angle <= 90) {
+            return DIRECTION.FORWARD;
+        } else if(angle > 90){
+            return DIRECTION.BACKWARD;
+        } else {
+            return DIRECTION.UNDEFINED;
+        }
+    }
+
+    /*
+    private DIRECTION getDirectionOfMovement() {
+        double lat = currentVector.location.getLatitude();
+        double lon = currentVector.location.getLongitude();
 
         double minDist = 10000;
         int index = 0;
@@ -342,7 +401,7 @@ public class DrivingBehaviourProcessor extends EventProcessor implements IOSMRes
         if(lastClosestIndex == -1) {
             lastClosestIndex = index;
             Log.d("INDEX", index+" was -1");
-            return DIRECTION.UNDEFINDED;
+            return DIRECTION.UNDEFINED;
 
         } else if(lastClosestIndex < index) {
             lastClosestIndex = index;
@@ -352,13 +411,14 @@ public class DrivingBehaviourProcessor extends EventProcessor implements IOSMRes
             lastClosestIndex = index;
             return DIRECTION.BACKWARD;
 
-        } else if(lastClosestIndex == index && currentDirection != DIRECTION.UNDEFINDED) {
+        } else if(lastClosestIndex == index && currentDirection != DIRECTION.UNDEFINED) {
             return currentDirection;
 
         } else {
             Log.d("INDEX", index+" else");
             lastClosestIndex = index;
-            return DIRECTION.UNDEFINDED;
+            return DIRECTION.UNDEFINED;
         }
     }
+    */
 }

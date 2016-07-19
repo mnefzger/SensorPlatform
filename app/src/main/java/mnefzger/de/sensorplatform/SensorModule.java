@@ -102,8 +102,11 @@ public class SensorModule implements ISensorCallback, IEventCallback{
             location.start();
             activeProviders.add(location);
             // orientation is needed for road detection
-            orientation.start();
-            activeProviders.add(orientation);
+            if( !activeProviders.contains(orientation) ) {
+                orientation.start();
+                activeProviders.add(orientation);
+            }
+
         }
     }
 
@@ -141,13 +144,18 @@ public class SensorModule implements ISensorCallback, IEventCallback{
         }
     }
 
+    double lon = 153.015722;
+    double lat = -27.451605;
     private void aggregateData(final int ms) {
         DataVector last = current;
 
         Location mock = new Location("mock");
-        mock.setLongitude(153.016117);
-        mock.setLatitude(-27.452112);
+        mock.setLongitude(lon);
+        mock.setLatitude(lat);
         last.setLocation(mock);
+        lon += 0.00001;
+        lat -= 0.00001;
+
 
         current = new DataVector();
 

@@ -357,14 +357,8 @@ public class DrivingBehaviourProcessor extends EventProcessor implements IOSMRes
         double[] delta_pos = {( previousVector.location.getLatitude() - currentVector.location.getLatitude()),
                                (previousVector.location.getLongitude() - currentVector.location.getLongitude())};
 
-        double dot = MathFunctions.dotProduct(delta_nodes, delta_pos);
-        //double cross = MathFunctions.crossProduct(delta_nodes, delta_pos);
-        double cos = dot / ( (Math.sqrt(delta_nodes[0]*delta_nodes[0] + delta_nodes[1]*delta_nodes[1])) *
-                               (Math.sqrt(delta_pos[0]*delta_pos[0] + delta_pos[1]*delta_pos[1])) );
+        double cos = MathFunctions.cosVectors(delta_nodes, delta_pos);
         double angle = Math.acos(cos) * (180/Math.PI);
-        //double angle = Math.atan2(cross, dot);
-        //angle += 180;
-        //angle /= 2;
 
         Log.d("ANGLE", delta_nodes[0]+","+delta_nodes[1]+ "; " + delta_pos[0]+","+delta_pos[1] + "; " + angle);
 

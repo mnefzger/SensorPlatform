@@ -109,6 +109,12 @@ public class MathFunctions {
         return v1[0] * v2[1] - v1[1]*v2[0];
     }
 
+    public static double cosVectors(double[] v1, double[] v2) {
+        double cos = dotProduct(v1, v2) / ( (Math.sqrt(v1[0]*v1[0] + v1[1]*v1[1])) *
+                (Math.sqrt(v2[0]*v2[0] + v2[1]*v2[1])) );
+        return cos;
+    }
+
     /**
      * Class representing the Exponential Moving Average
      */

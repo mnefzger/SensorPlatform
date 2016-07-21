@@ -229,19 +229,23 @@ public class DrivingBehaviourProcessor extends EventProcessor implements IOSMRes
         nextSpeedSign = relevantSigns[0];
         passedSpeedSign = relevantSigns[1];
 
-        nextSpeedSign.tags.maxspeed = nextSpeedSign.tags.maxspeed_backward == null ? nextSpeedSign.tags.maxspeed_forward : nextSpeedSign.tags.maxspeed_backward;
-        passedSpeedSign.tags.maxspeed = passedSpeedSign.tags.maxspeed_backward == null ? passedSpeedSign.tags.maxspeed_forward : passedSpeedSign.tags.maxspeed_backward;
+        if(nextSpeedSign != null)
+            nextSpeedSign.tags.maxspeed = nextSpeedSign.tags.maxspeed_backward == null ? nextSpeedSign.tags.maxspeed_forward : nextSpeedSign.tags.maxspeed_backward;
+        if(passedSpeedSign != null)
+            passedSpeedSign.tags.maxspeed = passedSpeedSign.tags.maxspeed_backward == null ? passedSpeedSign.tags.maxspeed_forward : passedSpeedSign.tags.maxspeed_backward;
 
         if(passedSpeedSign != null) {
             if(nextSpeedSign != null)
-                callback.onEventDetected(new EventVector(System.currentTimeMillis(), "You are on " + lastRecognizedRoad.tags.name + ", Current SpeedLimit: " + passedSpeedSign.tags.maxspeed + ", upcoming: " + nextSpeedSign.tags.maxspeed, 0));
+                callback.onEventDetected(new EventVector(System.currentTimeMillis(), "ROAD: You are on " + lastRecognizedRoad.tags.name + ", Current SpeedLimit: " + passedSpeedSign.tags.maxspeed + ", upcoming: " + nextSpeedSign.tags.maxspeed, 0));
             else
-                callback.onEventDetected(new EventVector(System.currentTimeMillis(), "You are on " + lastRecognizedRoad.tags.name + ", Current SpeedLimit: " + passedSpeedSign, 0));
+                callback.onEventDetected(new EventVector(System.currentTimeMillis(), "ROAD: You are on " + lastRecognizedRoad.tags.name + ", Current SpeedLimit: " + passedSpeedSign, 0));
         } else if(lastRecognizedRoad.tags.maxspeed != null) {
             if(nextSpeedSign != null)
-                callback.onEventDetected(new EventVector(System.currentTimeMillis(), "You are on " + lastRecognizedRoad.tags.name + ", Current SpeedLimit: " + lastRecognizedRoad.tags.maxspeed + ", upcoming: " + nextSpeedSign.tags.maxspeed, 0));
+                callback.onEventDetected(new EventVector(System.currentTimeMillis(), "ROAD: You are on " + lastRecognizedRoad.tags.name + ", Current SpeedLimit: " + lastRecognizedRoad.tags.maxspeed + ", upcoming: " + nextSpeedSign.tags.maxspeed, 0));
             else
-                callback.onEventDetected(new EventVector(System.currentTimeMillis(), "You are on " + lastRecognizedRoad.tags.name + ", Current SpeedLimit: " + lastRecognizedRoad.tags.maxspeed, 0));
+                callback.onEventDetected(new EventVector(System.currentTimeMillis(), "ROAD: You are on " + lastRecognizedRoad.tags.name + ", Current SpeedLimit: " + lastRecognizedRoad.tags.maxspeed, 0));
+        } else {
+            callback.onEventDetected(new EventVector(System.currentTimeMillis(), "ROAD: You are on " + lastRecognizedRoad.tags.name, 0));
         }
 
         /*
@@ -447,10 +451,10 @@ public class DrivingBehaviourProcessor extends EventProcessor implements IOSMRes
                 if(sign.index < index)
                     signsPassed.add(sign.speedSign);
                 else
-                   signsAhead.add(sign.speedSign);
+                    signsAhead.add(sign.speedSign);
 
             } else if (currentDirection == DIRECTION.BACKWARD) {
-                if(sign.index > index)
+                if(sign.index < index)
                     signsAhead.add(sign.speedSign);
                 else
                     signsPassed.add(sign.speedSign);

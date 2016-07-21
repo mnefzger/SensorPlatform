@@ -154,8 +154,8 @@ public class SensorModule implements ISensorCallback, IEventCallback{
         mock.setLongitude(lon);
         mock.setLatitude(lat);
         last.setLocation(mock);
-        lon += 0.00001;
-        lat -= 0.00001;
+        lon -= 0.00001;
+        lat += 0.00001;
 */
 
         current = new DataVector();

@@ -15,6 +15,7 @@ public class MainActivity extends AppCompatActivity implements IDataCallback{
     static {
         try {
             System.loadLibrary("opencv_java3");
+            System.loadLibrary("imgProc");
         } catch (UnsatisfiedLinkError e) {
             Log.d("APPLICATION INIT", "Unsatisfied Link error: " + e.toString());
         }
@@ -36,6 +37,7 @@ public class MainActivity extends AppCompatActivity implements IDataCallback{
 
     TextView street;
     TextView event;
+    TextView face;
 
     DecimalFormat df = new DecimalFormat("#.####");
 
@@ -56,6 +58,8 @@ public class MainActivity extends AppCompatActivity implements IDataCallback{
 
         sPC.logRawData(false);
         sPC.logEventData(false);
+
+        Log.d("PATH", android.os.Environment.getExternalStorageDirectory().getAbsolutePath());
 
         /**
          * Mock unsubscribe
@@ -82,6 +86,7 @@ public class MainActivity extends AppCompatActivity implements IDataCallback{
 
         street = (TextView) findViewById(R.id.osmText);
         event = (TextView) findViewById(R.id.eventText);
+        face = (TextView) findViewById(R.id.faceText);
 
     }
 
@@ -93,6 +98,7 @@ public class MainActivity extends AppCompatActivity implements IDataCallback{
 
     @Override
     public void onEventData(EventVector v) {
+
         Log.d("EventData @ App  ", v.toString());
         updateUI(v);
     }
@@ -139,12 +145,13 @@ public class MainActivity extends AppCompatActivity implements IDataCallback{
             @Override
             public void run() {
 
-                if(v.eventDescription.contains("ROAD")) street.setText(v.eventDescription);
+                if (v.eventDescription.contains("ROAD")) street.setText(v.eventDescription);
+                else if (v.eventDescription.equals("Face detected"))
+                    face.setText("Face detected: YES");
                 else event.setText("Last event: " + v.eventDescription);
-
-
             }
-        });
 
+        });
     }
+
 }

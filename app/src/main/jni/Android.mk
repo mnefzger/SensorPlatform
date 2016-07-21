@@ -9,9 +9,9 @@ OPENCV_INSTALL_MODULES:=on
 OPENCV_LIB_TYPE:=SHARED
 include ${OPENCVROOT}/sdk/native/jni/OpenCV.mk
 
-
+LOCAL_SRC_FILES := face_detection.cpp
 LOCAL_C_INCLUDES += $(LOCAL_PATH)
 LOCAL_LDLIBS     += -llog -ldl
-LOCAL_MODULE := hello-jni
+LOCAL_MODULE := imgProc
 
 include $(BUILD_SHARED_LIBRARY)

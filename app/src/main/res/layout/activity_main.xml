@@ -136,7 +136,15 @@
                 android:textAppearance="?android:attr/textAppearanceLarge"
                 android:id="@+id/eventText"
                 android:layout_marginTop="10dp" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textAppearance="?android:attr/textAppearanceLarge"
+                android:id="@+id/faceText"
+                android:layout_marginTop="10dp" />
         </LinearLayout>
     </LinearLayout>
+
 
 </RelativeLayout>

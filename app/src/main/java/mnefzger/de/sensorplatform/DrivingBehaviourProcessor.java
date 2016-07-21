@@ -5,6 +5,7 @@ import android.hardware.SensorManager;
 import android.util.Log;
 import android.util.SparseArray;
 
+import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
@@ -18,6 +19,8 @@ public class DrivingBehaviourProcessor extends EventProcessor implements IOSMRes
     private boolean turned = false;
     private OSMRespone lastResponse;
     private OSMRespone.Element lastRecognizedRoad;
+    private OSMRespone.Element nextSpeedSign;
+    private OSMRespone.Element passedSpeedSign;
     private DataVector currentVector;
     private DataVector previousVector;
 
@@ -220,19 +223,41 @@ public class DrivingBehaviourProcessor extends EventProcessor implements IOSMRes
             }
         }
 
-        if(speedLimits.size() > 0 && currentDirection == DIRECTION.FORWARD)
-            callback.onEventDetected(new EventVector(System.currentTimeMillis(), "ROAD: You are on " + lastRecognizedRoad.tags.name + ", SpeedLimit forward: " + speedLimits.get(0).tags.maxspeed_forward, 0));
-        else if(speedLimits.size() > 0 && currentDirection == DIRECTION.BACKWARD)
-            callback.onEventDetected(new EventVector(System.currentTimeMillis(), "ROAD: You are on " + lastRecognizedRoad.tags.name + ", SpeedLimit backward: " + speedLimits.get(0).tags.maxspeed_backward, 0));
-        else if(speedLimits.size() > 0)
-            callback.onEventDetected(new EventVector(System.currentTimeMillis(), "ROAD: You are on " + lastRecognizedRoad.tags.name + ", SpeedLimit both: " + speedLimits.get(0).tags.maxspeed, 0));
-        else if(lastRecognizedRoad.tags.maxspeed != null)
-            callback.onEventDetected(new EventVector(System.currentTimeMillis(), "ROAD: You are on " + lastRecognizedRoad.tags.name + ", SpeedLimit road: " + lastRecognizedRoad.tags.maxspeed, 0));
-        else
-            callback.onEventDetected(new EventVector(System.currentTimeMillis(), "ROAD: You are on " + lastRecognizedRoad.tags.name, 0));
-
         // TODO determine which speed sign is the right one for our current position
+        OSMRespone.Element[] relevantSigns = findRelevantSpeedSign(speedLimits);
+
+        nextSpeedSign = relevantSigns[0];
+        passedSpeedSign = relevantSigns[1];
+
+        nextSpeedSign.tags.maxspeed = nextSpeedSign.tags.maxspeed_backward == null ? nextSpeedSign.tags.maxspeed_forward : nextSpeedSign.tags.maxspeed_backward;
+        passedSpeedSign.tags.maxspeed = passedSpeedSign.tags.maxspeed_backward == null ? passedSpeedSign.tags.maxspeed_forward : passedSpeedSign.tags.maxspeed_backward;
+
+        if(passedSpeedSign != null) {
+            if(nextSpeedSign != null)
+                callback.onEventDetected(new EventVector(System.currentTimeMillis(), "You are on " + lastRecognizedRoad.tags.name + ", Current SpeedLimit: " + passedSpeedSign.tags.maxspeed + ", upcoming: " + nextSpeedSign.tags.maxspeed, 0));
+            else
+                callback.onEventDetected(new EventVector(System.currentTimeMillis(), "You are on " + lastRecognizedRoad.tags.name + ", Current SpeedLimit: " + passedSpeedSign, 0));
+        } else if(lastRecognizedRoad.tags.maxspeed != null) {
+            if(nextSpeedSign != null)
+                callback.onEventDetected(new EventVector(System.currentTimeMillis(), "You are on " + lastRecognizedRoad.tags.name + ", Current SpeedLimit: " + lastRecognizedRoad.tags.maxspeed + ", upcoming: " + nextSpeedSign.tags.maxspeed, 0));
+            else
+                callback.onEventDetected(new EventVector(System.currentTimeMillis(), "You are on " + lastRecognizedRoad.tags.name + ", Current SpeedLimit: " + lastRecognizedRoad.tags.maxspeed, 0));
+        }
+
+        /*
+        if(nextSpeedSign == null && lastRecognizedRoad.tags.maxspeed != null)
+            callback.onEventDetected(new EventVector(System.currentTimeMillis(), "You are on " + lastRecognizedRoad.tags.name + ", SpeedLimit Road: " + lastRecognizedRoad.tags.maxspeed, 0));
+        else if(speedLimits.size() > 0 && currentDirection == DIRECTION.FORWARD)
+            callback.onEventDetected(new EventVector(System.currentTimeMillis(), "You are on " + lastRecognizedRoad.tags.name + ", Limit:" + passedSpeedSign.tags.maxspeed_forward + ", SpeedLimit forward upcoming: " + nextSpeedSign.tags.maxspeed_forward, 0));
+        else if(speedLimits.size() > 0 && currentDirection == DIRECTION.BACKWARD)
+            callback.onEventDetected(new EventVector(System.currentTimeMillis(), "You are on " + lastRecognizedRoad.tags.name + ", SpeedLimit backward upcoming: " + nextSpeedSign.tags.maxspeed_backward, 0));
+        else if(speedLimits.size() > 0)
+            callback.onEventDetected(new EventVector(System.currentTimeMillis(), "You are on " + lastRecognizedRoad.tags.name + ", SpeedLimit both upcoming: " + nextSpeedSign.tags.maxspeed, 0));
+        else
+            callback.onEventDetected(new EventVector(System.currentTimeMillis(), "You are on " + lastRecognizedRoad.tags.name, 0));
+            */
     }
+
 
     /**
      * Returns the best estimate for the current road
@@ -257,7 +282,7 @@ public class DrivingBehaviourProcessor extends EventProcessor implements IOSMRes
         } else if(roads.size() > 1) {
             double min_dist = 10000;
             for(int i=0; i<roads.size(); i++) {
-                double temp_dist = getDistanceToRoad(roads.valueAt(i), response);
+                double temp_dist = getDistanceToRoad(roads.valueAt(i));
                 // if there was no turn detected, we assume it is more likely that we are still on the same road
                 // to express this likelyhood, we multiply the distance to lastRecognizedRoad by 0.75
                 if(lastRecognizedRoad == roads.valueAt(i)) {
@@ -279,9 +304,8 @@ public class DrivingBehaviourProcessor extends EventProcessor implements IOSMRes
     /**
      * Returns the distance from current position to a given OpenStreetMap road
      * @param element   The road we want to calculate the distance
-     * @param response  Contains all the nodes defining the road
      */
-    private double getDistanceToRoad(OSMRespone.Element element, OSMRespone response) {
+    private double getDistanceToRoad(OSMRespone.Element element) {
         double distance;
 
         // First, we have to find the two nearest nodes of this street (element)
@@ -369,6 +393,96 @@ public class DrivingBehaviourProcessor extends EventProcessor implements IOSMRes
         } else {
             return DIRECTION.UNDEFINED;
         }
+    }
+
+    /**
+     * Monstrosity of a method
+     * There is probably a smarter way to do it
+     * Returns the closest SpeedSign that lies ahead
+     */
+
+    private OSMRespone.Element[] findRelevantSpeedSign(SparseArray<OSMRespone.Element> speedLimits) {
+        // Helper class to combine an index and the Speedsign element
+        class InfoWrapper {
+            int index;
+            OSMRespone.Element speedSign;
+
+            InfoWrapper(int index, OSMRespone.Element sign) {
+                this.index = index;
+                this.speedSign = sign;
+            }
+        }
+
+        double lat = currentVector.location.getLatitude();
+        double lon = currentVector.location.getLongitude();
+
+        double minDist = 10000;
+        int index = 0;
+        ArrayList<InfoWrapper> signs = new ArrayList<>();
+
+        // get the index of the closest node and the indices of the speedsigns
+        for(int i=0; i<lastResponse.elements.size(); i++) {
+            OSMRespone.Element node = lastResponse.elements.get(i);
+            if(node.lat != 0 && node.lon != 0) {
+                double temp = MathFunctions.calculateDistance(node.lat, node.lon, lat, lon);
+                if(temp < minDist) {
+                    minDist = temp;
+                    index = i;
+                }
+            }
+
+            for(int s=0; s<speedLimits.size(); s++) {
+                OSMRespone.Element sign = speedLimits.get(s);
+                if(sign.id == node.id) {
+                    signs.add(new InfoWrapper(i,sign));
+                }
+            }
+        }
+
+        // Separate Signs into ahead and passed categories
+        ArrayList<OSMRespone.Element> signsAhead = new ArrayList<>();
+        ArrayList<OSMRespone.Element> signsPassed = new ArrayList<>();
+        for(InfoWrapper sign : signs) {
+            if(currentDirection == DIRECTION.FORWARD) {
+                if(sign.index < index)
+                    signsPassed.add(sign.speedSign);
+                else
+                   signsAhead.add(sign.speedSign);
+
+            } else if (currentDirection == DIRECTION.BACKWARD) {
+                if(sign.index > index)
+                    signsAhead.add(sign.speedSign);
+                else
+                    signsPassed.add(sign.speedSign);
+
+            }
+
+        }
+
+        // calculate the distances to the speed signs ahead to find the closest
+        double aheadDist = 10000;
+        OSMRespone.Element closestSignAhead = null;
+        for(OSMRespone.Element ahead : signsAhead) {
+            double tempDist =  MathFunctions.calculateDistance(ahead.lat, ahead.lon, lat, lon);
+            if(tempDist < aheadDist) {
+                aheadDist = tempDist;
+                closestSignAhead = ahead;
+            }
+        }
+
+        // calculate the distances to the speed signs passed to find the closest
+        double passedDist = 10000;
+        OSMRespone.Element closestSignPassed = null;
+        for(OSMRespone.Element ahead : signsAhead) {
+            double tempDist =  MathFunctions.calculateDistance(ahead.lat, ahead.lon, lat, lon);
+            if(tempDist < passedDist) {
+                passedDist = tempDist;
+                closestSignPassed = ahead;
+            }
+        }
+
+        OSMRespone.Element[] aheadPassed = {closestSignAhead, closestSignPassed};
+        return aheadPassed;
     }
 
     /*

@@ -30,16 +30,7 @@ public class DrivingBehaviourProcessor extends EventProcessor implements IOSMRes
     private enum DIRECTION {FORWARD, BACKWARD, UNDEFINED};
     private DIRECTION currentDirection = DIRECTION.UNDEFINED;
 
-    /**
-     * Hard acceleration / braking threshold
-     *
-     */
     private double ACC_THRESHOLD;
-
-    /**
-     * Turn threshold in rad/s
-     * Value based on (Wang, 2013)
-     */
     private double TURN_THRESHOLD;
     private double TURN_THRESHOLD_SHARP;
 

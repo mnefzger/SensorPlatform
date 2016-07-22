@@ -2,41 +2,47 @@
 <PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android"
     android:key="preferences">
 
-        <ListPreference
-            android:summary="The accelerometer sensor delay in microseconds"
-            android:defaultValue="@integer/accelerometer_delay_default"
-            android:entries="@array/frequency_readable"
-            android:entryValues="@array/frequency_values"
-            android:key="frequency_accelerometer"
-            android:persistent="false"
-            android:title="Acclerometer sampling rate" />
+        <PreferenceCategory android:title="Acceleration and Braking">
+            <ListPreference
+                android:summary="The accelerometer sensor delay in microseconds"
+                android:defaultValue="@integer/accelerometer_delay_default"
+                android:entries="@array/frequency_readable"
+                android:entryValues="@array/frequency_values"
+                android:key="frequency_accelerometer"
+                android:persistent="false"
+                android:title="Acclerometer sampling rate" />
 
-        <EditTextPreference
-            android:key="accelerometer_threshold"
-            android:title="Hard acceleration threshold"
-            android:summary="This represents the g-force value for hard acceleration and braking"
-            android:defaultValue="@integer/acceleration_threshold" />
+            <EditTextPreference
+                android:key="accelerometer_threshold"
+                android:title="Hard acceleration threshold"
+                android:summary="This represents the g-force value for hard acceleration and braking"
+                android:defaultValue="@integer/acceleration_threshold_default" />
+        </PreferenceCategory>
 
-        <ListPreference
-            android:summary="The rotation sensor delay in microseconds"
-            android:defaultValue="@integer/rotation_delay_default"
-            android:entries="@array/frequency_readable"
-            android:entryValues="@array/frequency_values"
-            android:key="frequency_rotation"
-            android:persistent="false"
-            android:title="Rotation sampling rate" />
 
-        <EditTextPreference
-            android:key="rotation_threshold_normal"
-            android:title="Normal turn threshold"
-            android:summary="This value is the threshold for a normal turn in rad/s"
-            android:defaultValue="@integer/acceleration_threshold" />
+        <PreferenceCategory android:title="Rotation and Turns">
+            <ListPreference
+                android:summary="The rotation sensor delay in microseconds"
+                android:defaultValue="@integer/rotation_delay_default"
+                android:entries="@array/frequency_readable"
+                android:entryValues="@array/frequency_values"
+                android:key="frequency_rotation"
+                android:persistent="false"
+                android:title="Rotation sampling rate" />
 
-        <EditTextPreference
-            android:key="rotation_threshold_risky"
-            android:title="Sharp turn threshold"
-            android:summary="This value is the threshold for a sharp turn in rad/s"
-            android:defaultValue="@integer/acceleration_threshold" />
+            <EditTextPreference
+                android:key="rotation_threshold_normal"
+                android:title="Normal turn threshold"
+                android:summary="This value is the threshold for a normal turn in rad/s"
+                android:defaultValue="@integer/acceleration_threshold_default" />
+
+            <EditTextPreference
+                android:key="rotation_threshold_risky"
+                android:title="Sharp turn threshold"
+                android:summary="This value is the threshold for a sharp turn in rad/s"
+                android:defaultValue="@integer/acceleration_threshold_default" />
+        </PreferenceCategory>
+
 
         <ListPreference
             android:summary="The onRawData() and event detection sampling rate in milliseconds"

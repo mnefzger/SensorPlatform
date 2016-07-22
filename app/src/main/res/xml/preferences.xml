@@ -4,26 +4,29 @@
 
         <ListPreference
             android:summary="The accelerometer sensor delay in microseconds"
-            android:defaultValue="60000"
+            android:defaultValue="@integer/accelerometer_delay_default"
             android:entries="@array/frequency_readable"
             android:entryValues="@array/frequency_values"
             android:key="frequency_accelerometer"
+            android:persistent="false"
             android:title="Acclerometer sampling rate" />
 
         <ListPreference
             android:summary="The rotation sensor delay in microseconds"
-            android:defaultValue="60000"
+            android:defaultValue="@integer/rotation_delay_default"
             android:entries="@array/frequency_readable"
             android:entryValues="@array/frequency_values"
             android:key="frequency_rotation"
+            android:persistent="false"
             android:title="Rotation sampling rate" />
 
         <ListPreference
             android:summary="The onRawData() and event detection sampling rate in milliseconds"
-            android:defaultValue="500"
+            android:defaultValue="@integer/rawData_delay_default"
             android:entries="@array/rawData_readable"
             android:entryValues="@array/rawData_values"
             android:key="frequency_rawData"
+            android:persistent="false"
             android:title="Rotation sampling rate" />
 
 

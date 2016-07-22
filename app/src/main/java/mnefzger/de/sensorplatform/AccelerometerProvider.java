@@ -31,13 +31,6 @@ public class AccelerometerProvider extends SensorProvider {
 
     public AccelerometerProvider(Context c, SensorModule m) {
         super(c, m);
-
-        // set sampling value from default
-        String sampling = prefs.getString(Preferences.FREQUENCY_ACCELEROMETER, "60000");
-        SharedPreferences.Editor editor = prefs.edit();
-        editor.putInt(Preferences.FREQUENCY_ACCELEROMETER, Integer.valueOf(sampling));
-        editor.commit();
-
     }
 
     public void start() {
@@ -45,8 +38,9 @@ public class AccelerometerProvider extends SensorProvider {
         if (sensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER) != null){
             accSensor = sensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER);
         }
-        Log.d("SETTINGS", prefs.getAll()+"");
-        sensorManager.registerListener(this, accSensor, prefs.getInt(Preferences.FREQUENCY_ACCELEROMETER, 60000));
+
+        int sampling = Integer.valueOf( prefs.getString(Preferences.FREQUENCY_ACCELEROMETER, "60000") );
+        sensorManager.registerListener(this, accSensor, sampling );
     }
 
     public void stop() {

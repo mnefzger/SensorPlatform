@@ -50,8 +50,13 @@ public class MainActivity extends AppCompatActivity implements IDataCallback{
         setContentView(R.layout.activity_main);
 
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
-        PreferenceManager.setDefaultValues(this, R.xml.preferences, true);
-        prefs.edit().commit();
+        prefs.edit().clear();
+        if(prefs.getAll().isEmpty()) {
+            PreferenceManager.setDefaultValues(this, R.xml.preferences, true);
+            prefs.edit().commit();
+        } else {
+            PreferenceManager.setDefaultValues(this, R.xml.preferences, false);
+        }
 
         sPC = new SensorPlatformController(this);
         sPC.subscribeTo(DataType.ACCELERATION_EVENT);

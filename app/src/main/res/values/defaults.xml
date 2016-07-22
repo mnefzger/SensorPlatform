@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <integer name="accelerometer_delay_default">60000</integer>
+
+    <integer name="rotation_delay_default">60000</integer>
+
+    <integer name="rawData_delay_default">500</integer>
+
+</resources>

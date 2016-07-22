@@ -1,6 +1,7 @@
 package mnefzger.de.sensorplatform;
 
 import android.content.Context;
+import android.content.SharedPreferences;
 import android.hardware.Sensor;
 import android.hardware.SensorEvent;
 import android.hardware.SensorManager;
@@ -27,7 +28,8 @@ public class OrientationProvider extends SensorProvider {
             Log.d("SENSOR", "TYPE_ROTATION_VECTOR not available on device");
         }
 
-        sensorManager.registerListener(this, rotationSensor, SensorManager.SENSOR_DELAY_GAME);
+        int sampling = Integer.valueOf( prefs.getString(Preferences.FREQUENCY_ROTATION, "60000") );
+        sensorManager.registerListener(this, rotationSensor, sampling);
     }
 
     public void stop() {

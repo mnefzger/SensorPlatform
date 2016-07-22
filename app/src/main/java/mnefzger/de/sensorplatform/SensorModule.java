@@ -1,6 +1,7 @@
 package mnefzger.de.sensorplatform;
 
 import android.app.Activity;
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.hardware.Sensor;
 import android.location.Location;
@@ -51,10 +52,6 @@ public class SensorModule implements ISensorCallback, IEventCallback{
      */
     private DrivingBehaviourProcessor drivingBehProc;
     /**
-     * The EventProcessor for Driver Behaviour
-     */
-    private DriverBehaviourProcessor driverBehProc;
-    /**
      * The size of the dataBuffer
      */
     private final int BUFFERSIZE = 100;
@@ -78,21 +75,13 @@ public class SensorModule implements ISensorCallback, IEventCallback{
         dataBuffer = new ArrayList<>();
 
         prefs = PreferenceManager.getDefaultSharedPreferences(app);
-        setPrefValues();
-    }
-
-    private void setPrefValues() {
-        // set sampling value from default
-        String sampling = prefs.getString(Preferences.FREQUENCY_RAWDATA, "500");
-        SharedPreferences.Editor editor = prefs.edit();
-        editor.putInt(Preferences.FREQUENCY_RAWDATA, Integer.valueOf(sampling));
-        editor.commit();
     }
 
     public void startSensing(DataType type) {
 
         if(!sensing) {
-            aggregateData( prefs.getInt(Preferences.FREQUENCY_RAWDATA, 500) );
+            int sampling = Integer.valueOf( prefs.getString(Preferences.FREQUENCY_RAWDATA, "500") );
+            aggregateData( sampling );
             sensing = true;
         }
 

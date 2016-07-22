@@ -58,6 +58,7 @@ public class MainActivity extends AppCompatActivity implements IDataCallback{
             PreferenceManager.setDefaultValues(this, R.xml.preferences, false);
         }
 
+
         sPC = new SensorPlatformController(this);
         sPC.subscribeTo(DataType.ACCELERATION_EVENT);
         sPC.subscribeTo(DataType.ACCELERATION_RAW);
@@ -65,22 +66,11 @@ public class MainActivity extends AppCompatActivity implements IDataCallback{
         sPC.subscribeTo(DataType.LOCATION_EVENT);
         sPC.subscribeTo(DataType.ROTATION_RAW);
         sPC.subscribeTo(DataType.ROTATION_EVENT);
-
         //sPC.subscribeTo(DataType.CAMERA_RAW);
 
         sPC.logRawData(false);
         sPC.logEventData(false);
 
-        /**
-         * Mock unsubscribe
-
-        Handler handler = new Handler();
-        handler.postDelayed(new Runnable() {
-            public void run() {
-                sPC.unsubscribe(DataType.ACCELERATION_EVENT);
-            }
-        }, 5000);
-         */
 
         accX = (TextView) findViewById(R.id.accXText);
         accY = (TextView) findViewById(R.id.accYText);

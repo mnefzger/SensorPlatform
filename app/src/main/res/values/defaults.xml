@@ -7,4 +7,15 @@
 
     <integer name="rawData_delay_default">500</integer>
 
+    <!-- Threshold is the g-force value
+         e.g. 0.4 * 9.81 = 3.924
+         Value of 0.4g based on: DriveSafe (Bergasa, 2014) -->
+    <item name="acceleration_threshold" format="float" type="integer">3.924</item>
+
+    <!-- Threshold in rad/s
+         Value based on (Wang, 2013) -->
+    <item name="rotation_threshold_normal" format="float" type="integer">0.3</item>
+
+    <item name="rotation_threshold_risky" format="float" type="integer">0.5</item>
+
 </resources>

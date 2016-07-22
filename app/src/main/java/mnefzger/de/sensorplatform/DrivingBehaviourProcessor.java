@@ -1,7 +1,9 @@
 package mnefzger.de.sensorplatform;
 
 import android.content.Context;
+import android.content.SharedPreferences;
 import android.hardware.SensorManager;
+import android.preference.PreferenceManager;
 import android.util.Log;
 import android.util.SparseArray;
 
@@ -15,6 +17,7 @@ import mnefzger.de.sensorplatform.Utilities.OSMQueryAdapter;
 import mnefzger.de.sensorplatform.Utilities.OSMRespone;
 
 public class DrivingBehaviourProcessor extends EventProcessor implements IOSMResponse {
+    private SharedPreferences prefs;
     private OSMQueryAdapter qAdapter;
     private boolean turned = false;
     private OSMRespone lastResponse;
@@ -29,16 +32,16 @@ public class DrivingBehaviourProcessor extends EventProcessor implements IOSMRes
 
     /**
      * Hard acceleration / braking threshold
-     * Value of 0.4g based on: DriveSafe (Bergasa, 2014)
+     *
      */
-    private final double ACC_THRESHOLD = 0.4 * 9.81;
+    private double ACC_THRESHOLD;
 
     /**
      * Turn threshold in rad/s
      * Value based on (Wang, 2013)
      */
-    private final double TURN_THRESHOLD = 0.3;
-    private final double TURN_SHARP_THRESHOLD = 0.5;
+    private double TURN_THRESHOLD;
+    private double TURN_THRESHOLD_SHARP;
 
     /**
      * Time between two OpenStreetMap requests in ms
@@ -49,6 +52,11 @@ public class DrivingBehaviourProcessor extends EventProcessor implements IOSMRes
     public DrivingBehaviourProcessor(SensorModule m, Context c) {
         super(m);
         qAdapter = new OSMQueryAdapter(this, c);
+        prefs = PreferenceManager.getDefaultSharedPreferences(c);
+
+        ACC_THRESHOLD = Double.valueOf( prefs.getString(Preferences.ACCELEROMETER_THRESHOLD, "3.924") );
+        TURN_THRESHOLD = Double.valueOf( prefs.getString(Preferences.TURN_THRESHOLD_NORMAL, "0.3") );
+        TURN_THRESHOLD_SHARP = Double.valueOf( prefs.getString(Preferences.TURN_THRESHOLD_SHARP, "0.5") );
     }
 
     public void processData(List<DataVector> data) {
@@ -120,11 +128,11 @@ public class DrivingBehaviourProcessor extends EventProcessor implements IOSMRes
         /**
          * Did the data include a sharp turn?
          */
-        if(leftDelta <= -TURN_SHARP_THRESHOLD) {
+        if(leftDelta <= -TURN_THRESHOLD_SHARP) {
             EventVector ev = new EventVector(lastData.get(0).timestamp, "Sharp Left Turn", leftDelta);
             callback.onEventDetected(ev);
         }
-        if(rightDelta >= TURN_SHARP_THRESHOLD) {
+        if(rightDelta >= TURN_THRESHOLD_SHARP) {
             EventVector ev = new EventVector(lastData.get(0).timestamp, "Sharp Right Turn", rightDelta);
             callback.onEventDetected(ev);
         }

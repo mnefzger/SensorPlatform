@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string-array name="frequency_values">
+        <item>200000</item>
+        <item>60000</item>
+        <item>20000</item>
+        <item>0</item>
+    </string-array>
+    <string-array name="frequency_readable">
+        <item>Slow</item>
+        <item>Normal</item>
+        <item>Fast</item>
+        <item>Fastest</item>
+    </string-array>
+
+    <string-array name="rawData_values">
+        <item>1000</item>
+        <item>500</item>
+        <item>250</item>
+        <item>100</item>
+    </string-array>
+    <string-array name="rawData_readable">
+        <item>1000 ms</item>
+        <item>500 ms</item>
+        <item>250 ms</item>
+        <item>100 ms</item>
+    </string-array>
+</resources>

@@ -1,9 +1,11 @@
 package mnefzger.de.sensorplatform;
 
 import android.content.Context;
+import android.content.SharedPreferences;
 import android.hardware.Sensor;
 import android.hardware.SensorEvent;
 import android.hardware.SensorManager;
+import android.util.Log;
 
 import java.util.ArrayList;
 
@@ -29,6 +31,13 @@ public class AccelerometerProvider extends SensorProvider {
 
     public AccelerometerProvider(Context c, SensorModule m) {
         super(c, m);
+
+        // set sampling value from default
+        String sampling = prefs.getString(Preferences.FREQUENCY_ACCELEROMETER, "60000");
+        SharedPreferences.Editor editor = prefs.edit();
+        editor.putInt(Preferences.FREQUENCY_ACCELEROMETER, Integer.valueOf(sampling));
+        editor.commit();
+
     }
 
     public void start() {
@@ -36,8 +45,8 @@ public class AccelerometerProvider extends SensorProvider {
         if (sensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER) != null){
             accSensor = sensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER);
         }
-
-        sensorManager.registerListener(this, accSensor, SensorManager.SENSOR_DELAY_GAME);
+        Log.d("SETTINGS", prefs.getAll()+"");
+        sensorManager.registerListener(this, accSensor, prefs.getInt(Preferences.FREQUENCY_ACCELEROMETER, 60000));
     }
 
     public void stop() {

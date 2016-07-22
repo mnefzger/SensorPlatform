@@ -26,7 +26,6 @@ public class DrivingBehaviourProcessor extends EventProcessor implements IOSMRes
 
     private enum DIRECTION {FORWARD, BACKWARD, UNDEFINED};
     private DIRECTION currentDirection = DIRECTION.UNDEFINED;
-    private int lastClosestIndex = -1;
 
     /**
      * Hard acceleration / braking threshold
@@ -190,13 +189,6 @@ public class DrivingBehaviourProcessor extends EventProcessor implements IOSMRes
 
         OSMRespone.Element road = getCurrentRoad(response);
         if(road != null) {
-            // if the road has changed, reset index for direction
-            if(lastRecognizedRoad != null)
-                if(!road.tags.name.equals(lastRecognizedRoad.tags.name)) {
-                    Log.d("CHANGE", road.tags.name + "," + lastRecognizedRoad.tags.name);
-                    lastClosestIndex = -1;
-                }
-
             lastRecognizedRoad = road;
             qAdapter.startSearchForSpeedLimit(currentVector.location);
         } else {
@@ -223,7 +215,7 @@ public class DrivingBehaviourProcessor extends EventProcessor implements IOSMRes
             }
         }
 
-        // TODO determine which speed sign is the right one for our current position
+        // TODO make less ugly
         OSMRespone.Element[] relevantSigns = findRelevantSpeedSign(speedLimits);
 
         nextSpeedSign = relevantSigns[0];
@@ -248,18 +240,6 @@ public class DrivingBehaviourProcessor extends EventProcessor implements IOSMRes
             callback.onEventDetected(new EventVector(System.currentTimeMillis(), "ROAD: You are on " + lastRecognizedRoad.tags.name, 0));
         }
 
-        /*
-        if(nextSpeedSign == null && lastRecognizedRoad.tags.maxspeed != null)
-            callback.onEventDetected(new EventVector(System.currentTimeMillis(), "You are on " + lastRecognizedRoad.tags.name + ", SpeedLimit Road: " + lastRecognizedRoad.tags.maxspeed, 0));
-        else if(speedLimits.size() > 0 && currentDirection == DIRECTION.FORWARD)
-            callback.onEventDetected(new EventVector(System.currentTimeMillis(), "You are on " + lastRecognizedRoad.tags.name + ", Limit:" + passedSpeedSign.tags.maxspeed_forward + ", SpeedLimit forward upcoming: " + nextSpeedSign.tags.maxspeed_forward, 0));
-        else if(speedLimits.size() > 0 && currentDirection == DIRECTION.BACKWARD)
-            callback.onEventDetected(new EventVector(System.currentTimeMillis(), "You are on " + lastRecognizedRoad.tags.name + ", SpeedLimit backward upcoming: " + nextSpeedSign.tags.maxspeed_backward, 0));
-        else if(speedLimits.size() > 0)
-            callback.onEventDetected(new EventVector(System.currentTimeMillis(), "You are on " + lastRecognizedRoad.tags.name + ", SpeedLimit both upcoming: " + nextSpeedSign.tags.maxspeed, 0));
-        else
-            callback.onEventDetected(new EventVector(System.currentTimeMillis(), "You are on " + lastRecognizedRoad.tags.name, 0));
-            */
     }
 
 
@@ -372,6 +352,11 @@ public class DrivingBehaviourProcessor extends EventProcessor implements IOSMRes
         return closest;
     }
 
+    /**
+     * Compares the vector of GPS signals to the OSM road vector
+     * Dependent on the angle between both vectors, we can guess at the direction of movement on the road (Forward or Backward)
+     * @return the OSM direction the vehicle is travelling
+     */
     private DIRECTION getDirectionOfMovement() {
         OSMRespone.Element[] closest = get2ClosestNodes(lastRecognizedRoad, true);
         OSMRespone.Element near_node1 = closest[0];

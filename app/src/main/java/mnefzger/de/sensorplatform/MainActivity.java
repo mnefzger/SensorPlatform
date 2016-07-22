@@ -1,6 +1,9 @@
 package mnefzger.de.sensorplatform;
 
+import android.content.Context;
+import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.widget.TextView;
@@ -46,6 +49,10 @@ public class MainActivity extends AppCompatActivity implements IDataCallback{
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
+        PreferenceManager.setDefaultValues(this, R.xml.preferences, true);
+        prefs.edit().commit();
+
         sPC = new SensorPlatformController(this);
         sPC.subscribeTo(DataType.ACCELERATION_EVENT);
         sPC.subscribeTo(DataType.ACCELERATION_RAW);
@@ -58,8 +65,6 @@ public class MainActivity extends AppCompatActivity implements IDataCallback{
 
         sPC.logRawData(false);
         sPC.logEventData(false);
-
-        Log.d("PATH", android.os.Environment.getExternalStorageDirectory().getAbsolutePath());
 
         /**
          * Mock unsubscribe

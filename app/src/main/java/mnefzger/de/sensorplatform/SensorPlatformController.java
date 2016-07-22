@@ -1,6 +1,9 @@
 package mnefzger.de.sensorplatform;
 
 import android.app.Activity;
+import android.content.Context;
+import android.preference.PreferenceManager;
+import android.util.Log;
 
 import java.util.Iterator;
 

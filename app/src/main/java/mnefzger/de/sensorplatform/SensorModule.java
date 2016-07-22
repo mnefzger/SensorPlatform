@@ -1,8 +1,10 @@
 package mnefzger.de.sensorplatform;
 
 import android.app.Activity;
+import android.content.SharedPreferences;
 import android.hardware.Sensor;
 import android.location.Location;
+import android.preference.PreferenceManager;
 import android.util.Log;
 
 import java.util.ArrayList;
@@ -11,6 +13,7 @@ import java.util.Timer;
 import java.util.TimerTask;
 
 public class SensorModule implements ISensorCallback, IEventCallback{
+    private SharedPreferences prefs;
     /**
      * Callback implemented by SensorPlatformController
      */
@@ -56,10 +59,6 @@ public class SensorModule implements ISensorCallback, IEventCallback{
      */
     private final int BUFFERSIZE = 100;
     /**
-     * The onRawData() and event detection sampling rate in milliseconds
-     */
-    private final int SAMPLING_MS = 500;
-    /**
      * int identifier for GPS Sensor
      */
     private final int GPS_IDENTIFIER = 100;
@@ -77,12 +76,23 @@ public class SensorModule implements ISensorCallback, IEventCallback{
         current = new DataVector();
         current.setTimestamp(System.currentTimeMillis());
         dataBuffer = new ArrayList<>();
+
+        prefs = PreferenceManager.getDefaultSharedPreferences(app);
+        setPrefValues();
+    }
+
+    private void setPrefValues() {
+        // set sampling value from default
+        String sampling = prefs.getString(Preferences.FREQUENCY_RAWDATA, "500");
+        SharedPreferences.Editor editor = prefs.edit();
+        editor.putInt(Preferences.FREQUENCY_RAWDATA, Integer.valueOf(sampling));
+        editor.commit();
     }
 
     public void startSensing(DataType type) {
 
         if(!sensing) {
-            aggregateData(SAMPLING_MS);
+            aggregateData( prefs.getInt(Preferences.FREQUENCY_RAWDATA, 500) );
             sensing = true;
         }
 
@@ -179,7 +189,7 @@ public class SensorModule implements ISensorCallback, IEventCallback{
         }
 
         /**
-         * report raw data after SAMPLING_MS milliseconds
+         * report raw data after defined delay
          */
         new Timer().schedule(new TimerTask() {
             @Override

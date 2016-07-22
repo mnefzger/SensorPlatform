@@ -6,7 +6,6 @@ import android.hardware.SensorManager;
 import android.preference.PreferenceManager;
 import android.util.Log;
 import android.util.SparseArray;
-
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
@@ -33,11 +32,7 @@ public class DrivingBehaviourProcessor extends EventProcessor implements IOSMRes
     private double ACC_THRESHOLD;
     private double TURN_THRESHOLD;
     private double TURN_THRESHOLD_SHARP;
-
-    /**
-     * Time between two OpenStreetMap requests in ms
-     */
-    private final double OSM_REQUEST_RATE = 5000;
+    private int OSM_REQUEST_RATE;
 
 
     public DrivingBehaviourProcessor(SensorModule m, Context c) {
@@ -48,11 +43,11 @@ public class DrivingBehaviourProcessor extends EventProcessor implements IOSMRes
         ACC_THRESHOLD = Double.valueOf( prefs.getString(Preferences.ACCELEROMETER_THRESHOLD, "3.924") );
         TURN_THRESHOLD = Double.valueOf( prefs.getString(Preferences.TURN_THRESHOLD_NORMAL, "0.3") );
         TURN_THRESHOLD_SHARP = Double.valueOf( prefs.getString(Preferences.TURN_THRESHOLD_SHARP, "0.5") );
+        OSM_REQUEST_RATE = Integer.valueOf( prefs.getString(Preferences.OSM_REQUEST_RATE, "5000") );
     }
 
     public void processData(List<DataVector> data) {
         super.processData(data);
-
 
         if(data.size() >= 3) {
             currentVector = data.get(data.size()-1);

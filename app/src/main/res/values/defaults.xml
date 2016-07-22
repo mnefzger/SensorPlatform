@@ -7,7 +7,7 @@
 
     <integer name="rawData_delay_default">500</integer>
 
-    <integer name="rawData_delay_default">500</integer>
+    <integer name="osmRequest_delay_default">5000</integer>
 
     <!-- Threshold is the g-force value
          e.g. 0.4 * 9.81 = 3.924

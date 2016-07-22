@@ -53,6 +53,12 @@
             android:persistent="false"
             android:title="Rotation sampling rate" />
 
+        <EditTextPreference
+            android:key="osmRequest_frequency"
+            android:title="Sharp turn threshold"
+            android:summary="Time between two OSM requests in milliseconds"
+            android:defaultValue="@integer/acceleration_threshold_default" />
+
 
 
 

@@ -21,4 +21,6 @@ public class Preferences {
 
     public static final String FREQUENCY_RAWDATA = "frequency_rawData";
 
+    public static final String OSM_REQUEST_RATE = "osmRequest_frequency";
+
 }

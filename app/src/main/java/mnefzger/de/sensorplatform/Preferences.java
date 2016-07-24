@@ -21,6 +21,15 @@ public class Preferences {
 
     public static final String OSM_REQUEST_RATE = "osmRequest_frequency";
 
+    public static final String FRONT_CAMERA_FPS = "front_max_fps";
+
+    public static final String FRONT_PROCESSING_FPS = "front_processing_fps";
+
+    public static final String BACK_CAMERA_FPS = "back_max_fps";
+
+    public static final String BACK_PROCESSING_FPS = "back_processing_fps";
+
+
     public static Context context;
     public static void setContext(Context c) {
         context = c;
@@ -139,6 +148,80 @@ public class Preferences {
 
         return value;
     }
+
+    /**
+     *  CAMERA
+     */
+    public static int getFrontFPS(SharedPreferences prefs) {
+        String valueString = prefs.getString(FRONT_CAMERA_FPS, "15");
+
+        int value = context.getResources().getInteger(R.integer.front_max_fps);
+
+        try {
+            value = Integer.valueOf(valueString);
+        } catch (Exception e) {
+        }
+
+        if (value <= 0) {
+            value = context.getResources().getInteger(R.integer.front_max_fps);;
+        }
+
+        return value;
+    }
+
+    public static int getFrontProcessingFPS(SharedPreferences prefs) {
+        String valueString = prefs.getString(FRONT_PROCESSING_FPS, "5");
+
+        int value = context.getResources().getInteger(R.integer.front_processing_fps);
+
+        try {
+            value = Integer.valueOf(valueString);
+        } catch (Exception e) {
+        }
+
+        if (value <= 0) {
+            value = context.getResources().getInteger(R.integer.front_processing_fps);;
+        }
+
+        return value;
+    }
+
+
+    public static int getBackFPS(SharedPreferences prefs) {
+        String valueString = prefs.getString(BACK_CAMERA_FPS, "15");
+
+        int value = context.getResources().getInteger(R.integer.back_max_fps);
+
+        try {
+            value = Integer.valueOf(valueString);
+        } catch (Exception e) {
+        }
+
+        if (value <= 0) {
+            value = context.getResources().getInteger(R.integer.back_max_fps);;
+        }
+
+        return value;
+    }
+
+
+    public static int getBackProcessingFPS(SharedPreferences prefs) {
+        String valueString = prefs.getString(BACK_PROCESSING_FPS, "5");
+
+        int value = context.getResources().getInteger(R.integer.back_processing_fps);
+
+        try {
+            value = Integer.valueOf(valueString);
+        } catch (Exception e) {
+        }
+
+        if (value <= 0) {
+            value = context.getResources().getInteger(R.integer.back_processing_fps);;
+        }
+
+        return value;
+    }
+
 
 
 }

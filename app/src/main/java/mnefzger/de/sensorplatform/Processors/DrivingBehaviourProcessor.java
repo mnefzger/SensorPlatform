@@ -302,6 +302,12 @@ public class DrivingBehaviourProcessor extends EventProcessor implements IOSMRes
         return distance;
     }
 
+    /**
+     * Returns an array of the two nearest nodes on an OpenStreetMap road element in regard to the current position
+     * @param element
+     * @param orderByIndex: defines if the result should be ordered by index instead of distance
+     * @return
+     */
     private OSMRespone.Element[] get2ClosestNodes(OSMRespone.Element element, boolean orderByIndex) {
         double min_dist1 = 10000;
         OSMRespone.Element near_node1 = null;
@@ -472,48 +478,4 @@ public class DrivingBehaviourProcessor extends EventProcessor implements IOSMRes
         return aheadPassed;
     }
 
-    /*
-    private DIRECTION getDirectionOfMovement() {
-        double lat = currentVector.location.getLatitude();
-        double lon = currentVector.location.getLongitude();
-
-        double minDist = 10000;
-        int index = 0;
-
-        for(int i=0; i<lastResponse.elements.size(); i++) {
-            OSMRespone.Element node = lastResponse.elements.get(i);
-            if(node.lat != 0 && node.lon != 0) {
-                double temp = MathFunctions.calculateDistance(node.lat, node.lon, lat, lon);
-                if(temp < minDist) {
-                    minDist = temp;
-                    index = i;
-                }
-            }
-        }
-
-        Log.d("INDEX", index+"");
-
-        if(lastClosestIndex == -1) {
-            lastClosestIndex = index;
-            Log.d("INDEX", index+" was -1");
-            return DIRECTION.UNDEFINED;
-
-        } else if(lastClosestIndex < index) {
-            lastClosestIndex = index;
-            return DIRECTION.FORWARD;
-
-        } else if(lastClosestIndex > index) {
-            lastClosestIndex = index;
-            return DIRECTION.BACKWARD;
-
-        } else if(lastClosestIndex == index && currentDirection != DIRECTION.UNDEFINED) {
-            return currentDirection;
-
-        } else {
-            Log.d("INDEX", index+" else");
-            lastClosestIndex = index;
-            return DIRECTION.UNDEFINED;
-        }
-    }
-    */
 }

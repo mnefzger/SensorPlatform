@@ -22,6 +22,8 @@ public class SensorPlatformController implements IDataCallback{
 
         this.im = new ImageModule(this, app);
         this.appCallback = (IDataCallback) app;
+
+        Preferences.setContext(app);
     }
 
     public boolean subscribeTo(DataType type) {

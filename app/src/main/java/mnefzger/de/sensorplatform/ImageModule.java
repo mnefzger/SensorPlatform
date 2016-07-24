@@ -3,6 +3,7 @@ package mnefzger.de.sensorplatform;
 import android.Manifest;
 import android.app.Activity;
 import android.content.Context;
+import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -18,6 +19,7 @@ import android.media.Image;
 import android.media.ImageReader;
 import android.os.Handler;
 import android.os.HandlerThread;
+import android.preference.PreferenceManager;
 import android.support.v4.app.ActivityCompat;
 import android.util.Log;
 import android.util.SparseArray;
@@ -37,6 +39,7 @@ public class ImageModule implements IEventCallback{
     private Context context;
     protected ImageProcessor imgProc;
     private IDataCallback callback;
+    private SharedPreferences prefs;
 
     private CameraManager cameraManager;
     private CameraDevice camera_front;
@@ -49,13 +52,13 @@ public class ImageModule implements IEventCallback{
     private SparseArray<YuvImage> backImages = new SparseArray<>();
     private SparseArray<YuvImage> frontImages = new SparseArray<>();
 
-    private int FRONT_MAX_FPS = 15;
-    private double FRONT_AVG_FPS = FRONT_MAX_FPS;
-    private int FRONT_PROCESSING_FPS = 5;
+    private int FRONT_MAX_FPS;
+    private double FRONT_AVG_FPS;
+    private int FRONT_PROCESSING_FPS;
 
-    private int BACK_MAX_FPS = 15;
-    private double BACK_AVG_FPS  = BACK_MAX_FPS;
-    private int BACK_PROCESSING_FPS = 5;
+    private int BACK_MAX_FPS;
+    private double BACK_AVG_FPS;
+    private int BACK_PROCESSING_FPS;
 
     private HandlerThread mBackgroundThread;
     private Handler mBackgroundHandler;
@@ -71,6 +74,19 @@ public class ImageModule implements IEventCallback{
         callback = controller;
         cameraManager = (CameraManager) app.getSystemService(Activity.CAMERA_SERVICE);
         imgProc = new ImageProcessor(this);
+
+        prefs = PreferenceManager.getDefaultSharedPreferences(app);
+        setPrefs();
+    }
+
+    private void setPrefs() {
+        FRONT_MAX_FPS = Preferences.getFrontFPS(prefs);
+        FRONT_PROCESSING_FPS = Preferences.getFrontProcessingFPS(prefs);
+        FRONT_AVG_FPS = FRONT_MAX_FPS;
+
+        BACK_MAX_FPS = Preferences.getBackFPS(prefs);
+        BACK_PROCESSING_FPS = Preferences.getBackProcessingFPS(prefs);
+        BACK_AVG_FPS = BACK_MAX_FPS;
     }
 
     public void startCapture() {

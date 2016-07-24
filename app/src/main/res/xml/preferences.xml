@@ -9,7 +9,7 @@
                 android:entries="@array/frequency_readable"
                 android:entryValues="@array/frequency_values"
                 android:key="frequency_accelerometer"
-                android:persistent="false"
+                android:persistent="true"
                 android:title="Acclerometer sampling rate" />
 
             <EditTextPreference
@@ -27,21 +27,47 @@
                 android:entries="@array/frequency_readable"
                 android:entryValues="@array/frequency_values"
                 android:key="frequency_rotation"
-                android:persistent="false"
+                android:persistent="true"
                 android:title="Rotation sampling rate" />
 
             <EditTextPreference
                 android:key="rotation_threshold_normal"
                 android:title="Normal turn threshold"
                 android:summary="This value is the threshold for a normal turn in rad/s"
-                android:defaultValue="@integer/acceleration_threshold_default" />
+                android:defaultValue="@integer/rotation_threshold_normal_default" />
 
             <EditTextPreference
                 android:key="rotation_threshold_risky"
                 android:title="Sharp turn threshold"
                 android:summary="This value is the threshold for a sharp turn in rad/s"
-                android:defaultValue="@integer/acceleration_threshold_default" />
+                android:defaultValue="@integer/rotation_threshold_risky_default" />
         </PreferenceCategory>
+
+        <PreferenceCategory android:title="Image Processing">
+            <EditTextPreference
+                android:key="front_max_fps"
+                android:title="Front camera max. FPS"
+                android:summary="This value represents the maximum frames per second"
+                android:defaultValue="@integer/front_max_fps" />
+            <EditTextPreference
+                android:key="front_processing_fps"
+                android:title="Front camera processing FPS"
+                android:summary="This value represents the processed frames per second for the front camera"
+                android:defaultValue="@integer/front_processing_fps" />
+
+            <EditTextPreference
+                android:key="back_max_fps"
+                android:title="Back camera max. FPS"
+                android:summary="This value represents the maximum frames per second"
+                android:defaultValue="@integer/back_max_fps" />
+            <EditTextPreference
+                android:key="back_processing_fps"
+                android:title="Back camera processing FPS"
+                android:summary="This value represents the processed frames per second for the back camera"
+                android:defaultValue="@integer/back_processing_fps" />
+        </PreferenceCategory>
+
+
 
 
         <ListPreference
@@ -50,14 +76,14 @@
             android:entries="@array/rawData_readable"
             android:entryValues="@array/rawData_values"
             android:key="frequency_rawData"
-            android:persistent="false"
+            android:persistent="true"
             android:title="Rotation sampling rate" />
 
         <EditTextPreference
             android:key="osmRequest_frequency"
             android:title="Sharp turn threshold"
             android:summary="Time between two OSM requests in milliseconds"
-            android:defaultValue="@integer/acceleration_threshold_default" />
+            android:defaultValue="@integer/osmRequest_delay_default" />
 
 
 

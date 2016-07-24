@@ -1,4 +1,4 @@
-package mnefzger.de.sensorplatform;
+package mnefzger.de.sensorplatform.Processors;
 
 import android.content.Context;
 import android.content.SharedPreferences;
@@ -10,6 +10,10 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
+import mnefzger.de.sensorplatform.DataVector;
+import mnefzger.de.sensorplatform.EventVector;
+import mnefzger.de.sensorplatform.Preferences;
+import mnefzger.de.sensorplatform.SensorModule;
 import mnefzger.de.sensorplatform.Utilities.IOSMResponse;
 import mnefzger.de.sensorplatform.Utilities.MathFunctions;
 import mnefzger.de.sensorplatform.Utilities.OSMQueryAdapter;
@@ -40,10 +44,10 @@ public class DrivingBehaviourProcessor extends EventProcessor implements IOSMRes
         qAdapter = new OSMQueryAdapter(this, c);
         prefs = PreferenceManager.getDefaultSharedPreferences(c);
 
-        ACC_THRESHOLD = Double.valueOf( prefs.getString(Preferences.ACCELEROMETER_THRESHOLD, "3.924") );
-        TURN_THRESHOLD = Double.valueOf( prefs.getString(Preferences.TURN_THRESHOLD_NORMAL, "0.3") );
-        TURN_THRESHOLD_SHARP = Double.valueOf( prefs.getString(Preferences.TURN_THRESHOLD_SHARP, "0.5") );
-        OSM_REQUEST_RATE = Integer.valueOf( prefs.getString(Preferences.OSM_REQUEST_RATE, "5000") );
+        ACC_THRESHOLD = Preferences.getAccelerometerThreshold(prefs);
+        TURN_THRESHOLD = Preferences.getTurnThreshold(prefs);
+        TURN_THRESHOLD_SHARP = Preferences.getSharpTurnThreshold(prefs);
+        OSM_REQUEST_RATE = Preferences.getOSMRequestRate(prefs);
     }
 
     public void processData(List<DataVector> data) {

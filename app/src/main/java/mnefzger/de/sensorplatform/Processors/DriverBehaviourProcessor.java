@@ -1,4 +1,6 @@
-package mnefzger.de.sensorplatform;
+package mnefzger.de.sensorplatform.Processors;
+
+import mnefzger.de.sensorplatform.SensorModule;
 
 /**
  * Created by matthias on 21/06/16.

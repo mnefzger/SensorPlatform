@@ -39,8 +39,7 @@ public class AccelerometerProvider extends SensorProvider {
             accSensor = sensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER);
         }
 
-        int sampling = Integer.valueOf( prefs.getString(Preferences.FREQUENCY_ACCELEROMETER, "60000") );
-        sensorManager.registerListener(this, accSensor, sampling );
+        sensorManager.registerListener(this, accSensor, Preferences.getAccelerometerDelay(prefs) );
     }
 
     public void stop() {

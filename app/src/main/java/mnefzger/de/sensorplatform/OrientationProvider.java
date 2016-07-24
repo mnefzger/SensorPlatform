@@ -28,8 +28,7 @@ public class OrientationProvider extends SensorProvider {
             Log.d("SENSOR", "TYPE_ROTATION_VECTOR not available on device");
         }
 
-        int sampling = Integer.valueOf( prefs.getString(Preferences.FREQUENCY_ROTATION, "60000") );
-        sensorManager.registerListener(this, rotationSensor, sampling);
+        sensorManager.registerListener(this, rotationSensor, Preferences.getOrientationDelay(prefs));
     }
 
     public void stop() {

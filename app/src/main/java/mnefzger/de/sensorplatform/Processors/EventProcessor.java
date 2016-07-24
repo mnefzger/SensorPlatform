@@ -1,7 +1,11 @@
-package mnefzger.de.sensorplatform;
+package mnefzger.de.sensorplatform.Processors;
 
 
 import java.util.List;
+
+import mnefzger.de.sensorplatform.DataVector;
+import mnefzger.de.sensorplatform.IEventCallback;
+import mnefzger.de.sensorplatform.SensorModule;
 
 public abstract class EventProcessor {
 

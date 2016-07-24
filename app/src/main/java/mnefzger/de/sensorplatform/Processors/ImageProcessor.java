@@ -1,9 +1,13 @@
-package mnefzger.de.sensorplatform;
+package mnefzger.de.sensorplatform.Processors;
 
 import android.util.Log;
 
 import org.opencv.core.CvType;
 import org.opencv.core.Mat;
+
+import mnefzger.de.sensorplatform.EventVector;
+import mnefzger.de.sensorplatform.IEventCallback;
+import mnefzger.de.sensorplatform.ImageModule;
 
 
 public class ImageProcessor{

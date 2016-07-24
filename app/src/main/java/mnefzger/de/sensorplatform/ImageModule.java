@@ -21,20 +21,15 @@ import android.os.HandlerThread;
 import android.support.v4.app.ActivityCompat;
 import android.util.Log;
 import android.util.SparseArray;
-import android.widget.Toast;
 
-import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
 import java.nio.ByteBuffer;
-import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.List;
 
+import mnefzger.de.sensorplatform.Processors.ImageProcessor;
 import mnefzger.de.sensorplatform.Utilities.SequenceEncoderWrapper;
 
 

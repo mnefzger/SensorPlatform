@@ -1,7 +1,6 @@
 package mnefzger.de.sensorplatform;
 
 import android.app.Activity;
-import android.content.Intent;
 import android.content.SharedPreferences;
 import android.hardware.Sensor;
 import android.location.Location;
@@ -12,6 +11,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Timer;
 import java.util.TimerTask;
+
+import mnefzger.de.sensorplatform.Processors.DrivingBehaviourProcessor;
 
 public class SensorModule implements ISensorCallback, IEventCallback{
     private SharedPreferences prefs;

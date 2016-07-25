@@ -99,10 +99,15 @@ public class AppFragment extends Fragment {
     public void updateUI(EventVector vector) {
         final EventVector v = vector;
 
-        if (v.eventDescription.contains("ROAD")) street.setText(v.eventDescription);
-        else if (v.eventDescription.equals("Face detected"))
-            face.setText("Face detected: YES");
-        else event.setText("Last event: " + v.eventDescription);
+        getActivity().runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                if (v.eventDescription.contains("ROAD")) street.setText(v.eventDescription);
+                else if (v.eventDescription.equals("Face detected"))
+                    face.setText("Face detected: YES");
+                else event.setText("Last event: " + v.eventDescription);
+            }
+        });
     }
 
 }

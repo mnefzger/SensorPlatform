@@ -40,7 +40,7 @@ public class AccelerometerProvider extends SensorProvider {
             accSensor = sensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER);
         }
 
-        sensorManager.registerListener(this, accSensor, preferences.getAccelerometerDelay(prefs) );
+        sensorManager.registerListener(this, accSensor, Preferences.getAccelerometerDelay(prefs) );
     }
 
     public void stop() {

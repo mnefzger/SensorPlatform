@@ -23,7 +23,6 @@ public abstract class SensorProvider extends DataProvider implements SensorEvent
         sensorManager = (SensorManager) context.getSystemService(Context.SENSOR_SERVICE);
         sensorCallback = m;
         prefs = PreferenceManager.getDefaultSharedPreferences(context);
-        preferences = Preferences.getInstance(app);
     }
 
     @Override

@@ -30,18 +30,11 @@ public class Preferences {
     public static final String BACK_PROCESSING_FPS = "back_processing_fps";
 
 
-    private static Preferences instance = null;
-    private static Context context = null;
-    protected Preferences() {
-        // Exists only to defeat instantiation.
-    }
-    public static Preferences getInstance(Activity app) {
-        if(instance == null) {
-            instance = new Preferences();
-            context = app.getApplicationContext();
-        }
 
-        return instance;
+    private static Context context = null;
+
+    public static void setContext(Activity app) {
+        context = app.getApplicationContext();
     }
 
 

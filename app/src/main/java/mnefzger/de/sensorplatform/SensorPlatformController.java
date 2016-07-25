@@ -17,14 +17,15 @@ public class SensorPlatformController implements IDataCallback{
     private IDataCallback appCallback;
 
     public SensorPlatformController(Activity app) {
+        // needed for initialization of preference context
+        Preferences.setContext(app);
+
         this.sm = new SensorModule(this, app);
         this.lm = new LoggingModule(app);
 
         this.im = new ImageModule(this, app);
         this.appCallback = (IDataCallback) app;
 
-        // needed for initialisation of preference context
-        Preferences preferences = Preferences.getInstance(app);
     }
 
     public boolean subscribeTo(DataType type) {

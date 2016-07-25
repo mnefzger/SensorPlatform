@@ -1,12 +1,8 @@
 package mnefzger.de.sensorplatform;
 
 import android.app.Activity;
-import android.content.Context;
-import android.content.SharedPreferences;
 import android.hardware.Sensor;
 import android.hardware.SensorEvent;
-import android.hardware.SensorManager;
-import android.util.Log;
 
 import java.util.ArrayList;
 

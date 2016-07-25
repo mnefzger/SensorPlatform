@@ -11,6 +11,7 @@
 
     <integer name="gpsRequest_delay_default">1000</integer>
 
+
     <!-- Threshold is the g-force value
          e.g. 0.4 * 9.81 = 3.924
          Value of 0.4g based on: DriveSafe (Bergasa, 2014) -->

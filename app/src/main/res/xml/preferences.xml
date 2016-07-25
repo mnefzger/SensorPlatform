@@ -77,7 +77,7 @@
             android:entryValues="@array/rawData_values"
             android:key="frequency_rawData"
             android:persistent="true"
-            android:title="Rotation sampling rate" />
+            android:title="Raw data sampling rate" />
 
         <EditTextPreference
             android:key="osmRequest_frequency"
@@ -90,7 +90,5 @@
             android:title="Location update frequency"
             android:summary="Time between two location updateds requests in milliseconds"
             android:defaultValue="@integer/gpsRequest_delay_default" />
-
-
 
 </PreferenceScreen>

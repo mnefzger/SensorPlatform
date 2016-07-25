@@ -6,6 +6,7 @@ import android.hardware.SensorManager;
 import android.preference.PreferenceManager;
 import android.util.Log;
 import android.util.SparseArray;
+
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;

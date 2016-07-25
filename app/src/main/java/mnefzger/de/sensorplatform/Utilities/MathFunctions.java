@@ -2,7 +2,6 @@ package mnefzger.de.sensorplatform.Utilities;
 
 import android.hardware.SensorManager;
 
-import java.lang.reflect.Array;
 import java.util.Iterator;
 import java.util.List;
 

@@ -1,0 +1,108 @@
+package mnefzger.de.sensorplatform;
+
+
+import android.os.Bundle;
+import android.support.v4.app.Fragment;
+import android.util.Log;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.view.ViewGroup;
+import android.widget.TextView;
+
+import java.text.DecimalFormat;
+
+
+public class AppFragment extends Fragment {
+
+    TextView accX;
+    TextView accY;
+    TextView accZ;
+
+    TextView rotX;
+    TextView rotY;
+    TextView rotZ;
+
+    TextView lat;
+    TextView lon;
+    TextView speed;
+
+    TextView street;
+    TextView event;
+    TextView face;
+
+    DecimalFormat df = new DecimalFormat("#.####");
+
+    public AppFragment() {
+        // Required empty public constructor
+    }
+
+
+    @Override
+    public View onCreateView(LayoutInflater inflater, ViewGroup container,
+                             Bundle savedInstanceState) {
+
+        if (container != null) {
+            container.removeAllViews();
+        }
+
+        View v = inflater.inflate(R.layout.fragment_app, container, false);
+
+        accX = (TextView) v.findViewById(R.id.accXText);
+        accY = (TextView) v.findViewById(R.id.accYText);
+        accZ = (TextView) v.findViewById(R.id.accZText);
+
+        rotX = (TextView) v.findViewById(R.id.rotXText);
+        rotY = (TextView) v.findViewById(R.id.rotYText);
+        rotZ = (TextView) v.findViewById(R.id.rotZText);
+
+        lat = (TextView) v.findViewById(R.id.latText);
+        lon = (TextView) v.findViewById(R.id.lonText);
+        speed = (TextView) v.findViewById(R.id.speedText);
+
+        street = (TextView) v.findViewById(R.id.osmText);
+        event = (TextView) v.findViewById(R.id.eventText);
+        face = (TextView) v.findViewById(R.id.faceText);
+
+
+        return v;
+    }
+
+    public void updateUI(DataVector vector) {
+        final DataVector v = vector;
+
+        ((MainActivity)getActivity()).runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                accX.setText("AccX: " + df.format(v.accX) );
+                accY.setText("AccY: " + df.format(v.accY) );
+                accZ.setText("AccZ: " + df.format(v.accZ) );
+
+                rotX.setText("RotX: " + v.rotX);
+                rotY.setText("RotY: " + v.rotY);
+                rotZ.setText("RotZ: " + v.rotZ);
+
+                if(v.location == null && ActiveSubscriptions.usingGPS()) {
+                    lat.setText("Lat: Acquiring position…");
+                    lon.setText("Lon: Acquiring position…");
+                    speed.setText("Speed: Acquiring position…");
+                }
+                if(v.location != null) {
+                    lat.setText("Lat: " + v.location.getLatitude());
+                    lon.setText("Lon: " + v.location.getLongitude());
+                    speed.setText("Speed: " + df.format(v.speed) + " km/h");
+                }
+            }
+        });
+
+    }
+
+    public void updateUI(EventVector vector) {
+        final EventVector v = vector;
+
+        if (v.eventDescription.contains("ROAD")) street.setText(v.eventDescription);
+        else if (v.eventDescription.equals("Face detected"))
+            face.setText("Face detected: YES");
+        else event.setText("Last event: " + v.eventDescription);
+    }
+
+}

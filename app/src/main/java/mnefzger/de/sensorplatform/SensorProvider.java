@@ -8,7 +8,6 @@ import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
 import android.preference.PreferenceManager;
-import android.util.Log;
 
 public abstract class SensorProvider extends DataProvider implements SensorEventListener{
     private Context context;

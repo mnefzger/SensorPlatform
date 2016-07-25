@@ -1,16 +1,12 @@
 package mnefzger.de.sensorplatform;
 
-import android.content.Context;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
+import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentManager;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
-import android.widget.TextView;
-
-import org.w3c.dom.Text;
-
-import java.text.DecimalFormat;
 
 
 public class MainActivity extends AppCompatActivity implements IDataCallback{
@@ -25,24 +21,8 @@ public class MainActivity extends AppCompatActivity implements IDataCallback{
     }
 
     SensorPlatformController sPC;
-
-    TextView accX;
-    TextView accY;
-    TextView accZ;
-
-    TextView rotX;
-    TextView rotY;
-    TextView rotZ;
-
-    TextView lat;
-    TextView lon;
-    TextView speed;
-
-    TextView street;
-    TextView event;
-    TextView face;
-
-    DecimalFormat df = new DecimalFormat("#.####");
+    SettingsFragment settings;
+    AppFragment app;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -58,7 +38,13 @@ public class MainActivity extends AppCompatActivity implements IDataCallback{
             PreferenceManager.setDefaultValues(this, R.xml.preferences, false);
         }
 
+        // Show settings
+        settings = new SettingsFragment();
+        getFragmentManager().beginTransaction().replace(R.id.fragment_container, settings).commit();
 
+    }
+
+    public void startMeasuring() {
         sPC = new SensorPlatformController(this);
         sPC.subscribeTo(DataType.ACCELERATION_EVENT);
         sPC.subscribeTo(DataType.ACCELERATION_RAW);
@@ -71,87 +57,28 @@ public class MainActivity extends AppCompatActivity implements IDataCallback{
         sPC.logRawData(false);
         sPC.logEventData(false);
 
-
-        accX = (TextView) findViewById(R.id.accXText);
-        accY = (TextView) findViewById(R.id.accYText);
-        accZ = (TextView) findViewById(R.id.accZText);
-
-        rotX = (TextView) findViewById(R.id.rotXText);
-        rotY = (TextView) findViewById(R.id.rotYText);
-        rotZ = (TextView) findViewById(R.id.rotZText);
-
-        lat = (TextView) findViewById(R.id.latText);
-        lon = (TextView) findViewById(R.id.lonText);
-        speed = (TextView) findViewById(R.id.speedText);
-
-        street = (TextView) findViewById(R.id.osmText);
-        event = (TextView) findViewById(R.id.eventText);
-        face = (TextView) findViewById(R.id.faceText);
-
+        app = new AppFragment();
+        getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container, app).commit();
     }
+
 
     @Override
     public void onRawData(DataVector v) {
         //Log.d("RawData @ App  ", v.toString());
-        updateUI(v);
+        if( app != null )
+            app.updateUI(v);
     }
 
     @Override
     public void onEventData(EventVector v) {
-
         Log.d("EventData @ App  ", v.toString());
-        updateUI(v);
+        if( app != null )
+            app.updateUI(v);
     }
 
     @Override
     public void onImageData() {
 
-    }
-
-    public void updateUI(DataVector vector) {
-        final DataVector v = vector;
-        runOnUiThread(new Runnable() {
-            @Override
-            public void run() {
-
-                accX.setText("AccX: " + df.format(v.accX) );
-                accY.setText("AccY: " + df.format(v.accY) );
-                accZ.setText("AccZ: " + df.format(v.accZ) );
-
-                rotX.setText("RotX: " + v.rotX);
-                rotY.setText("RotY: " + v.rotY);
-                rotZ.setText("RotZ: " + v.rotZ);
-
-                if(v.location == null && ActiveSubscriptions.usingGPS()) {
-                    lat.setText("Lat: Acquiring position…");
-                    lon.setText("Lon: Acquiring position…");
-                    speed.setText("Speed: Acquiring position…");
-                }
-                if(v.location != null) {
-                    lat.setText("Lat: " + v.location.getLatitude());
-                    lon.setText("Lon: " + v.location.getLongitude());
-                    speed.setText("Speed: " + df.format(v.speed) + " km/h");
-                }
-
-
-            }
-        });
-
-    }
-
-    public void updateUI(EventVector vector) {
-        final EventVector v = vector;
-        runOnUiThread(new Runnable() {
-            @Override
-            public void run() {
-
-                if (v.eventDescription.contains("ROAD")) street.setText(v.eventDescription);
-                else if (v.eventDescription.equals("Face detected"))
-                    face.setText("Face detected: YES");
-                else event.setText("Last event: " + v.eventDescription);
-            }
-
-        });
     }
 
 }

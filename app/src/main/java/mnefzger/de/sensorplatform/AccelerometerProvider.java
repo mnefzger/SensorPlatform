@@ -1,5 +1,6 @@
 package mnefzger.de.sensorplatform;
 
+import android.app.Activity;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.hardware.Sensor;
@@ -29,8 +30,8 @@ public class AccelerometerProvider extends SensorProvider {
     private float timestampOld = System.nanoTime();
     private int count = 0;
 
-    public AccelerometerProvider(Context c, SensorModule m) {
-        super(c, m);
+    public AccelerometerProvider(Activity a, SensorModule m) {
+        super(a, m);
     }
 
     public void start() {
@@ -39,7 +40,7 @@ public class AccelerometerProvider extends SensorProvider {
             accSensor = sensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER);
         }
 
-        sensorManager.registerListener(this, accSensor, Preferences.getAccelerometerDelay(prefs) );
+        sensorManager.registerListener(this, accSensor, preferences.getAccelerometerDelay(prefs) );
     }
 
     public void stop() {

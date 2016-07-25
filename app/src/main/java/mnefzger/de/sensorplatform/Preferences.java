@@ -1,9 +1,8 @@
 package mnefzger.de.sensorplatform;
 
+import android.app.Activity;
 import android.content.Context;
-import android.content.Intent;
 import android.content.SharedPreferences;
-import android.preference.PreferenceManager;
 
 public class Preferences {
 
@@ -21,6 +20,7 @@ public class Preferences {
 
     public static final String OSM_REQUEST_RATE = "osmRequest_frequency";
 
+
     public static final String FRONT_CAMERA_FPS = "front_max_fps";
 
     public static final String FRONT_PROCESSING_FPS = "front_processing_fps";
@@ -30,11 +30,37 @@ public class Preferences {
     public static final String BACK_PROCESSING_FPS = "back_processing_fps";
 
 
-    public static Context context;
-    public static void setContext(Context c) {
-        context = c;
+    private static Preferences instance = null;
+    private static Context context = null;
+    protected Preferences() {
+        // Exists only to defeat instantiation.
+    }
+    public static Preferences getInstance(Activity app) {
+        if(instance == null) {
+            instance = new Preferences();
+            context = app.getApplicationContext();
+        }
+
+        return instance;
     }
 
+
+    public static int getRawDataDelay(SharedPreferences prefs) {
+        String valueString = prefs.getString(FREQUENCY_RAWDATA, "500");
+
+        int value = context.getResources().getInteger(R.integer.rawData_delay_default); // by default 60000 microseconds
+
+        try {
+            value = Integer.valueOf(valueString);
+        } catch (Exception e) {
+        }
+
+        if (value <= 0) {
+            value = context.getResources().getInteger(R.integer.rawData_delay_default);;
+        }
+
+        return value;
+    }
 
     /**
      * ACCELEROMETER
@@ -50,7 +76,7 @@ public class Preferences {
         }
 
         if (value <= 0) {
-            value = context.getResources().getInteger(R.integer.accelerometer_delay_default);;
+            value = context.getResources().getInteger(R.integer.accelerometer_delay_default);
         }
 
         return value;
@@ -59,7 +85,7 @@ public class Preferences {
     public static double getAccelerometerThreshold(SharedPreferences prefs) {
         String valueString = prefs.getString(ACCELEROMETER_THRESHOLD, "3.924");
 
-        double value = context.getResources().getInteger(R.integer.acceleration_threshold_default);
+        double value = Double.valueOf( context.getResources().getString(R.string.acceleration_threshold_default) );
 
         try {
             value = Double.valueOf(valueString);
@@ -67,7 +93,7 @@ public class Preferences {
         }
 
         if (value <= 0) {
-            value = context.getResources().getInteger(R.integer.acceleration_threshold_default);;
+            value = Double.valueOf( context.getResources().getString(R.string.acceleration_threshold_default) );
         }
 
         return value;
@@ -97,7 +123,7 @@ public class Preferences {
     public static double getTurnThreshold(SharedPreferences prefs) {
         String valueString = prefs.getString(TURN_THRESHOLD_NORMAL, "0.3");
 
-        double value = context.getResources().getInteger(R.integer.rotation_threshold_normal_default);
+        double value = Double.valueOf( context.getResources().getString(R.string.rotation_threshold_normal_default) );
 
         try {
             value = Double.valueOf(valueString);
@@ -105,7 +131,7 @@ public class Preferences {
         }
 
         if (value <= 0) {
-            value = context.getResources().getInteger(R.integer.rotation_threshold_normal_default);;
+            value = Double.valueOf( context.getResources().getString(R.string.rotation_threshold_normal_default) );
         }
 
         return value;
@@ -114,7 +140,7 @@ public class Preferences {
     public static double getSharpTurnThreshold(SharedPreferences prefs) {
         String valueString = prefs.getString(TURN_THRESHOLD_SHARP, "0.5");
 
-        double value = context.getResources().getInteger(R.integer.rotation_threshold_risky_default);
+        double value = Double.valueOf( context.getResources().getString(R.string.rotation_threshold_risky_default) );
 
         try {
             value = Double.valueOf(valueString);
@@ -122,7 +148,7 @@ public class Preferences {
         }
 
         if (value <= 0) {
-            value = context.getResources().getInteger(R.integer.rotation_threshold_risky_default);;
+            value = Double.valueOf( context.getResources().getString(R.string.rotation_threshold_risky_default) );
         }
 
         return value;
@@ -143,11 +169,12 @@ public class Preferences {
         }
 
         if (value <= 0) {
-            value = context.getResources().getInteger(R.integer.osmRequest_delay_default);;
+            value = context.getResources().getInteger(R.integer.osmRequest_delay_default);
         }
 
         return value;
     }
+
 
     /**
      *  CAMERA
@@ -163,7 +190,7 @@ public class Preferences {
         }
 
         if (value <= 0) {
-            value = context.getResources().getInteger(R.integer.front_max_fps);;
+            value = context.getResources().getInteger(R.integer.front_max_fps);
         }
 
         return value;
@@ -180,7 +207,7 @@ public class Preferences {
         }
 
         if (value <= 0) {
-            value = context.getResources().getInteger(R.integer.front_processing_fps);;
+            value = context.getResources().getInteger(R.integer.front_processing_fps);
         }
 
         return value;
@@ -198,7 +225,7 @@ public class Preferences {
         }
 
         if (value <= 0) {
-            value = context.getResources().getInteger(R.integer.back_max_fps);;
+            value = context.getResources().getInteger(R.integer.back_max_fps);
         }
 
         return value;
@@ -216,7 +243,7 @@ public class Preferences {
         }
 
         if (value <= 0) {
-            value = context.getResources().getInteger(R.integer.back_processing_fps);;
+            value = context.getResources().getInteger(R.integer.back_processing_fps);
         }
 
         return value;

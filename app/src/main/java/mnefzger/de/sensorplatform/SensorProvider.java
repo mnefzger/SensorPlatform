@@ -1,5 +1,6 @@
 package mnefzger.de.sensorplatform;
 
+import android.app.Activity;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.hardware.Sensor;
@@ -13,14 +14,16 @@ public abstract class SensorProvider extends DataProvider implements SensorEvent
     private Context context;
     protected ISensorCallback sensorCallback;
     protected SharedPreferences prefs;
+    protected Preferences preferences;
 
     protected SensorManager sensorManager;
 
-    SensorProvider(Context c, SensorModule m) {
-        this.context = c;
+    SensorProvider(Activity app, SensorModule m) {
+        this.context = app.getApplicationContext();
         sensorManager = (SensorManager) context.getSystemService(Context.SENSOR_SERVICE);
         sensorCallback = m;
         prefs = PreferenceManager.getDefaultSharedPreferences(context);
+        preferences = Preferences.getInstance(app);
     }
 
     @Override

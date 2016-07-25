@@ -81,7 +81,7 @@ public class SensorModule implements ISensorCallback, IEventCallback{
     public void startSensing(DataType type) {
 
         if(!sensing) {
-            int sampling = Integer.valueOf( prefs.getString(Preferences.FREQUENCY_RAWDATA, "500") );
+            int sampling = Integer.valueOf( Preferences.getRawDataDelay(prefs) );
             aggregateData( sampling );
             sensing = true;
         }

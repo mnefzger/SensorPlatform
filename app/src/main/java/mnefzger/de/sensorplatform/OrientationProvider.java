@@ -1,5 +1,6 @@
 package mnefzger.de.sensorplatform;
 
+import android.app.Activity;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.hardware.Sensor;
@@ -15,8 +16,8 @@ import mnefzger.de.sensorplatform.Utilities.MathFunctions;
 public class OrientationProvider extends SensorProvider {
     private Sensor rotationSensor;
 
-    public OrientationProvider(Context c, SensorModule m) {
-        super(c,m);
+    public OrientationProvider(Activity a, SensorModule m) {
+        super(a,m);
     }
 
     public void start() {

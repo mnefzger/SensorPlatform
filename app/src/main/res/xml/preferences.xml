@@ -16,7 +16,7 @@
                 android:key="accelerometer_threshold"
                 android:title="Hard acceleration threshold"
                 android:summary="This represents the g-force value for hard acceleration and braking"
-                android:defaultValue="@integer/acceleration_threshold_default" />
+                android:defaultValue="@string/acceleration_threshold_default" />
         </PreferenceCategory>
 
 
@@ -34,13 +34,13 @@
                 android:key="rotation_threshold_normal"
                 android:title="Normal turn threshold"
                 android:summary="This value is the threshold for a normal turn in rad/s"
-                android:defaultValue="@integer/rotation_threshold_normal_default" />
+                android:defaultValue="@string/rotation_threshold_normal_default" />
 
             <EditTextPreference
                 android:key="rotation_threshold_risky"
                 android:title="Sharp turn threshold"
                 android:summary="This value is the threshold for a sharp turn in rad/s"
-                android:defaultValue="@integer/rotation_threshold_risky_default" />
+                android:defaultValue="@string/rotation_threshold_risky_default" />
         </PreferenceCategory>
 
         <PreferenceCategory android:title="Image Processing">

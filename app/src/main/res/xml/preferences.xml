@@ -81,10 +81,15 @@
 
         <EditTextPreference
             android:key="osmRequest_frequency"
-            android:title="Sharp turn threshold"
+            android:title="OSM query frequency"
             android:summary="Time between two OSM requests in milliseconds"
             android:defaultValue="@integer/osmRequest_delay_default" />
 
+        <EditTextPreference
+            android:key="gpsRequest_frequency"
+            android:title="Location update frequency"
+            android:summary="Time between two location updateds requests in milliseconds"
+            android:defaultValue="@integer/gpsRequest_delay_default" />
 
 
 

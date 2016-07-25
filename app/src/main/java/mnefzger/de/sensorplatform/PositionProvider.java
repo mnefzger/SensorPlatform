@@ -4,11 +4,13 @@ package mnefzger.de.sensorplatform;
 import android.Manifest;
 import android.app.Activity;
 import android.content.Context;
+import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.support.v4.app.ActivityCompat;
 
 import java.util.ArrayList;
@@ -17,6 +19,7 @@ import java.util.List;
 import mnefzger.de.sensorplatform.Utilities.MathFunctions;
 
 public class PositionProvider extends DataProvider implements LocationListener{
+    private SharedPreferences prefs;
     private LocationManager locationManager;
     private Context context;
     private ISensorCallback callback;
@@ -24,13 +27,16 @@ public class PositionProvider extends DataProvider implements LocationListener{
     private double lastTimestamp = System.currentTimeMillis();
     private List<Double> lastSpeedValues = new ArrayList<>();
 
-    private final int LOCATION_REFRESH_TIME = 0;
+    private final int LOCATION_REFRESH_TIME;
     private final int LOCATION_REFRESH_DISTANCE = 0;
 
     public PositionProvider(Activity app, SensorModule m) {
         verifyLocationPermissions(app);
         context = app;
         callback = (ISensorCallback) m;
+        prefs = PreferenceManager.getDefaultSharedPreferences(app);
+
+        LOCATION_REFRESH_TIME = Preferences.getGPSRequestRate(prefs);
     }
 
     public void start() {

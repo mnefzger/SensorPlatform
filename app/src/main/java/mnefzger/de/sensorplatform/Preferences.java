@@ -20,6 +20,8 @@ public class Preferences {
 
     public static final String OSM_REQUEST_RATE = "osmRequest_frequency";
 
+    public static final String GPS_REQUEST_RATE = "gpsRequest_frequency";
+
 
     public static final String FRONT_CAMERA_FPS = "front_max_fps";
 
@@ -149,7 +151,7 @@ public class Preferences {
 
 
     /**
-     * OpenStreetMap
+     * Location
      */
     public static int getOSMRequestRate(SharedPreferences prefs) {
         String valueString = prefs.getString(OSM_REQUEST_RATE, "5000");
@@ -163,6 +165,23 @@ public class Preferences {
 
         if (value <= 0) {
             value = context.getResources().getInteger(R.integer.osmRequest_delay_default);
+        }
+
+        return value;
+    }
+
+    public static int getGPSRequestRate(SharedPreferences prefs) {
+        String valueString = prefs.getString(GPS_REQUEST_RATE, "1000");
+
+        int value = context.getResources().getInteger(R.integer.gpsRequest_delay_default);
+
+        try {
+            value = Integer.valueOf(valueString);
+        } catch (Exception e) {
+        }
+
+        if (value <= 0) {
+            value = context.getResources().getInteger(R.integer.gpsRequest_delay_default);
         }
 
         return value;

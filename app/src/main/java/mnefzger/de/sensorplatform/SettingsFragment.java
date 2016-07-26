@@ -38,7 +38,6 @@ public class SettingsFragment extends PreferenceFragment
             findPreference("image_saving").setSelectable(false);
         }
 
-
         return v;
     }
 

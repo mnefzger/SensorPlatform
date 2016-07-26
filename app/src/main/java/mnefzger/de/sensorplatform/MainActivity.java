@@ -3,8 +3,12 @@ package mnefzger.de.sensorplatform;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
+import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentManager;
+import android.support.v4.app.FragmentTransaction;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
+import android.R.anim;
 
 
 public class MainActivity extends AppCompatActivity implements IDataCallback{
@@ -37,10 +41,9 @@ public class MainActivity extends AppCompatActivity implements IDataCallback{
             PreferenceManager.setDefaultValues(this, R.xml.preferences, false);
         }
 
-        // Show settings
         settings = new SettingsFragment();
         getFragmentManager().beginTransaction().replace(R.id.fragment_container, settings).commit();
-
+        //hangeFragment(settings, false, true);
     }
 
     public void startMeasuring() {
@@ -69,8 +72,17 @@ public class MainActivity extends AppCompatActivity implements IDataCallback{
         sPC.logRawData(false);
         sPC.logEventData(false);
 
+        /*FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
+        Fragment topFragment = getSupportFragmentManager().findFragmentById(R.id.fragment_container);
+        if(topFragment != null)
+            transaction.remove(topFragment);
+
         app = new AppFragment();
-        getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container, app).commit();
+        transaction.replace(R.id.fragment_container, app).commit();
+        getFragmentManager().popBackStack("backstack_state",0);*/
+
+        app = new AppFragment();
+        changeFragment(app, true, true);
     }
 
 
@@ -91,6 +103,37 @@ public class MainActivity extends AppCompatActivity implements IDataCallback{
     @Override
     public void onImageData() {
 
+    }
+
+    private void changeFragment(Fragment frag, boolean saveInBackstack, boolean animate) {
+        String backStateName = ((Object) frag).getClass().getName();
+
+        try {
+            FragmentManager manager = getSupportFragmentManager();
+            boolean fragmentPopped = manager.popBackStackImmediate(backStateName, 0);
+
+            if (!fragmentPopped && manager.findFragmentByTag(backStateName) == null) {
+                //fragment not in back stack, create it.
+                FragmentTransaction transaction = manager.beginTransaction();
+
+                if (animate) {
+                    transaction.setCustomAnimations(R.anim.slide_in_right, R.anim.slide_out_left);
+                }
+
+                transaction.replace(R.id.fragment_container, frag, backStateName);
+
+                if (saveInBackstack) {
+                    transaction.addToBackStack(backStateName);
+                } else {
+                }
+
+                transaction.commit();
+            } else {
+                // custom effect if fragment is already instanciated
+            }
+        } catch (IllegalStateException exception) {
+            Log.w("FRAGMENT", "Unable to commit fragment, could be activity as been killed in background. " + exception.toString());
+        }
     }
 
 }

@@ -2,6 +2,7 @@ package mnefzger.de.sensorplatform;
 
 
 import android.app.Activity;
+import android.content.pm.ActivityInfo;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
@@ -38,16 +39,23 @@ public class AppFragment extends Fragment {
         // Required empty public constructor
     }
 
+    @Override
+    public void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setRetainInstance(true);
+        main = getActivity();
+        main.setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_REVERSE_LANDSCAPE);
+    }
+
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
 
         if (container != null) {
-            container.removeAllViews();
+            container.removeViewAt(0);
         }
 
-        main = getActivity();
 
         View v = inflater.inflate(R.layout.fragment_app, container, false);
 
@@ -66,7 +74,6 @@ public class AppFragment extends Fragment {
         street = (TextView) v.findViewById(R.id.osmText);
         event = (TextView) v.findViewById(R.id.eventText);
         face = (TextView) v.findViewById(R.id.faceText);
-
 
         return v;
     }

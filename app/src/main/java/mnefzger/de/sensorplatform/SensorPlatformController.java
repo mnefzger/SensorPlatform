@@ -90,7 +90,7 @@ public class SensorPlatformController implements IDataCallback{
             lm.writeEventToCSV(ev);
         }
 
-        if(Preferences.videoSavingActivated(prefs)) {
+        if(Preferences.videoSavingActivated(prefs) && !ev.eventDescription.contains("Face")) {
             im.saveVideoAfterEvent(ev);
         }
     }

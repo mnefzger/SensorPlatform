@@ -109,7 +109,7 @@ public class Preferences {
     public static int getRawDataDelay(SharedPreferences prefs) {
         String valueString = prefs.getString(FREQUENCY_RAWDATA, "500");
 
-        int value = context.getResources().getInteger(R.integer.rawData_delay_default); // by default 60000 microseconds
+        int value = context.getResources().getInteger(R.integer.rawData_delay_default);
 
         try {
             value = Integer.valueOf(valueString);
@@ -129,7 +129,7 @@ public class Preferences {
     public static int getAccelerometerDelay(SharedPreferences prefs) {
         String valueString = prefs.getString(FREQUENCY_ACCELEROMETER, "60000");
 
-        int value = context.getResources().getInteger(R.integer.accelerometer_delay_default); // by default 60000 microseconds
+        int value = context.getResources().getInteger(R.integer.accelerometer_delay_default);
 
         try {
             value = Integer.valueOf(valueString);

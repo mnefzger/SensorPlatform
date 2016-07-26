@@ -3,8 +3,6 @@ package mnefzger.de.sensorplatform;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
-import android.support.v4.app.Fragment;
-import android.support.v4.app.FragmentManager;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 
@@ -23,13 +21,14 @@ public class MainActivity extends AppCompatActivity implements IDataCallback{
     SensorPlatformController sPC;
     SettingsFragment settings;
     AppFragment app;
+    SharedPreferences prefs;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
+        prefs = PreferenceManager.getDefaultSharedPreferences(this);
         prefs.edit().clear();
         if(prefs.getAll().isEmpty()) {
             PreferenceManager.setDefaultValues(this, R.xml.preferences, true);
@@ -46,13 +45,23 @@ public class MainActivity extends AppCompatActivity implements IDataCallback{
 
     public void startMeasuring() {
         sPC = new SensorPlatformController(this);
-        //sPC.subscribeTo(DataType.ACCELERATION_EVENT);
-        sPC.subscribeTo(DataType.ACCELERATION_RAW);
-        //sPC.subscribeTo(DataType.LOCATION_RAW);
-        //sPC.subscribeTo(DataType.LOCATION_EVENT);
-        sPC.subscribeTo(DataType.ROTATION_RAW);
-        //sPC.subscribeTo(DataType.ROTATION_EVENT);
-        sPC.subscribeTo(DataType.CAMERA_RAW);
+
+        if(Preferences.getAccelerometerActivated(prefs)) {
+            sPC.subscribeTo(DataType.ACCELERATION_RAW);
+            sPC.subscribeTo(DataType.ACCELERATION_EVENT);
+        }
+
+        if(Preferences.getRotationActivated(prefs)) {
+            sPC.subscribeTo(DataType.ROTATION_RAW);
+            sPC.subscribeTo(DataType.ROTATION_EVENT);
+        }
+
+        if(Preferences.getLocationActivated(prefs)) {
+            sPC.subscribeTo(DataType.LOCATION_RAW);
+            sPC.subscribeTo(DataType.LOCATION_EVENT);
+        }
+
+        //sPC.subscribeTo(DataType.CAMERA_RAW);
 
         sPC.logRawData(false);
         sPC.logEventData(false);

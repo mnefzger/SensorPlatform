@@ -3,8 +3,16 @@ package mnefzger.de.sensorplatform;
 import android.app.Activity;
 import android.content.Context;
 import android.content.SharedPreferences;
+import android.util.Log;
 
 public class Preferences {
+
+    public static final String ACCELEROMETER_RAW = "accelerometer_raw";
+
+    public static final String ROTATION_RAW = "rotation_raw";
+
+    public static final String LOCATION_RAW = "location_raw";
+
 
     public static final String FREQUENCY_ACCELEROMETER = "frequency_accelerometer";
 
@@ -39,6 +47,24 @@ public class Preferences {
         context = app.getApplicationContext();
     }
 
+
+    public static boolean getAccelerometerActivated(SharedPreferences prefs) {
+        boolean value = prefs.getBoolean(ACCELEROMETER_RAW, true);
+
+        return value;
+    }
+
+    public static boolean getRotationActivated(SharedPreferences prefs) {
+        boolean value = prefs.getBoolean(ROTATION_RAW, true);
+
+        return value;
+    }
+
+    public static boolean getLocationActivated(SharedPreferences prefs) {
+        boolean value = prefs.getBoolean(LOCATION_RAW, true);
+
+        return value;
+    }
 
     public static int getRawDataDelay(SharedPreferences prefs) {
         String valueString = prefs.getString(FREQUENCY_RAWDATA, "500");

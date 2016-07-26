@@ -2,6 +2,15 @@
 <PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android"
     android:key="preferences">
 
+        <ListPreference
+            android:summary="The onRawData() and event detection sampling rate in milliseconds"
+            android:defaultValue="@integer/rawData_delay_default"
+            android:entries="@array/rawData_readable"
+            android:entryValues="@array/rawData_values"
+            android:key="frequency_rawData"
+            android:persistent="true"
+            android:title="Raw data sampling rate" />
+
         <PreferenceCategory android:title="Acceleration and Braking">
             <ListPreference
                 android:summary="The accelerometer sensor delay in microseconds"
@@ -67,28 +76,18 @@
                 android:defaultValue="@integer/back_processing_fps" />
         </PreferenceCategory>
 
+        <PreferenceCategory android:title="Location">
+            <EditTextPreference
+                android:key="osmRequest_frequency"
+                android:title="OSM query frequency"
+                android:summary="Time between two OSM requests in milliseconds"
+                android:defaultValue="@integer/osmRequest_delay_default" />
 
-
-
-        <ListPreference
-            android:summary="The onRawData() and event detection sampling rate in milliseconds"
-            android:defaultValue="@integer/rawData_delay_default"
-            android:entries="@array/rawData_readable"
-            android:entryValues="@array/rawData_values"
-            android:key="frequency_rawData"
-            android:persistent="true"
-            android:title="Raw data sampling rate" />
-
-        <EditTextPreference
-            android:key="osmRequest_frequency"
-            android:title="OSM query frequency"
-            android:summary="Time between two OSM requests in milliseconds"
-            android:defaultValue="@integer/osmRequest_delay_default" />
-
-        <EditTextPreference
-            android:key="gpsRequest_frequency"
-            android:title="Location update frequency"
-            android:summary="Time between two location updateds requests in milliseconds"
-            android:defaultValue="@integer/gpsRequest_delay_default" />
+            <EditTextPreference
+                android:key="gpsRequest_frequency"
+                android:title="Location update frequency"
+                android:summary="Time between two location updateds requests in milliseconds"
+                android:defaultValue="@integer/gpsRequest_delay_default" />
+        </PreferenceCategory>
 
 </PreferenceScreen>

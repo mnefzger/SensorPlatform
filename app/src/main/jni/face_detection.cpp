@@ -12,7 +12,7 @@
 #define  LOGE(...)  __android_log_print(ANDROID_LOG_ERROR,LOG_TAG,__VA_ARGS__)
 
 extern "C" {
-    JNIEXPORT jintArray Java_mnefzger_de_sensorplatform_ImageProcessor_nAsmFindFace(JNIEnv *env, jobject obj, jlong address, jlong returnadress);
+    JNIEXPORT jintArray Java_mnefzger_de_sensorplatform_Processors_ImageProcessor_nAsmFindFace(JNIEnv *env, jobject obj, jlong address, jlong returnadress);
 }
 
 using namespace cv;
@@ -36,7 +36,7 @@ int initAsm() {
 	return 1;
 }
 
-JNIEXPORT jintArray Java_mnefzger_de_sensorplatform_ImageProcessor_nAsmFindFace(JNIEnv *env, jobject obj, jlong address, jlong returnadress) {
+JNIEXPORT jintArray Java_mnefzger_de_sensorplatform_Processors_ImageProcessor_nAsmFindFace(JNIEnv *env, jobject obj, jlong address, jlong returnadress) {
 	jintArray result;
 	Mat image = *((Mat*) address);
 

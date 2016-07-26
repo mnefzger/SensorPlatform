@@ -1,9 +1,9 @@
 package mnefzger.de.sensorplatform;
 
 
+import android.app.Activity;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -30,6 +30,8 @@ public class AppFragment extends Fragment {
     TextView event;
     TextView face;
 
+    Activity main;
+
     DecimalFormat df = new DecimalFormat("#.####");
 
     public AppFragment() {
@@ -44,6 +46,8 @@ public class AppFragment extends Fragment {
         if (container != null) {
             container.removeAllViews();
         }
+
+        main = getActivity();
 
         View v = inflater.inflate(R.layout.fragment_app, container, false);
 
@@ -70,7 +74,7 @@ public class AppFragment extends Fragment {
     public void updateUI(DataVector vector) {
         final DataVector v = vector;
 
-        ((MainActivity)getActivity()).runOnUiThread(new Runnable() {
+        main.runOnUiThread(new Runnable() {
             @Override
             public void run() {
                 accX.setText("AccX: " + df.format(v.accX) );
@@ -99,7 +103,7 @@ public class AppFragment extends Fragment {
     public void updateUI(EventVector vector) {
         final EventVector v = vector;
 
-        getActivity().runOnUiThread(new Runnable() {
+        main.runOnUiThread(new Runnable() {
             @Override
             public void run() {
                 if (v.eventDescription.contains("ROAD")) street.setText(v.eventDescription);

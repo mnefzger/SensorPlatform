@@ -1,5 +1,6 @@
 package mnefzger.de.sensorplatform.Processors;
 
+import android.os.AsyncTask;
 import android.util.Log;
 
 import org.opencv.core.CvType;
@@ -67,8 +68,6 @@ public class ImageProcessor{
         Log.d("FACE_DETECTION_FRAME", System.currentTimeMillis()-time + "");
         return faces;
     }
-
-
 
 
 }

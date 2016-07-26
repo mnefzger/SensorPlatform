@@ -268,7 +268,12 @@ public class ImageModule implements IEventCallback{
              */
             if(Preferences.frontImagesProcessingActivated(prefs) && now - lastFrontProc >= (1000 / FRONT_PROCESSING_FPS) ) {
 
-                imgProc.processImage(bytes, w, h);
+                new Thread(new Runnable() {
+                    @Override
+                    public void run() {
+                        imgProc.processImage(bytes.clone(), w, h);
+                    }
+                }).start();
                 //byte[] processedImg = imgProc.processImage(bytes, img.getWidth(), img.getHeight());
                 //yuvimage = new YuvImage(processedImg, ImageFormat.NV21, img.getWidth(), img.getHeight(), null);
                 lastFrontProc = now;
@@ -283,6 +288,7 @@ public class ImageModule implements IEventCallback{
             if(now - lastFront >= (1000/(1+FRONT_MAX_FPS)) ) {
                 double latestFPS = 1000 / (now - lastFront);
                 FRONT_AVG_FPS = 0.995*FRONT_AVG_FPS + 0.005*latestFPS;
+                Log.d("FPS front", FRONT_AVG_FPS+", " +latestFPS);
 
                 frontImages.append(frontIt, yuvimage);
                 frontIt++;
@@ -316,18 +322,16 @@ public class ImageModule implements IEventCallback{
 
             double now = System.currentTimeMillis();
 
-
             /**
              * Decide if frame is to be processed or not
              */
             if(Preferences.backImagesProcessingActivated(prefs) && now - lastBackProc >= (1000 / BACK_PROCESSING_FPS) ) {
-
-                mBackgroundHandler.post(new Runnable() {
+                new Thread(new Runnable() {
                     @Override
                     public void run() {
-                        imgProc.processImage(bytes, w, h);
+                        imgProc.processImage(bytes.clone(), w, h);
                     }
-                });
+                }).start();
                 //byte[] processedImg = imgProc.processImage(bytes, img.getWidth(), img.getHeight());
                 //yuvimage = new YuvImage(processedImg, ImageFormat.NV21, img.getWidth(), img.getHeight(), null);
                 lastFrontProc = now;
@@ -342,7 +346,7 @@ public class ImageModule implements IEventCallback{
             if(now - lastBack >= (1000/(1+BACK_MAX_FPS)) ) {
                 double latestFPS = 1000 / (now - lastBack);
                 BACK_AVG_FPS = 0.995*BACK_AVG_FPS + 0.005*latestFPS;
-                Log.d("FPS", BACK_AVG_FPS+"");
+                Log.d("FPS back", BACK_AVG_FPS+", " +latestFPS);
 
                 backImages.put(backIt, yuvimage);
                 backIt++;

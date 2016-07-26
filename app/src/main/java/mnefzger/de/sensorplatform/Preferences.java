@@ -21,6 +21,8 @@ public class Preferences {
 
     public static final String BACK_PROCESSING = "image_back_processing";
 
+    public static final String VIDEO_SAVING = "image_saving";
+
 
     public static final String FREQUENCY_ACCELEROMETER = "frequency_accelerometer";
 
@@ -94,6 +96,12 @@ public class Preferences {
 
     public static boolean backImagesProcessingActivated(SharedPreferences prefs) {
         boolean value = prefs.getBoolean(BACK_PROCESSING, true);
+
+        return value;
+    }
+
+    public static boolean videoSavingActivated(SharedPreferences prefs) {
+        boolean value = prefs.getBoolean(VIDEO_SAVING, true);
 
         return value;
     }

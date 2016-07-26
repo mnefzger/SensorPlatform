@@ -1,13 +1,15 @@
 package mnefzger.de.sensorplatform;
 
 import android.app.Activity;
+import android.content.SharedPreferences;
+import android.preference.PreferenceManager;
 
 import java.util.Iterator;
 
 import mnefzger.de.sensorplatform.Logger.LoggingModule;
 
 public class SensorPlatformController implements IDataCallback{
-
+    private SharedPreferences prefs;
     private SensorModule sm;
     private LoggingModule lm;
     private ImageModule im;
@@ -16,6 +18,7 @@ public class SensorPlatformController implements IDataCallback{
     public SensorPlatformController(Activity app) {
         // needed for initialization of preference context
         Preferences.setContext(app);
+        prefs = PreferenceManager.getDefaultSharedPreferences(app);
 
         this.sm = new SensorModule(this, app);
         this.lm = new LoggingModule(app);
@@ -85,6 +88,10 @@ public class SensorPlatformController implements IDataCallback{
         appCallback.onEventData(ev);
         if(ActiveSubscriptions.eventLoggingActive()) {
             lm.writeEventToCSV(ev);
+        }
+
+        if(Preferences.videoSavingActivated(prefs)) {
+            im.saveVideoAfterEvent(ev);
         }
     }
 

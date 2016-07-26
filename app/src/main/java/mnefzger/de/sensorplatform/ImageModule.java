@@ -65,7 +65,8 @@ public class ImageModule implements IEventCallback{
 
     private final String TAG = "CAMERA_SENSORPLATFORM";
 
-    boolean saving = false;
+    static boolean backSaving = false;
+    static boolean frontSaving = false;
 
 
     public ImageModule(SensorPlatformController controller, Activity app) {
@@ -227,9 +228,31 @@ public class ImageModule implements IEventCallback{
 
     @Override
     public void onEventDetected(EventVector v) {
+        if(Preferences.videoSavingActivated(prefs)) {
+
+
+        }
+
         callback.onEventData(v);
     }
 
+    public void saveVideoAfterEvent(EventVector ev) {
+        final EventVector v = ev;
+        if(!frontSaving && !backSaving) {
+            mBackgroundHandler.postDelayed(new Runnable() {
+                @Override
+                public void run() {
+                    if(Preferences.frontCameraActivated(prefs)) {
+                        new VideoSaver(frontImages, (int)FRONT_AVG_FPS, 320, 240, "front", ""+v.timestamp);
+                    }
+                    if(Preferences.backCameraActivated(prefs)) {
+                        new VideoSaver(backImages, (int)BACK_AVG_FPS, 640, 480, "back", ""+v.timestamp);
+                    }
+
+                }
+            }, 4000);
+        }
+    }
 
     private double lastFront = System.currentTimeMillis();
     private double lastFrontProc = System.currentTimeMillis();
@@ -269,11 +292,12 @@ public class ImageModule implements IEventCallback{
 
             /**
              * Save video every ten seconds to file
-             */
+             *
             if(now - lastFrontSaved >= 10000 ) {
-                new VideoSaver(frontImages, (int)FRONT_AVG_FPS, 320, 240, "front");
+                new VideoSaver(frontImages, (int)FRONT_AVG_FPS, 320, 240, "front", ""+System.currentTimeMillis());
                 lastFrontSaved = now;
             }
+             */
 
             /**
              * Only store the last ten seconds in the image buffer
@@ -326,11 +350,12 @@ public class ImageModule implements IEventCallback{
 
             /**
              * Save video every ten seconds to file
-             */
+             *
             if(now - lastBackSaved >= 10000 ) {
-                new VideoSaver(backImages, (int)BACK_AVG_FPS, 640, 480, "back");
+                new VideoSaver(backImages, (int)BACK_AVG_FPS, 640, 480, "back", ""+System.currentTimeMillis());
                 lastBackSaved = now;
             }
+             */
 
             /**
              * Only store the last ten seconds in the image buffer
@@ -373,18 +398,25 @@ public class ImageModule implements IEventCallback{
 
         private SparseArray<YuvImage> images = new SparseArray<>();
         private int FPS, w, h;
+        private String mode;
 
         SequenceEncoderWrapper encoder;
         String baseDir = android.os.Environment.getExternalStorageDirectory().getAbsolutePath();
-        String fileName = "Video-" + System.nanoTime() + ".mp4";
+        String fileName;
         String filePath = baseDir + "/SensorPlatform/videos/";
         File mFile;
 
-        public VideoSaver(SparseArray<YuvImage> list, int FPS, int width, int height, String mode) {
+        public VideoSaver(SparseArray<YuvImage> list, int FPS, int width, int height, String mode, String timestamp) {
             this.images = copy(list);
             this.FPS = FPS;
             this.w = width;
             this.h = height;
+            this.mode = mode;
+
+            fileName = "Video-" + timestamp + ".mp4";
+
+            if(mode == "front" && frontSaving == true) return;
+            if(mode == "back" && backSaving == true) return;
 
             File folder = new File(filePath);
             if (!folder.exists()) {
@@ -407,6 +439,8 @@ public class ImageModule implements IEventCallback{
             new Thread(new Runnable() {
                 public void run() {
                     try {
+                        if(mode == "front") frontSaving = true;
+                        if(mode == "back") backSaving = true;
                         Log.d("VIDEO", "Trying to save..." + images.size() + " frames");
                         double start = System.currentTimeMillis();
                         encoder = new SequenceEncoderWrapper(mFile, images.size(), FPS, w, h);
@@ -421,6 +455,8 @@ public class ImageModule implements IEventCallback{
 
                         double delta = (System.currentTimeMillis() - start)/1000;
                         Log.d("VIDEO", "Saving finished in " + delta + "s!" );
+                        if(mode == "front") frontSaving = false;
+                        if(mode == "back") backSaving = false;
 
                     } catch (IOException e) {
                         e.printStackTrace();

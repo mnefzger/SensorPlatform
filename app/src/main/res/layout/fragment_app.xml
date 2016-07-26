@@ -94,7 +94,7 @@
             android:orientation="horizontal"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:layout_marginTop="120dp">
+            android:layout_marginTop="90dp">
 
             <LinearLayout
                 android:orientation="vertical"
@@ -133,21 +133,24 @@
                     android:textAppearance="?android:attr/textAppearanceLarge"
                     android:text=""
                     android:id="@+id/osmText"
-                    android:layout_marginTop="15dp" />
+                    android:layout_marginTop="25dp"
+                    android:textSize="20dp" />
 
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:textAppearance="?android:attr/textAppearanceLarge"
                     android:id="@+id/eventText"
-                    android:layout_marginTop="10dp" />
+                    android:layout_marginTop="10dp"
+                    android:textSize="20dp" />
 
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:textAppearance="?android:attr/textAppearanceLarge"
                     android:id="@+id/faceText"
-                    android:layout_marginTop="10dp" />
+                    android:layout_marginTop="10dp"
+                    android:textSize="20dp" />
             </LinearLayout>
         </LinearLayout>
 

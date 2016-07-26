@@ -61,7 +61,6 @@ public class ImageProcessor{
             Log.d("FACE_DETECTION", "Detected at (" + faces[0] + "," + faces[1]+")");
             callback.onEventDetected(new EventVector(System.currentTimeMillis(), "Face detected", 0));
         } else {
-            Log.d("FACE_DETECTION", "Nothing detected");
             callback.onEventDetected(new EventVector(System.currentTimeMillis(), "No Face detected", 0));
         }
         faceProcRunning = false;

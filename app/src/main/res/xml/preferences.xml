@@ -9,25 +9,37 @@
                 android:summary="Activates raw data collection of vehicle acceleration"
                 android:defaultValue="true"/>
             <CheckBoxPreference
-                android:key="rotation_raw"
-                android:title="Rotation Raw Data"
-                android:summary="Activates raw data collection of vehicle orientation"
-                android:defaultValue="true"/>
-            <CheckBoxPreference
                 android:key="location_raw"
                 android:title="Location Raw Data"
                 android:summary="Activates raw data collection of the vehicle location"
                 android:defaultValue="true"/>
             <CheckBoxPreference
-                android:key="image_front"
-                android:title="Front Camera Processing"
-                android:summary="Activates image processing of front camera images"
+                android:key="rotation_raw"
+                android:title="Rotation Raw Data"
+                android:summary="Activates raw data collection of vehicle orientation"
                 android:defaultValue="true"/>
             <CheckBoxPreference
-                android:key="image_back"
+                android:key="front_active"
+                android:title="Front camera"
+                android:summary="Activate video capture with the front camera"
+                android:defaultValue="true"/>
+            <CheckBoxPreference
+                android:key="back_active"
+                android:title="Back camera"
+                android:summary="Activate video capture with the back camera"
+                android:defaultValue="true"/>
+            <CheckBoxPreference
+                android:key="image_front_processing"
+                android:title="Front Camera Processing"
+                android:summary="Activates image processing of front camera images"
+                android:defaultValue="true"
+                android:dependency="front_active"/>
+            <CheckBoxPreference
+                android:key="image_back_processing"
                 android:title="Back Camera Processing"
                 android:summary="Activates image processing of back camera images"
-                android:defaultValue="true"/>
+                android:defaultValue="true"
+                android:dependency="back_active"/>
             <CheckBoxPreference
                 android:key="image_saving"
                 android:title="Video Saving"

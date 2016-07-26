@@ -13,6 +13,14 @@ public class Preferences {
 
     public static final String LOCATION_RAW = "location_raw";
 
+    public static final String FRONT_CAMERA = "front_active";
+
+    public static final String BACK_CAMERA = "back_active";
+
+    public static final String FRONT_PROCESSING = "image_front_processing";
+
+    public static final String BACK_PROCESSING = "image_back_processing";
+
 
     public static final String FREQUENCY_ACCELEROMETER = "frequency_accelerometer";
 
@@ -48,20 +56,44 @@ public class Preferences {
     }
 
 
-    public static boolean getAccelerometerActivated(SharedPreferences prefs) {
+    public static boolean accelerometerActivated(SharedPreferences prefs) {
         boolean value = prefs.getBoolean(ACCELEROMETER_RAW, true);
 
         return value;
     }
 
-    public static boolean getRotationActivated(SharedPreferences prefs) {
+    public static boolean rotationActivated(SharedPreferences prefs) {
         boolean value = prefs.getBoolean(ROTATION_RAW, true);
 
         return value;
     }
 
-    public static boolean getLocationActivated(SharedPreferences prefs) {
+    public static boolean locationActivated(SharedPreferences prefs) {
         boolean value = prefs.getBoolean(LOCATION_RAW, true);
+
+        return value;
+    }
+
+    public static boolean frontCameraActivated(SharedPreferences prefs) {
+        boolean value = prefs.getBoolean(FRONT_CAMERA, true);
+
+        return value;
+    }
+
+    public static boolean backCameraActivated(SharedPreferences prefs) {
+        boolean value = prefs.getBoolean(BACK_CAMERA, true);
+
+        return value;
+    }
+
+    public static boolean frontImagesProcessingActivated(SharedPreferences prefs) {
+        boolean value = prefs.getBoolean(FRONT_PROCESSING, true);
+
+        return value;
+    }
+
+    public static boolean backImagesProcessingActivated(SharedPreferences prefs) {
+        boolean value = prefs.getBoolean(BACK_PROCESSING, true);
 
         return value;
     }

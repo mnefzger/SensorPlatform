@@ -91,8 +91,9 @@ public class ImageModule implements IEventCallback{
 
     public void startCapture() {
         startBackgroundThread();
-        //open("0");
-        open("1");
+        Log.d("CAMERA", ""+Preferences.backCameraActivated(prefs) );
+        if( Preferences.backCameraActivated(prefs) ) open("0");
+        if( Preferences.frontCameraActivated(prefs) ) open("1");
     }
 
     public void stopCapture() {
@@ -242,9 +243,9 @@ public class ImageModule implements IEventCallback{
             double now = System.currentTimeMillis();
 
             /**
-             * We do not want to process every frame
+             * Decide if frame is to be processed or not
              */
-            if(now - lastFrontProc >= (1000 / FRONT_PROCESSING_FPS) ) {
+            if(Preferences.frontImagesProcessingActivated(prefs) && now - lastFrontProc >= (1000 / FRONT_PROCESSING_FPS) ) {
                 byte[] processedImg = imgProc.processImage(bytes, img.getWidth(), img.getHeight());
                 yuvimage = new YuvImage(processedImg, ImageFormat.NV21, img.getWidth(), img.getHeight(), null);
                 lastFrontProc = now;
@@ -299,9 +300,9 @@ public class ImageModule implements IEventCallback{
 
 
             /**
-             * We do not want to process every frame
+             * Decide if frame is to be processed or not
              */
-            if(false/*now - lastBackProc >= (1000 / BACK_PROCESSING_FPS)*/ ) {
+            if(Preferences.backImagesProcessingActivated(prefs) && now - lastBackProc >= (1000 / BACK_PROCESSING_FPS) ) {
                 byte[] processedImg = imgProc.processImage(bytes, img.getWidth(), img.getHeight());
                 yuvimage = new YuvImage(processedImg, ImageFormat.NV21, img.getWidth(), img.getHeight(), null);
                 lastFrontProc = now;
@@ -327,7 +328,7 @@ public class ImageModule implements IEventCallback{
              * Save video every ten seconds to file
              */
             if(now - lastBackSaved >= 10000 ) {
-                new VideoSaver(deepCopy(backImages), (int)BACK_AVG_FPS, 640, 480, "back");
+                new VideoSaver(backImages, (int)BACK_AVG_FPS, 640, 480, "back");
                 lastBackSaved = now;
             }
 
@@ -339,7 +340,7 @@ public class ImageModule implements IEventCallback{
                 backImages.remove(key);
             }
 
-           // mBackgroundHandler.post( new ImageSaver(yuvimage, "back") );
+            //mBackgroundHandler.post( new ImageSaver(yuvimage, "back") );
         }
         img.close();
     }

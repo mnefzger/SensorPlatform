@@ -46,22 +46,25 @@ public class MainActivity extends AppCompatActivity implements IDataCallback{
     public void startMeasuring() {
         sPC = new SensorPlatformController(this);
 
-        if(Preferences.getAccelerometerActivated(prefs)) {
+        if(Preferences.accelerometerActivated(prefs)) {
             sPC.subscribeTo(DataType.ACCELERATION_RAW);
             sPC.subscribeTo(DataType.ACCELERATION_EVENT);
         }
 
-        if(Preferences.getRotationActivated(prefs)) {
+        if(Preferences.rotationActivated(prefs)) {
             sPC.subscribeTo(DataType.ROTATION_RAW);
             sPC.subscribeTo(DataType.ROTATION_EVENT);
         }
 
-        if(Preferences.getLocationActivated(prefs)) {
+        if(Preferences.locationActivated(prefs)) {
             sPC.subscribeTo(DataType.LOCATION_RAW);
             sPC.subscribeTo(DataType.LOCATION_EVENT);
         }
 
-        //sPC.subscribeTo(DataType.CAMERA_RAW);
+        if(Preferences.frontCameraActivated(prefs) ||
+                Preferences.backCameraActivated(prefs)) {
+            sPC.subscribeTo(DataType.CAMERA_RAW);
+        }
 
         sPC.logRawData(false);
         sPC.logEventData(false);

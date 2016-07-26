@@ -3,6 +3,7 @@ package mnefzger.de.sensorplatform;
 
 import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.preference.CheckBoxPreference;
 import android.preference.ListPreference;
 import android.preference.Preference;
 import android.preference.PreferenceFragment;
@@ -34,8 +35,10 @@ public class SettingsFragment extends PreferenceFragment
 
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(getActivity());
         if(prefs.getBoolean("front_active", true) == false && prefs.getBoolean("back_active", true) == false ) {
-            findPreference("image_saving").setEnabled(false);
-            findPreference("image_saving").setSelectable(false);
+            CheckBoxPreference box = (CheckBoxPreference) findPreference("image_saving");
+            box.setChecked(false);
+            box.setEnabled(false);
+            box.setSelectable(false);
         }
 
         return v;
@@ -60,6 +63,8 @@ public class SettingsFragment extends PreferenceFragment
             if(sharedPreferences.getBoolean("front_active", true) == false &&
                     sharedPreferences.getBoolean("back_active", true) == false ) {
                 findPreference("image_saving").setEnabled(false);
+                CheckBoxPreference box = (CheckBoxPreference) findPreference("image_saving");
+                box.setChecked(false);
             } else {
                 findPreference("image_saving").setEnabled(true);
                 findPreference("image_saving").setSelectable(true);

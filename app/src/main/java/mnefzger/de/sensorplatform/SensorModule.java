@@ -12,6 +12,7 @@ import java.util.List;
 import java.util.Timer;
 import java.util.TimerTask;
 
+import mnefzger.de.sensorplatform.External.OBD2Provider;
 import mnefzger.de.sensorplatform.Processors.DrivingBehaviourProcessor;
 
 public class SensorModule implements ISensorCallback, IEventCallback{
@@ -32,6 +33,10 @@ public class SensorModule implements ISensorCallback, IEventCallback{
      * PositionProvider to collect geolocation
      */
     private PositionProvider location;
+    /**
+     * OBD2Provider to collect vehicle data
+     */
+    private OBD2Provider obd2;
     /**
      * List of all currently running SensorProviders
      */
@@ -62,20 +67,22 @@ public class SensorModule implements ISensorCallback, IEventCallback{
     private final int GPS_IDENTIFIER = 100;
 
 
-    public SensorModule(SensorPlatformController controller, Activity app) {
-        callback = (IDataCallback)controller;
+    public SensorModule(IDataCallback callback, Activity app) {
+        prefs = PreferenceManager.getDefaultSharedPreferences(app);
+        this.callback = callback;
 
         activeProviders = new ArrayList<>();
+
         accelerometer = new AccelerometerProvider(app, this);
         orientation = new OrientationProvider(app, this);
         location = new PositionProvider(app, this);
+        obd2 = new OBD2Provider(app, this);
         drivingBehProc = new DrivingBehaviourProcessor(this, app);
 
         current = new DataVector();
         current.setTimestamp(System.currentTimeMillis());
         dataBuffer = new ArrayList<>();
 
-        prefs = PreferenceManager.getDefaultSharedPreferences(app);
     }
 
     public void startSensing(DataType type) {
@@ -135,8 +142,6 @@ public class SensorModule implements ISensorCallback, IEventCallback{
             location.stop();
             activeProviders.remove(location);
 
-         } else if(t == Sensor.TYPE_ALL) {
-            //TODO: loop through sensors, check if sensor is needed, stop it if not
         }
 
         if(activeProviders.size() == 0) {
@@ -254,8 +259,6 @@ public class SensorModule implements ISensorCallback, IEventCallback{
             case LOCATION_RAW:
             case LOCATION_EVENT:
                 return GPS_IDENTIFIER;
-            case RAW:
-                return Sensor.TYPE_ALL;
             default:
                 return -1;
         }

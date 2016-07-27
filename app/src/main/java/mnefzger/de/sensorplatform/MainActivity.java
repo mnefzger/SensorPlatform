@@ -32,6 +32,7 @@ public class MainActivity extends AppCompatActivity implements IDataCallback{
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+
         prefs = PreferenceManager.getDefaultSharedPreferences(this);
         prefs.edit().clear();
         if(prefs.getAll().isEmpty()) {
@@ -41,13 +42,14 @@ public class MainActivity extends AppCompatActivity implements IDataCallback{
             PreferenceManager.setDefaultValues(this, R.xml.preferences, false);
         }
 
+        sPC = new SensorPlatformController(this);
+
         settings = new SettingsFragment();
         getFragmentManager().beginTransaction().replace(R.id.fragment_container, settings).commit();
         //hangeFragment(settings, false, true);
     }
 
     public void startMeasuring() {
-        sPC = new SensorPlatformController(this);
 
         if(Preferences.accelerometerActivated(prefs)) {
             sPC.subscribeTo(DataType.ACCELERATION_RAW);
@@ -64,22 +66,13 @@ public class MainActivity extends AppCompatActivity implements IDataCallback{
             sPC.subscribeTo(DataType.LOCATION_EVENT);
         }
 
-        if(Preferences.frontCameraActivated(prefs) ||
-                Preferences.backCameraActivated(prefs)) {
+        if(Preferences.frontCameraActivated(prefs) || Preferences.backCameraActivated(prefs)) {
             sPC.subscribeTo(DataType.CAMERA_RAW);
         }
 
         sPC.logRawData(false);
         sPC.logEventData(false);
 
-        /*FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
-        Fragment topFragment = getSupportFragmentManager().findFragmentById(R.id.fragment_container);
-        if(topFragment != null)
-            transaction.remove(topFragment);
-
-        app = new AppFragment();
-        transaction.replace(R.id.fragment_container, app).commit();
-        getFragmentManager().popBackStack("backstack_state",0);*/
 
         app = new AppFragment();
         changeFragment(app, true, true);
@@ -98,11 +91,6 @@ public class MainActivity extends AppCompatActivity implements IDataCallback{
         Log.d("EventData @ App  ", v.toString());
         if( app != null && app.isVisible())
             app.updateUI(v);
-    }
-
-    @Override
-    public void onImageData() {
-
     }
 
     private void changeFragment(Fragment frag, boolean saveInBackstack, boolean animate) {

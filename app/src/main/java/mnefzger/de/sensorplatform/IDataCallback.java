@@ -6,6 +6,4 @@ public interface IDataCallback {
 
     void onEventData(EventVector ev);
 
-    void onImageData();
-
 }

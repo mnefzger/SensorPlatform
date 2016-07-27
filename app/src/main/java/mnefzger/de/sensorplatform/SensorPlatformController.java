@@ -95,10 +95,4 @@ public class SensorPlatformController implements IDataCallback{
         }
     }
 
-    @Override
-    public void onImageData() {
-
-    }
-
-
 }

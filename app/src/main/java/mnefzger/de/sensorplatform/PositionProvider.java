@@ -30,10 +30,10 @@ public class PositionProvider extends DataProvider implements LocationListener{
     private final int LOCATION_REFRESH_TIME;
     private final int LOCATION_REFRESH_DISTANCE = 0;
 
-    public PositionProvider(Activity app, SensorModule m) {
+    public PositionProvider(Activity app, ISensorCallback m) {
         verifyLocationPermissions(app);
         context = app;
-        callback = (ISensorCallback) m;
+        callback = m;
         prefs = PreferenceManager.getDefaultSharedPreferences(app);
 
         LOCATION_REFRESH_TIME = Preferences.getGPSRequestRate(prefs);

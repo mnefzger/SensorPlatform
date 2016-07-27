@@ -234,6 +234,11 @@ public class SensorModule implements ISensorCallback, IEventCallback{
         current.setSpeed(speed);
     }
 
+    @Override
+    public void onOBD2Data(double[] values) {
+
+    }
+
     /**
      * Hands the EventVector to the SensorPlatformController
      * @param v: the EventVector containing the event

@@ -10,4 +10,6 @@ public interface ISensorCallback {
     void onRotationData(float[][] values);
 
     void onLocationData(Location location, double speed);
+
+    void onOBD2Data(double[] values);
 }

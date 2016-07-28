@@ -39,7 +39,7 @@ class ActiveSubscriptions {
     }
 
     public static boolean rawActive() {
-       return isActive(new DataType[]{DataType.ACCELERATION_RAW, DataType.ROTATION_RAW, DataType.LOCATION_RAW});
+       return isActive(new DataType[]{DataType.ACCELERATION_RAW, DataType.ROTATION_RAW, DataType.LOCATION_RAW, DataType.OBD});
     }
 
     public static boolean drivingBehaviourActive() {

@@ -42,7 +42,7 @@ public class MainActivity extends AppCompatActivity implements IDataCallback{
             PreferenceManager.setDefaultValues(this, R.xml.preferences, false);
         }
 
-        sPC = new SensorPlatformController(this);
+        if(sPC == null) sPC = new SensorPlatformController(this);
 
         settings = new SettingsFragment();
         getFragmentManager().beginTransaction().replace(R.id.fragment_container, settings).commit();
@@ -50,6 +50,9 @@ public class MainActivity extends AppCompatActivity implements IDataCallback{
     }
 
     public void startMeasuring() {
+
+        app = new AppFragment();
+        changeFragment(app, true, true);
 
         if(Preferences.accelerometerActivated(prefs)) {
             sPC.subscribeTo(DataType.ACCELERATION_RAW);
@@ -76,14 +79,13 @@ public class MainActivity extends AppCompatActivity implements IDataCallback{
         sPC.logEventData(false);
 
 
-        app = new AppFragment();
-        changeFragment(app, true, true);
+
     }
 
 
     @Override
     public void onRawData(DataVector v) {
-        // Log.d("RawData @ App  ", v.toString());
+         Log.d("RawData @ App  ", v.toString());
         if( app != null && app.isVisible())
             app.updateUI(v);
     }

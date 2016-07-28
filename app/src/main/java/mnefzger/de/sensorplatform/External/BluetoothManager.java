@@ -61,19 +61,6 @@ public class BluetoothManager {
         return sock;
     }
 
-    public static BluetoothSocket connectPaired(BluetoothDevice dev) {
-        BluetoothSocket socket = null;
-        try {
-            Method m = dev.getClass().getMethod("createRfcommSocket",
-                    new Class[] { int.class });
-            socket = (BluetoothSocket) m.invoke(dev, Integer.valueOf(1));
-
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        return socket;
-    }
-
     private static final int USE_BLUETOOTH = 1;
     private static String[] PERMISSION_BLUETOOTH = {
             Manifest.permission.BLUETOOTH,

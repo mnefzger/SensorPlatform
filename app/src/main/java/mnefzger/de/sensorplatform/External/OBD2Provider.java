@@ -10,19 +10,17 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.util.Log;
 
-import com.github.pires.obd.exceptions.NonNumericResponseException;
+import com.github.pires.obd.commands.ObdCommand;
+import com.github.pires.obd.commands.SpeedCommand;
+import com.github.pires.obd.commands.engine.RPMCommand;
 
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.util.ArrayList;
-import java.util.Set;
-import java.util.logging.Handler;
+import java.util.Timer;
+import java.util.TimerTask;
 
 import mnefzger.de.sensorplatform.DataProvider;
-import mnefzger.de.sensorplatform.External.Commands.ObdCommand;
-import mnefzger.de.sensorplatform.External.Commands.RPMCommand;
-import mnefzger.de.sensorplatform.External.Commands.SpeedCommand;
 import mnefzger.de.sensorplatform.ISensorCallback;
 
 
@@ -31,6 +29,8 @@ public class OBD2Provider extends DataProvider{
     private BluetoothDevice obd2Device;
     private BluetoothAdapter btAdapter;
     private BluetoothSocket sock;
+
+    boolean setupComplete = false;
 
     private Activity app;
 
@@ -47,6 +47,8 @@ public class OBD2Provider extends DataProvider{
                 if(device.getName().equals("OBDII")) {
                     obd2Device = device;
                     btAdapter.cancelDiscovery();
+                    app.unregisterReceiver(mReceiver);
+                    Log.d("RECEIVER", "unregistered");
                     connectToOBD2Device();
                 }
             }
@@ -57,59 +59,48 @@ public class OBD2Provider extends DataProvider{
         BluetoothManager.verifyBluetoothPermissions(app);
         this.callback = callback;
         this.app = app;
-
-        if(obd2Device == null) searchForOBD2Device();
     }
 
     private void searchForOBD2Device() {
         btAdapter = BluetoothAdapter.getDefaultAdapter();
         IntentFilter filter = new IntentFilter(BluetoothDevice.ACTION_FOUND);
+
         app.registerReceiver(mReceiver, filter);
 
-        Log.d("BLUETOOTH", "Looking for paired devices...");
-        Set<BluetoothDevice> pairedDevices = btAdapter.getBondedDevices();
-        // If there are paired devices
-        if (pairedDevices.size() > 0) {
-            // Loop through paired devices
-            for (BluetoothDevice device : pairedDevices) {
-                if(device.getName().equals("OBDII")) {
-                    obd2Device = device;
-                    sock = BluetoothManager.connectPaired(obd2Device);
-                    Log.d("BLUETOOTH", sock.isConnected()+"");
-                    connectToOBD2Device();
-                    break;
-                }
-            }
-        } else {
-            Log.d("BLUETOOTH", "Start discovery...");
-            btAdapter.startDiscovery();
-        }
-
-
+        Log.d("BLUETOOTH", "Start discovery...");
+        btAdapter.startDiscovery();
     }
 
     private void connectToOBD2Device() {
         try{
             sock = BluetoothManager.connect(obd2Device);
-            app.unregisterReceiver(mReceiver);
             Log.d("BLUETOOTH", "Connected to: " + obd2Device.getName() + "-> " + sock.isConnected());
 
-            try { Thread.sleep(1000); } catch (InterruptedException e) { e.printStackTrace(); }
+            new Thread(new Runnable() {
+                @Override
+                public void run() {
+                    try { Thread.sleep(1000); } catch (InterruptedException e) { e.printStackTrace(); }
 
-            /* Setup */
-            runCommand(sock, "ATD");
-            runCommand(sock, "ATZ");
-            runCommand(sock, "AT E0");
-            runCommand(sock, "AT L0");
-            runCommand(sock, "AT S0");
-            runCommand(sock, "AT H0");
+                     /* Setup */
+                    runCommand(sock, "ATD");
+                    runCommand(sock, "ATZ");
+                    runCommand(sock, "ATZ");
+                    runCommand(sock, "ATZ");
+                    runCommand(sock, "ATZ");
+                    runCommand(sock, "AT E0");
+                    runCommand(sock, "AT L0");
+                    runCommand(sock, "AT S0");
+                    runCommand(sock, "AT H0");
 
-            SpeedCommand cmd = new SpeedCommand();
-            runCommand(sock, cmd);
+                    SpeedCommand cmd = new SpeedCommand();
+                    runCommand(sock, cmd);
 
-            RPMCommand rpm_cmd = new RPMCommand();
-            runCommand(sock, rpm_cmd);
+                    RPMCommand rpm_cmd = new RPMCommand();
+                    runCommand(sock, rpm_cmd);
 
+                    setupComplete = true;
+                }
+            }).start();
 
         } catch (IOException e) {
             Log.e("BLUETOOTH", "Could not connect to OBD2 device.", e);
@@ -118,10 +109,46 @@ public class OBD2Provider extends DataProvider{
 
     public void start() {
         super.start();
+        if(obd2Device == null) {
+            new Thread(new Runnable() {
+                @Override
+                public void run() {
+                    searchForOBD2Device();
+                }
+            }).start();
+        }
+        collectOBDData();
     }
 
     public void stop() {
         super.stop();
+    }
+
+    private void collectOBDData() {
+        new Timer().schedule(new TimerTask() {
+            @Override
+            public void run() {
+                if(sock != null && sock.isConnected() && setupComplete)
+                    requestData();
+
+                collectOBDData();
+            }
+        }, 1000);
+    }
+
+    private void requestData() {
+        SpeedCommand cmd = new SpeedCommand();
+        runCommand(sock, cmd);
+
+        RPMCommand rpm_cmd = new RPMCommand();
+        runCommand(sock, rpm_cmd);
+
+        double speed = Double.valueOf( cmd.getCalculatedResult() );
+        double rpm = Double.valueOf( rpm_cmd.getCalculatedResult() );
+
+        double[] response = {speed, rpm};
+
+        callback.onOBD2Data(response);
     }
 
     public void runCommand(BluetoothSocket s, String cmd) {
@@ -138,7 +165,7 @@ public class OBD2Provider extends DataProvider{
         if(obd2Device != null) {
             try{
                 cmd.run(s.getInputStream(), s.getOutputStream());
-                Log.d("PIRES", cmd.getFormattedResult());
+                Log.d("OBD", cmd.getFormattedResult());
             } catch (Exception e) {
                 e.printStackTrace();
             }

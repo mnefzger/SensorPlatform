@@ -181,6 +181,8 @@ public class SensorModule implements ISensorCallback, IEventCallback{
             current.setRotMatrix(last.rotMatrix);
             current.setLocation(last.location);
             current.setSpeed(last.speed);
+            current.setOBDSpeed(last.obdSpeed);
+            current.setRPM(last.rpm);
         }
         /**
          * only store last BUFFERSIZE DataVectors
@@ -242,7 +244,10 @@ public class SensorModule implements ISensorCallback, IEventCallback{
 
     @Override
     public void onOBD2Data(double[] values) {
-
+        double obdSpeed = values[0];
+        double rpm = values[1];
+        current.setOBDSpeed(obdSpeed);
+        current.setRPM(rpm);
     }
 
     /**

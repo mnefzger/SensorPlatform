@@ -29,6 +29,10 @@ public class DataVector {
      */
     public double speed;
 
+    public double obdSpeed;
+
+    public double rpm;
+
     public DataVector() {
 
     }
@@ -61,10 +65,19 @@ public class DataVector {
         this.speed = s;
     }
 
+    public void setOBDSpeed(double s) {
+        this.obdSpeed = s;
+    }
+
+    public void setRPM(double r) {
+        this.rpm = r;
+    }
+
     @Override
     public String toString() {
         return "time: " + timestamp + ", accX: " + accX + ", accY: " + accY + ", accZ: " + accZ +
-                ", rotX: " + rotX + ", rotY: " + rotY + ", rotZ: " + rotZ +", speed: " + speed;
+                ", rotX: " + rotX + ", rotY: " + rotY + ", rotZ: " + rotZ +", speed: " + speed +
+                ", OBD speed: " + obdSpeed + ", rpm: " + rpm;
     }
 
     public String toCSVString() {
@@ -72,6 +85,6 @@ public class DataVector {
         double lon = (location == null) ? 0 : location.getLongitude();
         return timestamp + ";" + accX + ";" + accY + ";" + accZ + ";" +
                 rotX + ";" + rotY + ";" + rotZ + ";" +
-                lat + ";" + lon + ";" + speed;
+                lat + ";" + lon + ";" + speed + ";" + obdSpeed + ";" + rpm;
     }
 }

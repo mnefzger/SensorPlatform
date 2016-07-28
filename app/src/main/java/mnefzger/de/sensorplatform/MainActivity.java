@@ -46,7 +46,7 @@ public class MainActivity extends AppCompatActivity implements IDataCallback{
 
         settings = new SettingsFragment();
         getFragmentManager().beginTransaction().replace(R.id.fragment_container, settings).commit();
-        //hangeFragment(settings, false, true);
+
     }
 
     public void startMeasuring() {
@@ -69,6 +69,8 @@ public class MainActivity extends AppCompatActivity implements IDataCallback{
         if(Preferences.frontCameraActivated(prefs) || Preferences.backCameraActivated(prefs)) {
             sPC.subscribeTo(DataType.CAMERA_RAW);
         }
+
+        sPC.subscribeTo(DataType.OBD);
 
         sPC.logRawData(false);
         sPC.logEventData(false);

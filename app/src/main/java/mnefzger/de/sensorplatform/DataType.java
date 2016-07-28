@@ -29,5 +29,9 @@ public enum DataType {
     /**
      *
      */
-    CAMERA_RAW
+    CAMERA_RAW,
+    /**
+     *
+     */
+    OBD
 }

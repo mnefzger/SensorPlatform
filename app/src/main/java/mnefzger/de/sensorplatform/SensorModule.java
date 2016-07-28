@@ -65,6 +65,7 @@ public class SensorModule implements ISensorCallback, IEventCallback{
      * int identifier for GPS Sensor
      */
     private final int GPS_IDENTIFIER = 100;
+    private final int OBD_IDENTIFIER = 101;
 
 
     public SensorModule(IDataCallback callback, Activity app) {
@@ -114,6 +115,11 @@ public class SensorModule implements ISensorCallback, IEventCallback{
                 activeProviders.add(orientation);
             }
 
+        }
+
+        if(t == OBD_IDENTIFIER && !activeProviders.contains(obd2)) {
+            obd2.start();
+            activeProviders.add(obd2);
         }
     }
 
@@ -264,6 +270,8 @@ public class SensorModule implements ISensorCallback, IEventCallback{
             case LOCATION_RAW:
             case LOCATION_EVENT:
                 return GPS_IDENTIFIER;
+            case OBD:
+                return OBD_IDENTIFIER;
             default:
                 return -1;
         }

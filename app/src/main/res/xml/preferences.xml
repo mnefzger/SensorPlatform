@@ -56,6 +56,15 @@
             android:persistent="true"
             android:title="Raw data sampling rate" />
 
+        <ListPreference
+            android:summary="The request rate for OBD2 updates"
+            android:defaultValue="@integer/obdRequest_delay_default"
+            android:entries="@array/obd_readable"
+            android:entryValues="@array/obd_values"
+            android:key="obdRequest_frequency"
+            android:persistent="true"
+            android:title="OBD2 request frequency" />
+
         <PreferenceCategory android:title="Acceleration and Braking">
             <ListPreference
                 android:summary="The accelerometer sensor delay in microseconds"

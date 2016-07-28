@@ -11,6 +11,8 @@
 
     <integer name="gpsRequest_delay_default">1000</integer>
 
+    <integer name="obdRequest_delay_default">500</integer>
+
 
     <!-- Threshold is the g-force value
          e.g. 0.4 * 9.81 = 3.924

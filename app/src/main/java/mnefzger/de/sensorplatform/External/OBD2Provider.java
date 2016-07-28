@@ -8,6 +8,8 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.content.SharedPreferences;
+import android.preference.PreferenceManager;
 import android.util.Log;
 
 import com.github.pires.obd.commands.ObdCommand;
@@ -22,13 +24,16 @@ import java.util.TimerTask;
 
 import mnefzger.de.sensorplatform.DataProvider;
 import mnefzger.de.sensorplatform.ISensorCallback;
+import mnefzger.de.sensorplatform.Preferences;
 
 
 public class OBD2Provider extends DataProvider{
+    SharedPreferences prefs;
     ISensorCallback callback;
     private BluetoothDevice obd2Device;
     private BluetoothAdapter btAdapter;
     private BluetoothSocket sock;
+    private int OBD_DELAY;
 
     boolean setupComplete = false;
 
@@ -59,6 +64,9 @@ public class OBD2Provider extends DataProvider{
         BluetoothManager.verifyBluetoothPermissions(app);
         this.callback = callback;
         this.app = app;
+
+        prefs = PreferenceManager.getDefaultSharedPreferences(app);
+        OBD_DELAY = Preferences.getOBDDelay(prefs);
     }
 
     private void searchForOBD2Device() {
@@ -103,7 +111,7 @@ public class OBD2Provider extends DataProvider{
             }).start();
 
         } catch (IOException e) {
-            Log.e("BLUETOOTH", "Could not connect to OBD2 device.", e);
+            e.printStackTrace();
         }
     }
 
@@ -124,21 +132,29 @@ public class OBD2Provider extends DataProvider{
         super.stop();
     }
 
+    // Is called in case of IOException with broken pipe
+    public void reset() {
+        Log.d("BLUETOOTH", "reset");
+        sock = null;
+        searchForOBD2Device();
+    }
+
     private void collectOBDData() {
         new Timer().schedule(new TimerTask() {
             @Override
             public void run() {
-                if(sock != null && sock.isConnected() && setupComplete)
+                if(sock != null && sock.isConnected() && setupComplete) {
                     new Thread(new Runnable() {
                         @Override
                         public void run() {
                             requestData();
                         }
                     }).start();
+                }
 
                 collectOBDData();
             }
-        }, 1000);
+        }, OBD_DELAY);
     }
 
     private void requestData() {
@@ -173,7 +189,11 @@ public class OBD2Provider extends DataProvider{
             try{
                 cmd.run(s.getInputStream(), s.getOutputStream());
                 Log.d("OBD", cmd.getFormattedResult());
-            } catch (Exception e) {
+            } catch (IOException io) {
+                if(io.getMessage().contains("Broken pipe")) {
+                    reset();
+                }
+            } catch(Exception e) {
                 e.printStackTrace();
             }
         }

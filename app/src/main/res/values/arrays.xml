@@ -25,4 +25,17 @@
         <item>250 ms</item>
         <item>100 ms</item>
     </string-array>
+
+    <string-array name="obd_values">
+        <item>2000</item>
+        <item>1000</item>
+        <item>500</item>
+        <item>250</item>
+    </string-array>
+    <string-array name="obd_readable">
+        <item>Slow (0.5Hz)</item>
+        <item>Normal (1Hz)</item>
+        <item>Fast (2Hz)</item>
+        <item>Very Fast (4Hz)</item>
+    </string-array>
 </resources>

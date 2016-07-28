@@ -40,6 +40,8 @@ public class Preferences {
 
     public static final String GPS_REQUEST_RATE = "gpsRequest_frequency";
 
+    public static final String OBD_REQUEST_RATE = "obdRequest_frequency";
+
 
     public static final String FRONT_CAMERA_FPS = "front_max_fps";
 
@@ -118,6 +120,24 @@ public class Preferences {
 
         if (value <= 0) {
             value = context.getResources().getInteger(R.integer.rawData_delay_default);;
+        }
+
+        return value;
+    }
+
+
+    public static int getOBDDelay(SharedPreferences prefs) {
+        String valueString = prefs.getString(OBD_REQUEST_RATE, "500");
+
+        int value = context.getResources().getInteger(R.integer.obdRequest_delay_default);
+
+        try {
+            value = Integer.valueOf(valueString);
+        } catch (Exception e) {
+        }
+
+        if (value <= 0) {
+            value = context.getResources().getInteger(R.integer.obdRequest_delay_default);;
         }
 
         return value;

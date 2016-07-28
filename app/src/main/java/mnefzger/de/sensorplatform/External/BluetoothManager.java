@@ -7,6 +7,7 @@ import java.util.UUID;
 import android.Manifest;
 import android.app.Activity;
 import android.bluetooth.BluetoothDevice;
+import android.bluetooth.BluetoothServerSocket;
 import android.bluetooth.BluetoothSocket;
 import android.content.pm.PackageManager;
 import android.support.v4.app.ActivityCompat;
@@ -60,6 +61,7 @@ public class BluetoothManager {
         }
         return sock;
     }
+
 
     private static final int USE_BLUETOOTH = 1;
     private static String[] PERMISSION_BLUETOOTH = {

@@ -129,7 +129,12 @@ public class OBD2Provider extends DataProvider{
             @Override
             public void run() {
                 if(sock != null && sock.isConnected() && setupComplete)
-                    requestData();
+                    new Thread(new Runnable() {
+                        @Override
+                        public void run() {
+                            requestData();
+                        }
+                    }).start();
 
                 collectOBDData();
             }
@@ -142,6 +147,8 @@ public class OBD2Provider extends DataProvider{
 
         RPMCommand rpm_cmd = new RPMCommand();
         runCommand(sock, rpm_cmd);
+
+        try { Thread.sleep(25); } catch (InterruptedException e) { e.printStackTrace(); }
 
         double speed = Double.valueOf( cmd.getCalculatedResult() );
         double rpm = Double.valueOf( rpm_cmd.getCalculatedResult() );

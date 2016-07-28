@@ -47,15 +47,18 @@ public class OBD2Provider extends DataProvider{
                 // Get the BluetoothDevice object from the Intent
                 BluetoothDevice device = intent.getParcelableExtra(BluetoothDevice.EXTRA_DEVICE);
 
-                Log.d("Discovery", device.getName());
-
-                if(device.getName().equals("OBDII")) {
-                    obd2Device = device;
-                    btAdapter.cancelDiscovery();
-                    app.unregisterReceiver(mReceiver);
-                    Log.d("RECEIVER", "unregistered");
-                    connectToOBD2Device();
+                if(device != null) {
+                    Log.d("Discovery", device + "");
+                    if(device.getName() != null && device.getName().equals("OBDII")) {
+                        obd2Device = device;
+                        btAdapter.cancelDiscovery();
+                        app.unregisterReceiver(mReceiver);
+                        Log.d("RECEIVER", "unregistered");
+                        connectToOBD2Device();
+                    }
                 }
+
+
             }
         }
     };

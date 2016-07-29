@@ -69,8 +69,6 @@ public class SettingsFragment extends PreferenceFragment
                 findPreference("image_saving").setEnabled(true);
                 findPreference("image_saving").setSelectable(true);
             }
-
-
         }
     }
 }

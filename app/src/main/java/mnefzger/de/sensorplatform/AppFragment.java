@@ -15,6 +15,8 @@ import android.widget.TextView;
 
 import com.github.pires.obd.commands.SpeedCommand;
 
+import org.w3c.dom.Text;
+
 import java.text.DecimalFormat;
 
 
@@ -38,6 +40,9 @@ public class AppFragment extends Fragment {
     TextView street;
     TextView event;
     TextView face;
+
+    TextView obdSpeed;
+    TextView obdRPM;
 
     Activity main;
 
@@ -83,6 +88,9 @@ public class AppFragment extends Fragment {
         event = (TextView) v.findViewById(R.id.eventText);
         face = (TextView) v.findViewById(R.id.faceText);
 
+        obdRPM = (TextView) v.findViewById(R.id.obdRPMText);
+        obdSpeed = (TextView) v.findViewById(R.id.obdSpeedText);
+
         return v;
     }
 
@@ -110,6 +118,9 @@ public class AppFragment extends Fragment {
                     lon.setText("Lon: " + v.location.getLongitude());
                     speed.setText("Speed: " + df.format(v.speed) + " km/h");
                 }
+
+                obdRPM.setText("OBD RPM: " + v.rpm);
+                obdSpeed.setText("OBD Speed: " + v.obdSpeed);
             }
         });
 

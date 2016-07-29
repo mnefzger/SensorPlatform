@@ -13,9 +13,9 @@ import java.io.IOException;
 
 /**
  * This class is responsible for setting up a Bluetooth connection to the OBD2 device
- * It stores the device and socket in the class variables of OBDConnection
+ * It stores the device and socket in the class variables of OBD2Connection
  */
-public class OBDConnector {
+public class OBD2Connector {
     private Activity app;
     private final String TAG = "OBD_CONNECTOR";
 
@@ -34,7 +34,7 @@ public class OBDConnector {
 
                 if(device != null) {
                     if(device.getName() != null && device.getName().equals("OBDII")) {
-                        OBDConnection.obd2Device = device;
+                        OBD2Connection.obd2Device = device;
                         app.unregisterReceiver(mReceiver);
                         receiverRegistered = false;
                         new Thread(new Runnable() {
@@ -50,7 +50,7 @@ public class OBDConnector {
     };
 
 
-    public OBDConnector(Activity app) {
+    public OBD2Connector(Activity app) {
         this.app = app;
 
         btAdapter = BluetoothAdapter.getDefaultAdapter();
@@ -68,7 +68,7 @@ public class OBDConnector {
 
     public void registerReceiver() {
         IntentFilter filter = new IntentFilter(BluetoothDevice.ACTION_FOUND);
-        if(!receiverRegistered && (OBDConnection.sock == null || !OBDConnection.sock.isConnected()) ) {
+        if(!receiverRegistered && (OBD2Connection.sock == null || !OBD2Connection.sock.isConnected()) ) {
             app.registerReceiver(mReceiver, filter);
             receiverRegistered = true;
             Log.d(TAG, "Receiver registered");
@@ -79,9 +79,9 @@ public class OBDConnector {
 
     private void connectToOBD2Device() {
         try{
-            OBDConnection.sock = BluetoothManager.connect(OBDConnection.obd2Device);
-            OBDConnection.connected = true;
-            Log.d(TAG, "Connected to: " + OBDConnection.obd2Device.getName() + "-> " + OBDConnection.sock.isConnected());
+            OBD2Connection.sock = BluetoothManager.connect(OBD2Connection.obd2Device);
+            OBD2Connection.connected = true;
+            Log.d(TAG, "Connected to: " + OBD2Connection.obd2Device.getName() + "-> " + OBD2Connection.sock.isConnected());
 
         } catch (IOException e) {
             e.printStackTrace();

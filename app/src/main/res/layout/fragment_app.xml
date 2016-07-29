@@ -99,7 +99,8 @@
             <LinearLayout
                 android:orientation="vertical"
                 android:layout_width="match_parent"
-                android:layout_height="match_parent">
+                android:layout_height="match_parent"
+                android:layout_weight="0.5">
 
                 <TextView
                     android:text="Lat:"
@@ -126,6 +127,45 @@
                     android:layout_below="@+id/lonText"
                     android:layout_alignStart="@+id/lonText"
                     android:layout_marginTop="10dp" />
+
+            </LinearLayout>
+
+            <LinearLayout
+                android:orientation="vertical"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_weight="0.5">
+                <TextView
+                    android:text="OBD RPM:"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:id="@+id/obdSpeedText"
+                    android:layout_below="@+id/latText"
+                    android:layout_alignStart="@+id/latText"
+                    android:layout_marginTop="10dp" />
+
+                <TextView
+                    android:text="OBD Speed:"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:id="@+id/obdRPMText"
+                    android:layout_below="@+id/lonText"
+                    android:layout_alignStart="@+id/lonText"
+                    android:layout_marginTop="10dp" />
+            </LinearLayout>
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:orientation="horizontal"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_marginTop="180dp">
+
+            <LinearLayout
+                android:orientation="vertical"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent">
 
                 <TextView
                     android:layout_width="wrap_content"

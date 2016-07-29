@@ -37,6 +37,7 @@ public class OBD2Connector {
                         OBD2Connection.obd2Device = device;
                         app.unregisterReceiver(mReceiver);
                         receiverRegistered = false;
+                        btAdapter.cancelDiscovery();
                         new Thread(new Runnable() {
                             @Override
                             public void run() {
@@ -73,7 +74,6 @@ public class OBD2Connector {
             receiverRegistered = true;
             Log.d(TAG, "Receiver registered");
         }
-
     }
 
 

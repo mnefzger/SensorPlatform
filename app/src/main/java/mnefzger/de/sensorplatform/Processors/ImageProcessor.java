@@ -57,6 +57,7 @@ public class ImageProcessor{
         faceProcRunning = true;
         double time = System.currentTimeMillis();
         int[] faces = nAsmFindFace(adress1, adress2);
+        Log.d("FACE_DETECTION_FRAME", System.currentTimeMillis()-time + "");
 
         if(faces.length == 4) {
             Log.d("FACE_DETECTION", "Detected at (" + faces[0] + "," + faces[1]+")");
@@ -65,7 +66,7 @@ public class ImageProcessor{
             callback.onEventDetected(new EventVector(System.currentTimeMillis(), "No Face detected", 0));
         }
         faceProcRunning = false;
-        Log.d("FACE_DETECTION_FRAME", System.currentTimeMillis()-time + "");
+
         return faces;
     }
 

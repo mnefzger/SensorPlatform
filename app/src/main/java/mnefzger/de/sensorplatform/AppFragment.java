@@ -22,9 +22,6 @@ import java.text.DecimalFormat;
 
 public class AppFragment extends Fragment {
 
-    SensorPlatformController sPC;
-    SharedPreferences prefs;
-
     TextView accX;
     TextView accY;
     TextView accZ;
@@ -142,8 +139,6 @@ public class AppFragment extends Fragment {
             }
         });
     }
-
-
 
 
 }

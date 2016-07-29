@@ -352,7 +352,7 @@ public class ImageModule implements IEventCallback{
                 backIt++;
                 lastBack = now;
 
-                //mBackgroundHandler.post( new ImageSaver(yuvimage, "front") );
+                mBackgroundHandler.post( new ImageSaver(yuvimage, "front") );
             }
 
             /**

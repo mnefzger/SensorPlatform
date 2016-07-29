@@ -18,16 +18,22 @@ extern "C" {
 using namespace cv;
 using namespace std;
 
-CascadeClassifier faceCascade;
+CascadeClassifier faceCascadeHaar;
+CascadeClassifier faceCascadeLBP;
+CascadeClassifier faceCascadeLBP2;
 
 int initAsm();
 int initialized = initAsm();
 
 int initAsm() {
     string haarFaceCascadePath = "/storage/emulated/0/SensorPlatform/haarcascade_frontalface_alt.xml";
+    string lbpFaceCascadePath = "/storage/emulated/0/SensorPlatform/lbpcascade_frontalface.xml";
+    string lbpFaceCascadePath2 = "/storage/emulated/0/SensorPlatform/visionary_FACES_01_LBP.xml";
 
     if (initialized == 0) {
-		faceCascade.load(haarFaceCascadePath);
+		faceCascadeHaar.load(haarFaceCascadePath);
+		faceCascadeLBP.load(lbpFaceCascadePath);
+		faceCascadeLBP2.load(lbpFaceCascadePath2);
 		initialized = 1;
     }
 
@@ -62,7 +68,10 @@ JNIEXPORT jintArray Java_mnefzger_de_sensorplatform_Processors_ImageProcessor_nA
     */
 
     vector< Rect > faces;
-    faceCascade.detectMultiScale(gray, faces, 1.1, 2, 0 | CV_HAAR_SCALE_IMAGE, Size(30, 30));
+    //faceCascadeHaar.detectMultiScale(gray, faces, 1.1, 2, 0 | CV_HAAR_SCALE_IMAGE, Size(30, 30));
+    faceCascadeLBP.detectMultiScale( gray, faces, 1.1, 2, 0, Size(30, 30) );
+    //faceCascadeLBP2.detectMultiScale( gray, faces, 1.1, 2, 0, Size(30, 30) );
+
 
     if (faces.size()) {
     	result = env->NewIntArray(4);
@@ -81,7 +90,7 @@ JNIEXPORT jintArray Java_mnefzger_de_sensorplatform_Processors_ImageProcessor_nA
         result = env->NewIntArray(0);
     }
 
-
+    /*
     Mat bgr(gray.rows, gray.cols, CV_8UC3);
     cvtColor(gray, bgr, COLOR_GRAY2BGR);
 
@@ -91,6 +100,7 @@ JNIEXPORT jintArray Java_mnefzger_de_sensorplatform_Processors_ImageProcessor_nA
     Mat* mat = (Mat*) returnadress;
     mat->create(yuv.rows, yuv.cols, CV_8UC1);
     memcpy(mat->data, yuv.data, mat->rows * mat->cols );
+    */
 
     return result;
 }

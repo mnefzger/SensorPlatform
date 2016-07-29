@@ -1,6 +1,7 @@
 package mnefzger.de.sensorplatform;
 
 import android.content.SharedPreferences;
+import android.content.pm.ActivityInfo;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.support.v4.app.Fragment;
@@ -8,7 +9,8 @@ import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
-import android.R.anim;
+
+import com.jakewharton.threetenabp.AndroidThreeTen;
 
 
 public class MainActivity extends AppCompatActivity implements IDataCallback{
@@ -22,16 +24,15 @@ public class MainActivity extends AppCompatActivity implements IDataCallback{
         }
     }
 
-    SensorPlatformController sPC;
     SettingsFragment settings;
     AppFragment app;
     SharedPreferences prefs;
+    SensorPlatformController sPC;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-
 
         prefs = PreferenceManager.getDefaultSharedPreferences(this);
         prefs.edit().clear();
@@ -42,14 +43,17 @@ public class MainActivity extends AppCompatActivity implements IDataCallback{
             PreferenceManager.setDefaultValues(this, R.xml.preferences, false);
         }
 
-        if(sPC == null) sPC = new SensorPlatformController(this);
-
         settings = new SettingsFragment();
         getFragmentManager().beginTransaction().replace(R.id.fragment_container, settings).commit();
 
+        // Backport of the new java8 time
+        AndroidThreeTen.init(getApplication());
+
+        sPC = new SensorPlatformController(this);
     }
 
     public void startMeasuring() {
+        this.setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_REVERSE_LANDSCAPE);
 
         app = new AppFragment();
         changeFragment(app, true, true);
@@ -73,19 +77,19 @@ public class MainActivity extends AppCompatActivity implements IDataCallback{
             sPC.subscribeTo(DataType.CAMERA_RAW);
         }
 
-        sPC.subscribeTo(DataType.OBD);
+        if(Preferences.OBDActivated(prefs)) {
+            sPC.subscribeTo(DataType.OBD);
+        }
 
         sPC.logRawData(false);
         sPC.logEventData(false);
-
-
 
     }
 
 
     @Override
     public void onRawData(DataVector v) {
-         Log.d("RawData @ App  ", v.toString());
+        Log.d("RawData @ App  ", v.toString());
         if( app != null && app.isVisible())
             app.updateUI(v);
     }

@@ -2,18 +2,26 @@ package mnefzger.de.sensorplatform;
 
 
 import android.app.Activity;
+import android.content.SharedPreferences;
 import android.content.pm.ActivityInfo;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.support.v4.app.Fragment;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
+import com.github.pires.obd.commands.SpeedCommand;
+
 import java.text.DecimalFormat;
 
 
 public class AppFragment extends Fragment {
+
+    SensorPlatformController sPC;
+    SharedPreferences prefs;
 
     TextView accX;
     TextView accY;
@@ -43,8 +51,9 @@ public class AppFragment extends Fragment {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setRetainInstance(true);
+
         main = getActivity();
-        main.setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_REVERSE_LANDSCAPE);
+
     }
 
 
@@ -55,7 +64,6 @@ public class AppFragment extends Fragment {
         if (container != null) {
             container.removeViewAt(0);
         }
-
 
         View v = inflater.inflate(R.layout.fragment_app, container, false);
 
@@ -123,5 +131,8 @@ public class AppFragment extends Fragment {
             }
         });
     }
+
+
+
 
 }

@@ -2,7 +2,15 @@
 <PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android"
     android:key="preferences">
 
-        <PreferenceCategory android:title="Sensors and Events">
+        <PreferenceCategory android:title="Sensors">
+            <ListPreference
+                android:summary="The onRawData() and event detection sampling rate in milliseconds"
+                android:defaultValue="@integer/rawData_delay_default"
+                android:entries="@array/rawData_readable"
+                android:entryValues="@array/rawData_values"
+                android:key="frequency_rawData"
+                android:persistent="true"
+                android:title="Raw data sampling rate" />
             <CheckBoxPreference
                 android:key="accelerometer_raw"
                 android:title="Accelerometer Raw Data"
@@ -47,23 +55,22 @@
                 android:defaultValue="true"/>
         </PreferenceCategory>
 
-        <ListPreference
-            android:summary="The onRawData() and event detection sampling rate in milliseconds"
-            android:defaultValue="@integer/rawData_delay_default"
-            android:entries="@array/rawData_readable"
-            android:entryValues="@array/rawData_values"
-            android:key="frequency_rawData"
-            android:persistent="true"
-            android:title="Raw data sampling rate" />
+        <PreferenceCategory android:title="OBD2 Adapter">
+            <CheckBoxPreference
+                android:key="obd_raw"
+                android:title="OBD Raw Data"
+                android:summary="Activate OBD2 connection and vehicle data collection"
+                android:defaultValue="false"/>
+            <ListPreference
+                android:summary="The request rate for OBD2 updates"
+                android:defaultValue="@integer/obdRequest_delay_default"
+                android:entries="@array/obd_readable"
+                android:entryValues="@array/obd_values"
+                android:key="obdRequest_frequency"
+                android:persistent="true"
+                android:title="OBD2 request frequency" />
+        </PreferenceCategory>
 
-        <ListPreference
-            android:summary="The request rate for OBD2 updates"
-            android:defaultValue="@integer/obdRequest_delay_default"
-            android:entries="@array/obd_readable"
-            android:entryValues="@array/obd_values"
-            android:key="obdRequest_frequency"
-            android:persistent="true"
-            android:title="OBD2 request frequency" />
 
         <PreferenceCategory android:title="Acceleration and Braking">
             <ListPreference

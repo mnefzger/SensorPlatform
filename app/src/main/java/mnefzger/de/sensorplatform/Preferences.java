@@ -13,6 +13,8 @@ public class Preferences {
 
     public static final String LOCATION_RAW = "location_raw";
 
+    public static final String OBD_RAW = "location_raw";
+
     public static final String FRONT_CAMERA = "front_active";
 
     public static final String BACK_CAMERA = "back_active";
@@ -74,6 +76,12 @@ public class Preferences {
 
     public static boolean locationActivated(SharedPreferences prefs) {
         boolean value = prefs.getBoolean(LOCATION_RAW, true);
+
+        return value;
+    }
+
+    public static boolean OBDActivated(SharedPreferences prefs) {
+        boolean value = prefs.getBoolean(OBD_RAW, false);
 
         return value;
     }

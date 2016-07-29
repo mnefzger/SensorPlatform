@@ -1,6 +1,7 @@
 package mnefzger.de.sensorplatform;
 
 import android.app.Activity;
+import android.content.BroadcastReceiver;
 import android.content.SharedPreferences;
 import android.hardware.Sensor;
 import android.location.Location;
@@ -160,14 +161,14 @@ public class SensorModule implements ISensorCallback, IEventCallback{
     private void aggregateData(final int ms) {
         DataVector last = current;
 
-
+/*
         Location mock = new Location("mock");
         mock.setLongitude(lon);
         mock.setLatitude(lat);
         last.setLocation(mock);
         lon -= 0.00001;
         lat += 0.00001;
-
+*/
 
         current = new DataVector();
 
@@ -281,5 +282,4 @@ public class SensorModule implements ISensorCallback, IEventCallback{
                 return -1;
         }
     }
-
 }

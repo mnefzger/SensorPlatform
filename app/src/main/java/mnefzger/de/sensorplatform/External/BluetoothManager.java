@@ -63,6 +63,8 @@ public class BluetoothManager {
     }
 
 
+
+
     private static final int USE_BLUETOOTH = 1;
     private static String[] PERMISSION_BLUETOOTH = {
             Manifest.permission.BLUETOOTH,

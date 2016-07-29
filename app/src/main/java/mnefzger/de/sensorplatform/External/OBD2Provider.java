@@ -30,38 +30,14 @@ import mnefzger.de.sensorplatform.Preferences;
 public class OBD2Provider extends DataProvider{
     SharedPreferences prefs;
     ISensorCallback callback;
-    private BluetoothDevice obd2Device;
-    private BluetoothAdapter btAdapter;
-    private BluetoothSocket sock;
     private int OBD_DELAY;
 
-    boolean setupComplete = false;
-
+    private boolean setupComplete = false;
+    private boolean setupRunning = false;
     private Activity app;
 
-    BroadcastReceiver mReceiver = new BroadcastReceiver() {
-        public void onReceive(Context context, Intent intent) {
-            String action = intent.getAction();
-            // When discovery finds a device
-            if (BluetoothDevice.ACTION_FOUND.equals(action)) {
-                // Get the BluetoothDevice object from the Intent
-                BluetoothDevice device = intent.getParcelableExtra(BluetoothDevice.EXTRA_DEVICE);
+    private final String TAG = "OBD_BLUETOOTH";
 
-                if(device != null) {
-                    Log.d("Discovery", device + "");
-                    if(device.getName() != null && device.getName().equals("OBDII")) {
-                        obd2Device = device;
-                        btAdapter.cancelDiscovery();
-                        app.unregisterReceiver(mReceiver);
-                        Log.d("RECEIVER", "unregistered");
-                        connectToOBD2Device();
-                    }
-                }
-
-
-            }
-        }
-    };
 
     public OBD2Provider(Activity app, ISensorCallback callback) {
         BluetoothManager.verifyBluetoothPermissions(app);
@@ -70,64 +46,14 @@ public class OBD2Provider extends DataProvider{
 
         prefs = PreferenceManager.getDefaultSharedPreferences(app);
         OBD_DELAY = Preferences.getOBDDelay(prefs);
+
+        Log.d(TAG, "init");
     }
 
-    private void searchForOBD2Device() {
-        btAdapter = BluetoothAdapter.getDefaultAdapter();
-        IntentFilter filter = new IntentFilter(BluetoothDevice.ACTION_FOUND);
-
-        app.registerReceiver(mReceiver, filter);
-
-        Log.d("BLUETOOTH", "Start discovery...");
-        btAdapter.startDiscovery();
-    }
-
-    private void connectToOBD2Device() {
-        try{
-            sock = BluetoothManager.connect(obd2Device);
-            Log.d("BLUETOOTH", "Connected to: " + obd2Device.getName() + "-> " + sock.isConnected());
-
-            new Thread(new Runnable() {
-                @Override
-                public void run() {
-                    try { Thread.sleep(1000); } catch (InterruptedException e) { e.printStackTrace(); }
-
-                     /* Setup */
-                    runCommand(sock, "ATD");
-                    runCommand(sock, "ATZ");
-                    runCommand(sock, "ATZ");
-                    runCommand(sock, "ATZ");
-                    runCommand(sock, "ATZ");
-                    runCommand(sock, "AT E0");
-                    runCommand(sock, "AT L0");
-                    runCommand(sock, "AT S0");
-                    runCommand(sock, "AT H0");
-
-                    SpeedCommand cmd = new SpeedCommand();
-                    runCommand(sock, cmd);
-
-                    RPMCommand rpm_cmd = new RPMCommand();
-                    runCommand(sock, rpm_cmd);
-
-                    setupComplete = true;
-                }
-            }).start();
-
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-    }
 
     public void start() {
         super.start();
-        if(obd2Device == null) {
-            new Thread(new Runnable() {
-                @Override
-                public void run() {
-                    searchForOBD2Device();
-                }
-            }).start();
-        }
+
         collectOBDData();
     }
 
@@ -137,20 +63,54 @@ public class OBD2Provider extends DataProvider{
 
     // Is called in case of IOException with broken pipe
     public void reset() {
-        Log.d("BLUETOOTH", "reset");
-        sock = null;
-        searchForOBD2Device();
+        Log.d(TAG, "reset");
+        OBDConnection.sock = null;
+        setupComplete = false;
+        new OBDConnector(app);
+    }
+
+    private void setup() {
+        setupRunning = true;
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                try { Thread.sleep(1000); } catch (InterruptedException e) { e.printStackTrace(); }
+                /* Setup */
+                runCommand(OBDConnection.sock, "ATD");
+                runCommand(OBDConnection.sock, "ATZ");
+                runCommand(OBDConnection.sock, "ATZ");
+                runCommand(OBDConnection.sock, "ATZ");
+                runCommand(OBDConnection.sock, "ATZ");
+                runCommand(OBDConnection.sock, "AT E0");
+                runCommand(OBDConnection.sock, "AT L0");
+                runCommand(OBDConnection.sock, "AT S0");
+                runCommand(OBDConnection.sock, "AT H0");
+
+                SpeedCommand cmd = new SpeedCommand();
+                runCommand(OBDConnection.sock, cmd);
+
+                RPMCommand rpm_cmd = new RPMCommand();
+                runCommand(OBDConnection.sock, rpm_cmd);
+
+                setupComplete = true;
+                setupRunning = false;
+            }
+        }).start();
     }
 
     private void collectOBDData() {
         new Timer().schedule(new TimerTask() {
             @Override
             public void run() {
-                if(sock != null && sock.isConnected() && setupComplete) {
+                if(OBDConnection.sock != null && OBDConnection.sock.isConnected()) {
                     new Thread(new Runnable() {
                         @Override
                         public void run() {
-                            requestData();
+                            if(setupComplete)
+                                requestData();
+                            else {
+                                if(!setupRunning) setup();
+                            }
                         }
                     }).start();
                 }
@@ -162,10 +122,10 @@ public class OBD2Provider extends DataProvider{
 
     private void requestData() {
         SpeedCommand cmd = new SpeedCommand();
-        runCommand(sock, cmd);
+        runCommand(OBDConnection.sock, cmd);
 
         RPMCommand rpm_cmd = new RPMCommand();
-        runCommand(sock, rpm_cmd);
+        runCommand(OBDConnection.sock, rpm_cmd);
 
         try { Thread.sleep(25); } catch (InterruptedException e) { e.printStackTrace(); }
 
@@ -178,7 +138,7 @@ public class OBD2Provider extends DataProvider{
     }
 
     public void runCommand(BluetoothSocket s, String cmd) {
-        if(obd2Device != null) {
+        if(OBDConnection.obd2Device != null) {
             try{
                 mRun(cmd, s.getInputStream(), s.getOutputStream());
             } catch (Exception e) {
@@ -188,10 +148,9 @@ public class OBD2Provider extends DataProvider{
     }
 
     public void runCommand(BluetoothSocket s, ObdCommand cmd) {
-        if(obd2Device != null) {
+        if(OBDConnection.obd2Device != null) {
             try{
                 cmd.run(s.getInputStream(), s.getOutputStream());
-                Log.d("OBD", cmd.getFormattedResult());
             } catch (IOException io) {
                 if(io.getMessage().contains("Broken pipe")) {
                     reset();
@@ -249,4 +208,5 @@ public class OBD2Provider extends DataProvider{
 
         return rawData;
     }
+
 }

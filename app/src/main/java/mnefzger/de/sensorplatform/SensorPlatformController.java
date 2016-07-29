@@ -1,11 +1,13 @@
 package mnefzger.de.sensorplatform;
 
 import android.app.Activity;
+import android.content.BroadcastReceiver;
 import android.content.SharedPreferences;
 import android.preference.PreferenceManager;
 
 import java.util.Iterator;
 
+import mnefzger.de.sensorplatform.External.OBDConnector;
 import mnefzger.de.sensorplatform.Logger.LoggingModule;
 
 public class SensorPlatformController implements IDataCallback{
@@ -26,6 +28,9 @@ public class SensorPlatformController implements IDataCallback{
         this.im = new ImageModule(this, app);
         this.appCallback = (IDataCallback) app;
 
+        // start OBD connection setup
+        if(Preferences.OBDActivated(prefs))
+            new OBDConnector(app);
     }
 
     public boolean subscribeTo(DataType type) {

@@ -2,11 +2,16 @@ package mnefzger.de.sensorplatform;
 
 import android.location.Location;
 
+import com.jakewharton.threetenabp.AndroidThreeTen;
+
+import org.threeten.bp.Instant;
+
 /**
  * Created by matthias on 20/06/16.
  */
 public class DataVector {
     public long timestamp;
+    public String dateTime;
     /**
      * Three axis acceleration
      */
@@ -34,11 +39,15 @@ public class DataVector {
     public double rpm;
 
     public DataVector() {
-
+        setDateTime();
     }
 
     public void setTimestamp(long time) {
         this.timestamp = time;
+    }
+
+    public void setDateTime() {
+        this.dateTime = Instant.now().toString();
     }
 
     public void setAcc(double x, double y, double z) {
@@ -75,7 +84,7 @@ public class DataVector {
 
     @Override
     public String toString() {
-        return "time: " + timestamp + ", accX: " + accX + ", accY: " + accY + ", accZ: " + accZ +
+        return "time: " + timestamp + ", date: " + dateTime + ", accX: " + accX + ", accY: " + accY + ", accZ: " + accZ +
                 ", rotX: " + rotX + ", rotY: " + rotY + ", rotZ: " + rotZ +", speed: " + speed +
                 ", OBD speed: " + obdSpeed + ", rpm: " + rpm;
     }
@@ -83,7 +92,7 @@ public class DataVector {
     public String toCSVString() {
         double lat = (location == null) ? 0 : location.getLatitude();
         double lon = (location == null) ? 0 : location.getLongitude();
-        return timestamp + ";" + accX + ";" + accY + ";" + accZ + ";" +
+        return timestamp + ";" + dateTime + ";" + accX + ";" + accY + ";" + accZ + ";" +
                 rotX + ";" + rotY + ";" + rotZ + ";" +
                 lat + ";" + lon + ";" + speed + ";" + obdSpeed + ";" + rpm;
     }

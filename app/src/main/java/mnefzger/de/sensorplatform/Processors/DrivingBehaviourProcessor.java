@@ -163,7 +163,7 @@ public class DrivingBehaviourProcessor extends EventProcessor implements IOSMRes
         // determine the direction of movement on the road, necessary for traffic_signs
         if(lastRecognizedRoad != null) {
             currentDirection = getDirectionOfMovement();
-            Log.d("DIRECTION", currentDirection+"");
+            Log.d("DIRECTION", currentDirection+", " + lastRecognizedRoad.tags.name);
         }
 
     }
@@ -190,6 +190,7 @@ public class DrivingBehaviourProcessor extends EventProcessor implements IOSMRes
         if(road != null) {
             lastRecognizedRoad = road;
             qAdapter.startSearchForSpeedLimit(currentVector.location);
+            callback.onEventDetected(new EventVector(System.currentTimeMillis(), "ROAD: You are on " + lastRecognizedRoad.tags.name, 0));
         } else {
             lastRecognizedRoad = null;
             callback.onEventDetected(new EventVector(System.currentTimeMillis(), "ROAD: No road detected", 0));
@@ -235,8 +236,6 @@ public class DrivingBehaviourProcessor extends EventProcessor implements IOSMRes
                 callback.onEventDetected(new EventVector(System.currentTimeMillis(), "ROAD: You are on " + lastRecognizedRoad.tags.name + ", Current SpeedLimit: " + lastRecognizedRoad.tags.maxspeed + ", upcoming: " + nextSpeedSign.tags.maxspeed, 0));
             else
                 callback.onEventDetected(new EventVector(System.currentTimeMillis(), "ROAD: You are on " + lastRecognizedRoad.tags.name + ", Current SpeedLimit: " + lastRecognizedRoad.tags.maxspeed, 0));
-        } else {
-            callback.onEventDetected(new EventVector(System.currentTimeMillis(), "ROAD: You are on " + lastRecognizedRoad.tags.name, 0));
         }
 
     }

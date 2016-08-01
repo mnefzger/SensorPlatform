@@ -156,19 +156,19 @@ public class SensorModule implements ISensorCallback, IEventCallback{
         }
     }
 
-    double lon = 153.015722;
-    double lat = -27.451605;
+    double lon = 153.015858;
+    double lat = -27.447945;
     private void aggregateData(final int ms) {
         DataVector last = current;
 
-/*
+
         Location mock = new Location("mock");
         mock.setLongitude(lon);
         mock.setLatitude(lat);
         last.setLocation(mock);
         lon -= 0.00001;
         lat += 0.00001;
-*/
+
 
         current = new DataVector();
 

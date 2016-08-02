@@ -22,13 +22,12 @@ public abstract class EventProcessor {
 
     public List<DataVector> getLastData(int ms) {
         if( !(data.get(0).timestamp == 0) && data.size() > 1 ) {
+
             // time between last and first entry
             long totalTime = data.get(data.size() - 1).timestamp - data.get(0).timestamp;
-            //Log.d("SAMPLING total", totalTime + " ms");
 
             // average time between each entry
             long deltaTime = totalTime / data.size();
-            //Log.d("SAMPLING delta", deltaTime + " ms");
 
             double samplingRate = 1000 / deltaTime;
             //Log.d("SAMPLING rate", samplingRate + " Hz");

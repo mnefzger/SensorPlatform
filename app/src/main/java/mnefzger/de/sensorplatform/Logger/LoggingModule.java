@@ -53,56 +53,33 @@ public class LoggingModule {
     public void writeRawToCSV(DataVector v) {
         String[] line = { v.toCSVString() };
 
-        try {
-            if(!isExternalStorageWritable())  {
-                throw new IOException("External storage not writable!");
-            }
-            CSVWriter writer = new CSVWriter(new FileWriter(rawFile, true), CSVWriter.DEFAULT_SEPARATOR, CSVWriter.NO_QUOTE_CHARACTER,CSVWriter.DEFAULT_LINE_END);
-            writer.writeNext(line);
-            writer.close();
-        } catch (IOException e) {
-            System.err.println("Caught IOException: " +  e.getMessage());
-        }
+        write(rawFile, line);
     }
 
     public void writeEventToCSV(EventVector v) {
         String[] line = { v.toCSVString() };
 
-        try {
-            if(!isExternalStorageWritable())  {
-                throw new IOException("External storage not writable!");
-            }
-            CSVWriter writer = new CSVWriter(new FileWriter(eventFile, true), CSVWriter.DEFAULT_SEPARATOR, CSVWriter.NO_QUOTE_CHARACTER,CSVWriter.DEFAULT_LINE_END);
-            writer.writeNext(line);
-            writer.close();
-        } catch (IOException e) {
-            System.err.println("Caught IOException: " +  e.getMessage());
-        }
+        write(eventFile, line);
     }
 
     private void createHeadersRaw() {
         String[] line = { "timestamp;dateTime;accelerationX;accelerationY;accelerationZ;rotationX;rotationY;rotationZ;latitude;longitude;GPS speed;OBD speed;OBD RPM" };
 
-        try {
-            if(!isExternalStorageWritable())  {
-                throw new IOException("External storage not writable!");
-            }
-            CSVWriter writer = new CSVWriter(new FileWriter(rawFile, true), CSVWriter.DEFAULT_SEPARATOR, CSVWriter.NO_QUOTE_CHARACTER,CSVWriter.DEFAULT_LINE_END);
-            writer.writeNext(line);
-            writer.close();
-        } catch (IOException e) {
-            System.err.println("Caught IOException: " +  e.getMessage());
-        }
+        write(rawFile, line);
     }
 
     private void createHeadersEvent() {
         String[] line = { "timestamp;description;value" };
 
+        write(eventFile, line);
+    }
+
+    private void write(File file, String[] line) {
         try {
             if(!isExternalStorageWritable())  {
                 throw new IOException("External storage not writable!");
             }
-            CSVWriter writer = new CSVWriter(new FileWriter(rawFile, true), CSVWriter.DEFAULT_SEPARATOR, CSVWriter.NO_QUOTE_CHARACTER,CSVWriter.DEFAULT_LINE_END);
+            CSVWriter writer = new CSVWriter(new FileWriter(file, true), CSVWriter.DEFAULT_SEPARATOR, CSVWriter.NO_QUOTE_CHARACTER,CSVWriter.DEFAULT_LINE_END);
             writer.writeNext(line);
             writer.close();
         } catch (IOException e) {
@@ -111,7 +88,7 @@ public class LoggingModule {
     }
 
     /* Checks if external storage is available for read and write */
-    public boolean isExternalStorageWritable() {
+    private boolean isExternalStorageWritable() {
         String state = Environment.getExternalStorageState();
         if (Environment.MEDIA_MOUNTED.equals(state)) {
             return true;
@@ -133,7 +110,7 @@ public class LoggingModule {
      *
      * @param activity
      */
-    public static void verifyStoragePermissions(Activity activity) {
+    private static void verifyStoragePermissions(Activity activity) {
         // Check if we have write permission
         int permission = ActivityCompat.checkSelfPermission(activity, Manifest.permission.WRITE_EXTERNAL_STORAGE);
 

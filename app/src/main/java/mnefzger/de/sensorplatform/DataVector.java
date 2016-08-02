@@ -5,6 +5,8 @@ import android.location.Location;
 import com.jakewharton.threetenabp.AndroidThreeTen;
 
 import org.threeten.bp.Instant;
+import org.threeten.bp.LocalDateTime;
+import org.threeten.bp.ZoneId;
 
 /**
  * Created by matthias on 20/06/16.
@@ -47,7 +49,8 @@ public class DataVector {
     }
 
     public void setDateTime() {
-        this.dateTime = Instant.now().toString();
+        Instant now = Instant.now();
+        this.dateTime = LocalDateTime.ofInstant(now, ZoneId.systemDefault()).toString();
     }
 
     public void setAcc(double x, double y, double z) {

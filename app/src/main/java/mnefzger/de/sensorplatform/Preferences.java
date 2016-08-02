@@ -54,6 +54,11 @@ public class Preferences {
     public static final String BACK_PROCESSING_FPS = "back_processing_fps";
 
 
+    public static final String LOGGING_RAW = "logging_raw";
+
+    public static final String LOGGING_EVENT = "logging_event";
+
+
 
     private static Context context = null;
 
@@ -355,6 +360,16 @@ public class Preferences {
         return value;
     }
 
+    public static boolean rawLoggingActivated(SharedPreferences prefs) {
+        boolean value = prefs.getBoolean(LOGGING_RAW, false);
 
+        return value;
+    }
+
+    public static boolean eventLoggingActivated(SharedPreferences prefs) {
+        boolean value = prefs.getBoolean(LOGGING_EVENT, false);
+
+        return value;
+    }
 
 }

@@ -37,10 +37,12 @@ public class LoggingModule {
             rawFile = new File(filePath + File.separator + fileNameRaw);
             if(!rawFile.exists()) {
                 rawFile.createNewFile();
+                createHeadersRaw();
             }
             eventFile = new File(filePath + File.separator + fileNameEvent);
             if(!rawFile.exists()) {
                 eventFile.createNewFile();
+                createHeadersEvent();
             }
         } catch (IOException e) {
             e.printStackTrace();
@@ -78,6 +80,35 @@ public class LoggingModule {
         }
     }
 
+    private void createHeadersRaw() {
+        String[] line = { "timestamp;dateTime;accelerationX;accelerationY;accelerationZ;rotationX;rotationY;rotationZ;latitude;longitude;GPS speed;OBD speed;OBD RPM" };
+
+        try {
+            if(!isExternalStorageWritable())  {
+                throw new IOException("External storage not writable!");
+            }
+            CSVWriter writer = new CSVWriter(new FileWriter(rawFile, true), CSVWriter.DEFAULT_SEPARATOR, CSVWriter.NO_QUOTE_CHARACTER,CSVWriter.DEFAULT_LINE_END);
+            writer.writeNext(line);
+            writer.close();
+        } catch (IOException e) {
+            System.err.println("Caught IOException: " +  e.getMessage());
+        }
+    }
+
+    private void createHeadersEvent() {
+        String[] line = { "timestamp;description;value" };
+
+        try {
+            if(!isExternalStorageWritable())  {
+                throw new IOException("External storage not writable!");
+            }
+            CSVWriter writer = new CSVWriter(new FileWriter(rawFile, true), CSVWriter.DEFAULT_SEPARATOR, CSVWriter.NO_QUOTE_CHARACTER,CSVWriter.DEFAULT_LINE_END);
+            writer.writeNext(line);
+            writer.close();
+        } catch (IOException e) {
+            System.err.println("Caught IOException: " +  e.getMessage());
+        }
+    }
 
     /* Checks if external storage is available for read and write */
     public boolean isExternalStorageWritable() {

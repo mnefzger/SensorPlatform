@@ -55,6 +55,19 @@
                 android:defaultValue="true"/>
         </PreferenceCategory>
 
+        <PreferenceCategory android:title="CSV Logging">
+            <CheckBoxPreference
+                android:key="logging_raw"
+                android:title="Log Raw Data"
+                android:summary="Writes all raw data values to a csv file"
+                android:defaultValue="false"/>
+            <CheckBoxPreference
+                android:key="logging_event"
+                android:title="Log Event Data"
+                android:summary="Writes all events to a csv file"
+                android:defaultValue="false"/>
+        </PreferenceCategory>
+
         <PreferenceCategory android:title="OBD2 Adapter">
             <CheckBoxPreference
                 android:key="obd_raw"

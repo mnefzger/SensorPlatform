@@ -81,8 +81,13 @@ public class MainActivity extends AppCompatActivity implements IDataCallback{
             sPC.subscribeTo(DataType.OBD);
         }
 
-        sPC.logRawData(false);
-        sPC.logEventData(false);
+        if(Preferences.rawLoggingActivated(prefs)) {
+            sPC.logRawData(true);
+        }
+
+        if(Preferences.eventLoggingActivated(prefs)) {
+            sPC.logEventData(true);
+        }
 
     }
 

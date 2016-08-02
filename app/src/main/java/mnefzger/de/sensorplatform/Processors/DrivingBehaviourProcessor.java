@@ -161,7 +161,7 @@ public class DrivingBehaviourProcessor extends EventProcessor implements IOSMRes
         }
 
         // determine the direction of movement on the road, necessary for traffic_signs
-        if(lastRecognizedRoad != null) {
+        if(lastRecognizedRoad != null && lastRecognizedRoad.tags != null) {
             currentDirection = getDirectionOfMovement();
             Log.d("DIRECTION", currentDirection+", " + lastRecognizedRoad.tags.name);
         }

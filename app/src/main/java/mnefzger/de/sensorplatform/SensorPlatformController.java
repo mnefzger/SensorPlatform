@@ -30,7 +30,7 @@ public class SensorPlatformController implements IDataCallback{
 
         // start OBD connection setup
         if(Preferences.OBDActivated(prefs) && OBD2Connection.connected == false)
-            new OBD2Connector(app);
+            OBD2Connection.connector = new OBD2Connector(app);
     }
 
     public boolean subscribeTo(DataType type) {

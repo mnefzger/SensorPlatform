@@ -59,7 +59,7 @@ public class OBD2Provider extends DataProvider{
         Log.d(TAG, "reset");
         OBD2Connection.sock = null;
         setupComplete = false;
-        new OBD2Connector(app);
+        OBD2Connection.connector = new OBD2Connector(app);
     }
 
     private void setup() {

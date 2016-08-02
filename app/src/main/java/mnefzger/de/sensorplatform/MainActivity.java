@@ -12,6 +12,8 @@ import android.util.Log;
 
 import com.jakewharton.threetenabp.AndroidThreeTen;
 
+import mnefzger.de.sensorplatform.External.OBD2Connection;
+
 
 public class MainActivity extends AppCompatActivity implements IDataCallback{
 
@@ -94,7 +96,7 @@ public class MainActivity extends AppCompatActivity implements IDataCallback{
 
     @Override
     public void onRawData(DataVector v) {
-        Log.d("RawData @ App  ", v.toString());
+        //Log.d("RawData @ App  ", v.toString());
         if( app != null && app.isVisible())
             app.updateUI(v);
     }
@@ -135,6 +137,12 @@ public class MainActivity extends AppCompatActivity implements IDataCallback{
         } catch (IllegalStateException exception) {
             Log.w("FRAGMENT", "Unable to commit fragment, could be activity as been killed in background. " + exception.toString());
         }
+    }
+
+    @Override
+    public void onPause() {
+        OBD2Connection.connector.unregisterReceiver();
+        super.onPause();
     }
 
 }

@@ -11,4 +11,5 @@ public class OBD2Connection {
     public static BluetoothSocket sock;
     public static BluetoothDevice obd2Device;
     public static boolean connected = false;
+    public static OBD2Connector connector;
 }

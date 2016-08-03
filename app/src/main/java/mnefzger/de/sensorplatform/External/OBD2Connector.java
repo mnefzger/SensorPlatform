@@ -63,7 +63,8 @@ public class OBD2Connector {
     }
 
     public void unregisterReceiver() {
-        app.unregisterReceiver(mReceiver);
+        if(receiverRegistered)
+            app.unregisterReceiver(mReceiver);
         receiverRegistered = false;
     }
 

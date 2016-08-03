@@ -69,7 +69,7 @@ public class ImageModule implements IEventCallback{
     static boolean frontSaving = false;
 
 
-    public ImageModule(SensorPlatformController controller, Activity app) {
+    public ImageModule(SensorPlatformController controller, Context app) {
         verifyCameraPermissions(app);
         context = app;
         callback = controller;
@@ -565,15 +565,15 @@ public class ImageModule implements IEventCallback{
     /**
      * Checks if the app has permission to write to device storage
      * If the app does not has permission then the user will be prompted to grant permissions
-     * @param activity
+     * @param context
      */
-    public static void verifyCameraPermissions(Activity activity) {
+    public static void verifyCameraPermissions(Context context) {
         // Check if we have write permission
-        int permission = ActivityCompat.checkSelfPermission(activity, Manifest.permission.CAMERA);
+        int permission = ActivityCompat.checkSelfPermission(context, Manifest.permission.CAMERA);
 
         if (permission != PackageManager.PERMISSION_GRANTED) {
             // We don't have permission so prompt the user
-            ActivityCompat.requestPermissions(activity,
+            ActivityCompat.requestPermissions((Activity)context,
                     PERMISSIONS_CAMERA, REQUEST_CAMERA);
         }
     }

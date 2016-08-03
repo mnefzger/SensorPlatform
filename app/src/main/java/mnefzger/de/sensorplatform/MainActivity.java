@@ -1,8 +1,14 @@
 package mnefzger.de.sensorplatform;
 
+import android.app.Activity;
+import android.content.ComponentName;
+import android.content.Context;
+import android.content.Intent;
+import android.content.ServiceConnection;
 import android.content.SharedPreferences;
 import android.content.pm.ActivityInfo;
 import android.os.Bundle;
+import android.os.IBinder;
 import android.preference.PreferenceManager;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
@@ -30,6 +36,8 @@ public class MainActivity extends AppCompatActivity implements IDataCallback{
     AppFragment app;
     SharedPreferences prefs;
     SensorPlatformController sPC;
+    boolean mBound = false;
+    boolean started = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -51,52 +59,25 @@ public class MainActivity extends AppCompatActivity implements IDataCallback{
         // Backport of the new java8 time
         AndroidThreeTen.init(getApplication());
 
-        sPC = new SensorPlatformController(this);
     }
 
     public void startMeasuring() {
         this.setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_REVERSE_LANDSCAPE);
 
+        started = true;
+
         app = new AppFragment();
         changeFragment(app, true, true);
 
-        if(Preferences.accelerometerActivated(prefs)) {
-            sPC.subscribeTo(DataType.ACCELERATION_RAW);
-            sPC.subscribeTo(DataType.ACCELERATION_EVENT);
-        }
-
-        if(Preferences.rotationActivated(prefs)) {
-            sPC.subscribeTo(DataType.ROTATION_RAW);
-            sPC.subscribeTo(DataType.ROTATION_EVENT);
-        }
-
-        if(Preferences.locationActivated(prefs)) {
-            sPC.subscribeTo(DataType.LOCATION_RAW);
-            sPC.subscribeTo(DataType.LOCATION_EVENT);
-        }
-
-        if(Preferences.frontCameraActivated(prefs) || Preferences.backCameraActivated(prefs)) {
-            sPC.subscribeTo(DataType.CAMERA_RAW);
-        }
-
-        if(Preferences.OBDActivated(prefs)) {
-            sPC.subscribeTo(DataType.OBD);
-        }
-
-        if(Preferences.rawLoggingActivated(prefs)) {
-            sPC.logRawData(true);
-        }
-
-        if(Preferences.eventLoggingActivated(prefs)) {
-            sPC.logEventData(true);
-        }
+        Intent intent = new Intent(this, SensorPlatformController.class);
+        startService(intent);
+        bindService(intent, mConnection, Context.BIND_AUTO_CREATE);
 
     }
 
-
     @Override
     public void onRawData(DataVector v) {
-        //Log.d("RawData @ App  ", v.toString());
+        Log.d("RawData @ App  ", v.toString());
         if( app != null && app.isVisible())
             app.updateUI(v);
     }
@@ -139,10 +120,49 @@ public class MainActivity extends AppCompatActivity implements IDataCallback{
         }
     }
 
+    IDataCallback getActivity() {
+        return this;
+    }
+
+    private ServiceConnection mConnection = new ServiceConnection() {
+
+        @Override
+        public void onServiceConnected(ComponentName className,
+                                       IBinder service) {
+            Log.d("CONNECTED", "fuck yeah");
+            // We've bound to LocalService, cast the IBinder and get SensorPlatformController instance
+            SensorPlatformController.LocalBinder binder = (SensorPlatformController.LocalBinder) service;
+            sPC = binder.getService();
+            mBound = true;
+            sPC.setAppCallback(getActivity());
+        }
+
+        @Override
+        public void onServiceDisconnected(ComponentName arg0) {
+            mBound = false;
+        }
+    };
+
     @Override
-    public void onPause() {
-        OBD2Connection.connector.unregisterReceiver();
-        super.onPause();
+    public void onDestroy() {
+        if(OBD2Connection.connector != null)
+            OBD2Connection.connector.unregisterReceiver();
+        unbindService(mConnection);
+        mBound = false;
+        if(sPC != null)
+            sPC.setAppCallback(null);
+        super.onDestroy();
+    }
+
+    @Override
+    public void onResume() {
+        if(!mBound && started) {
+            Intent intent = new Intent(this, SensorPlatformController.class);
+            bindService(intent, mConnection, Context.BIND_AUTO_CREATE);
+            Log.d("RESUME", sPC + "");
+        }
+
+        super.onResume();
     }
 
 }

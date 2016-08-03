@@ -62,7 +62,7 @@ public class Preferences {
 
     private static Context context = null;
 
-    public static void setContext(Activity app) {
+    public static void setContext(Context app) {
         context = app.getApplicationContext();
     }
 

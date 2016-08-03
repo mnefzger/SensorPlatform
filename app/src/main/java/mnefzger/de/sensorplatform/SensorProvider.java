@@ -17,7 +17,7 @@ public abstract class SensorProvider extends DataProvider implements SensorEvent
 
     protected SensorManager sensorManager;
 
-    SensorProvider(Activity app, SensorModule m) {
+    SensorProvider(Context app, SensorModule m) {
         this.context = app.getApplicationContext();
         sensorManager = (SensorManager) context.getSystemService(Context.SENSOR_SERVICE);
         sensorCallback = m;

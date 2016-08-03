@@ -2,6 +2,7 @@ package mnefzger.de.sensorplatform.External;
 
 import android.app.Activity;
 import android.bluetooth.BluetoothSocket;
+import android.content.Context;
 import android.content.SharedPreferences;
 import android.preference.PreferenceManager;
 import android.util.Log;
@@ -28,12 +29,12 @@ public class OBD2Provider extends DataProvider{
 
     private boolean setupComplete = false;
     private boolean setupRunning = false;
-    private Activity app;
+    private Context app;
 
     private final String TAG = "OBD_BLUETOOTH";
 
 
-    public OBD2Provider(Activity app, ISensorCallback callback) {
+    public OBD2Provider(Context app, ISensorCallback callback) {
         BluetoothManager.verifyBluetoothPermissions(app);
         this.callback = callback;
         this.app = app;

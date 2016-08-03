@@ -1,6 +1,7 @@
 package mnefzger.de.sensorplatform;
 
 import android.app.Activity;
+import android.content.Context;
 import android.hardware.Sensor;
 import android.hardware.SensorEvent;
 
@@ -26,7 +27,7 @@ public class AccelerometerProvider extends SensorProvider {
     private float timestampOld = System.nanoTime();
     private int count = 0;
 
-    public AccelerometerProvider(Activity a, SensorModule m) {
+    public AccelerometerProvider(Context a, SensorModule m) {
         super(a, m);
     }
 

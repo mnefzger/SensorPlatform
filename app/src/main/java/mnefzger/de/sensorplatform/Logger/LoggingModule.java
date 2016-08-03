@@ -2,6 +2,7 @@ package mnefzger.de.sensorplatform.Logger;
 
 import android.Manifest;
 import android.app.Activity;
+import android.content.Context;
 import android.content.pm.PackageManager;
 import android.os.Environment;
 import android.support.v4.app.ActivityCompat;
@@ -27,7 +28,7 @@ public class LoggingModule {
     File rawFile;
     File eventFile;
 
-    public LoggingModule(Activity app) {
+    public LoggingModule(Context app) {
         verifyStoragePermissions(app);
         try {
             File folder = new File(filePath);
@@ -108,16 +109,16 @@ public class LoggingModule {
      *
      * If the app does not has permission then the user will be prompted to grant permissions
      *
-     * @param activity
+     * @param context
      */
-    private static void verifyStoragePermissions(Activity activity) {
+    private static void verifyStoragePermissions(Context context) {
         // Check if we have write permission
-        int permission = ActivityCompat.checkSelfPermission(activity, Manifest.permission.WRITE_EXTERNAL_STORAGE);
+        int permission = ActivityCompat.checkSelfPermission(context, Manifest.permission.WRITE_EXTERNAL_STORAGE);
 
         if (permission != PackageManager.PERMISSION_GRANTED) {
             // We don't have permission so prompt the user
             ActivityCompat.requestPermissions(
-                    activity,
+                    (Activity)context,
                     PERMISSIONS_STORAGE,
                     REQUEST_EXTERNAL_STORAGE
             );

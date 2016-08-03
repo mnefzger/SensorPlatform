@@ -2,6 +2,7 @@ package mnefzger.de.sensorplatform;
 
 import android.app.Activity;
 import android.content.BroadcastReceiver;
+import android.content.Context;
 import android.content.SharedPreferences;
 import android.hardware.Sensor;
 import android.location.Location;
@@ -69,7 +70,7 @@ public class SensorModule implements ISensorCallback, IEventCallback{
     private final int OBD_IDENTIFIER = 101;
 
 
-    public SensorModule(IDataCallback callback, Activity app) {
+    public SensorModule(IDataCallback callback, Context app) {
         prefs = PreferenceManager.getDefaultSharedPreferences(app);
         this.callback = callback;
 

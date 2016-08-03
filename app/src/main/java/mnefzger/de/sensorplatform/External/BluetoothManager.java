@@ -9,6 +9,7 @@ import android.app.Activity;
 import android.bluetooth.BluetoothDevice;
 import android.bluetooth.BluetoothServerSocket;
 import android.bluetooth.BluetoothSocket;
+import android.content.Context;
 import android.content.pm.PackageManager;
 import android.support.v4.app.ActivityCompat;
 import android.util.Log;
@@ -73,15 +74,15 @@ public class BluetoothManager {
     /**
      * Checks if the app has permission to write to device storage
      * If the app does not has permission then the user will be prompted to grant permissions
-     * @param activity
+     * @param context
      */
-    public static void verifyBluetoothPermissions(Activity activity) {
+    public static void verifyBluetoothPermissions(Context context) {
         // Check if we have write permission
-        int permission = ActivityCompat.checkSelfPermission(activity, Manifest.permission.BLUETOOTH);
+        int permission = ActivityCompat.checkSelfPermission(context, Manifest.permission.BLUETOOTH);
 
         if (permission != PackageManager.PERMISSION_GRANTED) {
             // We don't have permission so prompt the user
-            ActivityCompat.requestPermissions(activity,
+            ActivityCompat.requestPermissions((Activity)context,
                     PERMISSION_BLUETOOTH, USE_BLUETOOTH);
         }
     }

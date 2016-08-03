@@ -16,7 +16,7 @@ import java.io.IOException;
  * It stores the device and socket in the class variables of OBD2Connection
  */
 public class OBD2Connector {
-    private Activity app;
+    private Context app;
     private final String TAG = "OBD_CONNECTOR";
 
     private boolean receiverRegistered = false;
@@ -51,7 +51,7 @@ public class OBD2Connector {
     };
 
 
-    public OBD2Connector(Activity app) {
+    public OBD2Connector(Context app) {
         this.app = app;
 
         btAdapter = BluetoothAdapter.getDefaultAdapter();

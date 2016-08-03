@@ -1,6 +1,7 @@
 package mnefzger.de.sensorplatform.Processors;
 
 import android.app.Activity;
+import android.content.Context;
 import android.content.SharedPreferences;
 import android.hardware.SensorManager;
 import android.preference.PreferenceManager;
@@ -40,7 +41,7 @@ public class DrivingBehaviourProcessor extends EventProcessor implements IOSMRes
     private int OSM_REQUEST_RATE;
 
 
-    public DrivingBehaviourProcessor(SensorModule m, Activity a) {
+    public DrivingBehaviourProcessor(SensorModule m, Context a) {
         super(m);
         qAdapter = new OSMQueryAdapter(this, a);
         prefs = PreferenceManager.getDefaultSharedPreferences(a);

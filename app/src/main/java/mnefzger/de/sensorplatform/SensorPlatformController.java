@@ -1,6 +1,8 @@
 package mnefzger.de.sensorplatform;
 
 import android.app.Activity;
+import android.app.Notification;
+import android.app.PendingIntent;
 import android.app.Service;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -92,7 +94,7 @@ public class SensorPlatformController extends Service implements IDataCallback{
     public void onRawData(DataVector dv) {
         if(appCallback != null)
             appCallback.onRawData(dv);
-        Log.d("RawData @ Service", dv.toString());
+        //Log.d("RawData @ Service", dv.toString());
         if(ActiveSubscriptions.rawLoggingActive()) {
             lm.writeRawToCSV(dv);
         }
@@ -147,6 +149,18 @@ public class SensorPlatformController extends Service implements IDataCallback{
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
+        Notification note = new Notification(R.drawable.inertial,
+                "Data collection running.",
+                System.currentTimeMillis());
+        Intent i = new Intent(this, MainActivity.class);
+
+        i.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP|
+                Intent.FLAG_ACTIVITY_SINGLE_TOP);
+
+        note.flags|=Notification.FLAG_NO_CLEAR;
+
+        startForeground(1337, note);
+
         return START_STICKY;
     }
 
@@ -165,10 +179,6 @@ public class SensorPlatformController extends Service implements IDataCallback{
         this.lm = new LoggingModule(getApplicationContext());
 
         this.im = new ImageModule(this, getApplicationContext());
-
-        // start OBD connection setup
-        if( Preferences.OBDActivated(prefs) && OBD2Connection.connected == false )
-            OBD2Connection.connector = new OBD2Connector(getApplicationContext());
 
         subscribe();
     }

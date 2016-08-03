@@ -19,6 +19,7 @@ import android.util.Log;
 import com.jakewharton.threetenabp.AndroidThreeTen;
 
 import mnefzger.de.sensorplatform.External.OBD2Connection;
+import mnefzger.de.sensorplatform.External.OBD2Connector;
 
 
 public class MainActivity extends AppCompatActivity implements IDataCallback{
@@ -59,10 +60,14 @@ public class MainActivity extends AppCompatActivity implements IDataCallback{
         // Backport of the new java8 time
         AndroidThreeTen.init(getApplication());
 
+        // start OBD connection setup
+        if( Preferences.OBDActivated(prefs) && OBD2Connection.connected == false )
+            OBD2Connection.connector = new OBD2Connector(getApplicationContext());
+
     }
 
     public void startMeasuring() {
-        this.setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_REVERSE_LANDSCAPE);
+        //this.setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_REVERSE_LANDSCAPE);
 
         started = true;
 
@@ -147,10 +152,12 @@ public class MainActivity extends AppCompatActivity implements IDataCallback{
     public void onDestroy() {
         if(OBD2Connection.connector != null)
             OBD2Connection.connector.unregisterReceiver();
-        unbindService(mConnection);
-        mBound = false;
-        if(sPC != null)
-            sPC.setAppCallback(null);
+        if(started) {
+            unbindService(mConnection);
+            mBound = false;
+            if(sPC != null)
+                sPC.setAppCallback(null);
+        }
         super.onDestroy();
     }
 

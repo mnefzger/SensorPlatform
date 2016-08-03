@@ -4,6 +4,7 @@ import android.app.Activity;
 import android.content.Context;
 import android.hardware.Sensor;
 import android.hardware.SensorEvent;
+import android.util.Log;
 
 import java.util.ArrayList;
 
@@ -86,6 +87,7 @@ public class AccelerometerProvider extends SensorProvider {
             lastValues.remove(0);
         }
         double[] emaValues = MathFunctions.getAccEMA(lastValues);
+        Log.d("ACCELEROMETER", emaValues[0] + "");
         sensorCallback.onAccelerometerData(emaValues);
     }
 

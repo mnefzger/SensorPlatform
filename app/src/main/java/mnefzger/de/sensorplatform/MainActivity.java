@@ -34,9 +34,10 @@ public class MainActivity extends AppCompatActivity implements IDataCallback{
     }
 
     SettingsFragment settings;
-    AppFragment app;
+    AppFragment appFragment;
     SharedPreferences prefs;
     SensorPlatformController sPC;
+    SensorPlatformController.LocalBinder binder;
     boolean mBound = false;
     boolean started = false;
 
@@ -64,34 +65,87 @@ public class MainActivity extends AppCompatActivity implements IDataCallback{
         if( Preferences.OBDActivated(prefs) && OBD2Connection.connected == false )
             OBD2Connection.connector = new OBD2Connector(getApplicationContext());
 
+
+        if(savedInstanceState == null) {
+            // bind and start service running in the background
+            Intent intent = new Intent(this, SensorPlatformController.class);
+            bindService(intent, mConnection, Context.BIND_AUTO_CREATE);
+            startService(intent);
+        } else {
+            // if the data collection was already started, set reference to the right UI
+            started = savedInstanceState.getBoolean("started");
+            if(started) {
+                String frag = getSupportFragmentManager().getBackStackEntryAt(getSupportFragmentManager().getBackStackEntryCount() - 1).getName();
+                appFragment = (AppFragment) getSupportFragmentManager().findFragmentByTag(frag);
+                Log.d("FRAGMENT", appFragment + "");
+            }
+        }
     }
 
     public void startMeasuring() {
-        //this.setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_REVERSE_LANDSCAPE);
-
         started = true;
 
-        app = new AppFragment();
-        changeFragment(app, true, true);
+        appFragment = new AppFragment();
+        changeFragment(appFragment, true, true);
 
-        Intent intent = new Intent(this, SensorPlatformController.class);
-        startService(intent);
-        bindService(intent, mConnection, Context.BIND_AUTO_CREATE);
+        sPC.subscribe();
 
+        this.setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_REVERSE_LANDSCAPE);
     }
 
     @Override
     public void onRawData(DataVector v) {
         Log.d("RawData @ App  ", v.toString());
-        if( app != null && app.isVisible())
-            app.updateUI(v);
+        if( appFragment != null && appFragment.isVisible())
+            appFragment.updateUI(v);
     }
 
     @Override
     public void onEventData(EventVector v) {
         Log.d("EventData @ App  ", v.toString());
-        if( app != null && app.isVisible())
-            app.updateUI(v);
+        if( appFragment != null && appFragment.isVisible())
+            appFragment.updateUI(v);
+    }
+
+    IDataCallback getActivity() {
+        return this;
+    }
+
+    private ServiceConnection mConnection = new ServiceConnection() {
+
+        @Override
+        public void onServiceConnected(ComponentName className,
+                                       IBinder service) {
+            // We've bound to LocalService, cast the IBinder and get SensorPlatformController instance
+            SensorPlatformController.LocalBinder binder = (SensorPlatformController.LocalBinder) service;
+            sPC = binder.getService();
+            mBound = true;
+            sPC.setAppCallback(getActivity());
+            Log.d("SERVICE", "is connected");
+        }
+
+        @Override
+        public void onServiceDisconnected(ComponentName arg0) {
+            mBound = false;
+        }
+    };
+
+    @Override
+    public void onSaveInstanceState(Bundle savedInstanceState) {
+        super.onSaveInstanceState(savedInstanceState);
+        Log.d("SAVE", "saving state...");
+        savedInstanceState.putBoolean("started", started);
+    }
+
+    @Override
+    public void onPause() {
+        super.onPause();
+
+        if(OBD2Connection.connector != null)
+            OBD2Connection.connector.unregisterReceiver();
+        if(started && mBound)
+            unbindService(mConnection);
+
     }
 
     private void changeFragment(Fragment frag, boolean saveInBackstack, boolean animate) {
@@ -123,53 +177,6 @@ public class MainActivity extends AppCompatActivity implements IDataCallback{
         } catch (IllegalStateException exception) {
             Log.w("FRAGMENT", "Unable to commit fragment, could be activity as been killed in background. " + exception.toString());
         }
-    }
-
-    IDataCallback getActivity() {
-        return this;
-    }
-
-    private ServiceConnection mConnection = new ServiceConnection() {
-
-        @Override
-        public void onServiceConnected(ComponentName className,
-                                       IBinder service) {
-            Log.d("CONNECTED", "fuck yeah");
-            // We've bound to LocalService, cast the IBinder and get SensorPlatformController instance
-            SensorPlatformController.LocalBinder binder = (SensorPlatformController.LocalBinder) service;
-            sPC = binder.getService();
-            mBound = true;
-            sPC.setAppCallback(getActivity());
-        }
-
-        @Override
-        public void onServiceDisconnected(ComponentName arg0) {
-            mBound = false;
-        }
-    };
-
-    @Override
-    public void onDestroy() {
-        if(OBD2Connection.connector != null)
-            OBD2Connection.connector.unregisterReceiver();
-        if(started) {
-            unbindService(mConnection);
-            mBound = false;
-            if(sPC != null)
-                sPC.setAppCallback(null);
-        }
-        super.onDestroy();
-    }
-
-    @Override
-    public void onResume() {
-        if(!mBound && started) {
-            Intent intent = new Intent(this, SensorPlatformController.class);
-            bindService(intent, mConnection, Context.BIND_AUTO_CREATE);
-            Log.d("RESUME", sPC + "");
-        }
-
-        super.onResume();
     }
 
 }

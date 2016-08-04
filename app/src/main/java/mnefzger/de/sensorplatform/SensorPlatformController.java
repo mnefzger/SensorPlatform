@@ -114,7 +114,7 @@ public class SensorPlatformController extends Service implements IDataCallback{
         }
     }
 
-    private void subscribe() {
+    public void subscribe() {
         if(Preferences.accelerometerActivated(prefs)) {
             subscribeTo(DataType.ACCELERATION_RAW);
             subscribeTo(DataType.ACCELERATION_EVENT);
@@ -179,8 +179,6 @@ public class SensorPlatformController extends Service implements IDataCallback{
         this.lm = new LoggingModule(getApplicationContext());
 
         this.im = new ImageModule(this, getApplicationContext());
-
-        subscribe();
     }
 
     @Override

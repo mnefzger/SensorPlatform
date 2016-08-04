@@ -87,7 +87,7 @@ public class AccelerometerProvider extends SensorProvider {
             lastValues.remove(0);
         }
         double[] emaValues = MathFunctions.getAccEMA(lastValues);
-        Log.d("ACCELEROMETER", emaValues[0] + "");
+
         sensorCallback.onAccelerometerData(emaValues);
     }
 

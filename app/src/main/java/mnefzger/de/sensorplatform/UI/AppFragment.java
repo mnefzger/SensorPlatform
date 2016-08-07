@@ -1,23 +1,20 @@
-package mnefzger.de.sensorplatform;
+package mnefzger.de.sensorplatform.UI;
 
 
 import android.app.Activity;
-import android.content.SharedPreferences;
-import android.content.pm.ActivityInfo;
 import android.os.Bundle;
-import android.preference.PreferenceManager;
 import android.support.v4.app.Fragment;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
-import com.github.pires.obd.commands.SpeedCommand;
-
-import org.w3c.dom.Text;
-
 import java.text.DecimalFormat;
+
+import mnefzger.de.sensorplatform.ActiveSubscriptions;
+import mnefzger.de.sensorplatform.DataVector;
+import mnefzger.de.sensorplatform.EventVector;
+import mnefzger.de.sensorplatform.R;
 
 
 public class AppFragment extends Fragment {
@@ -33,6 +30,8 @@ public class AppFragment extends Fragment {
     TextView lat;
     TextView lon;
     TextView speed;
+
+    TextView light;
 
     TextView street;
     TextView event;
@@ -80,6 +79,7 @@ public class AppFragment extends Fragment {
         lat = (TextView) v.findViewById(R.id.latText);
         lon = (TextView) v.findViewById(R.id.lonText);
         speed = (TextView) v.findViewById(R.id.speedText);
+        light = (TextView) v.findViewById(R.id.lightText);
 
         street = (TextView) v.findViewById(R.id.osmText);
         event = (TextView) v.findViewById(R.id.eventText);
@@ -104,6 +104,8 @@ public class AppFragment extends Fragment {
                 rotX.setText("RotX: " + v.rotX);
                 rotY.setText("RotY: " + v.rotY);
                 rotZ.setText("RotZ: " + v.rotZ);
+
+                light.setText("Light: " + v.light);
 
                 if(v.location == null && ActiveSubscriptions.usingGPS()) {
                     lat.setText("Lat: Acquiring position…");

@@ -2,8 +2,6 @@ package mnefzger.de.sensorplatform;
 
 import android.location.Location;
 
-import com.jakewharton.threetenabp.AndroidThreeTen;
-
 import org.threeten.bp.Instant;
 import org.threeten.bp.LocalDateTime;
 import org.threeten.bp.ZoneId;
@@ -27,6 +25,10 @@ public class DataVector {
     public double rotY;
     public double rotZ;
     public float[] rotMatrix;
+    /**
+     * Light level in cabin in lux
+     */
+    public double light;
     /**
      * vehicle location in lat, lon
      */
@@ -65,6 +67,10 @@ public class DataVector {
         this.rotZ = z;
     }
 
+    public void setLight(double light) {
+        this.light = light;
+    }
+
     public void setRotMatrix(float[] matrix) {
         this.rotMatrix = matrix;
     }
@@ -88,7 +94,7 @@ public class DataVector {
     @Override
     public String toString() {
         return "time: " + timestamp + ", date: " + dateTime + ", accX: " + accX + ", accY: " + accY + ", accZ: " + accZ +
-                ", rotX: " + rotX + ", rotY: " + rotY + ", rotZ: " + rotZ +", speed: " + speed +
+                ", rotX: " + rotX + ", rotY: " + rotY + ", rotZ: " + rotZ + ", light: " + light + ", speed: " + speed +
                 ", OBD speed: " + obdSpeed + ", rpm: " + rpm;
     }
 
@@ -96,7 +102,9 @@ public class DataVector {
         double lat = (location == null) ? 0 : location.getLatitude();
         double lon = (location == null) ? 0 : location.getLongitude();
         return timestamp + ";" + dateTime + ";" + accX + ";" + accY + ";" + accZ + ";" +
-                rotX + ";" + rotY + ";" + rotZ + ";" +
+                rotX + ";" + rotY + ";" + rotZ + ";" + light + ";" +
                 lat + ";" + lon + ";" + speed + ";" + obdSpeed + ";" + rpm;
     }
+
+
 }

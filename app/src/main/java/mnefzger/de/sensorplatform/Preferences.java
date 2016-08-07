@@ -1,9 +1,7 @@
 package mnefzger.de.sensorplatform;
 
-import android.app.Activity;
 import android.content.Context;
 import android.content.SharedPreferences;
-import android.util.Log;
 
 public class Preferences {
 
@@ -12,6 +10,8 @@ public class Preferences {
     public static final String ROTATION_RAW = "rotation_raw";
 
     public static final String LOCATION_RAW = "location_raw";
+
+    public static final String LIGHT = "light_raw";
 
     public static final String OBD_RAW = "location_raw";
 
@@ -26,6 +26,8 @@ public class Preferences {
     public static final String VIDEO_SAVING = "image_saving";
 
 
+    public static final String FREQUENCY_RAWDATA = "frequency_rawData";
+
     public static final String FREQUENCY_ACCELEROMETER = "frequency_accelerometer";
 
     public static final String ACCELEROMETER_THRESHOLD = "accelerometer_threshold";
@@ -36,7 +38,7 @@ public class Preferences {
 
     public static final String TURN_THRESHOLD_SHARP = "rotation_threshold_risky";
 
-    public static final String FREQUENCY_RAWDATA = "frequency_rawData";
+    public static final String FREQUENCY_LIGHT = "frequency_light";
 
     public static final String OSM_REQUEST_RATE = "osmRequest_frequency";
 
@@ -85,6 +87,12 @@ public class Preferences {
         return value;
     }
 
+    public static boolean lightActivated(SharedPreferences prefs) {
+        boolean value = prefs.getBoolean(LIGHT, true);
+
+        return value;
+    }
+
     public static boolean OBDActivated(SharedPreferences prefs) {
         boolean value = prefs.getBoolean(OBD_RAW, false);
 
@@ -129,6 +137,7 @@ public class Preferences {
         try {
             value = Integer.valueOf(valueString);
         } catch (Exception e) {
+            e.printStackTrace();
         }
 
         if (value <= 0) {
@@ -147,6 +156,7 @@ public class Preferences {
         try {
             value = Integer.valueOf(valueString);
         } catch (Exception e) {
+            e.printStackTrace();
         }
 
         if (value <= 0) {
@@ -167,6 +177,7 @@ public class Preferences {
         try {
             value = Integer.valueOf(valueString);
         } catch (Exception e) {
+            e.printStackTrace();
         }
 
         if (value <= 0) {
@@ -184,6 +195,7 @@ public class Preferences {
         try {
             value = Double.valueOf(valueString);
         } catch (Exception e) {
+            e.printStackTrace();
         }
 
         if (value <= 0) {
@@ -205,6 +217,7 @@ public class Preferences {
         try {
             value = Integer.valueOf(valueString);
         } catch (Exception e) {
+            e.printStackTrace();
         }
 
         if (value <= 0) {
@@ -222,6 +235,7 @@ public class Preferences {
         try {
             value = Double.valueOf(valueString);
         } catch (Exception e) {
+            e.printStackTrace();
         }
 
         if (value <= 0) {
@@ -239,6 +253,7 @@ public class Preferences {
         try {
             value = Double.valueOf(valueString);
         } catch (Exception e) {
+            e.printStackTrace();
         }
 
         if (value <= 0) {
@@ -248,6 +263,24 @@ public class Preferences {
         return value;
     }
 
+
+    public static int getLightDelay(SharedPreferences prefs) {
+        String valueString = prefs.getString(FREQUENCY_LIGHT, "60000");
+
+        int value = context.getResources().getInteger(R.integer.light_delay_default);
+
+        try {
+            value = Integer.valueOf(valueString);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        if (value <= 0) {
+            value = context.getResources().getInteger(R.integer.light_delay_default);
+        }
+
+        return value;
+    }
 
     /**
      * Location
@@ -260,6 +293,7 @@ public class Preferences {
         try {
             value = Integer.valueOf(valueString);
         } catch (Exception e) {
+            e.printStackTrace();
         }
 
         if (value <= 0) {
@@ -277,6 +311,7 @@ public class Preferences {
         try {
             value = Integer.valueOf(valueString);
         } catch (Exception e) {
+            e.printStackTrace();
         }
 
         if (value <= 0) {
@@ -298,6 +333,7 @@ public class Preferences {
         try {
             value = Integer.valueOf(valueString);
         } catch (Exception e) {
+            e.printStackTrace();
         }
 
         if (value <= 0) {
@@ -315,6 +351,7 @@ public class Preferences {
         try {
             value = Integer.valueOf(valueString);
         } catch (Exception e) {
+            e.printStackTrace();
         }
 
         if (value <= 0) {
@@ -333,6 +370,7 @@ public class Preferences {
         try {
             value = Integer.valueOf(valueString);
         } catch (Exception e) {
+            e.printStackTrace();
         }
 
         if (value <= 0) {
@@ -351,6 +389,7 @@ public class Preferences {
         try {
             value = Integer.valueOf(valueString);
         } catch (Exception e) {
+            e.printStackTrace();
         }
 
         if (value <= 0) {
@@ -371,5 +410,6 @@ public class Preferences {
 
         return value;
     }
+
 
 }

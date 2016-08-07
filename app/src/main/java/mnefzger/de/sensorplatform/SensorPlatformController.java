@@ -1,20 +1,15 @@
 package mnefzger.de.sensorplatform;
 
-import android.app.Activity;
 import android.app.Notification;
-import android.app.PendingIntent;
 import android.app.Service;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Binder;
 import android.os.IBinder;
 import android.preference.PreferenceManager;
-import android.util.Log;
 
 import java.util.Iterator;
 
-import mnefzger.de.sensorplatform.External.OBD2Connection;
-import mnefzger.de.sensorplatform.External.OBD2Connector;
 import mnefzger.de.sensorplatform.Logger.LoggingModule;
 
 public class SensorPlatformController extends Service implements IDataCallback{
@@ -43,6 +38,52 @@ public class SensorPlatformController extends Service implements IDataCallback{
         this.appCallback = app;
     }
 
+    private void setup() {
+        Preferences.setContext(getApplication());
+        prefs = PreferenceManager.getDefaultSharedPreferences(getApplication());
+
+        this.sm = new SensorModule(this, getApplicationContext());
+        this.lm = new LoggingModule(getApplicationContext());
+
+        this.im = new ImageModule(this, getApplicationContext());
+    }
+
+    public void subscribe() {
+        if(Preferences.accelerometerActivated(prefs)) {
+            subscribeTo(DataType.ACCELERATION_RAW);
+            subscribeTo(DataType.ACCELERATION_EVENT);
+        }
+
+        if(Preferences.rotationActivated(prefs)) {
+            subscribeTo(DataType.ROTATION_RAW);
+            subscribeTo(DataType.ROTATION_EVENT);
+        }
+
+        if(Preferences.locationActivated(prefs)) {
+            subscribeTo(DataType.LOCATION_RAW);
+            subscribeTo(DataType.LOCATION_EVENT);
+        }
+
+        if(Preferences.lightActivated(prefs)) {
+            subscribeTo(DataType.LIGHT);
+        }
+
+        if(Preferences.frontCameraActivated(prefs) || Preferences.backCameraActivated(prefs)) {
+            subscribeTo(DataType.CAMERA_RAW);
+        }
+
+        if(Preferences.OBDActivated(prefs)) {
+            subscribeTo(DataType.OBD);
+        }
+
+        if(Preferences.rawLoggingActivated(prefs)) {
+            logRawData(true);
+        }
+
+        if(Preferences.eventLoggingActivated(prefs)) {
+            logEventData(true);
+        }
+    }
 
     public boolean subscribeTo(DataType type) {
         /**
@@ -109,43 +150,12 @@ public class SensorPlatformController extends Service implements IDataCallback{
             lm.writeEventToCSV(ev);
         }
 
-        if(Preferences.videoSavingActivated(prefs) && !ev.eventDescription.contains("Face")) {
+        if(Preferences.videoSavingActivated(prefs) && /**TODO: remove this ->*/ !ev.eventDescription.contains("Face")) {
             im.saveVideoAfterEvent(ev);
         }
     }
 
-    public void subscribe() {
-        if(Preferences.accelerometerActivated(prefs)) {
-            subscribeTo(DataType.ACCELERATION_RAW);
-            subscribeTo(DataType.ACCELERATION_EVENT);
-        }
 
-        if(Preferences.rotationActivated(prefs)) {
-            subscribeTo(DataType.ROTATION_RAW);
-            subscribeTo(DataType.ROTATION_EVENT);
-        }
-
-        if(Preferences.locationActivated(prefs)) {
-            subscribeTo(DataType.LOCATION_RAW);
-            subscribeTo(DataType.LOCATION_EVENT);
-        }
-
-        if(Preferences.frontCameraActivated(prefs) || Preferences.backCameraActivated(prefs)) {
-            subscribeTo(DataType.CAMERA_RAW);
-        }
-
-        if(Preferences.OBDActivated(prefs)) {
-            subscribeTo(DataType.OBD);
-        }
-
-        if(Preferences.rawLoggingActivated(prefs)) {
-            logRawData(true);
-        }
-
-        if(Preferences.eventLoggingActivated(prefs)) {
-            logEventData(true);
-        }
-    }
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
@@ -172,17 +182,16 @@ public class SensorPlatformController extends Service implements IDataCallback{
 
     @Override
     public void onCreate() {
-        Preferences.setContext(getApplication());
-        prefs = PreferenceManager.getDefaultSharedPreferences(getApplication());
-
-        this.sm = new SensorModule(this, getApplicationContext());
-        this.lm = new LoggingModule(getApplicationContext());
-
-        this.im = new ImageModule(this, getApplicationContext());
+        setup();
     }
 
     @Override
     public void onDestroy() {
-
+        super.onDestroy();
+        Iterator<Subscription> it = ActiveSubscriptions.get().iterator();
+        while(it.hasNext()) {
+            Subscription sub = it.next();
+            sm.StopSensing(sub.getType());
+        }
     }
 }

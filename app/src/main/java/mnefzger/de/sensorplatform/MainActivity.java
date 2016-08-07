@@ -1,6 +1,5 @@
 package mnefzger.de.sensorplatform;
 
-import android.app.Activity;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
@@ -20,6 +19,8 @@ import com.jakewharton.threetenabp.AndroidThreeTen;
 
 import mnefzger.de.sensorplatform.External.OBD2Connection;
 import mnefzger.de.sensorplatform.External.OBD2Connector;
+import mnefzger.de.sensorplatform.UI.AppFragment;
+import mnefzger.de.sensorplatform.UI.SettingsFragment;
 
 
 public class MainActivity extends AppCompatActivity implements IDataCallback{
@@ -37,7 +38,6 @@ public class MainActivity extends AppCompatActivity implements IDataCallback{
     AppFragment appFragment;
     SharedPreferences prefs;
     SensorPlatformController sPC;
-    SensorPlatformController.LocalBinder binder;
     boolean mBound = false;
     boolean started = false;
 
@@ -143,8 +143,15 @@ public class MainActivity extends AppCompatActivity implements IDataCallback{
 
         if(OBD2Connection.connector != null)
             OBD2Connection.connector.unregisterReceiver();
-        if(started && mBound)
-            unbindService(mConnection);
+        if(mBound) {
+            try {
+                unbindService(mConnection);
+            } catch (Exception e) {
+                e.printStackTrace();
+
+            }
+        }
+
 
     }
 

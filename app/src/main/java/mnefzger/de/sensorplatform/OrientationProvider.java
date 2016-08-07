@@ -1,6 +1,5 @@
 package mnefzger.de.sensorplatform;
 
-import android.app.Activity;
 import android.content.Context;
 import android.hardware.Sensor;
 import android.hardware.SensorEvent;
@@ -22,15 +21,17 @@ public class OrientationProvider extends SensorProvider {
         super.start();
         if (sensorManager.getDefaultSensor(Sensor.TYPE_ROTATION_VECTOR) != null){
             rotationSensor = sensorManager.getDefaultSensor(Sensor.TYPE_ROTATION_VECTOR);
+
+            sensorManager.registerListener(this, rotationSensor, Preferences.getOrientationDelay(prefs));
         } else {
             Log.d("SENSOR", "TYPE_ROTATION_VECTOR not available on device");
         }
 
-        sensorManager.registerListener(this, rotationSensor, Preferences.getOrientationDelay(prefs));
     }
 
     public void stop() {
         super.stop();
+        sensorManager.unregisterListener(this);
     }
 
     @Override

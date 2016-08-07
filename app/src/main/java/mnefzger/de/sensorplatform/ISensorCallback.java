@@ -12,4 +12,6 @@ public interface ISensorCallback {
     void onLocationData(Location location, double speed);
 
     void onOBD2Data(double[] values);
+
+    void onLightData(double value);
 }

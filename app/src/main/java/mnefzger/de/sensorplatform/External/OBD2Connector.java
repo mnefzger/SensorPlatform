@@ -1,6 +1,5 @@
 package mnefzger.de.sensorplatform.External;
 
-import android.app.Activity;
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
 import android.content.BroadcastReceiver;

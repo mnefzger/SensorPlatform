@@ -1,7 +1,5 @@
 package mnefzger.de.sensorplatform;
 
-import android.app.Activity;
-import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.hardware.Sensor;
@@ -31,6 +29,10 @@ public class SensorModule implements ISensorCallback, IEventCallback{
      * SensorProvider for orientation data
      */
     private SensorProvider orientation;
+    /**
+     * Provides cabin light data
+     */
+    private SensorProvider light;
     /**
      * PositionProvider to collect geolocation
      */
@@ -78,6 +80,7 @@ public class SensorModule implements ISensorCallback, IEventCallback{
 
         accelerometer = new AccelerometerProvider(app, this);
         orientation = new OrientationProvider(app, this);
+        light = new LightProvider(app, this);
         location = new PositionProvider(app, this);
         obd2 = new OBD2Provider(app, this);
         drivingBehProc = new DrivingBehaviourProcessor(this, app);
@@ -108,6 +111,11 @@ public class SensorModule implements ISensorCallback, IEventCallback{
             activeProviders.add(orientation);
         }
 
+        if(t == Sensor.TYPE_LIGHT && !activeProviders.contains(light)) {
+            light.start();
+            activeProviders.add(light);
+        }
+
         if(t == GPS_IDENTIFIER && !activeProviders.contains(location)) {
             location.start();
             activeProviders.add(location);
@@ -132,18 +140,24 @@ public class SensorModule implements ISensorCallback, IEventCallback{
     public void StopSensing(DataType type) {
         int t = getSensorTypeFromDataType(type);
 
-        if(t == Sensor.TYPE_ACCELEROMETER) {
-            if(!ActiveSubscriptions.usingAccelerometer()) {
+        if (t == Sensor.TYPE_ACCELEROMETER) {
+            if (!ActiveSubscriptions.usingAccelerometer()) {
                 Log.d("Sensor Stop", "" + Sensor.TYPE_ACCELEROMETER);
                 accelerometer.stop();
                 activeProviders.remove(accelerometer);
             }
 
-        } else if(t == Sensor.TYPE_ROTATION_VECTOR) {
-            if(!ActiveSubscriptions.usingRotation()) {
+        } else if (t == Sensor.TYPE_ROTATION_VECTOR) {
+            if (!ActiveSubscriptions.usingRotation()) {
                 Log.d("Sensor Stop", "" + Sensor.TYPE_ROTATION_VECTOR);
                 orientation.stop();
                 activeProviders.remove(orientation);
+            }
+
+        } else if (t == Sensor.TYPE_LIGHT) {
+            if(!ActiveSubscriptions.usingLight()) {
+                light.stop();
+                activeProviders.remove(light);
             }
 
         } else if(t == GPS_IDENTIFIER) {
@@ -175,12 +189,13 @@ public class SensorModule implements ISensorCallback, IEventCallback{
 
         /**
          * add last recorded DataVector to Buffer
-         * init new DataVector with average acceleration of previous;
+         * init new DataVector with previous values to prevent empty entries;
          */
         if(last != null) {
             dataBuffer.add(last);
             current.setAcc(last.accX, last.accY, last.accZ);
             current.setRotMatrix(last.rotMatrix);
+            current.setLight(last.light);
             current.setLocation(last.location);
             current.setSpeed(last.speed);
             current.setOBDSpeed(last.obdSpeed);
@@ -245,6 +260,11 @@ public class SensorModule implements ISensorCallback, IEventCallback{
     }
 
     @Override
+    public void onLightData(double lux) {
+        current.setLight(lux);
+    }
+
+    @Override
     public void onOBD2Data(double[] values) {
         double obdSpeed = values[0];
         double rpm = values[1];
@@ -274,6 +294,8 @@ public class SensorModule implements ISensorCallback, IEventCallback{
             case ROTATION_EVENT:
             case ROTATION_RAW:
                 return Sensor.TYPE_ROTATION_VECTOR;
+            case LIGHT:
+                return Sensor.TYPE_LIGHT;
             case LOCATION_RAW:
             case LOCATION_EVENT:
                 return GPS_IDENTIFIER;

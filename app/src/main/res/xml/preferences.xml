@@ -27,6 +27,11 @@
                 android:summary="Activates raw data collection of vehicle orientation"
                 android:defaultValue="true"/>
             <CheckBoxPreference
+                android:key="light_raw"
+                android:title="Cabin Light Data"
+                android:summary="Activates light sensor to measure ambient cabin light"
+                android:defaultValue="true"/>
+            <CheckBoxPreference
                 android:key="front_active"
                 android:title="Front camera"
                 android:summary="Activate video capture with the front camera"

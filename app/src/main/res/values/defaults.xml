@@ -5,6 +5,8 @@
 
     <integer name="rotation_delay_default">60000</integer>
 
+    <integer name="light_delay_default">200000</integer>
+
     <integer name="rawData_delay_default">500</integer>
 
     <integer name="osmRequest_delay_default">5000</integer>

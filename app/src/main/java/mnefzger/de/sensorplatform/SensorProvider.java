@@ -1,6 +1,5 @@
 package mnefzger.de.sensorplatform;
 
-import android.app.Activity;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.hardware.Sensor;
@@ -40,6 +39,5 @@ public abstract class SensorProvider extends DataProvider implements SensorEvent
 
     public  void stop() {
         super.stop();
-        sensorManager.unregisterListener(this);
     }
 }

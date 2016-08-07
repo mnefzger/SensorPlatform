@@ -19,6 +19,10 @@ public enum DataType {
      */
     ROTATION_EVENT,
     /**
+     *
+     */
+    LIGHT,
+    /**
      * includes lat, lon, current speed
      */
     LOCATION_RAW,

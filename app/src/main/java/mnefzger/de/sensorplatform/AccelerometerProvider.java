@@ -1,10 +1,8 @@
 package mnefzger.de.sensorplatform;
 
-import android.app.Activity;
 import android.content.Context;
 import android.hardware.Sensor;
 import android.hardware.SensorEvent;
-import android.util.Log;
 
 import java.util.ArrayList;
 
@@ -36,13 +34,15 @@ public class AccelerometerProvider extends SensorProvider {
         super.start();
         if (sensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER) != null){
             accSensor = sensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER);
+
+            sensorManager.registerListener(this, accSensor, Preferences.getAccelerometerDelay(prefs) );
         }
 
-        sensorManager.registerListener(this, accSensor, Preferences.getAccelerometerDelay(prefs) );
     }
 
     public void stop() {
         super.stop();
+        sensorManager.unregisterListener(this);
     }
 
     @Override

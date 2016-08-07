@@ -1,18 +1,17 @@
 package mnefzger.de.sensorplatform.External;
 
-import java.io.IOException;
-import java.lang.reflect.Method;
-import java.util.UUID;
-
 import android.Manifest;
 import android.app.Activity;
 import android.bluetooth.BluetoothDevice;
-import android.bluetooth.BluetoothServerSocket;
 import android.bluetooth.BluetoothSocket;
 import android.content.Context;
 import android.content.pm.PackageManager;
 import android.support.v4.app.ActivityCompat;
 import android.util.Log;
+
+import java.io.IOException;
+import java.lang.reflect.Method;
+import java.util.UUID;
 
 public class BluetoothManager {
 

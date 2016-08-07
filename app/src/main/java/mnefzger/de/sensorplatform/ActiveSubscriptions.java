@@ -3,7 +3,7 @@ package mnefzger.de.sensorplatform;
 import java.util.ArrayList;
 import java.util.Iterator;
 
-class ActiveSubscriptions {
+public class ActiveSubscriptions {
     private static ArrayList<Subscription> activeSubscriptions = new ArrayList<>();
     private static boolean logRaw = false;
     private static boolean logEvent = false;
@@ -39,7 +39,7 @@ class ActiveSubscriptions {
     }
 
     public static boolean rawActive() {
-       return isActive(new DataType[]{DataType.ACCELERATION_RAW, DataType.ROTATION_RAW, DataType.LOCATION_RAW, DataType.OBD});
+       return isActive(new DataType[]{DataType.ACCELERATION_RAW, DataType.ROTATION_RAW, DataType.LOCATION_RAW, DataType.LIGHT, DataType.OBD});
     }
 
     public static boolean drivingBehaviourActive() {
@@ -56,6 +56,10 @@ class ActiveSubscriptions {
 
     public static boolean usingGPS() {
         return isActive(new DataType[]{DataType.LOCATION_RAW, DataType.LOCATION_EVENT});
+    }
+
+    public static boolean usingLight() {
+        return isActive(new DataType[]{DataType.LIGHT});
     }
 
     private static boolean isActive(DataType[] types) {

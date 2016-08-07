@@ -6,9 +6,6 @@ import org.threeten.bp.Instant;
 import org.threeten.bp.LocalDateTime;
 import org.threeten.bp.ZoneId;
 
-/**
- * Created by matthias on 20/06/16.
- */
 public class DataVector {
     public long timestamp;
     public String dateTime;

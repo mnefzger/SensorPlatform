@@ -2,11 +2,14 @@ package mnefzger.de.sensorplatform;
 
 import android.app.Notification;
 import android.app.Service;
+import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Binder;
 import android.os.IBinder;
 import android.preference.PreferenceManager;
+
+import com.jakewharton.threetenabp.AndroidThreeTen;
 
 import java.util.Iterator;
 
@@ -34,6 +37,11 @@ public class SensorPlatformController extends Service implements IDataCallback{
 
     public SensorPlatformController() {}
 
+    public SensorPlatformController(Context c, IDataCallback app) {
+        setAppCallback(app);
+        setup();
+    }
+
     public void setAppCallback(IDataCallback app) {
         this.appCallback = app;
     }
@@ -46,6 +54,9 @@ public class SensorPlatformController extends Service implements IDataCallback{
         this.lm = new LoggingModule(getApplicationContext());
 
         this.im = new ImageModule(this, getApplicationContext());
+
+        // Backport of the new java8 time
+        AndroidThreeTen.init(getApplication());
     }
 
     public void subscribe() {
@@ -154,8 +165,6 @@ public class SensorPlatformController extends Service implements IDataCallback{
             im.saveVideoAfterEvent(ev);
         }
     }
-
-
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {

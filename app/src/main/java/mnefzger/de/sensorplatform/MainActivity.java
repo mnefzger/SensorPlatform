@@ -15,8 +15,6 @@ import android.support.v4.app.FragmentTransaction;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 
-import com.jakewharton.threetenabp.AndroidThreeTen;
-
 import mnefzger.de.sensorplatform.External.OBD2Connection;
 import mnefzger.de.sensorplatform.External.OBD2Connector;
 import mnefzger.de.sensorplatform.UI.AppFragment;
@@ -57,9 +55,6 @@ public class MainActivity extends AppCompatActivity implements IDataCallback{
 
         settings = new SettingsFragment();
         getFragmentManager().beginTransaction().replace(R.id.fragment_container, settings).commit();
-
-        // Backport of the new java8 time
-        AndroidThreeTen.init(getApplication());
 
         // start OBD connection setup
         if( Preferences.OBDActivated(prefs) && OBD2Connection.connected == false )
@@ -141,17 +136,17 @@ public class MainActivity extends AppCompatActivity implements IDataCallback{
     public void onPause() {
         super.onPause();
 
+        // don't forget to unregister the receiver
         if(OBD2Connection.connector != null)
             OBD2Connection.connector.unregisterReceiver();
+
         if(mBound) {
             try {
                 unbindService(mConnection);
             } catch (Exception e) {
                 e.printStackTrace();
-
             }
         }
-
 
     }
 

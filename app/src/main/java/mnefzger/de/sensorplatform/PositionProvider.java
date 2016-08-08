@@ -12,6 +12,7 @@ import android.location.LocationManager;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.support.v4.app.ActivityCompat;
+import android.support.v4.content.ContextCompat;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -31,7 +32,6 @@ public class PositionProvider extends DataProvider implements LocationListener{
     private final int LOCATION_REFRESH_DISTANCE = 0;
 
     public PositionProvider(Context app, ISensorCallback m) {
-        verifyLocationPermissions(app);
         context = app;
         callback = m;
         prefs = PreferenceManager.getDefaultSharedPreferences(app);
@@ -99,27 +99,6 @@ public class PositionProvider extends DataProvider implements LocationListener{
     @Override
     public void onProviderDisabled(String provider) {
 
-    }
-
-    private static final int REQUEST_LOCATION = 1;
-    private static String[] PERMISSIONS_LOCATION = {
-            Manifest.permission.ACCESS_FINE_LOCATION,
-            Manifest.permission.ACCESS_COARSE_LOCATION
-    };
-    /**
-     * Checks if the app has permission to write to device storage
-     * If the app does not has permission then the user will be prompted to grant permissions
-     * @param context
-     */
-    public static void verifyLocationPermissions(Context context) {
-        // Check if we have write permission
-        int permission = ActivityCompat.checkSelfPermission(context, Manifest.permission.ACCESS_FINE_LOCATION);
-
-        if (permission != PackageManager.PERMISSION_GRANTED) {
-            // We don't have permission so prompt the user
-            ActivityCompat.requestPermissions((Activity)context,
-                    PERMISSIONS_LOCATION, REQUEST_LOCATION);
-        }
     }
 
 

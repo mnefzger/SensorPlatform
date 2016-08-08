@@ -29,7 +29,6 @@ public class LoggingModule {
     File eventFile;
 
     public LoggingModule(Context app) {
-        verifyStoragePermissions(app);
         try {
             File folder = new File(filePath);
             if (!folder.exists()) {
@@ -97,32 +96,6 @@ public class LoggingModule {
         return false;
     }
 
-    // Storage Permissions
-    private static final int REQUEST_EXTERNAL_STORAGE = 1;
-    private static String[] PERMISSIONS_STORAGE = {
-            Manifest.permission.READ_EXTERNAL_STORAGE,
-            Manifest.permission.WRITE_EXTERNAL_STORAGE
-    };
 
-    /**
-     * Checks if the app has permission to write to device storage
-     *
-     * If the app does not has permission then the user will be prompted to grant permissions
-     *
-     * @param context
-     */
-    private static void verifyStoragePermissions(Context context) {
-        // Check if we have write permission
-        int permission = ActivityCompat.checkSelfPermission(context, Manifest.permission.WRITE_EXTERNAL_STORAGE);
-
-        if (permission != PackageManager.PERMISSION_GRANTED) {
-            // We don't have permission so prompt the user
-            ActivityCompat.requestPermissions(
-                    (Activity)context,
-                    PERMISSIONS_STORAGE,
-                    REQUEST_EXTERNAL_STORAGE
-            );
-        }
-    }
 
 }

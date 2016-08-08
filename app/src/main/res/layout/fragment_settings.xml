@@ -11,7 +11,7 @@
 
         <android.support.design.widget.FloatingActionButton
             android:id="@+id/start_button"
-            android:src="@drawable/stress"
+            android:src="@drawable/data_collection"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="bottom|right"

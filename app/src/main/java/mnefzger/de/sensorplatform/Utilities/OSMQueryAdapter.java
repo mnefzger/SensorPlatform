@@ -25,7 +25,6 @@ public class OSMQueryAdapter {
     public OSMQueryAdapter(IOSMResponse caller, Context context) {
         this.context = context;
         this.callback = caller;
-        verifyInternetPermission(context);
     }
 
     public void startSearchForRoad(Location location) {
@@ -109,23 +108,5 @@ public class OSMQueryAdapter {
     }
 
 
-    private static final int REQUEST_INTERNET = 2;
-    private static String[] PERMISSIONS_INTERNET = {
-            Manifest.permission.INTERNET
-    };
-    /**
-     * Checks if the app has permission to write to device storage
-     * If the app does not has permission then the user will be prompted to grant permissions
-     * @param context
-     */
-    public static void verifyInternetPermission(Context context) {
-        // Check if we have write permission
-        int permission = ActivityCompat.checkSelfPermission(context, Manifest.permission.INTERNET);
 
-        if (permission != PackageManager.PERMISSION_GRANTED) {
-            // We don't have permission so prompt the user
-            ActivityCompat.requestPermissions((Activity)context,
-                    PERMISSIONS_INTERNET, REQUEST_INTERNET);
-        }
-    }
 }

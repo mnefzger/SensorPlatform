@@ -15,6 +15,9 @@ import android.util.Log;
 
 import com.jakewharton.threetenabp.AndroidThreeTen;
 
+import org.threeten.bp.LocalDateTime;
+import org.threeten.bp.LocalTime;
+
 import java.util.Iterator;
 
 import mnefzger.de.sensorplatform.Logger.LoggingModule;
@@ -57,10 +60,10 @@ public class SensorPlatformController extends Service implements IDataCallback{
         Preferences.setContext(getApplication());
         prefs = PreferenceManager.getDefaultSharedPreferences(getApplication());
 
-        this.sm = new SensorModule(this, getApplicationContext());
-        this.lm = new LoggingModule(getApplicationContext());
+        this.sm = new SensorModule(this, getApplication());
+        this.lm = new LoggingModule(getApplication());
 
-        this.im = new ImageModule(this, getApplicationContext());
+        this.im = new ImageModule(this, getApplication());
     }
 
     public void subscribe() {
@@ -182,8 +185,8 @@ public class SensorPlatformController extends Service implements IDataCallback{
         Notification note = new NotificationCompat.Builder(getApplicationContext())
                 .setContentTitle("Sensor Platform")
                 .setContentText("Data collection running")
-                .setSmallIcon(R.drawable.stress)
-                .setWhen(SystemClock.currentThreadTimeMillis())
+                .setSmallIcon(R.drawable.data_collection)
+                .setWhen(System.currentTimeMillis())
                 .addAction(getStopAction())
                 .build();
 
@@ -235,7 +238,7 @@ public class SensorPlatformController extends Service implements IDataCallback{
 
         PendingIntent p = PendingIntent.getService(this, 0, stopIntent, PendingIntent.FLAG_UPDATE_CURRENT);
 
-        NotificationCompat.Action stop = new NotificationCompat.Action.Builder(R.drawable.inertial, "Stop", p).build();
+        NotificationCompat.Action stop = new NotificationCompat.Action.Builder(R.drawable.data_collection, "Stop", p).build();
 
         return stop;
     }

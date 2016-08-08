@@ -19,6 +19,7 @@ import mnefzger.de.sensorplatform.External.OBD2Connection;
 import mnefzger.de.sensorplatform.External.OBD2Connector;
 import mnefzger.de.sensorplatform.UI.AppFragment;
 import mnefzger.de.sensorplatform.UI.SettingsFragment;
+import mnefzger.de.sensorplatform.Utilities.PermissionManager;
 
 
 public class MainActivity extends AppCompatActivity implements IDataCallback{
@@ -43,6 +44,8 @@ public class MainActivity extends AppCompatActivity implements IDataCallback{
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+        PermissionManager.verifyPermissions(this);
 
         prefs = PreferenceManager.getDefaultSharedPreferences(this);
         prefs.edit().clear();

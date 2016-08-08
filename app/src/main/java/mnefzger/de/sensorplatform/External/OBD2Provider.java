@@ -35,13 +35,13 @@ public class OBD2Provider extends DataProvider{
 
 
     public OBD2Provider(Context app, ISensorCallback callback) {
-        BluetoothManager.verifyBluetoothPermissions(app);
         this.callback = callback;
         this.app = app;
 
         prefs = PreferenceManager.getDefaultSharedPreferences(app);
         OBD_DELAY = Preferences.getOBDDelay(prefs);
-
+        if(OBD2Connection.connected == false)
+            reset();
     }
 
 

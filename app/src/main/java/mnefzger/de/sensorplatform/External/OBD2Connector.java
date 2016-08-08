@@ -24,6 +24,7 @@ public class OBD2Connector {
     BroadcastReceiver mReceiver = new BroadcastReceiver() {
         public void onReceive(Context context, Intent intent) {
             String action = intent.getAction();
+            Log.d("ACTION", action);
             // When discovery finds a device
             if (BluetoothDevice.ACTION_FOUND.equals(action)) {
                 // Get the BluetoothDevice object from the Intent
@@ -54,6 +55,10 @@ public class OBD2Connector {
         this.app = app;
 
         btAdapter = BluetoothAdapter.getDefaultAdapter();
+
+        if(!btAdapter.isEnabled()) {
+            btAdapter.enable();
+        }
 
         registerReceiver();
 

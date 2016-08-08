@@ -236,7 +236,7 @@ public class SensorPlatformController extends Service implements IDataCallback{
         Intent stopIntent = new Intent(this, SensorPlatformController.class);
         stopIntent.setAction("SERVICE_STOP");
 
-        PendingIntent p = PendingIntent.getService(this, 0, stopIntent, PendingIntent.FLAG_UPDATE_CURRENT);
+        PendingIntent p = PendingIntent.getService(this, 0, stopIntent, PendingIntent.FLAG_CANCEL_CURRENT);
 
         NotificationCompat.Action stop = new NotificationCompat.Action.Builder(R.drawable.data_collection, "Stop", p).build();
 

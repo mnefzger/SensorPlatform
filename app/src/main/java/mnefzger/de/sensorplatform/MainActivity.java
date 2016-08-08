@@ -59,11 +59,6 @@ public class MainActivity extends AppCompatActivity implements IDataCallback{
         settings = new SettingsFragment();
         getFragmentManager().beginTransaction().replace(R.id.fragment_container, settings).commit();
 
-        // start OBD connection setup
-        if( Preferences.OBDActivated(prefs) && OBD2Connection.connected == false )
-            OBD2Connection.connector = new OBD2Connector(getApplicationContext());
-
-
         if(savedInstanceState == null) {
             // bind and start service running in the background
             Intent intent = new Intent(this, SensorPlatformController.class);
@@ -77,6 +72,7 @@ public class MainActivity extends AppCompatActivity implements IDataCallback{
                 Log.d("FRAGMENT", appFragment + "");
             }
         }
+        
     }
 
     public void startMeasuring() {

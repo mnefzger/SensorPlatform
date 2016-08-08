@@ -42,7 +42,7 @@ public class PositionProvider extends DataProvider implements LocationListener{
     public void start() {
         super.start();
         locationManager = (LocationManager) context.getSystemService(Context.LOCATION_SERVICE);
-        int permission = ActivityCompat.checkSelfPermission(context, Manifest.permission.ACCESS_FINE_LOCATION);
+        int permission = ContextCompat.checkSelfPermission(context, Manifest.permission.ACCESS_FINE_LOCATION);
         if(permission == PackageManager.PERMISSION_GRANTED) {
             locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, LOCATION_REFRESH_TIME,
                     LOCATION_REFRESH_DISTANCE, this);
@@ -50,7 +50,7 @@ public class PositionProvider extends DataProvider implements LocationListener{
     }
 
     public void stop() {
-        int permission = ActivityCompat.checkSelfPermission(context, Manifest.permission.ACCESS_FINE_LOCATION);
+        int permission = ContextCompat.checkSelfPermission(context, Manifest.permission.ACCESS_FINE_LOCATION);
         if(permission == PackageManager.PERMISSION_GRANTED) {
             locationManager.removeUpdates(this);
         }

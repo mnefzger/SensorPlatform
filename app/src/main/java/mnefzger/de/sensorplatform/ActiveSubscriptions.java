@@ -22,6 +22,10 @@ public class ActiveSubscriptions {
         }
     }
 
+    public static void removeAll() {
+        activeSubscriptions.clear();
+    }
+
     public static void setLogRaw(boolean log) {
         logRaw = log;
     }

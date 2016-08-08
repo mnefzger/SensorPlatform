@@ -137,33 +137,33 @@ public class SensorModule implements ISensorCallback, IEventCallback{
      * This method stops the sensor after checking that no active subscriptions depend on it
      * @param type: The unsubscribed DataType
      */
-    public void StopSensing(DataType type) {
+    public void stopSensing(DataType type) {
         int t = getSensorTypeFromDataType(type);
 
         if (t == Sensor.TYPE_ACCELEROMETER) {
-            if (!ActiveSubscriptions.usingAccelerometer()) {
-                Log.d("Sensor Stop", "" + Sensor.TYPE_ACCELEROMETER);
-                accelerometer.stop();
+            accelerometer.stop();
+            if(activeProviders.contains(accelerometer))
                 activeProviders.remove(accelerometer);
-            }
 
         } else if (t == Sensor.TYPE_ROTATION_VECTOR) {
-            if (!ActiveSubscriptions.usingRotation()) {
-                Log.d("Sensor Stop", "" + Sensor.TYPE_ROTATION_VECTOR);
-                orientation.stop();
+            orientation.stop();
+            if(activeProviders.contains(orientation))
                 activeProviders.remove(orientation);
-            }
 
         } else if (t == Sensor.TYPE_LIGHT) {
-            if(!ActiveSubscriptions.usingLight()) {
-                light.stop();
+            light.stop();
+            if(activeProviders.contains(light))
                 activeProviders.remove(light);
-            }
 
         } else if(t == GPS_IDENTIFIER) {
             location.stop();
-            activeProviders.remove(location);
+            if(activeProviders.contains(location))
+                activeProviders.remove(location);
 
+        } else if(t == OBD_IDENTIFIER) {
+            obd2.stop();
+            if(activeProviders.contains(obd2))
+                activeProviders.remove(obd2);
         }
 
         if(activeProviders.size() == 0) {

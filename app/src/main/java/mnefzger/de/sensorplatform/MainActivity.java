@@ -65,7 +65,6 @@ public class MainActivity extends AppCompatActivity implements IDataCallback{
             // bind and start service running in the background
             Intent intent = new Intent(this, SensorPlatformController.class);
             bindService(intent, mConnection, Context.BIND_AUTO_CREATE);
-            startService(intent);
         } else {
             // if the data collection was already started, set reference to the right UI
             started = savedInstanceState.getBoolean("started");
@@ -78,6 +77,8 @@ public class MainActivity extends AppCompatActivity implements IDataCallback{
     }
 
     public void startMeasuring() {
+        Intent intent = new Intent(this, SensorPlatformController.class);
+        startService(intent);
         started = true;
 
         appFragment = new AppFragment();

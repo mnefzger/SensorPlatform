@@ -28,6 +28,7 @@ public class OBD2Provider extends DataProvider{
 
     private boolean setupComplete = false;
     private boolean setupRunning = false;
+    private boolean collecting = false;
     private Context app;
 
     private final String TAG = "OBD_BLUETOOTH";
@@ -46,11 +47,12 @@ public class OBD2Provider extends DataProvider{
 
     public void start() {
         super.start();
-
+        collecting = true;
         collectOBDData();
     }
 
     public void stop() {
+        collecting = false;
         super.stop();
     }
 
@@ -103,7 +105,8 @@ public class OBD2Provider extends DataProvider{
                     }).start();
                 }
 
-                collectOBDData();
+                if(collecting)
+                    collectOBDData();
             }
         }, OBD_DELAY);
     }

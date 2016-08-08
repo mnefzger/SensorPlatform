@@ -1,13 +1,17 @@
 package mnefzger.de.sensorplatform;
 
 import android.app.Notification;
+import android.app.PendingIntent;
 import android.app.Service;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Binder;
 import android.os.IBinder;
+import android.os.SystemClock;
 import android.preference.PreferenceManager;
+import android.support.v4.app.NotificationCompat;
+import android.util.Log;
 
 import com.jakewharton.threetenabp.AndroidThreeTen;
 
@@ -47,6 +51,9 @@ public class SensorPlatformController extends Service implements IDataCallback{
     }
 
     private void setup() {
+        // Backport of the new java8 time
+        AndroidThreeTen.init(getApplication());
+
         Preferences.setContext(getApplication());
         prefs = PreferenceManager.getDefaultSharedPreferences(getApplication());
 
@@ -54,9 +61,6 @@ public class SensorPlatformController extends Service implements IDataCallback{
         this.lm = new LoggingModule(getApplicationContext());
 
         this.im = new ImageModule(this, getApplicationContext());
-
-        // Backport of the new java8 time
-        AndroidThreeTen.init(getApplication());
     }
 
     public void subscribe() {
@@ -127,7 +131,7 @@ public class SensorPlatformController extends Service implements IDataCallback{
             if(sub.getType() == type) {
                 it.remove();
                 ActiveSubscriptions.remove(sub);
-                sm.StopSensing(type);
+                sm.stopSensing(type);
                 return true;
             }
         }
@@ -168,9 +172,21 @@ public class SensorPlatformController extends Service implements IDataCallback{
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
-        Notification note = new Notification(R.drawable.inertial,
-                "Data collection running.",
-                System.currentTimeMillis());
+        if(intent != null && intent.getAction() != null) {
+            Log.d("INTENT", intent.getAction());
+            if(intent.getAction().equals("SERVICE_STOP")) {
+                stopService();
+            }
+        }
+
+        Notification note = new NotificationCompat.Builder(getApplicationContext())
+                .setContentTitle("Sensor Platform")
+                .setContentText("Data collection running")
+                .setSmallIcon(R.drawable.stress)
+                .setWhen(SystemClock.currentThreadTimeMillis())
+                .addAction(getStopAction())
+                .build();
+
         Intent i = new Intent(this, MainActivity.class);
 
         i.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP|
@@ -180,7 +196,7 @@ public class SensorPlatformController extends Service implements IDataCallback{
 
         startForeground(1337, note);
 
-        return START_STICKY;
+        return START_NOT_STICKY;
     }
 
     @Override
@@ -196,11 +212,32 @@ public class SensorPlatformController extends Service implements IDataCallback{
 
     @Override
     public void onDestroy() {
+        Log.d("SENSOR PLATFORM", "Destroy Service");
         super.onDestroy();
+    }
+
+    public void stopService() {
+        Log.d("SENSOR PLATFORM", "Stop Service");
         Iterator<Subscription> it = ActiveSubscriptions.get().iterator();
         while(it.hasNext()) {
             Subscription sub = it.next();
-            sm.StopSensing(sub.getType());
+            sm.stopSensing(sub.getType());
         }
+
+        ActiveSubscriptions.removeAll();
+        stopForeground(true);
+        stopSelf();
     }
+
+    private NotificationCompat.Action getStopAction() {
+        Intent stopIntent = new Intent(this, SensorPlatformController.class);
+        stopIntent.setAction("SERVICE_STOP");
+
+        PendingIntent p = PendingIntent.getService(this, 0, stopIntent, PendingIntent.FLAG_UPDATE_CURRENT);
+
+        NotificationCompat.Action stop = new NotificationCompat.Action.Builder(R.drawable.inertial, "Stop", p).build();
+
+        return stop;
+    }
+
 }

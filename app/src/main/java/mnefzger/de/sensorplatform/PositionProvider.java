@@ -52,7 +52,8 @@ public class PositionProvider extends DataProvider implements LocationListener{
     public void stop() {
         int permission = ContextCompat.checkSelfPermission(context, Manifest.permission.ACCESS_FINE_LOCATION);
         if(permission == PackageManager.PERMISSION_GRANTED) {
-            locationManager.removeUpdates(this);
+            if(locationManager != null)
+                locationManager.removeUpdates(this);
         }
         super.stop();
     }

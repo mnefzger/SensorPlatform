@@ -60,24 +60,34 @@ public class MainActivity extends AppCompatActivity implements IDataCallback{
         getFragmentManager().beginTransaction().replace(R.id.fragment_container, settings).commit();
 
         if(savedInstanceState == null) {
+            Log.d("CREATE", "New activity");
             // bind and start service running in the background
             Intent intent = new Intent(this, SensorPlatformController.class);
             bindService(intent, mConnection, Context.BIND_AUTO_CREATE);
+            startService(intent);
+
         } else {
-            // if the data collection was already started, set reference to the right UI
+            // if the data collection was already started, set reference to the UI fragment that shows live data
             started = savedInstanceState.getBoolean("started");
+            mBound = savedInstanceState.getBoolean("bound");
+
+            Log.d("RECREATE", "started:"+started+", bound:"+mBound);
             if(started) {
                 String frag = getSupportFragmentManager().getBackStackEntryAt(getSupportFragmentManager().getBackStackEntryCount() - 1).getName();
                 appFragment = (AppFragment) getSupportFragmentManager().findFragmentByTag(frag);
                 Log.d("FRAGMENT", appFragment + "");
+            } else if(!mBound) {
+                Log.d("BINDING", "Rebinding service");
+                Intent intent = new Intent(this, SensorPlatformController.class);
+                bindService(intent, mConnection, Context.BIND_AUTO_CREATE);
             }
         }
-        
+
     }
 
     public void startMeasuring() {
         Intent intent = new Intent(this, SensorPlatformController.class);
-        startService(intent);
+
         started = true;
 
         appFragment = new AppFragment();
@@ -130,6 +140,7 @@ public class MainActivity extends AppCompatActivity implements IDataCallback{
         super.onSaveInstanceState(savedInstanceState);
         Log.d("SAVE", "saving state...");
         savedInstanceState.putBoolean("started", started);
+        savedInstanceState.putBoolean("bound", mBound);
     }
 
     @Override
@@ -143,6 +154,7 @@ public class MainActivity extends AppCompatActivity implements IDataCallback{
         if(mBound) {
             try {
                 unbindService(mConnection);
+                mBound = false;
             } catch (Exception e) {
                 e.printStackTrace();
             }

@@ -54,6 +54,7 @@ public class SensorPlatformController extends Service implements IDataCallback{
     }
 
     private void setup() {
+        Log.d("SERVICE", "setting up...");
         // Backport of the new java8 time
         AndroidThreeTen.init(getApplication());
 
@@ -175,19 +176,29 @@ public class SensorPlatformController extends Service implements IDataCallback{
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
+        String message = "Data Collection running.";
         if(intent != null && intent.getAction() != null) {
             Log.d("INTENT", intent.getAction());
             if(intent.getAction().equals("SERVICE_STOP")) {
                 stopService();
             }
+            if(intent.getAction().equals("SERVICE_PAUSE")) {
+                pauseDataCollection();
+                message = "Data Collection Paused.";
+            }
+            if(intent.getAction().equals("SERVICE_RESUME")) {
+                restartDataCollection();
+            }
         }
 
         Notification note = new NotificationCompat.Builder(getApplicationContext())
                 .setContentTitle("Sensor Platform")
-                .setContentText("Data collection running")
+                .setContentText(message)
                 .setSmallIcon(R.drawable.data_collection)
                 .setWhen(System.currentTimeMillis())
                 .addAction(getStopAction())
+                .addAction(getPauseAction())
+                .addAction(getResumeAction())
                 .build();
 
         Intent i = new Intent(this, MainActivity.class);
@@ -232,6 +243,23 @@ public class SensorPlatformController extends Service implements IDataCallback{
         stopSelf();
     }
 
+    public void pauseDataCollection() {
+        Log.d("SENSOR PLATFORM", "Pause Service");
+        Iterator<Subscription> it = ActiveSubscriptions.get().iterator();
+        while(it.hasNext()) {
+            sm.stopSensing(it.next().getType());
+        }
+        sm.clearDataBuffer();
+    }
+
+    public void restartDataCollection() {
+        Iterator<Subscription> it = ActiveSubscriptions.get().iterator();
+        while(it.hasNext()) {
+            Subscription sub = it.next();
+            sm.startSensing(sub.getType());
+        }
+    }
+
     private NotificationCompat.Action getStopAction() {
         Intent stopIntent = new Intent(this, SensorPlatformController.class);
         stopIntent.setAction("SERVICE_STOP");
@@ -241,6 +269,28 @@ public class SensorPlatformController extends Service implements IDataCallback{
         NotificationCompat.Action stop = new NotificationCompat.Action.Builder(R.drawable.data_collection, "Stop", p).build();
 
         return stop;
+    }
+
+    private NotificationCompat.Action getPauseAction() {
+        Intent pauseIntent = new Intent(this, SensorPlatformController.class);
+        pauseIntent.setAction("SERVICE_PAUSE");
+
+        PendingIntent p = PendingIntent.getService(this, 0, pauseIntent, PendingIntent.FLAG_UPDATE_CURRENT);
+
+        NotificationCompat.Action pause = new NotificationCompat.Action.Builder(R.drawable.data_collection, "Pause", p).build();
+
+        return pause;
+    }
+
+    private NotificationCompat.Action getResumeAction() {
+        Intent resumeIntent = new Intent(this, SensorPlatformController.class);
+        resumeIntent.setAction("SERVICE_RESUME");
+
+        PendingIntent p = PendingIntent.getService(this, 0, resumeIntent, PendingIntent.FLAG_UPDATE_CURRENT);
+
+        NotificationCompat.Action resume = new NotificationCompat.Action.Builder(R.drawable.data_collection, "Resume", p).build();
+
+        return resume;
     }
 
 }

@@ -140,6 +140,8 @@ public class SensorModule implements ISensorCallback, IEventCallback{
     public void stopSensing(DataType type) {
         int t = getSensorTypeFromDataType(type);
 
+        Log.d("STOPPED", type+"");
+
         if (t == Sensor.TYPE_ACCELEROMETER) {
             accelerometer.stop();
             if(activeProviders.contains(accelerometer))
@@ -166,6 +168,7 @@ public class SensorModule implements ISensorCallback, IEventCallback{
                 activeProviders.remove(obd2);
         }
 
+        Log.d("STOPPED", activeProviders.size()+"");
         if(activeProviders.size() == 0) {
             sensing = false;
         }
@@ -214,10 +217,12 @@ public class SensorModule implements ISensorCallback, IEventCallback{
         new Timer().schedule(new TimerTask() {
             @Override
             public void run() {
-                current.setTimestamp(System.currentTimeMillis());
-                startEventProcessing();
-                if(ActiveSubscriptions.rawActive()){
-                    callback.onRawData(current);
+                if(current != null) {
+                    current.setTimestamp(System.currentTimeMillis());
+                    startEventProcessing();
+                    if(ActiveSubscriptions.rawActive()){
+                        callback.onRawData(current);
+                    }
                 }
                 if(sensing) {
                     aggregateData(ms);
@@ -230,6 +235,10 @@ public class SensorModule implements ISensorCallback, IEventCallback{
         if(ActiveSubscriptions.drivingBehaviourActive()) {
             drivingBehProc.processData( dataBuffer );
         }
+    }
+
+    public void clearDataBuffer() {
+        dataBuffer.clear();
     }
 
     /**

@@ -16,7 +16,6 @@ import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 
 import mnefzger.de.sensorplatform.External.OBD2Connection;
-import mnefzger.de.sensorplatform.External.OBD2Connector;
 import mnefzger.de.sensorplatform.UI.AppFragment;
 import mnefzger.de.sensorplatform.UI.SettingsFragment;
 import mnefzger.de.sensorplatform.Utilities.PermissionManager;
@@ -36,7 +35,7 @@ public class MainActivity extends AppCompatActivity implements IDataCallback{
     SettingsFragment settings;
     AppFragment appFragment;
     SharedPreferences prefs;
-    SensorPlatformController sPC;
+    SensorPlatformService sPS;
     boolean mBound = false;
     boolean started = false;
 
@@ -62,7 +61,7 @@ public class MainActivity extends AppCompatActivity implements IDataCallback{
         if(savedInstanceState == null) {
             Log.d("CREATE", "New activity");
             // bind and start service running in the background
-            Intent intent = new Intent(this, SensorPlatformController.class);
+            Intent intent = new Intent(this, SensorPlatformService.class);
             bindService(intent, mConnection, Context.BIND_AUTO_CREATE);
             startService(intent);
 
@@ -78,7 +77,7 @@ public class MainActivity extends AppCompatActivity implements IDataCallback{
                 Log.d("FRAGMENT", appFragment + "");
             } else if(!mBound) {
                 Log.d("BINDING", "Rebinding service");
-                Intent intent = new Intent(this, SensorPlatformController.class);
+                Intent intent = new Intent(this, SensorPlatformService.class);
                 bindService(intent, mConnection, Context.BIND_AUTO_CREATE);
             }
         }
@@ -86,14 +85,14 @@ public class MainActivity extends AppCompatActivity implements IDataCallback{
     }
 
     public void startMeasuring() {
-        Intent intent = new Intent(this, SensorPlatformController.class);
+        Intent intent = new Intent(this, SensorPlatformService.class);
 
         started = true;
 
         appFragment = new AppFragment();
         changeFragment(appFragment, true, true);
 
-        sPC.subscribe();
+        sPS.subscribe();
 
         this.setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_REVERSE_LANDSCAPE);
     }
@@ -121,11 +120,11 @@ public class MainActivity extends AppCompatActivity implements IDataCallback{
         @Override
         public void onServiceConnected(ComponentName className,
                                        IBinder service) {
-            // We've bound to LocalService, cast the IBinder and get SensorPlatformController instance
-            SensorPlatformController.LocalBinder binder = (SensorPlatformController.LocalBinder) service;
-            sPC = binder.getService();
+            // We've bound to LocalService, cast the IBinder and get SensorPlatformService instance
+            SensorPlatformService.LocalBinder binder = (SensorPlatformService.LocalBinder) service;
+            sPS = binder.getService();
             mBound = true;
-            sPC.setAppCallback(getActivity());
+            sPS.setAppCallback(getActivity());
             Log.d("SERVICE", "is connected");
         }
 

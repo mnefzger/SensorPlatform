@@ -23,6 +23,6 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <service android:name="mnefzger.de.sensorplatform.SensorPlatformController" />
+        <service android:name=".SensorPlatformService" />
     </application>
 </manifest>

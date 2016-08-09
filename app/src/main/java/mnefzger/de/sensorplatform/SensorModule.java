@@ -18,7 +18,7 @@ import mnefzger.de.sensorplatform.Processors.DrivingBehaviourProcessor;
 public class SensorModule implements ISensorCallback, IEventCallback{
     private SharedPreferences prefs;
     /**
-     * Callback implemented by SensorPlatformController
+     * Callback implemented by SensorPlatformService
      */
     private IDataCallback callback;
     /**
@@ -282,7 +282,7 @@ public class SensorModule implements ISensorCallback, IEventCallback{
     }
 
     /**
-     * Hands the EventVector to the SensorPlatformController
+     * Hands the EventVector to the SensorPlatformService
      * @param v: the EventVector containing the event
      */
     @Override

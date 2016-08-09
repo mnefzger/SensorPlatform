@@ -69,9 +69,9 @@ public class ImageModule implements IEventCallback{
     static boolean frontSaving = false;
 
 
-    public ImageModule(SensorPlatformController controller, Context app) {
+    public ImageModule(IDataCallback caller, Context app) {
         context = app;
-        callback = controller;
+        callback = caller;
         cameraManager = (CameraManager) app.getSystemService(Activity.CAMERA_SERVICE);
         imgProc = new ImageProcessor(this);
 

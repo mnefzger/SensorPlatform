@@ -8,21 +8,17 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Binder;
 import android.os.IBinder;
-import android.os.SystemClock;
 import android.preference.PreferenceManager;
 import android.support.v4.app.NotificationCompat;
 import android.util.Log;
 
 import com.jakewharton.threetenabp.AndroidThreeTen;
 
-import org.threeten.bp.LocalDateTime;
-import org.threeten.bp.LocalTime;
-
 import java.util.Iterator;
 
 import mnefzger.de.sensorplatform.Logger.LoggingModule;
 
-public class SensorPlatformController extends Service implements IDataCallback{
+public class SensorPlatformService extends Service implements IDataCallback{
     private SharedPreferences prefs;
     private SensorModule sm;
     private LoggingModule lm;
@@ -36,15 +32,15 @@ public class SensorPlatformController extends Service implements IDataCallback{
      * runs in the same process as its clients, we don't need to deal with IPC.
      */
     public class LocalBinder extends Binder {
-        SensorPlatformController getService() {
+        SensorPlatformService getService() {
             // Return this instance of LocalService so clients can call public methods
-            return SensorPlatformController.this;
+            return SensorPlatformService.this;
         }
     }
 
-    public SensorPlatformController() {}
+    public SensorPlatformService() {}
 
-    public SensorPlatformController(Context c, IDataCallback app) {
+    public SensorPlatformService(Context c, IDataCallback app) {
         setAppCallback(app);
         setup();
     }
@@ -261,7 +257,7 @@ public class SensorPlatformController extends Service implements IDataCallback{
     }
 
     private NotificationCompat.Action getStopAction() {
-        Intent stopIntent = new Intent(this, SensorPlatformController.class);
+        Intent stopIntent = new Intent(this, SensorPlatformService.class);
         stopIntent.setAction("SERVICE_STOP");
 
         PendingIntent p = PendingIntent.getService(this, 0, stopIntent, PendingIntent.FLAG_CANCEL_CURRENT);
@@ -272,7 +268,7 @@ public class SensorPlatformController extends Service implements IDataCallback{
     }
 
     private NotificationCompat.Action getPauseAction() {
-        Intent pauseIntent = new Intent(this, SensorPlatformController.class);
+        Intent pauseIntent = new Intent(this, SensorPlatformService.class);
         pauseIntent.setAction("SERVICE_PAUSE");
 
         PendingIntent p = PendingIntent.getService(this, 0, pauseIntent, PendingIntent.FLAG_UPDATE_CURRENT);
@@ -283,7 +279,7 @@ public class SensorPlatformController extends Service implements IDataCallback{
     }
 
     private NotificationCompat.Action getResumeAction() {
-        Intent resumeIntent = new Intent(this, SensorPlatformController.class);
+        Intent resumeIntent = new Intent(this, SensorPlatformService.class);
         resumeIntent.setAction("SERVICE_RESUME");
 
         PendingIntent p = PendingIntent.getService(this, 0, resumeIntent, PendingIntent.FLAG_UPDATE_CURRENT);

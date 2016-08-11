@@ -2,11 +2,14 @@ package mnefzger.de.sensorplatform.UI;
 
 
 import android.app.Activity;
+import android.app.PendingIntent;
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.TextView;
 
 import java.text.DecimalFormat;
@@ -15,6 +18,7 @@ import mnefzger.de.sensorplatform.ActiveSubscriptions;
 import mnefzger.de.sensorplatform.DataVector;
 import mnefzger.de.sensorplatform.EventVector;
 import mnefzger.de.sensorplatform.R;
+import mnefzger.de.sensorplatform.SensorPlatformService;
 
 
 public class AppFragment extends Fragment {
@@ -39,6 +43,8 @@ public class AppFragment extends Fragment {
 
     TextView obdSpeed;
     TextView obdRPM;
+
+    Button stopButton;
 
     Activity main;
 
@@ -88,8 +94,23 @@ public class AppFragment extends Fragment {
         obdRPM = (TextView) v.findViewById(R.id.obdRPMText);
         obdSpeed = (TextView) v.findViewById(R.id.obdSpeedText);
 
+        stopButton = (Button) v.findViewById(R.id.stopButton);
+
+        stopButton.setOnClickListener(stopListener);
+
+
         return v;
     }
+
+    View.OnClickListener stopListener = new View.OnClickListener() {
+        @Override
+        public void onClick(View v) {
+            Intent stopIntent = new Intent(getActivity(), SensorPlatformService.class);
+            stopIntent.setAction("SERVICE_STOP");
+
+            getActivity().startService(stopIntent);
+        }
+    };
 
     public void updateUI(DataVector vector) {
         final DataVector v = vector;

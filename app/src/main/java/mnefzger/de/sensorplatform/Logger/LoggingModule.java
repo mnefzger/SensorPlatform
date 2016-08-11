@@ -28,7 +28,7 @@ public class LoggingModule {
     File rawFile;
     File eventFile;
 
-    public LoggingModule(Context app) {
+    public LoggingModule() {
         try {
             File folder = new File(filePath);
             if (!folder.exists()) {

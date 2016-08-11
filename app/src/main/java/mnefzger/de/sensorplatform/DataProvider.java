@@ -3,11 +3,7 @@ package mnefzger.de.sensorplatform;
 
 public abstract class DataProvider {
 
-    public void start() {
+    public abstract void start();
 
-    }
-
-    public  void stop() {
-
-    }
+    public abstract void stop();
 }

@@ -17,9 +17,9 @@
 
 
     <!-- Threshold is the g-force value
-         e.g. 0.4 * 9.81 = 3.924
-         Value of 0.4g based on: DriveSafe (Bergasa, 2014) -->
-    <string name="acceleration_threshold_default" format="float" type="integer">3.924</string>
+         e.g. 0.35 * 9.81 = 3.4335
+         Value of 0.35g based on: DriveSafe (Bergasa, 2014), SeMiFOT (Victor et al., 2010) -->
+    <string name="acceleration_threshold_default" format="float" type="integer">3.4335</string>
 
     <!-- Threshold in rad/s
          Value based on (Wang, 2013) -->

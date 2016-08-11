@@ -1,6 +1,7 @@
 package mnefzger.de.sensorplatform;
 
 import android.app.Notification;
+import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.app.Service;
 import android.content.Context;
@@ -10,6 +11,7 @@ import android.os.Binder;
 import android.os.IBinder;
 import android.preference.PreferenceManager;
 import android.support.v4.app.NotificationCompat;
+import android.support.v4.app.NotificationManagerCompat;
 import android.util.Log;
 
 import com.jakewharton.threetenabp.AndroidThreeTen;
@@ -58,7 +60,7 @@ public class SensorPlatformService extends Service implements IDataCallback{
         prefs = PreferenceManager.getDefaultSharedPreferences(getApplication());
 
         this.sm = new SensorModule(this, getApplication());
-        this.lm = new LoggingModule(getApplication());
+        this.lm = new LoggingModule();
 
         this.im = new ImageModule(this, getApplication());
     }
@@ -177,6 +179,7 @@ public class SensorPlatformService extends Service implements IDataCallback{
             Log.d("INTENT", intent.getAction());
             if(intent.getAction().equals("SERVICE_STOP")) {
                 stopService();
+                return START_NOT_STICKY;
             }
             if(intent.getAction().equals("SERVICE_PAUSE")) {
                 pauseDataCollection();
@@ -237,6 +240,9 @@ public class SensorPlatformService extends Service implements IDataCallback{
         ActiveSubscriptions.removeAll();
         stopForeground(true);
         stopSelf();
+        // remove notification
+        NotificationManager nm = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
+        nm.cancelAll();
     }
 
     public void pauseDataCollection() {
@@ -271,7 +277,7 @@ public class SensorPlatformService extends Service implements IDataCallback{
         Intent pauseIntent = new Intent(this, SensorPlatformService.class);
         pauseIntent.setAction("SERVICE_PAUSE");
 
-        PendingIntent p = PendingIntent.getService(this, 0, pauseIntent, PendingIntent.FLAG_UPDATE_CURRENT);
+        PendingIntent p = PendingIntent.getService(this, 0, pauseIntent, PendingIntent.FLAG_CANCEL_CURRENT);
 
         NotificationCompat.Action pause = new NotificationCompat.Action.Builder(R.drawable.data_collection, "Pause", p).build();
 
@@ -282,7 +288,7 @@ public class SensorPlatformService extends Service implements IDataCallback{
         Intent resumeIntent = new Intent(this, SensorPlatformService.class);
         resumeIntent.setAction("SERVICE_RESUME");
 
-        PendingIntent p = PendingIntent.getService(this, 0, resumeIntent, PendingIntent.FLAG_UPDATE_CURRENT);
+        PendingIntent p = PendingIntent.getService(this, 0, resumeIntent, PendingIntent.FLAG_CANCEL_CURRENT);
 
         NotificationCompat.Action resume = new NotificationCompat.Action.Builder(R.drawable.data_collection, "Resume", p).build();
 

@@ -75,18 +75,18 @@ public class MainActivity extends AppCompatActivity implements IDataCallback{
                 String frag = getSupportFragmentManager().getBackStackEntryAt(getSupportFragmentManager().getBackStackEntryCount() - 1).getName();
                 appFragment = (AppFragment) getSupportFragmentManager().findFragmentByTag(frag);
                 Log.d("FRAGMENT", appFragment + "");
+
             } else if(!mBound) {
                 Log.d("BINDING", "Rebinding service");
                 Intent intent = new Intent(this, SensorPlatformService.class);
                 bindService(intent, mConnection, Context.BIND_AUTO_CREATE);
+
             }
         }
 
     }
 
     public void startMeasuring() {
-        Intent intent = new Intent(this, SensorPlatformService.class);
-
         started = true;
 
         appFragment = new AppFragment();

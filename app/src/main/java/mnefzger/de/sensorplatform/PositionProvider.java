@@ -39,8 +39,8 @@ public class PositionProvider extends DataProvider implements LocationListener{
         LOCATION_REFRESH_TIME = Preferences.getGPSRequestRate(prefs);
     }
 
+    @Override
     public void start() {
-        super.start();
         locationManager = (LocationManager) context.getSystemService(Context.LOCATION_SERVICE);
         int permission = ContextCompat.checkSelfPermission(context, Manifest.permission.ACCESS_FINE_LOCATION);
         if(permission == PackageManager.PERMISSION_GRANTED) {
@@ -49,13 +49,13 @@ public class PositionProvider extends DataProvider implements LocationListener{
         }
     }
 
+    @Override
     public void stop() {
         int permission = ContextCompat.checkSelfPermission(context, Manifest.permission.ACCESS_FINE_LOCATION);
         if(permission == PackageManager.PERMISSION_GRANTED) {
             if(locationManager != null)
                 locationManager.removeUpdates(this);
         }
-        super.stop();
     }
 
     @Override

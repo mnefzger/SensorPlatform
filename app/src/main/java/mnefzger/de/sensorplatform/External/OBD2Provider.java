@@ -44,16 +44,15 @@ public class OBD2Provider extends DataProvider{
             reset();
     }
 
-
+    @Override
     public void start() {
-        super.start();
         collecting = true;
         collectOBDData();
     }
 
+    @Override
     public void stop() {
         collecting = false;
-        super.stop();
     }
 
     // Is called in case of IOException with broken pipe

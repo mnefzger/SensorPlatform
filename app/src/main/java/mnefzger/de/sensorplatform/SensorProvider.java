@@ -33,11 +33,13 @@ public abstract class SensorProvider extends DataProvider implements SensorEvent
 
     }
 
+    @Override
     public void start() {
-        super.start();
+
     }
 
+    @Override
     public  void stop() {
-        super.stop();
+
     }
 }

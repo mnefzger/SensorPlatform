@@ -45,6 +45,8 @@ public class AppFragment extends Fragment {
     TextView obdRPM;
 
     Button stopButton;
+    Button pauseButton;
+    Button resumeButton;
 
     Activity main;
 
@@ -95,9 +97,12 @@ public class AppFragment extends Fragment {
         obdSpeed = (TextView) v.findViewById(R.id.obdSpeedText);
 
         stopButton = (Button) v.findViewById(R.id.stopButton);
+        pauseButton = (Button) v.findViewById(R.id.pauseButton);
+        resumeButton = (Button) v.findViewById(R.id.resumeButton);
 
         stopButton.setOnClickListener(stopListener);
-
+        pauseButton.setOnClickListener(pauseListener);
+        resumeButton.setOnClickListener(resumeListener);
 
         return v;
     }
@@ -109,6 +114,32 @@ public class AppFragment extends Fragment {
             stopIntent.setAction("SERVICE_STOP");
 
             getActivity().startService(stopIntent);
+            resumeButton.setEnabled(false);
+            pauseButton.setEnabled(false);
+        }
+    };
+
+    View.OnClickListener pauseListener = new View.OnClickListener() {
+        @Override
+        public void onClick(View v) {
+            Intent stopIntent = new Intent(getActivity(), SensorPlatformService.class);
+            stopIntent.setAction("SERVICE_PAUSE");
+
+            getActivity().startService(stopIntent);
+            resumeButton.setEnabled(true);
+            pauseButton.setEnabled(false);
+        }
+    };
+
+    View.OnClickListener resumeListener = new View.OnClickListener() {
+        @Override
+        public void onClick(View v) {
+            Intent stopIntent = new Intent(getActivity(), SensorPlatformService.class);
+            stopIntent.setAction("SERVICE_RESUME");
+
+            getActivity().startService(stopIntent);
+            resumeButton.setEnabled(false);
+            pauseButton.setEnabled(true);
         }
     };
 

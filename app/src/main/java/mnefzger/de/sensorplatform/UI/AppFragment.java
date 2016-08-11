@@ -122,10 +122,10 @@ public class AppFragment extends Fragment {
     View.OnClickListener pauseListener = new View.OnClickListener() {
         @Override
         public void onClick(View v) {
-            Intent stopIntent = new Intent(getActivity(), SensorPlatformService.class);
-            stopIntent.setAction("SERVICE_PAUSE");
+            Intent pauseIntent = new Intent(getActivity(), SensorPlatformService.class);
+            pauseIntent.setAction("SERVICE_PAUSE");
 
-            getActivity().startService(stopIntent);
+            getActivity().startService(pauseIntent);
             resumeButton.setEnabled(true);
             pauseButton.setEnabled(false);
         }
@@ -134,10 +134,10 @@ public class AppFragment extends Fragment {
     View.OnClickListener resumeListener = new View.OnClickListener() {
         @Override
         public void onClick(View v) {
-            Intent stopIntent = new Intent(getActivity(), SensorPlatformService.class);
-            stopIntent.setAction("SERVICE_RESUME");
+            Intent resumeIntent = new Intent(getActivity(), SensorPlatformService.class);
+            resumeIntent.setAction("SERVICE_RESUME");
 
-            getActivity().startService(stopIntent);
+            getActivity().startService(resumeIntent);
             resumeButton.setEnabled(false);
             pauseButton.setEnabled(true);
         }

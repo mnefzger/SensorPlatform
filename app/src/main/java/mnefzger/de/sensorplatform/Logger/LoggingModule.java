@@ -22,32 +22,47 @@ public class LoggingModule {
     String baseDir = android.os.Environment.getExternalStorageDirectory().getAbsolutePath();
     String filePath = baseDir + "/SensorPlatform/logs";
 
-    String fileNameRaw = "RawData.csv";
-    String fileNameEvent = "EventData.csv";
+    String fileNameRaw = "RawData_";
+    String fileNameEvent = "EventData_";
 
     File rawFile;
     File eventFile;
 
     public LoggingModule() {
-        try {
-            File folder = new File(filePath);
-            if (!folder.exists()) {
-                folder.mkdir();
-            }
-            rawFile = new File(filePath + File.separator + fileNameRaw);
-            if(!rawFile.exists()) {
-                rawFile.createNewFile();
-                createHeadersRaw();
-            }
-            eventFile = new File(filePath + File.separator + fileNameEvent);
-            if(!rawFile.exists()) {
-                eventFile.createNewFile();
-                createHeadersEvent();
-            }
-        } catch (IOException e) {
-            e.printStackTrace();
+        File folder = new File(filePath);
+        if (!folder.exists()) {
+            folder.mkdir();
         }
+        createNewRawFile(fileNameRaw + System.currentTimeMillis() + ".csv");
 
+        createNewEventFile(fileNameEvent + System.currentTimeMillis() + ".csv");
+
+    }
+
+    private void createNewRawFile(String name) {
+        rawFile = new File(filePath + File.separator + name);
+
+        if(!rawFile.exists()) {
+            try {
+                rawFile.createNewFile();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+            createHeadersRaw();
+        }
+    }
+
+    private void createNewEventFile(String name) {
+        eventFile = new File(filePath + File.separator + name);
+
+        if(!eventFile.exists()) {
+            try {
+                eventFile.createNewFile();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+            createHeadersEvent();
+        }
     }
 
     public void writeRawToCSV(DataVector v) {
@@ -63,7 +78,7 @@ public class LoggingModule {
     }
 
     private void createHeadersRaw() {
-        String[] line = { "timestamp;dateTime;accelerationX;accelerationY;accelerationZ;rotationX;rotationY;rotationZ;latitude;longitude;GPS speed;OBD speed;OBD RPM" };
+        String[] line = { "timestamp;dateTime;accelerationX;accelerationY;accelerationZ;rotationX;rotationY;rotationZ;light;latitude;longitude;GPS speed;OBD speed;OBD RPM" };
 
         write(rawFile, line);
     }

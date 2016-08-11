@@ -39,6 +39,8 @@ public class DataVector {
 
     public double rpm;
 
+    public double fuel;
+
     public DataVector() {
         setDateTime();
     }
@@ -88,11 +90,15 @@ public class DataVector {
         this.rpm = r;
     }
 
+    public void setFuel(double f) {
+        this.fuel = f;
+    }
+
     @Override
     public String toString() {
         return "time: " + timestamp + ", date: " + dateTime + ", accX: " + accX + ", accY: " + accY + ", accZ: " + accZ +
                 ", rotX: " + rotX + ", rotY: " + rotY + ", rotZ: " + rotZ + ", light: " + light + ", speed: " + speed +
-                ", OBD speed: " + obdSpeed + ", rpm: " + rpm;
+                ", OBD speed: " + obdSpeed + ", rpm: " + rpm + ", fuel: " + fuel;
     }
 
     public String toCSVString() {
@@ -100,7 +106,7 @@ public class DataVector {
         double lon = (location == null) ? 0 : location.getLongitude();
         return timestamp + ";" + dateTime + ";" + accX + ";" + accY + ";" + accZ + ";" +
                 rotX + ";" + rotY + ";" + rotZ + ";" + light + ";" +
-                lat + ";" + lon + ";" + speed + ";" + obdSpeed + ";" + rpm;
+                lat + ";" + lon + ";" + speed + ";" + obdSpeed + ";" + rpm + ";" + fuel;
     }
 
 

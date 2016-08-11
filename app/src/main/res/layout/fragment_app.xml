@@ -25,7 +25,7 @@
             <LinearLayout
                 android:orientation="vertical"
                 android:layout_width="wrap_content"
-                android:layout_height="match_parent"
+                android:layout_height="wrap_content"
                 android:layout_centerHorizontal="true"
                 android:weightSum="1"
                 android:layout_weight="0.5">
@@ -61,7 +61,7 @@
             <LinearLayout
                 android:orientation="vertical"
                 android:layout_width="wrap_content"
-                android:layout_height="match_parent"
+                android:layout_height="wrap_content"
                 android:layout_weight="0.5">
 
                 <TextView
@@ -93,18 +93,18 @@
         <LinearLayout
             android:orientation="horizontal"
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
+            android:layout_height="wrap_content"
             android:layout_marginTop="90dp">
 
             <LinearLayout
                 android:orientation="vertical"
                 android:layout_width="match_parent"
-                android:layout_height="match_parent"
+                android:layout_height="wrap_content"
                 android:layout_weight="0.5">
 
                 <TextView
                     android:text="Lat:"
-                    android:layout_width="wrap_content"
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:id="@+id/latText"
                     android:layout_centerVertical="true"
@@ -112,7 +112,7 @@
 
                 <TextView
                     android:text="Lon:"
-                    android:layout_width="wrap_content"
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:id="@+id/lonText"
                     android:layout_below="@+id/latText"
@@ -121,7 +121,7 @@
 
                 <TextView
                     android:text="Speed:"
-                    android:layout_width="wrap_content"
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:id="@+id/speedText"
                     android:layout_below="@+id/lonText"
@@ -133,23 +133,18 @@
             <LinearLayout
                 android:orientation="vertical"
                 android:layout_width="match_parent"
-                android:layout_height="match_parent"
+                android:layout_height="wrap_content"
                 android:layout_weight="0.5">
                 <TextView
                     android:text="Light:"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:id="@+id/lightText"
-                    android:layout_below="@+id/latText"
-                    android:layout_alignStart="@+id/latText"
-                    android:layout_marginTop="10dp" />
+                    android:id="@+id/lightText" />
                 <TextView
                     android:text="OBD RPM:"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:id="@+id/obdSpeedText"
-                    android:layout_below="@+id/latText"
-                    android:layout_alignStart="@+id/latText"
                     android:layout_marginTop="10dp" />
 
                 <TextView
@@ -157,8 +152,13 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:id="@+id/obdRPMText"
-                    android:layout_below="@+id/lonText"
-                    android:layout_alignStart="@+id/lonText"
+                    android:layout_marginTop="10dp" />
+
+                <TextView
+                    android:text="OBD Fuel:"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:id="@+id/obdFuelText"
                     android:layout_marginTop="10dp" />
             </LinearLayout>
 

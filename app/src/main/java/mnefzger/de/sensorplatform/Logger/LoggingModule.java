@@ -78,7 +78,7 @@ public class LoggingModule {
     }
 
     private void createHeadersRaw() {
-        String[] line = { "timestamp;dateTime;accelerationX;accelerationY;accelerationZ;rotationX;rotationY;rotationZ;light;latitude;longitude;GPS speed;OBD speed;OBD RPM" };
+        String[] line = { "timestamp;dateTime;accelerationX;accelerationY;accelerationZ;rotationX;rotationY;rotationZ;light;latitude;longitude;GPS speed;OBD speed;OBD RPM;OBD fuel" };
 
         write(rawFile, line);
     }

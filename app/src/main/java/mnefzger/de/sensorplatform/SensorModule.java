@@ -277,8 +277,10 @@ public class SensorModule implements ISensorCallback, IEventCallback{
     public void onOBD2Data(double[] values) {
         double obdSpeed = values[0];
         double rpm = values[1];
+        double currentFuel = values[2];
         current.setOBDSpeed(obdSpeed);
         current.setRPM(rpm);
+        current.setFuel(currentFuel);
     }
 
     /**

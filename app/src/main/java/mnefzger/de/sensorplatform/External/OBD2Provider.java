@@ -9,6 +9,7 @@ import android.util.Log;
 import com.github.pires.obd.commands.ObdCommand;
 import com.github.pires.obd.commands.SpeedCommand;
 import com.github.pires.obd.commands.engine.RPMCommand;
+import com.github.pires.obd.commands.fuel.ConsumptionRateCommand;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -111,18 +112,22 @@ public class OBD2Provider extends DataProvider{
     }
 
     private void requestData() {
-        SpeedCommand cmd = new SpeedCommand();
-        runCommand(OBD2Connection.sock, cmd);
+        SpeedCommand sp_cmd = new SpeedCommand();
+        runCommand(OBD2Connection.sock, sp_cmd);
 
         RPMCommand rpm_cmd = new RPMCommand();
         runCommand(OBD2Connection.sock, rpm_cmd);
 
+        ConsumptionRateCommand cr_cmd = new ConsumptionRateCommand();
+        runCommand(OBD2Connection.sock, cr_cmd);
+
         try { Thread.sleep(25); } catch (InterruptedException e) { e.printStackTrace(); }
 
-        double speed = Double.valueOf( cmd.getCalculatedResult() );
+        double speed = Double.valueOf( sp_cmd.getCalculatedResult() );
         double rpm = Double.valueOf( rpm_cmd.getCalculatedResult() );
+        double cr = Double.valueOf( cr_cmd.getCalculatedResult() );
 
-        double[] response = {speed, rpm};
+        double[] response = {speed, rpm, cr};
 
         callback.onOBD2Data(response);
     }

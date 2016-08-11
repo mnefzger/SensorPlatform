@@ -43,6 +43,7 @@ public class AppFragment extends Fragment {
 
     TextView obdSpeed;
     TextView obdRPM;
+    TextView obdFuel;
 
     Button stopButton;
     Button pauseButton;
@@ -95,6 +96,7 @@ public class AppFragment extends Fragment {
 
         obdRPM = (TextView) v.findViewById(R.id.obdRPMText);
         obdSpeed = (TextView) v.findViewById(R.id.obdSpeedText);
+        obdFuel = (TextView) v.findViewById(R.id.obdFuelText);
 
         stopButton = (Button) v.findViewById(R.id.stopButton);
         pauseButton = (Button) v.findViewById(R.id.pauseButton);
@@ -172,6 +174,7 @@ public class AppFragment extends Fragment {
 
                 obdRPM.setText("OBD RPM: " + v.rpm);
                 obdSpeed.setText("OBD Speed: " + v.obdSpeed);
+                obdFuel.setText("OBD Fuel: " + v.fuel);
             }
         });
 

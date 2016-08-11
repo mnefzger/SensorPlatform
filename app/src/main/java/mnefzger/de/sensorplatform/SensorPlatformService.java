@@ -188,26 +188,27 @@ public class SensorPlatformService extends Service implements IDataCallback{
             if(intent.getAction().equals("SERVICE_RESUME")) {
                 restartDataCollection();
             }
+            if(intent.getAction().equals("SERVICE_DATA_START")) {
+                Notification note = new NotificationCompat.Builder(getApplicationContext())
+                        .setContentTitle("Sensor Platform")
+                        .setContentText(message)
+                        .setSmallIcon(R.drawable.data_collection)
+                        .setWhen(System.currentTimeMillis())
+                        .addAction(getStopAction())
+                        .addAction(getPauseAction())
+                        .addAction(getResumeAction())
+                        .build();
+
+                Intent i = new Intent(this, MainActivity.class);
+
+                i.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP|
+                        Intent.FLAG_ACTIVITY_SINGLE_TOP);
+
+                note.flags|=Notification.FLAG_NO_CLEAR;
+
+                startForeground(1337, note);
+            }
         }
-
-        Notification note = new NotificationCompat.Builder(getApplicationContext())
-                .setContentTitle("Sensor Platform")
-                .setContentText(message)
-                .setSmallIcon(R.drawable.data_collection)
-                .setWhen(System.currentTimeMillis())
-                .addAction(getStopAction())
-                .addAction(getPauseAction())
-                .addAction(getResumeAction())
-                .build();
-
-        Intent i = new Intent(this, MainActivity.class);
-
-        i.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP|
-                Intent.FLAG_ACTIVITY_SINGLE_TOP);
-
-        note.flags|=Notification.FLAG_NO_CLEAR;
-
-        startForeground(1337, note);
 
         return START_NOT_STICKY;
     }

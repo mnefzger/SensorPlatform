@@ -60,7 +60,7 @@ public class MainActivity extends AppCompatActivity implements IDataCallback{
             // bind and start service running in the background
             Intent intent = new Intent(this, SensorPlatformService.class);
             bindService(intent, mConnection, Context.BIND_AUTO_CREATE);
-            //startService(intent);
+            startService(intent);
 
             settings = new SettingsFragment();
             getFragmentManager().beginTransaction().replace(R.id.fragment_container, settings).commit();
@@ -87,8 +87,11 @@ public class MainActivity extends AppCompatActivity implements IDataCallback{
     }
 
     public void startMeasuring() {
+
+        Intent startIntent = new Intent(this, SensorPlatformService.class);
+        startIntent.setAction("SERVICE_DATA_START");
+        startService(startIntent);
         started = true;
-        startService(new Intent(this, SensorPlatformService.class));
 
         appFragment = new AppFragment();
         changeFragment(appFragment, true, true);
@@ -100,7 +103,7 @@ public class MainActivity extends AppCompatActivity implements IDataCallback{
 
     @Override
     public void onRawData(DataVector v) {
-        //Log.d("RawData @ App  ", v.toString());
+        Log.d("RawData @ App  ", v.toString());
         if( appFragment != null && appFragment.isVisible())
             appFragment.updateUI(v);
     }

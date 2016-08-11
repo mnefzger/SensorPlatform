@@ -13,7 +13,7 @@ public class Preferences {
 
     public static final String LIGHT = "light_raw";
 
-    public static final String OBD_RAW = "location_raw";
+    public static final String OBD_RAW = "obd_raw";
 
     public static final String FRONT_CAMERA = "front_active";
 

@@ -159,7 +159,7 @@ public class AppFragment extends Fragment {
                 rotY.setText("RotY: " + v.rotY);
                 rotZ.setText("RotZ: " + v.rotZ);
 
-                light.setText("Light: " + v.light);
+                light.setText("Light: " + df.format(v.light) + " lumen");
 
                 if(v.location == null && ActiveSubscriptions.usingGPS()) {
                     lat.setText("Lat: Acquiring position…");
@@ -167,14 +167,14 @@ public class AppFragment extends Fragment {
                     speed.setText("Speed: Acquiring position…");
                 }
                 if(v.location != null) {
-                    lat.setText("Lat: " + v.location.getLatitude());
-                    lon.setText("Lon: " + v.location.getLongitude());
+                    lat.setText("Lat: " + df.format( v.location.getLatitude() ));
+                    lon.setText("Lon: " + df.format( v.location.getLongitude() ));
                     speed.setText("Speed: " + df.format(v.speed) + " km/h");
                 }
 
                 obdRPM.setText("OBD RPM: " + v.rpm);
-                obdSpeed.setText("OBD Speed: " + v.obdSpeed);
-                obdFuel.setText("OBD Fuel: " + v.fuel);
+                obdSpeed.setText("OBD Speed: " + v.obdSpeed + " km/h");
+                obdFuel.setText("OBD Fuel: " + v.fuel + " l/100km");
             }
         });
 
@@ -192,7 +192,9 @@ public class AppFragment extends Fragment {
                     face.setText("Face detected: YES");
                 else if (v.eventDescription.equals("No Face detected"))
                     face.setText("Face detected: NO");
-                else event.setText("Last event: " + v.eventDescription);
+                else {
+                    event.setText("Last event: " + v.eventDescription);
+                }
             }
         });
     }

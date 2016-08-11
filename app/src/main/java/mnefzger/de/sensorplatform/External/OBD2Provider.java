@@ -41,7 +41,7 @@ public class OBD2Provider extends DataProvider{
 
         prefs = PreferenceManager.getDefaultSharedPreferences(app);
         OBD_DELAY = Preferences.getOBDDelay(prefs);
-        if(OBD2Connection.connected == false)
+        if(Preferences.OBDActivated(prefs) && OBD2Connection.connected == false)
             reset();
     }
 
@@ -121,7 +121,7 @@ public class OBD2Provider extends DataProvider{
         ConsumptionRateCommand cr_cmd = new ConsumptionRateCommand();
         runCommand(OBD2Connection.sock, cr_cmd);
 
-        try { Thread.sleep(25); } catch (InterruptedException e) { e.printStackTrace(); }
+        try { Thread.sleep(10); } catch (InterruptedException e) { e.printStackTrace(); }
 
         double speed = Double.valueOf( sp_cmd.getCalculatedResult() );
         double rpm = Double.valueOf( rpm_cmd.getCalculatedResult() );

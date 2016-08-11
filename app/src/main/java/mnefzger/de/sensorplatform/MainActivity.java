@@ -55,15 +55,15 @@ public class MainActivity extends AppCompatActivity implements IDataCallback{
             PreferenceManager.setDefaultValues(this, R.xml.preferences, false);
         }
 
-        settings = new SettingsFragment();
-        getFragmentManager().beginTransaction().replace(R.id.fragment_container, settings).commit();
-
         if(savedInstanceState == null) {
             Log.d("CREATE", "New activity");
             // bind and start service running in the background
             Intent intent = new Intent(this, SensorPlatformService.class);
             bindService(intent, mConnection, Context.BIND_AUTO_CREATE);
-            startService(intent);
+            //startService(intent);
+
+            settings = new SettingsFragment();
+            getFragmentManager().beginTransaction().replace(R.id.fragment_container, settings).commit();
 
         } else {
             // if the data collection was already started, set reference to the UI fragment that shows live data
@@ -74,7 +74,7 @@ public class MainActivity extends AppCompatActivity implements IDataCallback{
             if(started) {
                 String frag = getSupportFragmentManager().getBackStackEntryAt(getSupportFragmentManager().getBackStackEntryCount() - 1).getName();
                 appFragment = (AppFragment) getSupportFragmentManager().findFragmentByTag(frag);
-                Log.d("FRAGMENT", appFragment + "");
+                changeFragment(appFragment, true, false);
 
             } else if(!mBound) {
                 Log.d("BINDING", "Rebinding service");
@@ -88,6 +88,7 @@ public class MainActivity extends AppCompatActivity implements IDataCallback{
 
     public void startMeasuring() {
         started = true;
+        startService(new Intent(this, SensorPlatformService.class));
 
         appFragment = new AppFragment();
         changeFragment(appFragment, true, true);

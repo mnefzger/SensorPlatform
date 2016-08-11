@@ -44,7 +44,6 @@ public class OrientationProvider extends SensorProvider {
         float[] temp_matrix = new float[9];
         SensorManager.getRotationMatrixFromVector(temp_matrix, values);
 
-
         float[][] result = new float[2][];
         result[0] = eulerValues;
         result[1] = temp_matrix;

@@ -23,9 +23,9 @@
 
     <!-- Threshold in rad/s
          Value based on (Wang, 2013) -->
-    <string name="rotation_threshold_normal_default" format="float" type="integer">0.3</string>
+    <string name="rotation_threshold_normal_default" format="float" type="integer">0.5</string>
 
-    <string name="rotation_threshold_risky_default" format="float" type="integer">0.5</string>
+    <string name="rotation_threshold_risky_default" format="float" type="integer">0.7</string>
 
 
 

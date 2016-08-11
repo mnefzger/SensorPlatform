@@ -100,7 +100,7 @@ public class MainActivity extends AppCompatActivity implements IDataCallback{
 
     @Override
     public void onRawData(DataVector v) {
-        Log.d("RawData @ App  ", v.toString());
+        //Log.d("RawData @ App  ", v.toString());
         if( appFragment != null && appFragment.isVisible())
             appFragment.updateUI(v);
     }

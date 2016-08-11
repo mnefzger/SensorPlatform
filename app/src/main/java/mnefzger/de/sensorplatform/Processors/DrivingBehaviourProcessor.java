@@ -58,8 +58,9 @@ public class DrivingBehaviourProcessor extends EventProcessor implements IOSMRes
             currentVector = data.get(data.size()-1);
             previousVector = data.get(data.size()-2);
 
-            checkForHardAcc(getLastData(500));
-            checkForSharpTurn(getLastData(1000));
+            // TODO: getLastData should check that timeframe >= 2*RawDataDelay, else we can't compare values
+            checkForHardAcc(getLastData(3000));
+            checkForSharpTurn(getLastData(3000));
             checkForSpeeding(currentVector);
         }
 
@@ -90,7 +91,7 @@ public class DrivingBehaviourProcessor extends EventProcessor implements IOSMRes
     private void checkForSharpTurn(List<DataVector> lastData) {
         double leftDelta = 0.0;
         double rightDelta = 0.0;
-        float[] prevMatrix = new float[9];
+        float[] prevMatrix = null;
 
         Iterator<DataVector> it = lastData.iterator();
         while(it.hasNext()) {

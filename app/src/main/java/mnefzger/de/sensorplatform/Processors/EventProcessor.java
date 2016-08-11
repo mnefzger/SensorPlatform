@@ -1,10 +1,13 @@
 package mnefzger.de.sensorplatform.Processors;
 
 
+import android.preference.PreferenceManager;
+
 import java.util.List;
 
 import mnefzger.de.sensorplatform.DataVector;
 import mnefzger.de.sensorplatform.IEventCallback;
+import mnefzger.de.sensorplatform.Preferences;
 import mnefzger.de.sensorplatform.SensorModule;
 
 public abstract class EventProcessor {

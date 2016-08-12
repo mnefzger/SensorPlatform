@@ -17,6 +17,7 @@ import java.text.DecimalFormat;
 import mnefzger.de.sensorplatform.ActiveSubscriptions;
 import mnefzger.de.sensorplatform.DataVector;
 import mnefzger.de.sensorplatform.EventVector;
+import mnefzger.de.sensorplatform.MainActivity;
 import mnefzger.de.sensorplatform.R;
 import mnefzger.de.sensorplatform.SensorPlatformService;
 
@@ -118,6 +119,9 @@ public class AppFragment extends Fragment {
             getActivity().startService(stopIntent);
             resumeButton.setEnabled(false);
             pauseButton.setEnabled(false);
+
+            MainActivity app = (MainActivity)getActivity();
+            app.goToStartFragment();
         }
     };
 

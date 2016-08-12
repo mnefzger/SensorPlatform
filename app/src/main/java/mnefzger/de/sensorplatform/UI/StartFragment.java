@@ -42,6 +42,10 @@ public class StartFragment extends Fragment {
         newStudy.setOnClickListener(newStudyButtonListener);
         currentStudy.setOnClickListener(currentStudyButtonListener);
 
+        if(SensorPlatformService.serviceRunning == false) {
+            currentStudy.setEnabled(false);
+        }
+
         return v;
     }
 

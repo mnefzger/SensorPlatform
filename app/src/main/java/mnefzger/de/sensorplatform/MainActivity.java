@@ -64,13 +64,15 @@ public class MainActivity extends AppCompatActivity implements IDataCallback{
             bindService(intent, mConnection, Context.BIND_AUTO_CREATE);
             startService(intent);
 
-            startFragment = new StartFragment();
-            changeFragment(startFragment, true, false);
+            goToStartFragment();
 
         } else {
             // if the data collection was already started, set reference to the UI fragment that shows live data
             started = savedInstanceState.getBoolean("started");
             mBound = savedInstanceState.getBoolean("bound");
+
+            if(SensorPlatformService.serviceRunning == false)
+                started = false;
 
             Log.d("RECREATE", "started:"+started+", bound:"+mBound);
             if(started) {
@@ -183,6 +185,12 @@ public class MainActivity extends AppCompatActivity implements IDataCallback{
     public void goToSettingsFragment() {
         settings = new SettingsFragment();
         getFragmentManager().beginTransaction().replace(R.id.fragment_container, settings).commit();
+        this.setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_UNSPECIFIED);
+    }
+
+    public void goToStartFragment() {
+        startFragment = new StartFragment();
+        changeFragment(startFragment, true, true);
         this.setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_UNSPECIFIED);
     }
 

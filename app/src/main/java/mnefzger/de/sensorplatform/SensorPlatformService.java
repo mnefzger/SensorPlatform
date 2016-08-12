@@ -29,6 +29,8 @@ public class SensorPlatformService extends Service implements IDataCallback{
 
     private final IBinder mBinder = new LocalBinder();
 
+    public static boolean serviceRunning = false;
+
     /**
      * Class used for the client Binder.  Because we know this service always
      * runs in the same process as its clients, we don't need to deal with IPC.
@@ -100,6 +102,8 @@ public class SensorPlatformService extends Service implements IDataCallback{
         if(Preferences.eventLoggingActivated(prefs)) {
             logEventData(true);
         }
+
+        serviceRunning = true;
     }
 
     public boolean subscribeTo(DataType type) {
@@ -244,6 +248,8 @@ public class SensorPlatformService extends Service implements IDataCallback{
         // remove notification
         NotificationManager nm = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
         nm.cancelAll();
+
+        serviceRunning = false;
     }
 
     public void pauseDataCollection() {

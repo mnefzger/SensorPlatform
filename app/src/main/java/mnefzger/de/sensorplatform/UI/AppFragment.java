@@ -72,7 +72,7 @@ public class AppFragment extends Fragment {
                              Bundle savedInstanceState) {
 
         if (container != null) {
-            container.removeViewAt(0);
+            container.removeAllViews();
         }
 
         View v = inflater.inflate(R.layout.fragment_app, container, false);

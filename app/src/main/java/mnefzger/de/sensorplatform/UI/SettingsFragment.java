@@ -22,6 +22,10 @@ public class SettingsFragment extends PreferenceFragment
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
 
+        if (container != null) {
+            container.removeAllViews();
+        }
+
         addPreferencesFromResource(R.xml.preferences);
         View v = inflater.inflate(R.layout.fragment_settings, container, false);
         FloatingActionButton b = (FloatingActionButton) v.findViewById(R.id.start_button);

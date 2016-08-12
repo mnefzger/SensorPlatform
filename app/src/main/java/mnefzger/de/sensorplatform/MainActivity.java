@@ -18,6 +18,7 @@ import android.util.Log;
 import mnefzger.de.sensorplatform.External.OBD2Connection;
 import mnefzger.de.sensorplatform.UI.AppFragment;
 import mnefzger.de.sensorplatform.UI.SettingsFragment;
+import mnefzger.de.sensorplatform.UI.StartFragment;
 import mnefzger.de.sensorplatform.Utilities.PermissionManager;
 
 
@@ -32,6 +33,7 @@ public class MainActivity extends AppCompatActivity implements IDataCallback{
         }
     }
 
+    StartFragment startFragment;
     SettingsFragment settings;
     AppFragment appFragment;
     SharedPreferences prefs;
@@ -62,8 +64,8 @@ public class MainActivity extends AppCompatActivity implements IDataCallback{
             bindService(intent, mConnection, Context.BIND_AUTO_CREATE);
             startService(intent);
 
-            settings = new SettingsFragment();
-            getFragmentManager().beginTransaction().replace(R.id.fragment_container, settings).commit();
+            startFragment = new StartFragment();
+            changeFragment(startFragment, true, false);
 
         } else {
             // if the data collection was already started, set reference to the UI fragment that shows live data
@@ -72,9 +74,7 @@ public class MainActivity extends AppCompatActivity implements IDataCallback{
 
             Log.d("RECREATE", "started:"+started+", bound:"+mBound);
             if(started) {
-                String frag = getSupportFragmentManager().getBackStackEntryAt(getSupportFragmentManager().getBackStackEntryCount() - 1).getName();
-                appFragment = (AppFragment) getSupportFragmentManager().findFragmentByTag(frag);
-                changeFragment(appFragment, true, false);
+                goToAppFragment();
 
             } else if(!mBound) {
                 Log.d("BINDING", "Rebinding service");
@@ -87,18 +87,14 @@ public class MainActivity extends AppCompatActivity implements IDataCallback{
     }
 
     public void startMeasuring() {
+        goToAppFragment();
 
         Intent startIntent = new Intent(this, SensorPlatformService.class);
         startIntent.setAction("SERVICE_DATA_START");
         startService(startIntent);
         started = true;
 
-        appFragment = new AppFragment();
-        changeFragment(appFragment, true, true);
-
         sPS.subscribe();
-
-        this.setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_REVERSE_LANDSCAPE);
     }
 
     @Override
@@ -163,6 +159,31 @@ public class MainActivity extends AppCompatActivity implements IDataCallback{
             }
         }
 
+    }
+
+    public void goToAppFragment() {
+        if(started) {
+            String frag = null;
+            for(int i=1; i<getSupportFragmentManager().getBackStackEntryCount(); i++) {
+                frag = getSupportFragmentManager().getBackStackEntryAt(getSupportFragmentManager().getBackStackEntryCount() - i).getName();
+                Log.d("FRAGMENT", frag);
+                if( frag.equals("mnefzger.de.sensorplatform.UI.AppFragment") ) {
+                    appFragment = (AppFragment) getSupportFragmentManager().findFragmentByTag(frag);
+                    break;
+                }
+            }
+        } else {
+            appFragment = new AppFragment();
+        }
+
+        changeFragment(appFragment, true, true);
+        this.setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_REVERSE_LANDSCAPE);
+    }
+
+    public void goToSettingsFragment() {
+        settings = new SettingsFragment();
+        getFragmentManager().beginTransaction().replace(R.id.fragment_container, settings).commit();
+        this.setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_UNSPECIFIED);
     }
 
     private void changeFragment(Fragment frag, boolean saveInBackstack, boolean animate) {

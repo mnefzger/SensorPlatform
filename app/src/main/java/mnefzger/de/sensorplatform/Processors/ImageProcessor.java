@@ -26,8 +26,9 @@ public class ImageProcessor{
 
     private native int[] nAsmFindFace(long adress1, long adress2);
 
+    private native int[] nAsmFindCars(long adress1, long adress2);
 
-    public byte[] processImage(byte[] image, int width, int height) {
+    public byte[] processImageFront(byte[] image, int width, int height) {
         Mat imgMat = new Mat(height + height/2, width, CvType.CV_8UC1);
         imgMat.put(0,0,image);
 
@@ -44,11 +45,33 @@ public class ImageProcessor{
         }
     }
 
+    public byte[] processImageBack(byte[] image, int width, int height) {
+        Mat imgMat = new Mat(height + height/2, width, CvType.CV_8UC1);
+        imgMat.put(0,0,image);
+
+        Mat output = new Mat();
+
+        detectCars(imgMat, output);
+
+        if(!output.empty()) {
+            byte[] return_buff = new byte[(int) (output.total() * output.elemSize())];
+            output.get(0, 0, return_buff);
+            return return_buff;
+        } else {
+            return image;
+        }
+    }
+
     private void detectFace(Mat imgMat, Mat output) {
         if(!faceProcRunning) {
             // the native code writes the processing results to the output adress
             int[] faces = findFaceInImage(imgMat.getNativeObjAddr(), output.getNativeObjAddr());
         }
+    }
+
+    private void detectCars(Mat imgMat, Mat output) {
+        // the native code writes the processing results to the output adress
+        int[] cars = findCarsInImage(imgMat.getNativeObjAddr(), output.getNativeObjAddr());
     }
 
 
@@ -67,6 +90,21 @@ public class ImageProcessor{
         faceProcRunning = false;
 
         return faces;
+    }
+
+    private int[] findCarsInImage(long adress1, long adress2) {
+        double time = System.currentTimeMillis();
+        int[] cars = nAsmFindCars(adress1, adress2);
+        Log.d("CAR_DETECTION_FRAME", System.currentTimeMillis()-time + "");
+
+        if(cars.length == 4) {
+            Log.d("CAR_DETECTION", "Detected at (" + cars[0] + "," + cars[1]+")");
+            callback.onEventDetected(new EventVector(System.currentTimeMillis(), "Car detected", 0));
+        } else {
+            callback.onEventDetected(new EventVector(System.currentTimeMillis(), "No Car detected", 0));
+        }
+
+        return cars;
     }
 
 

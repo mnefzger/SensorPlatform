@@ -242,6 +242,8 @@ public class SensorPlatformService extends Service implements IDataCallback{
             sm.stopSensing(sub.getType());
         }
 
+        im.stopCapture();
+
         ActiveSubscriptions.removeAll();
         stopForeground(true);
         stopSelf();
@@ -258,6 +260,9 @@ public class SensorPlatformService extends Service implements IDataCallback{
         while(it.hasNext()) {
             sm.stopSensing(it.next().getType());
         }
+
+        im.stopCapture();
+
         sm.clearDataBuffer();
     }
 
@@ -267,6 +272,8 @@ public class SensorPlatformService extends Service implements IDataCallback{
             Subscription sub = it.next();
             sm.startSensing(sub.getType());
         }
+
+        im.startCapture();
     }
 
     private NotificationCompat.Action getStopAction() {

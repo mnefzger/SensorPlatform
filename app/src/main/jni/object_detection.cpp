@@ -7,12 +7,13 @@
 #include "opencv2/highgui/highgui.hpp"
 #include "opencv2/imgproc/imgproc.hpp"
 
-#define  LOG_TAG    "Face_Detection_Native"
+#define  LOG_TAG    "Object_Detection_Native"
 #define  LOGI(...)  __android_log_print(ANDROID_LOG_INFO,LOG_TAG,__VA_ARGS__)
 #define  LOGE(...)  __android_log_print(ANDROID_LOG_ERROR,LOG_TAG,__VA_ARGS__)
 
 extern "C" {
     JNIEXPORT jintArray Java_mnefzger_de_sensorplatform_Processors_ImageProcessor_nAsmFindFace(JNIEnv *env, jobject obj, jlong address, jlong returnadress);
+    JNIEXPORT jintArray Java_mnefzger_de_sensorplatform_Processors_ImageProcessor_nAsmFindCars(JNIEnv *env, jobject obj, jlong address, jlong returnadress);
 }
 
 using namespace cv;
@@ -105,7 +106,48 @@ JNIEXPORT jintArray Java_mnefzger_de_sensorplatform_Processors_ImageProcessor_nA
     return result;
 }
 
+JNIEXPORT jintArray Java_mnefzger_de_sensorplatform_Processors_ImageProcessor_nAsmFindCars(JNIEnv *env, jobject obj, jlong address, jlong returnadress) {
+	jintArray result;
+	Mat image = *((Mat*) address);
 
+    Mat gray(image.rows, image.cols, image.depth());
+    cvtColor(image, gray, COLOR_YUV2GRAY_I420);
+
+    vector< Rect > cars;
+    //faceCascadeLBP.detectMultiScale( gray, cars, 1.1, 2, 0, Size(30, 30) );
+
+
+    if (cars.size()) {
+    	result = env->NewIntArray(4);
+    	jint tmp_array[4];
+
+    	tmp_array[0] = cars[0].x;
+    	tmp_array[1] = cars[0].y;
+    	tmp_array[2] = cars[0].width;
+    	tmp_array[3] = cars[0].height;
+
+		env->SetIntArrayRegion(result, 0, 4, tmp_array);
+
+        rectangle(gray, cars[0], CV_RGB(255, 255, 255), 1);
+
+    } else {
+        result = env->NewIntArray(0);
+    }
+
+    /*
+    Mat bgr(gray.rows, gray.cols, CV_8UC3);
+    cvtColor(gray, bgr, COLOR_GRAY2BGR);
+
+    Mat yuv;
+    cvtColor(bgr, yuv, COLOR_BGR2YUV_I420);
+
+    Mat* mat = (Mat*) returnadress;
+    mat->create(yuv.rows, yuv.cols, CV_8UC1);
+    memcpy(mat->data, yuv.data, mat->rows * mat->cols );
+    */
+
+    return result;
+}
 
 
 

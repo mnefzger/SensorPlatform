@@ -98,8 +98,10 @@ public class ImageModule implements IEventCallback{
 
     public void stopCapture() {
         stopBackgroundThread();
-        camera_front.close();
-        camera_back.close();
+        if(camera_front != null)
+            camera_front.close();
+        if(camera_back != null)
+            camera_back.close();
     }
 
     private void open(String id) {
@@ -113,7 +115,7 @@ public class ImageModule implements IEventCallback{
                 }
                 if(id == "1") {
                     cameraManager.openCamera(id, frontCameraStateCallback, null );
-                    imageReader_front = ImageReader.newInstance(320, 240, ImageFormat.YUV_420_888, 15);
+                    imageReader_front = ImageReader.newInstance(240, 320, ImageFormat.YUV_420_888, 15);
                     imageReader_front.setOnImageAvailableListener(onFrontImageAvailableListener, mBackgroundHandler);
                 }
             }
@@ -270,7 +272,7 @@ public class ImageModule implements IEventCallback{
                 new Thread(new Runnable() {
                     @Override
                     public void run() {
-                        imgProc.processImage(bytes.clone(), w, h);
+                        imgProc.processImageFront(bytes.clone(), w, h);
                     }
                 }).start();
                 //byte[] processedImg = imgProc.processImage(bytes, img.getWidth(), img.getHeight());
@@ -328,7 +330,7 @@ public class ImageModule implements IEventCallback{
                 new Thread(new Runnable() {
                     @Override
                     public void run() {
-                        imgProc.processImage(bytes.clone(), w, h);
+                        imgProc.processImageBack(bytes.clone(), w, h);
                     }
                 }).start();
                 //byte[] processedImg = imgProc.processImage(bytes, img.getWidth(), img.getHeight());

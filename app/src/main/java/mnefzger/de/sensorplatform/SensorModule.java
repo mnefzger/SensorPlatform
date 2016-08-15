@@ -12,6 +12,7 @@ import java.util.List;
 import java.util.Timer;
 import java.util.TimerTask;
 
+import mnefzger.de.sensorplatform.External.FitnessSensorManager;
 import mnefzger.de.sensorplatform.External.OBD2Provider;
 import mnefzger.de.sensorplatform.Processors.DrivingBehaviourProcessor;
 
@@ -41,6 +42,7 @@ public class SensorModule implements ISensorCallback, IEventCallback{
      * OBD2Provider to collect vehicle data
      */
     private OBD2Provider obd2;
+    private FitnessSensorManager fitness;
     /**
      * List of all currently running SensorProviders
      */
@@ -89,6 +91,7 @@ public class SensorModule implements ISensorCallback, IEventCallback{
         current.setTimestamp(System.currentTimeMillis());
         dataBuffer = new ArrayList<>();
 
+        fitness = new FitnessSensorManager(app);
     }
 
     public void startSensing(DataType type) {

@@ -14,4 +14,6 @@ public interface ISensorCallback {
     void onOBD2Data(double[] values);
 
     void onLightData(double value);
+
+    void onHeartData(double value);
 }

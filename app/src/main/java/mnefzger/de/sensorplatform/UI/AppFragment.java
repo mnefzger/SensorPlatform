@@ -121,9 +121,8 @@ public class AppFragment extends Fragment {
             resumeButton.setEnabled(false);
             pauseButton.setEnabled(false);
 
-
             MainActivity app = (MainActivity)getActivity();
-            app.goToStartFragment(50);
+            app.goToStartFragment(25);
 
         }
     };

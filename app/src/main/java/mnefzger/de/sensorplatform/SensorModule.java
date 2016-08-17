@@ -91,7 +91,8 @@ public class SensorModule implements ISensorCallback, IEventCallback{
         current.setTimestamp(System.currentTimeMillis());
         dataBuffer = new ArrayList<>();
 
-        fitness = new FitnessSensorManager(app);
+        fitness = FitnessSensorManager.getInstance(app);
+        fitness.setCallback(this);
     }
 
     public void startSensing(DataType type) {
@@ -277,6 +278,11 @@ public class SensorModule implements ISensorCallback, IEventCallback{
     @Override
     public void onLightData(double lux) {
         current.setLight(lux);
+    }
+
+    @Override
+    public void onHeartData(double bpm) {
+        current.setHeartRate(bpm);
     }
 
     @Override

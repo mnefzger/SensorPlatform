@@ -41,6 +41,8 @@ public class DataVector {
 
     public double fuel;
 
+    public double heartRate;
+
     public DataVector() {
         setDateTime();
     }
@@ -94,11 +96,15 @@ public class DataVector {
         this.fuel = f;
     }
 
+    public void setHeartRate(double heartRate) {
+        this.heartRate = heartRate;
+    }
+
     @Override
     public String toString() {
         return "time: " + timestamp + ", date: " + dateTime + ", accX: " + accX + ", accY: " + accY + ", accZ: " + accZ +
                 ", rotX: " + rotX + ", rotY: " + rotY + ", rotZ: " + rotZ + ", light: " + light + ", speed: " + speed +
-                ", OBD speed: " + obdSpeed + ", rpm: " + rpm + ", fuel: " + fuel;
+                ", OBD speed: " + obdSpeed + ", rpm: " + rpm + ", fuel: " + fuel + ", heart rate: " + heartRate;
     }
 
     public String toCSVString() {
@@ -106,8 +112,9 @@ public class DataVector {
         double lon = (location == null) ? 0 : location.getLongitude();
         return timestamp + ";" + dateTime + ";" + accX + ";" + accY + ";" + accZ + ";" +
                 rotX + ";" + rotY + ";" + rotZ + ";" + light + ";" +
-                lat + ";" + lon + ";" + speed + ";" + obdSpeed + ";" + rpm + ";" + fuel;
+                lat + ";" + lon + ";" + speed + ";" + obdSpeed + ";" + rpm + ";" + fuel + ";" + heartRate;
     }
+
 
 
 }

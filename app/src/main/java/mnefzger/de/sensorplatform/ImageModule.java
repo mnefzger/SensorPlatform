@@ -97,7 +97,8 @@ public class ImageModule implements IEventCallback{
     }
 
     public void stopCapture() {
-        stopBackgroundThread();
+        if(mBackgroundThread != null)
+            stopBackgroundThread();
         if(camera_front != null)
             camera_front.close();
         if(camera_back != null)

@@ -162,8 +162,11 @@ public class SensorModule implements ISensorCallback, IEventCallback{
 
         } else if(t == GPS_IDENTIFIER) {
             location.stop();
+            orientation.stop();
             if(activeProviders.contains(location))
                 activeProviders.remove(location);
+            if(activeProviders.contains(orientation))
+                activeProviders.remove(orientation);
 
         } else if(t == OBD_IDENTIFIER) {
             obd2.stop();

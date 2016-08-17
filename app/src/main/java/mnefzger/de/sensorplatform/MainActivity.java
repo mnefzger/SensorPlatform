@@ -7,6 +7,7 @@ import android.content.ServiceConnection;
 import android.content.SharedPreferences;
 import android.content.pm.ActivityInfo;
 import android.os.Bundle;
+import android.os.Handler;
 import android.os.IBinder;
 import android.preference.PreferenceManager;
 import android.support.v4.app.Fragment;
@@ -64,7 +65,7 @@ public class MainActivity extends AppCompatActivity implements IDataCallback{
             bindService(intent, mConnection, Context.BIND_AUTO_CREATE);
             startService(intent);
 
-            goToStartFragment();
+            goToStartFragment(0);
 
         } else {
             // if the data collection was already started, set reference to the UI fragment that shows live data
@@ -180,6 +181,7 @@ public class MainActivity extends AppCompatActivity implements IDataCallback{
 
         changeFragment(appFragment, true, true);
         this.setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_REVERSE_LANDSCAPE);
+
     }
 
     public void goToSettingsFragment() {
@@ -188,10 +190,22 @@ public class MainActivity extends AppCompatActivity implements IDataCallback{
         this.setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_UNSPECIFIED);
     }
 
-    public void goToStartFragment() {
+    /**
+     * Changing to the StartFragment allows for a short delay to allow the service to shut down completely
+     */
+    public void goToStartFragment(int ms) {
         startFragment = new StartFragment();
-        changeFragment(startFragment, true, true);
-        this.setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_UNSPECIFIED);
+
+        Handler wait = new Handler();
+        wait.postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                changeFragment(startFragment, true, true);
+                MainActivity that = (MainActivity) getActivity();
+                that.setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_UNSPECIFIED);
+            }
+        }, ms);
+
     }
 
     private void changeFragment(Fragment frag, boolean saveInBackstack, boolean animate) {

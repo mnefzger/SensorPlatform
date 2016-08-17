@@ -245,13 +245,15 @@ public class SensorPlatformService extends Service implements IDataCallback{
         im.stopCapture();
 
         ActiveSubscriptions.removeAll();
+
+        serviceRunning = false;
         stopForeground(true);
         stopSelf();
         // remove notification
         NotificationManager nm = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
         nm.cancelAll();
 
-        serviceRunning = false;
+
     }
 
     public void pauseDataCollection() {

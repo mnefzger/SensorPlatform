@@ -45,8 +45,10 @@ dependencies {
     compile group: 'com.google.code.gson', name: 'gson', version: '1.7.2'
     compile 'com.android.support:appcompat-v7:23.4.0'
     compile 'com.android.support:support-v4:23.4.0'
-    compile 'com.android.support:design:23.3.0'
+    compile 'com.android.support:design:23.4.0'
+    compile 'com.google.android.gms:play-services-wearable:7.5.0'
     compile 'com.android.volley:volley:1.0.0'
     compile 'com.github.pires:obd-java-api:1.0-RC16'
     compile 'com.jakewharton.threetenabp:threetenabp:1.0.3'
+    wearApp project(':wear')
 }

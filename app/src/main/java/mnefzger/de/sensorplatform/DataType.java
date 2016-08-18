@@ -37,5 +37,9 @@ public enum DataType {
     /**
      *
      */
-    OBD
+    OBD,
+    /**
+     *
+     */
+    HEART_RATE
 }

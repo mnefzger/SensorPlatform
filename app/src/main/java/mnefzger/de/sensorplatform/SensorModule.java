@@ -135,6 +135,11 @@ public class SensorModule implements ISensorCallback, IEventCallback{
             obd2.start();
             activeProviders.add(obd2);
         }
+
+        if(t == Sensor.TYPE_HEART_RATE && !activeProviders.contains(fitness)) {
+            fitness.start();
+            activeProviders.add(fitness);
+        }
     }
 
     /**
@@ -173,6 +178,11 @@ public class SensorModule implements ISensorCallback, IEventCallback{
             obd2.stop();
             if(activeProviders.contains(obd2))
                 activeProviders.remove(obd2);
+
+        } else if(t == Sensor.TYPE_HEART_RATE) {
+            fitness.stop();
+            if(activeProviders.contains(fitness))
+                activeProviders.remove(fitness);
         }
 
         Log.d("STOPPED", activeProviders.size()+"");
@@ -324,6 +334,8 @@ public class SensorModule implements ISensorCallback, IEventCallback{
                 return GPS_IDENTIFIER;
             case OBD:
                 return OBD_IDENTIFIER;
+            case HEART_RATE:
+                return Sensor.TYPE_HEART_RATE;
             default:
                 return -1;
         }

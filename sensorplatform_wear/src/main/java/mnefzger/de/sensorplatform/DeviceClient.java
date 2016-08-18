@@ -84,7 +84,7 @@ public class DeviceClient {
             Wearable.DataApi.putDataItem(googleApiClient, putDataRequest).setResultCallback(new ResultCallback<DataApi.DataItemResult>() {
                 @Override
                 public void onResult(DataApi.DataItemResult dataItemResult) {
-                    Log.v(TAG, "Sending sensor data: " + dataItemResult.getStatus().isSuccess());
+                    //Log.v(TAG, "Sending sensor data: " + dataItemResult.getStatus().isSuccess());
                 }
             });
         }

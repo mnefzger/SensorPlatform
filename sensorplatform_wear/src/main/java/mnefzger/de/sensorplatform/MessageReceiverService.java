@@ -25,12 +25,6 @@ public class MessageReceiverService extends WearableListenerService {
     }
 
     @Override
-    public int onStartCommand(Intent intent, int flags, int startId) {
-        Log.d(TAG, "Receiver Service started");
-        return START_STICKY;
-    }
-
-    @Override
     public void onDataChanged(DataEventBuffer dataEvents) {
         super.onDataChanged(dataEvents);
 
@@ -40,7 +34,7 @@ public class MessageReceiverService extends WearableListenerService {
                 Uri uri = dataItem.getUri();
                 String path = uri.getPath();
 
-                Log.d(TAG, "Data changed: " + uri + ", " + path + ", " + dataItem.getData());
+                //Log.d(TAG, "Data changed: " + uri + ", " + path + ", " + dataItem.getData());
             }
         }
     }

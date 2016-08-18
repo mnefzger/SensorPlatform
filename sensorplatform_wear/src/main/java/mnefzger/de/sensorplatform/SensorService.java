@@ -63,16 +63,18 @@ public class SensorService extends Service implements SensorEventListener {
         if (mSensorManager != null) {
 
             if (mHeartrateSensor != null) {
-                final int measurementDuration   = 10;   // Seconds
-                final int measurementBreak      = 5;    // Seconds
+                final int measurementDuration   = 1;   // Seconds
+                final int measurementBreak      = 0;    // Seconds
+
+                Log.d(TAG, "register Heartrate Sensor");
+                mSensorManager.registerListener(SensorService.this, mHeartrateSensor, SensorManager.SENSOR_DELAY_NORMAL);
 
                 mScheduler = Executors.newScheduledThreadPool(1);
                 mScheduler.scheduleAtFixedRate(
                         new Runnable() {
                             @Override
                             public void run() {
-                                Log.d(TAG, "register Heartrate Sensor");
-                                mSensorManager.registerListener(SensorService.this, mHeartrateSensor, SensorManager.SENSOR_DELAY_NORMAL);
+
 
                                 try {
                                     Thread.sleep(measurementDuration * 1000);
@@ -80,8 +82,7 @@ public class SensorService extends Service implements SensorEventListener {
                                     Log.e(TAG, "Interrupted while waiting to unregister Heartrate Sensor");
                                 }
 
-                                Log.d(TAG, "unregister Heartrate Sensor");
-                                mSensorManager.unregisterListener(SensorService.this, mHeartrateSensor);
+
                             }
                         }, 3, measurementDuration + measurementBreak, TimeUnit.SECONDS);
 
@@ -95,6 +96,9 @@ public class SensorService extends Service implements SensorEventListener {
     private void stopMeasurement() {
         if (mSensorManager != null) {
             mSensorManager.unregisterListener(this);
+
+            Log.d(TAG, "unregister Heartrate Sensor");
+            mSensorManager.unregisterListener(SensorService.this, mHeartrateSensor);
         }
         if (mScheduler != null && !mScheduler.isTerminated()) {
             mScheduler.shutdown();
@@ -104,6 +108,10 @@ public class SensorService extends Service implements SensorEventListener {
     @Override
     public void onSensorChanged(SensorEvent event) {
         Log.d(TAG, event.values[0] + " bpm");
+        if(event.accuracy == SensorManager.SENSOR_STATUS_UNRELIABLE ||
+                event.accuracy == SensorManager.SENSOR_STATUS_NO_CONTACT)
+            return;
+
         client.sendSensorData(event.sensor.getType(), event.accuracy, event.timestamp, event.values);
     }
 

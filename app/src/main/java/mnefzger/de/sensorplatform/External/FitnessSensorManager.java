@@ -13,9 +13,10 @@ import com.google.android.gms.wearable.Wearable;
 
 import java.util.List;
 
+import mnefzger.de.sensorplatform.DataProvider;
 import mnefzger.de.sensorplatform.ISensorCallback;
 
-public class FitnessSensorManager {
+public class FitnessSensorManager extends DataProvider{
 
     private static FitnessSensorManager instance;
     private ISensorCallback callback;
@@ -31,10 +32,6 @@ public class FitnessSensorManager {
         connect();
     }
 
-    public void setCallback(ISensorCallback callback) {
-        this.callback = callback;
-    }
-
     public static synchronized FitnessSensorManager getInstance(Context context) {
         if (instance == null) {
             instance = new FitnessSensorManager(context.getApplicationContext());
@@ -43,13 +40,16 @@ public class FitnessSensorManager {
         return instance;
     }
 
+    public void setCallback(ISensorCallback callback) {
+        this.callback = callback;
+    }
+
     private void connect() {
         new Thread(new Runnable() {
             @Override
             public void run() {
                 ConnectionResult result = googleApiClient.blockingConnect();
                 Log.d("WEAR CONNECT", result.isSuccess()+"");
-                startMeasurement();
             }
         }).start();
     }
@@ -59,11 +59,21 @@ public class FitnessSensorManager {
     }
 
     public void startMeasurement() {
-        controlMeasurementInBackground("/start_heart");
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                controlMeasurementInBackground("/start_heart");
+            }
+        }).start();
     }
 
     public void stopMeasurement() {
-        controlMeasurementInBackground("/stop_heart");
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                controlMeasurementInBackground("/stop_heart");
+            }
+        }).start();
     }
 
     private void controlMeasurementInBackground(final String path) {
@@ -86,6 +96,22 @@ public class FitnessSensorManager {
         } else {
             Log.w(TAG, "No connection possible");
         }
+    }
+
+    @Override
+    public void start() {
+        if(googleApiClient.isConnected())
+            startMeasurement();
+        else {
+            connect();
+            startMeasurement();
+        }
+
+    }
+
+    @Override
+    public void stop() {
+        stopMeasurement();
     }
 }
 

@@ -45,8 +45,6 @@ public class FitnessSensorReceiverService extends WearableListenerService {
 
     @Override
     public void onDataChanged(DataEventBuffer dataEvents) {
-        Log.d(TAG, "onDataChanged()");
-
         for (DataEvent dataEvent : dataEvents) {
             if (dataEvent.getType() == DataEvent.TYPE_CHANGED) {
                 DataItem dataItem = dataEvent.getDataItem();
@@ -68,7 +66,7 @@ public class FitnessSensorReceiverService extends WearableListenerService {
         long timestamp = dataMap.getLong("TIME");
         float[] values = dataMap.getFloatArray("VALUE");
 
-        Log.d(TAG, "Received heart rate = " + Arrays.toString(values) + ", accuracy = " + accuracy);
+        //Log.d(TAG, "Received heart rate = " + Arrays.toString(values) + ", accuracy = " + accuracy);
 
         fSM.handleIncomingData(values[0]);
     }

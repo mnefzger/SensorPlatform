@@ -12,6 +12,8 @@ import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.TextView;
 
+import org.w3c.dom.Text;
+
 import java.text.DecimalFormat;
 
 import mnefzger.de.sensorplatform.ActiveSubscriptions;
@@ -46,6 +48,8 @@ public class AppFragment extends Fragment {
     TextView obdSpeed;
     TextView obdRPM;
     TextView obdFuel;
+
+    TextView heart;
 
     Button stopButton;
     Button pauseButton;
@@ -99,6 +103,8 @@ public class AppFragment extends Fragment {
         obdRPM = (TextView) v.findViewById(R.id.obdRPMText);
         obdSpeed = (TextView) v.findViewById(R.id.obdSpeedText);
         obdFuel = (TextView) v.findViewById(R.id.obdFuelText);
+
+        heart = (TextView) v.findViewById(R.id.heartText);
 
         stopButton = (Button) v.findViewById(R.id.stopButton);
         pauseButton = (Button) v.findViewById(R.id.pauseButton);
@@ -181,6 +187,8 @@ public class AppFragment extends Fragment {
                 obdRPM.setText("OBD RPM: " + v.rpm);
                 obdSpeed.setText("OBD Speed: " + v.obdSpeed + " km/h");
                 obdFuel.setText("OBD Fuel: " + v.fuel + " l/100km");
+
+                heart.setText("Heart Rate: " + v.heartRate + "bpm");
             }
         });
 

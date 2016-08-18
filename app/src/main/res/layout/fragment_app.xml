@@ -26,7 +26,6 @@
                 android:orientation="vertical"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_centerHorizontal="true"
                 android:weightSum="1"
                 android:layout_weight="0.5">
 
@@ -35,7 +34,6 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:id="@+id/rotXText"
-                    android:layout_below="@+id/accZText"
                     android:layout_alignParentStart="true" />
 
                 <TextView
@@ -44,7 +42,6 @@
                     android:layout_height="wrap_content"
                     android:id="@+id/rotYText"
                     android:layout_marginTop="10dp"
-                    android:layout_below="@+id/rotXText"
                     android:layout_alignParentStart="true" />
 
                 <TextView
@@ -53,8 +50,6 @@
                     android:layout_height="wrap_content"
                     android:id="@+id/rotZText"
                     android:layout_marginTop="10dp"
-                    android:layout_below="@+id/rotYText"
-                    android:layout_alignParentStart="true"
                     android:layout_weight="0.18" />
             </LinearLayout>
 
@@ -75,7 +70,6 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:id="@+id/accYText"
-                    android:layout_below="@+id/accXText"
                     android:layout_marginTop="11dp" />
 
                 <TextView
@@ -83,8 +77,6 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:id="@+id/accZText"
-                    android:layout_below="@+id/accYText"
-                    android:layout_alignParentStart="true"
                     android:layout_marginTop="10dp" />
             </LinearLayout>
 
@@ -106,17 +98,13 @@
                     android:text="Lat:"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:id="@+id/latText"
-                    android:layout_centerVertical="true"
-                    android:layout_alignStart="@+id/accYText" />
+                    android:id="@+id/latText"/>
 
                 <TextView
                     android:text="Lon:"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:id="@+id/lonText"
-                    android:layout_below="@+id/latText"
-                    android:layout_alignStart="@+id/latText"
                     android:layout_marginTop="10dp" />
 
                 <TextView
@@ -124,8 +112,13 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:id="@+id/speedText"
-                    android:layout_below="@+id/lonText"
-                    android:layout_alignStart="@+id/lonText"
+                    android:layout_marginTop="10dp" />
+
+                <TextView
+                    android:text="Heart Rate:"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:id="@+id/heartText"
                     android:layout_marginTop="10dp" />
 
             </LinearLayout>

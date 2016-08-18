@@ -220,6 +220,7 @@ public class SensorModule implements ISensorCallback, IEventCallback{
             current.setSpeed(last.speed);
             current.setOBDSpeed(last.obdSpeed);
             current.setRPM(last.rpm);
+            current.setHeartRate(last.heartRate);
         }
         /**
          * only store last BUFFERSIZE DataVectors

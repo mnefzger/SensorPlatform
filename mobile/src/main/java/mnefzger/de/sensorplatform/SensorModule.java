@@ -16,6 +16,11 @@ import mnefzger.de.sensorplatform.External.FitnessSensorManager;
 import mnefzger.de.sensorplatform.External.OBD2Provider;
 import mnefzger.de.sensorplatform.Processors.DrivingBehaviourProcessor;
 
+/**
+ * This class is the central unit of data collection.
+ * It knows all the Sensor Provider classes and collects raw data values in one DataVector.
+ */
+
 public class SensorModule implements ISensorCallback, IEventCallback{
     private SharedPreferences prefs;
     /**
@@ -42,6 +47,9 @@ public class SensorModule implements ISensorCallback, IEventCallback{
      * OBD2Provider to collect vehicle data
      */
     private OBD2Provider obd2;
+    /**
+     * The DataProvider to collect heart rate from the Android Wear watch
+     */
     private FitnessSensorManager fitness;
     /**
      * List of all currently running SensorProviders

@@ -34,6 +34,12 @@ import java.util.Arrays;
 import mnefzger.de.sensorplatform.Processors.ImageProcessor;
 import mnefzger.de.sensorplatform.Utilities.SequenceEncoderWrapper;
 
+/**
+ * This class provides the connection to front and back camera.
+ * It also includes functions to save in the background:
+ * a. single images
+ * b. a number of single images as video
+ */
 
 public class ImageModule implements IEventCallback{
     private Context context;

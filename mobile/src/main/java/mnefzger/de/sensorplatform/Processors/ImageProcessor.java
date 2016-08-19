@@ -24,6 +24,11 @@ import mnefzger.de.sensorplatform.IEventCallback;
 import mnefzger.de.sensorplatform.ImageModule;
 import mnefzger.de.sensorplatform.R;
 
+/**
+ * This class includes all image analysis functions for
+ * a. face detection
+ * b. car detection and following distance calculation (TODO)
+ */
 
 public class ImageProcessor{
     private IEventCallback callback;

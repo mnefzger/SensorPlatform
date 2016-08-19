@@ -16,6 +16,9 @@ import java.io.IOException;
 import mnefzger.de.sensorplatform.DataVector;
 import mnefzger.de.sensorplatform.EventVector;
 
+/**
+ * This class writes Raw Data and Event Data to csv files on the phone
+ */
 
 public class LoggingModule {
 

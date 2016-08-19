@@ -3,6 +3,10 @@ package mnefzger.de.sensorplatform;
 import android.content.Context;
 import android.content.SharedPreferences;
 
+/**
+ * This class provides an interface to the res/xml/preferences.xml file
+ */
+
 public class Preferences {
 
     public static final String ACCELEROMETER_RAW = "accelerometer_raw";

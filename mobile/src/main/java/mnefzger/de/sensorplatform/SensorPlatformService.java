@@ -20,6 +20,12 @@ import java.util.Iterator;
 
 import mnefzger.de.sensorplatform.Logger.LoggingModule;
 
+/**
+ * This class is the main service managing the data collection.
+ * It provides functionality to start, stop, pause the service
+ * as well as to (un)subscribe to specific data values or events.
+ */
+
 public class SensorPlatformService extends Service implements IDataCallback{
     private SharedPreferences prefs;
     private SensorModule sm;

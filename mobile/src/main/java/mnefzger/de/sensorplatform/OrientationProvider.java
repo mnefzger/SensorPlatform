@@ -8,6 +8,10 @@ import android.util.Log;
 
 import mnefzger.de.sensorplatform.Utilities.MathFunctions;
 
+/**
+ * This class is responsible for getting the rotation vector data from the sensor
+ * It reports the rotation matrix and euler angles to the defined callback
+ */
 
 public class OrientationProvider extends SensorProvider {
     private Sensor rotationSensor;

@@ -54,7 +54,6 @@ public class SensorPlatformService extends Service implements IDataCallback{
     }
 
     private void setup() {
-        Log.d("SERVICE", "setting up...");
         // Backport of the new java8 time
         AndroidThreeTen.init(getApplication());
 
@@ -160,7 +159,7 @@ public class SensorPlatformService extends Service implements IDataCallback{
     public void onRawData(DataVector dv) {
         if(appCallback != null)
             appCallback.onRawData(dv);
-        //Log.d("RawData @ Service", dv.toString());
+
         if(ActiveSubscriptions.rawLoggingActive()) {
             lm.writeRawToCSV(dv);
         }

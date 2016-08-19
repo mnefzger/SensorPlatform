@@ -178,7 +178,7 @@ public class AppFragment extends Fragment {
                     lon.setText("Lon: Acquiring position…");
                     speed.setText("Speed: Acquiring position…");
                 }
-                if(v.location != null) {
+                if(v.location != null && ActiveSubscriptions.usingGPS()) {
                     lat.setText("Lat: " + df.format( v.location.getLatitude() ));
                     lon.setText("Lon: " + df.format( v.location.getLongitude() ));
                     speed.setText("Speed: " + df.format(v.speed) + " km/h");

@@ -86,19 +86,19 @@ public class SensorModule implements ISensorCallback, IEventCallback{
         location = new PositionProvider(app, this);
         obd2 = new OBD2Provider(app, this);
         drivingBehProc = new DrivingBehaviourProcessor(this, app);
+        fitness = FitnessSensorManager.getInstance(app);
+        fitness.setCallback(this);
 
         current = new DataVector();
         current.setTimestamp(System.currentTimeMillis());
         dataBuffer = new ArrayList<>();
 
-        fitness = FitnessSensorManager.getInstance(app);
-        fitness.setCallback(this);
     }
 
     public void startSensing(DataType type) {
 
         if(!sensing) {
-            int sampling = Integer.valueOf( Preferences.getRawDataDelay(prefs) );
+            int sampling = Preferences.getRawDataDelay(prefs);
             aggregateData( sampling );
             sensing = true;
         }

@@ -95,7 +95,9 @@ public class SensorPlatformService extends Service implements IDataCallback{
             subscribeTo(DataType.OBD);
         }
 
-        subscribeTo(DataType.HEART_RATE);
+        if(Preferences.heartRateActivated(prefs)) {
+            subscribeTo(DataType.HEART_RATE);
+        }
 
         if(Preferences.rawLoggingActivated(prefs)) {
             logRawData(true);

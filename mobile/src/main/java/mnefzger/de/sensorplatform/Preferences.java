@@ -15,6 +15,8 @@ public class Preferences {
 
     public static final String OBD_RAW = "obd_raw";
 
+    public static final String HEART_RATE = "heartRate_raw";
+
     public static final String FRONT_CAMERA = "front_active";
 
     public static final String BACK_CAMERA = "back_active";
@@ -24,6 +26,8 @@ public class Preferences {
     public static final String BACK_PROCESSING = "image_back_processing";
 
     public static final String VIDEO_SAVING = "image_saving";
+
+
 
 
     public static final String FREQUENCY_RAWDATA = "frequency_rawData";
@@ -95,6 +99,12 @@ public class Preferences {
 
     public static boolean OBDActivated(SharedPreferences prefs) {
         boolean value = prefs.getBoolean(OBD_RAW, false);
+
+        return value;
+    }
+
+    public static boolean heartRateActivated(SharedPreferences prefs) {
+        boolean value = prefs.getBoolean(HEART_RATE, false);
 
         return value;
     }

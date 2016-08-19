@@ -89,6 +89,14 @@
                 android:title="OBD2 request frequency" />
         </PreferenceCategory>
 
+        <PreferenceCategory android:title="Fitness Wearable">
+            <CheckBoxPreference
+                android:key="heartRate_raw"
+                android:title="Heart Rate"
+                android:summary="Activate connection to fitness wearable to collect heart rate"
+                android:defaultValue="false"/>
+        </PreferenceCategory>
+
 
         <PreferenceCategory android:title="Acceleration and Braking">
             <ListPreference

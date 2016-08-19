@@ -73,7 +73,7 @@ public class ImageModule implements IEventCallback{
         context = app;
         callback = caller;
         cameraManager = (CameraManager) app.getSystemService(Activity.CAMERA_SERVICE);
-        imgProc = new ImageProcessor(this);
+        imgProc = new ImageProcessor(this, app);
 
         prefs = PreferenceManager.getDefaultSharedPreferences(app);
         setPrefs();

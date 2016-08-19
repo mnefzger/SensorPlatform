@@ -1,13 +1,28 @@
 package mnefzger.de.sensorplatform.Processors;
 
+import android.content.Context;
+import android.content.res.Resources;
+import android.os.Environment;
 import android.util.Log;
+
+import com.opencsv.CSVWriter;
 
 import org.opencv.core.CvType;
 import org.opencv.core.Mat;
 
+import java.io.BufferedReader;
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileReader;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+
 import mnefzger.de.sensorplatform.EventVector;
 import mnefzger.de.sensorplatform.IEventCallback;
 import mnefzger.de.sensorplatform.ImageModule;
+import mnefzger.de.sensorplatform.R;
 
 
 public class ImageProcessor{
@@ -20,13 +35,17 @@ public class ImageProcessor{
         System.loadLibrary("imgProc");
     }
 
-    public ImageProcessor(ImageModule im) {
-        callback = im;
-    }
+    private native int nInitCascades();
 
     private native int[] nAsmFindFace(long adress1, long adress2);
 
     private native int[] nAsmFindCars(long adress1, long adress2);
+
+    public ImageProcessor(ImageModule im, Context c) {
+        callback = im;
+        writeCascadeToFileSystem(c);
+        nInitCascades();
+    }
 
     public byte[] processImageFront(byte[] image, int width, int height) {
         Mat imgMat = new Mat(height + height/2, width, CvType.CV_8UC1);
@@ -107,5 +126,42 @@ public class ImageProcessor{
         return cars;
     }
 
+
+    private void writeCascadeToFileSystem(Context c) {
+        String baseDir = android.os.Environment.getExternalStorageDirectory().getAbsolutePath();
+        String filePath = baseDir + "/SensorPlatform/";
+        Log.d("CASCADES", "writing to " + filePath);
+        File toPath = new File(filePath);
+
+        if (!toPath.exists()) {
+            toPath.mkdir();
+        }
+
+        try {
+            InputStream inStream = c.getAssets().open("lbpcascade_frontalface.xml");
+            BufferedReader br = new BufferedReader(new InputStreamReader(inStream));
+            File toFile = new File(toPath, "lbpcascade_frontalface.xml");
+            copyAssetFile(br, toFile);
+        } catch (IOException e) {
+        }
+    }
+
+    private void copyAssetFile(BufferedReader br, File toFile) throws IOException {
+        BufferedWriter bw = null;
+        try {
+            bw = new BufferedWriter(new FileWriter(toFile));
+
+            int in;
+            while ((in = br.read()) != -1) {
+                bw.write(in);
+            }
+        } finally {
+            Log.d("CASCADES", "Writing finished");
+            if (bw != null) {
+                bw.close();
+            }
+            br.close();
+        }
+    }
 
 }

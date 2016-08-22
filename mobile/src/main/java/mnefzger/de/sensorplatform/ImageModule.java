@@ -246,10 +246,10 @@ public class ImageModule implements IEventCallback{
                 @Override
                 public void run() {
                     if(Preferences.frontCameraActivated(prefs)) {
-                        new VideoSaver(frontImages, (int)FRONT_AVG_FPS, 320, 240, "front", ""+v.timestamp);
+                        new VideoSaver(frontImages, (int)FRONT_AVG_FPS, 320, 240, "front", v.getTimestamp());
                     }
                     if(Preferences.backCameraActivated(prefs)) {
-                        new VideoSaver(backImages, (int)BACK_AVG_FPS, 640, 480, "back", ""+v.timestamp);
+                        new VideoSaver(backImages, (int)BACK_AVG_FPS, 640, 480, "back", v.getTimestamp());
                     }
 
                 }
@@ -412,7 +412,7 @@ public class ImageModule implements IEventCallback{
         String filePath = baseDir + "/SensorPlatform/videos/";
         File mFile;
 
-        public VideoSaver(SparseArray<YuvImage> list, int FPS, int width, int height, String mode, String timestamp) {
+        public VideoSaver(SparseArray<YuvImage> list, int FPS, int width, int height, String mode, long timestamp) {
             this.images = copy(list);
             this.FPS = FPS;
             this.w = width;

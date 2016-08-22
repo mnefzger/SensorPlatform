@@ -200,14 +200,14 @@ public class AppFragment extends Fragment {
         main.runOnUiThread(new Runnable() {
             @Override
             public void run() {
-                if (v.eventDescription.contains("ROAD"))
-                    street.setText(v.eventDescription);
-                else if (v.eventDescription.equals("Face detected"))
+                if (v.getEventDescription().contains("ROAD"))
+                    street.setText(v.getEventDescription());
+                else if (v.getEventDescription().equals("Face detected"))
                     face.setText("Face detected: YES");
-                else if (v.eventDescription.equals("No Face detected"))
+                else if (v.getEventDescription().equals("No Face detected"))
                     face.setText("Face detected: NO");
                 else {
-                    event.setText("Last event: " + v.eventDescription);
+                    event.setText("Last event: " + v.getEventDescription());
                 }
             }
         });

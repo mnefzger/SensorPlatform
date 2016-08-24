@@ -195,7 +195,9 @@ public class MainActivity extends AppCompatActivity implements IDataCallback{
 
     public void goToSettingsFragment() {
         settings = new SettingsFragment();
-        getFragmentManager().beginTransaction().replace(R.id.fragment_container, settings).commit();
+        android.app.FragmentTransaction transaction = getFragmentManager().beginTransaction();
+        transaction.setCustomAnimations(R.animator.slide_in_right_animator, R.animator.slide_out_left_animator);
+        transaction.replace(R.id.fragment_container, settings).commit();
         this.setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_UNSPECIFIED);
     }
 

@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android"
+    android:key="@string/study_preferences_key">
+
+    <EditTextPreference
+        android:key="study_name"
+        android:title="Study Name"
+        android:summary="Defines a name for the study." />
+
+    <EditTextPreference
+        android:key="study_ID"
+        android:title="Study ID"
+        android:summary="Defines an unique alphanumerical identifier for the study. " />
+
+    <EditTextPreference
+        android:key="p_ID"
+        android:title="Participant ID"
+        android:summary="Defines an unique alphanumerical identifier for the participant." />
+
+    <EditTextPreference
+        android:key="p_age"
+        android:title="Participant Age"
+        android:summary="Declares the participant's age." />
+
+    <CheckBoxPreference
+        android:key="p_gender"
+        android:title="Participant Gender"
+        android:summary="Declares the participant's gender."/>
+
+</PreferenceScreen>

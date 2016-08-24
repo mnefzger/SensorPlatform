@@ -1,6 +1,7 @@
 package mnefzger.de.sensorplatform.UI;
 
 
+import android.content.Context;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.preference.CheckBoxPreference;
@@ -10,6 +11,9 @@ import android.support.design.widget.FloatingActionButton;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.TextView;
+
+import org.w3c.dom.Text;
 
 import mnefzger.de.sensorplatform.MainActivity;
 import mnefzger.de.sensorplatform.R;
@@ -17,6 +21,8 @@ import mnefzger.de.sensorplatform.R;
 
 public class SettingsFragment extends PreferenceFragment
         implements View.OnClickListener, SharedPreferences.OnSharedPreferenceChangeListener {
+
+    TextView topbar;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -28,6 +34,7 @@ public class SettingsFragment extends PreferenceFragment
 
         addPreferencesFromResource(R.xml.preferences);
         View v = inflater.inflate(R.layout.fragment_settings, container, false);
+
         FloatingActionButton b = (FloatingActionButton) v.findViewById(R.id.start_button);
         b.setOnClickListener(this);
 
@@ -40,6 +47,11 @@ public class SettingsFragment extends PreferenceFragment
             box.setEnabled(false);
             box.setSelectable(false);
         }
+
+        topbar = (TextView) v.findViewById(R.id.settings_topbar_text);
+        SharedPreferences studyPrefs = getActivity().getSharedPreferences(getString(R.string.study_preferences_key), Context.MODE_PRIVATE);
+        String studyName = studyPrefs.getString("study_name", "");
+        topbar.setText("New Study: " + studyName);
 
         return v;
     }

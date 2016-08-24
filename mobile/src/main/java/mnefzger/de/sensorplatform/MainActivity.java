@@ -19,6 +19,7 @@ import android.util.Log;
 import mnefzger.de.sensorplatform.External.OBD2Connection;
 import mnefzger.de.sensorplatform.UI.AppFragment;
 import mnefzger.de.sensorplatform.UI.SettingsFragment;
+import mnefzger.de.sensorplatform.UI.SetupFirstFragment;
 import mnefzger.de.sensorplatform.UI.StartFragment;
 import mnefzger.de.sensorplatform.Utilities.PermissionManager;
 
@@ -37,6 +38,7 @@ public class MainActivity extends AppCompatActivity implements IDataCallback{
     StartFragment startFragment;
     SettingsFragment settings;
     AppFragment appFragment;
+    SetupFirstFragment setupFragment;
     SharedPreferences prefs;
     SensorPlatformService sPS;
     boolean mBound = false;
@@ -49,7 +51,8 @@ public class MainActivity extends AppCompatActivity implements IDataCallback{
 
         PermissionManager.verifyPermissions(this);
 
-        prefs = PreferenceManager.getDefaultSharedPreferences(this);
+        //prefs = PreferenceManager.getDefaultSharedPreferences(this);
+        prefs = this.getSharedPreferences(getString(R.string.preferences_key), Context.MODE_PRIVATE);
         prefs.edit().clear();
         if(prefs.getAll().isEmpty()) {
             PreferenceManager.setDefaultValues(this, R.xml.preferences, true);
@@ -182,6 +185,12 @@ public class MainActivity extends AppCompatActivity implements IDataCallback{
         changeFragment(appFragment, true, true);
         this.setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_REVERSE_LANDSCAPE);
 
+    }
+
+    public void goToNewStudyFragment() {
+        setupFragment = new SetupFirstFragment();
+        changeFragment(setupFragment, true, true);
+        this.setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_UNSPECIFIED);
     }
 
     public void goToSettingsFragment() {

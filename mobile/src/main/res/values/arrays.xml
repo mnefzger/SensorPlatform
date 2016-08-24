@@ -18,12 +18,14 @@
         <item>500</item>
         <item>250</item>
         <item>100</item>
+        <item>50</item>
     </string-array>
     <string-array name="rawData_readable">
-        <item>1000 ms</item>
-        <item>500 ms</item>
-        <item>250 ms</item>
-        <item>100 ms</item>
+        <item>1 Hz</item>
+        <item>2 Hz</item>
+        <item>4 Hz</item>
+        <item>10 Hz</item>
+        <item>20 Hz</item>
     </string-array>
 
     <string-array name="obd_values">

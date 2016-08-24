@@ -14,6 +14,7 @@ import java.util.List;
 import mnefzger.de.sensorplatform.DataVector;
 import mnefzger.de.sensorplatform.EventVector;
 import mnefzger.de.sensorplatform.Preferences;
+import mnefzger.de.sensorplatform.R;
 import mnefzger.de.sensorplatform.SensorModule;
 import mnefzger.de.sensorplatform.Utilities.IOSMResponse;
 import mnefzger.de.sensorplatform.Utilities.MathFunctions;
@@ -43,7 +44,8 @@ public class DrivingBehaviourProcessor extends EventProcessor implements IOSMRes
     public DrivingBehaviourProcessor(SensorModule m, Context a) {
         super(m);
         qAdapter = new OSMQueryAdapter(this, a);
-        prefs = PreferenceManager.getDefaultSharedPreferences(a);
+        //prefs = PreferenceManager.getDefaultSharedPreferences(a);
+        prefs = a.getSharedPreferences(a.getString(R.string.preferences_key), Context.MODE_PRIVATE);
 
         ACC_THRESHOLD = Preferences.getAccelerometerThreshold(prefs);
         TURN_THRESHOLD = Preferences.getTurnThreshold(prefs);

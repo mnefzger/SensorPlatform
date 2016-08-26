@@ -9,15 +9,15 @@
     <LinearLayout
         android:orientation="vertical"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:paddingBottom="0dp">
+        android:layout_height="fill_parent"
+        android:paddingBottom="60dp">
 
         <LinearLayout
             android:orientation="horizontal"
             android:layout_width="match_parent"
-            android:layout_height="65dp"
+            android:layout_height="50dp"
             android:background="@color/colorPrimaryDark"
-            android:layout_marginBottom="25dp">
+            android:layout_marginBottom="0dp">
 
             <TextView
                 android:layout_width="wrap_content"
@@ -33,172 +33,202 @@
                 android:textStyle="bold" />
         </LinearLayout>
 
-        <LinearLayout
-            android:orientation="horizontal"
+        <ScrollView
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:layout_weight="0.2"
-            android:paddingLeft="25dp"
-            android:paddingRight="25dp">
+            android:layout_height="fill_parent"
+            android:id="@+id/scrollView" >
 
-            <android.support.design.widget.TextInputLayout
-                android:id="@+id/input_layout_name"
+            <LinearLayout
+                android:orientation="vertical"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:theme="@style/EditTextHint">
-
-                <android.support.design.widget.TextInputEditText
-                    android:id="@+id/study_name"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:inputType="text"
-                    android:singleLine="true"
-                    android:backgroundTint="#fff"
-                    android:textColor="@color/colorAccent"
-                    android:textSize="19sp"
-                    android:hint="Study Name"/>
-            </android.support.design.widget.TextInputLayout>
-
-        </LinearLayout>
-
-        <LinearLayout
-            android:orientation="horizontal"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:layout_weight="0.2"
-            android:paddingLeft="25dp"
-            android:paddingRight="25dp">
-
-            <android.support.design.widget.TextInputLayout
-                android:id="@+id/input_layout_sID"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:theme="@style/EditTextHint">
-
-                <android.support.design.widget.TextInputEditText
-                    android:id="@+id/study_id"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:inputType="text"
-                    android:singleLine="true"
-                    android:backgroundTint="#fff"
-                    android:textColor="@color/colorAccent"
-                    android:textSize="19sp"
-                    android:textColorHint="#aaffffff"
-                    android:hint="Study ID"/>
-            </android.support.design.widget.TextInputLayout>
-
-        </LinearLayout>
-
-        <LinearLayout
-            android:orientation="horizontal"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:layout_weight="0.2"
-            android:paddingLeft="25dp"
-            android:paddingRight="25dp">
-
-            <android.support.design.widget.TextInputLayout
-                android:id="@+id/input_layout_pID"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:theme="@style/EditTextHint">
-
-                <android.support.design.widget.TextInputEditText
-                    android:id="@+id/participant_id"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:inputType="text"
-                    android:singleLine="true"
-                    android:backgroundTint="#fff"
-                    android:textSize="19sp"
-                    android:textColor="@color/colorAccent"
-                    android:hint="Participant ID"/>
-            </android.support.design.widget.TextInputLayout>
-
-        </LinearLayout>
-
-        <LinearLayout
-            android:orientation="horizontal"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:layout_weight="0.2"
-            android:paddingLeft="25dp"
-            android:paddingRight="25dp">
-
-            <android.support.design.widget.TextInputLayout
-                android:id="@+id/input_layout_age"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:theme="@style/EditTextHint">
-
-                <android.support.design.widget.TextInputEditText
-                    android:id="@+id/participant_age"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:inputType="number"
-                    android:singleLine="true"
-                    android:backgroundTint="#fff"
-                    android:textColor="@color/colorAccent"
-                    android:textSize="19sp"
-                    android:hint="Participant Age"/>
-            </android.support.design.widget.TextInputLayout>
-
-
-        </LinearLayout>
-
-        <LinearLayout
-            android:orientation="horizontal"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:layout_weight="0.2"
-            android:paddingLeft="25dp"
-            android:paddingRight="25dp">
-
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Participant Gender"
-                android:textColor="#fff"
-                android:id="@+id/participant_gender_label"
-                android:textSize="17dp"
-                android:layout_marginRight="10dp"/>
-
-            <RadioGroup xmlns:android="http://schemas.android.com/apk/res/android"
-                android:layout_width="fill_parent"
                 android:layout_height="match_parent"
-                android:orientation="horizontal">
-                <RadioButton
-                    android:layout_width="100dp"
-                    android:layout_height="wrap_content"
-                    android:paddingLeft="5dp"
-                    android:text="Male"
-                    android:textColor="#fff"
-                    android:id="@+id/male_button"
-                    android:backgroundTint="#fff"
-                    android:checked="true"/>
+                android:weightSum="1">
 
-                <RadioButton
-                    android:layout_width="100dp"
-                    android:layout_height="wrap_content"
-                    android:paddingLeft="5dp"
-                    android:text="Female"
-                    android:textColor="#fff"
-                    android:textColorHint="#fff"
-                    android:id="@+id/female_button"
-                    android:backgroundTint="#fff"/>
-            </RadioGroup>
-        </LinearLayout>
+                <LinearLayout
+                    android:orientation="horizontal"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:layout_weight="0.2"
+                    android:paddingLeft="25dp"
+                    android:paddingRight="25dp"
+                    android:paddingTop="10dp"
+                    android:paddingBottom="15dp">
+
+                    <android.support.design.widget.TextInputLayout
+                        android:id="@+id/input_layout_name"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:theme="@style/EditTextHint">
+
+                        <android.support.design.widget.TextInputEditText
+                            android:id="@+id/study_name"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:inputType="text"
+                            android:singleLine="true"
+                            android:backgroundTint="#fff"
+                            android:textColor="@color/colorAccent"
+                            android:textSize="19sp"
+                            android:hint="Study Name"/>
+                    </android.support.design.widget.TextInputLayout>
+
+                </LinearLayout>
+
+                <LinearLayout
+                    android:orientation="horizontal"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:layout_weight="0.2"
+                    android:paddingLeft="25dp"
+                    android:paddingRight="25dp"
+                    android:paddingTop="10dp"
+                    android:paddingBottom="15dp">
+
+                    <android.support.design.widget.TextInputLayout
+                        android:id="@+id/input_layout_sID"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:theme="@style/EditTextHint">
+
+                        <android.support.design.widget.TextInputEditText
+                            android:id="@+id/study_id"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:inputType="text"
+                            android:singleLine="true"
+                            android:backgroundTint="#fff"
+                            android:textColor="@color/colorAccent"
+                            android:textSize="19sp"
+                            android:textColorHint="#aaffffff"
+                            android:hint="Study ID"/>
+                    </android.support.design.widget.TextInputLayout>
+
+                </LinearLayout>
+
+                <LinearLayout
+                    android:orientation="horizontal"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:layout_weight="0.2"
+                    android:paddingLeft="25dp"
+                    android:paddingRight="25dp"
+                    android:paddingTop="10dp"
+                    android:paddingBottom="15dp">
+
+                    <android.support.design.widget.TextInputLayout
+                        android:id="@+id/input_layout_pID"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:theme="@style/EditTextHint">
+
+                        <android.support.design.widget.TextInputEditText
+                            android:id="@+id/participant_id"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:inputType="text"
+                            android:singleLine="true"
+                            android:backgroundTint="#fff"
+                            android:textSize="19sp"
+                            android:textColor="@color/colorAccent"
+                            android:hint="Participant ID"/>
+                    </android.support.design.widget.TextInputLayout>
+
+                </LinearLayout>
+
+                <LinearLayout
+                    android:orientation="horizontal"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:layout_weight="0.2"
+                    android:paddingLeft="25dp"
+                    android:paddingRight="25dp"
+                    android:paddingTop="10dp"
+                    android:paddingBottom="15dp">
+
+                    <android.support.design.widget.TextInputLayout
+                        android:id="@+id/input_layout_age"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:theme="@style/EditTextHint">
+
+                        <android.support.design.widget.TextInputEditText
+                            android:id="@+id/participant_age"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:inputType="number"
+                            android:singleLine="true"
+                            android:backgroundTint="#fff"
+                            android:textColor="@color/colorAccent"
+                            android:textSize="19sp"
+                            android:hint="Participant Age"/>
+                    </android.support.design.widget.TextInputLayout>
+
+
+                </LinearLayout>
+
+                <LinearLayout
+                    android:orientation="horizontal"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:layout_weight="0.2"
+                    android:paddingLeft="28dp"
+                    android:paddingRight="25dp"
+                    android:paddingTop="10dp"
+                    android:paddingBottom="15dp">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Participant Gender"
+                        android:textColor="@color/colorHint"
+                        android:id="@+id/participant_gender_label"
+                        android:textSize="19dp"
+                        android:layout_marginRight="10dp"/>
+
+                    <RadioGroup xmlns:android="http://schemas.android.com/apk/res/android"
+                        android:layout_width="fill_parent"
+                        android:layout_height="match_parent"
+                        android:orientation="horizontal">
+                        <RadioButton
+                            android:layout_width="100dp"
+                            android:layout_height="wrap_content"
+                            android:paddingLeft="5dp"
+                            android:text="Male"
+                            android:textColor="#fff"
+                            android:id="@+id/male_button"
+                            android:backgroundTint="#fff"
+                            android:checked="true"/>
+
+                        <RadioButton
+                            android:layout_width="100dp"
+                            android:layout_height="wrap_content"
+                            android:paddingLeft="5dp"
+                            android:text="Female"
+                            android:textColor="#fff"
+                            android:textColorHint="#fff"
+                            android:id="@+id/female_button"
+                            android:backgroundTint="#fff"/>
+                    </RadioGroup>
+                </LinearLayout>
+            </LinearLayout>
+        </ScrollView>
+
+    </LinearLayout>
+
+    <FrameLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
 
         <LinearLayout
             android:orientation="horizontal"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:layout_weight="0.2">
+            android:layout_weight="0.2"
+            >
 
             <Button
                 android:layout_width="match_parent"
-                android:layout_height="75dp"
+                android:layout_height="60dp"
                 android:background="@color/colorPrimaryDark"
                 android:text="Next"
                 android:id="@+id/next_button"
@@ -208,7 +238,6 @@
                 android:gravity="center_vertical|right"
                 android:paddingRight="25dip"/>
         </LinearLayout>
-
-    </LinearLayout>
+    </FrameLayout>
 
 </FrameLayout>

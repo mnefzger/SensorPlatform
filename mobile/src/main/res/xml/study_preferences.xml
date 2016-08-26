@@ -5,22 +5,26 @@
     <EditTextPreference
         android:key="study_name"
         android:title="Study Name"
-        android:summary="Defines a name for the study." />
+        android:summary="Defines a name for the study."
+        android:persistent="true"/>
 
     <EditTextPreference
         android:key="study_ID"
         android:title="Study ID"
-        android:summary="Defines an unique alphanumerical identifier for the study. " />
+        android:summary="Defines an unique alphanumerical identifier for the study. "
+        android:persistent="true"/>
 
     <EditTextPreference
         android:key="p_ID"
         android:title="Participant ID"
-        android:summary="Defines an unique alphanumerical identifier for the participant." />
+        android:summary="Defines an unique alphanumerical identifier for the participant."
+        android:persistent="true"/>
 
     <EditTextPreference
         android:key="p_age"
         android:title="Participant Age"
-        android:summary="Declares the participant's age." />
+        android:summary="Declares the participant's age."
+        android:persistent="true"/>
 
     <CheckBoxPreference
         android:key="p_gender"

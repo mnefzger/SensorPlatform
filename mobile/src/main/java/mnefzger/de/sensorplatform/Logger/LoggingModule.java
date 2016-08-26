@@ -37,8 +37,9 @@ public class LoggingModule {
             folder.mkdir();
         }
         // TODO only create if logging is selected
-        createNewRawFile(fileNameRaw + System.currentTimeMillis() + ".csv");
-        createNewEventFile(fileNameEvent + System.currentTimeMillis() + ".csv");
+        long time = System.currentTimeMillis();
+        createNewRawFile(fileNameRaw + time + ".csv");
+        createNewEventFile(fileNameEvent + time + ".csv");
     }
 
     private void createNewRawFile(String name) {

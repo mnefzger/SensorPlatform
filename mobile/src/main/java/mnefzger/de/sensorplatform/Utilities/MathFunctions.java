@@ -132,7 +132,7 @@ public class MathFunctions {
                     oldValue[dimension] = values[dimension];
                     return oldValue;
                 }
-                newValue[dimension] = alpha * newValue[dimension] + (1-alpha) * oldValue[dimension];
+                newValue[dimension] = alpha * values[dimension] + (1-alpha) * oldValue[dimension];
                 oldValue[dimension] = newValue[dimension];
             }
 
@@ -140,12 +140,12 @@ public class MathFunctions {
         }
 
         public double average(double value) {
-            double newValue = 0.0;
+            double newValue;
             if (oldValueSingle == 0.0) {
                 oldValueSingle = value;
                 return oldValueSingle;
             }
-            newValue = alpha * newValue + (1-alpha) * oldValueSingle;
+            newValue = alpha * value + (1-alpha) * oldValueSingle;
             oldValueSingle = newValue;
 
             return newValue;

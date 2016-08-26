@@ -40,6 +40,7 @@ public class DrivingBehaviourProcessor extends EventProcessor implements IOSMRes
     private double TURN_THRESHOLD_SHARP;
     private int OSM_REQUEST_RATE;
 
+    private int rawDataDelay;
 
     public DrivingBehaviourProcessor(SensorModule m, Context a) {
         super(m);
@@ -51,6 +52,8 @@ public class DrivingBehaviourProcessor extends EventProcessor implements IOSMRes
         TURN_THRESHOLD = Preferences.getTurnThreshold(prefs);
         TURN_THRESHOLD_SHARP = Preferences.getSharpTurnThreshold(prefs);
         OSM_REQUEST_RATE = Preferences.getOSMRequestRate(prefs);
+
+        rawDataDelay = Preferences.getRawDataDelay(prefs);
     }
 
     public void processData(List<DataVector> data) {
@@ -60,9 +63,10 @@ public class DrivingBehaviourProcessor extends EventProcessor implements IOSMRes
             currentVector = data.get(data.size()-1);
             previousVector = data.get(data.size()-2);
 
-            // TODO: getLastData should check that timeframe >= 2*RawDataDelay, else we can't compare values
-            checkForHardAcc(getLastData(3000));
-            checkForSharpTurn(getLastData(3000));
+            //checkForHardAcc(getLastData(3*rawDataDelay));
+            //checkForSharpTurn(getLastData(10*rawDataDelay));
+            checkForHardAcc(getLastDataItems(3));
+            checkForSharpTurn(getLastDataItems(6));
             checkForSpeeding(currentVector);
         }
 
@@ -78,6 +82,8 @@ public class DrivingBehaviourProcessor extends EventProcessor implements IOSMRes
         }
 
         avg = avg/lastData.size();
+
+        Log.d("ACCELERATION Z", lastData.size() + ", " + avg + "");
 
         if(avg > ACC_THRESHOLD) {
             EventVector ev = new EventVector(lastData.get(0).timestamp, "Hard brake", avg);

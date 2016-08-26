@@ -2,6 +2,7 @@ package mnefzger.de.sensorplatform.Processors;
 
 
 import android.preference.PreferenceManager;
+import android.util.Log;
 
 import java.util.List;
 
@@ -23,7 +24,7 @@ public abstract class EventProcessor {
         this.data = data;
     }
 
-    public List<DataVector> getLastData(int ms) {
+    protected List<DataVector> getLastData(int ms) {
         if( !(data.get(0).timestamp == 0) && data.size() > 1 ) {
 
             // time between last and first entry
@@ -33,16 +34,24 @@ public abstract class EventProcessor {
             long deltaTime = totalTime / data.size();
 
             double samplingRate = 1000 / deltaTime;
-            //Log.d("SAMPLING rate", samplingRate + " Hz");
 
             // in the timespan of ms, how many DataVectors were collected?
             int numberOfDataVectors = (int) Math.ceil(samplingRate * ms/1000);
+            Log.d("NUMBER DATA VECTORS", numberOfDataVectors + "");
 
             int lastSamplingIndex = data.size() - numberOfDataVectors;
 
             lastSamplingIndex = lastSamplingIndex < 0 ? 0 : lastSamplingIndex;
 
             return data.subList(lastSamplingIndex, data.size());
+        }
+
+        return data;
+    }
+
+    protected List<DataVector> getLastDataItems(int number) {
+        if( data.size() > number ) {
+            return data.subList(data.size()-number, data.size());
         }
 
         return data;

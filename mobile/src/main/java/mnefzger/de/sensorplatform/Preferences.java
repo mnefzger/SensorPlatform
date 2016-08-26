@@ -155,7 +155,7 @@ public class Preferences {
         }
 
         if (value <= 0) {
-            value = context.getResources().getInteger(R.integer.rawData_delay_default);;
+            value = context.getResources().getInteger(R.integer.rawData_delay_default);
         }
 
         return value;
@@ -174,7 +174,7 @@ public class Preferences {
         }
 
         if (value <= 0) {
-            value = context.getResources().getInteger(R.integer.obdRequest_delay_default);;
+            value = context.getResources().getInteger(R.integer.obdRequest_delay_default);
         }
 
         return value;

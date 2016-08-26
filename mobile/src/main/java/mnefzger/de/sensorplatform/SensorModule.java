@@ -275,11 +275,14 @@ public class SensorModule implements ISensorCallback, IEventCallback{
     @Override
     public void onAccelerometerData(double[] dataValues) {
         // store average acceleration in current DataVector
+        /*
         if(dataBuffer.size() > 0) {
             current.setAcc( (current.accX+dataValues[0]) / 2.0, (current.accY+dataValues[1]) / 2.0, (current.accZ+dataValues[2]) / 2.0 );
         } else {
             current.setAcc( dataValues[0], dataValues[1], dataValues[2] );
         }
+        */
+        current.setAcc( dataValues[0], dataValues[1], dataValues[2] );
     }
 
     @Override

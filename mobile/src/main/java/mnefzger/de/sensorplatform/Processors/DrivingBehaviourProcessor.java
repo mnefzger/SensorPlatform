@@ -73,7 +73,7 @@ public class DrivingBehaviourProcessor extends EventProcessor implements IOSMRes
     }
 
     private void checkForHardAcc(List<DataVector> lastData) {
-        Iterator<DataVector> it = lastData.iterator();
+        /*Iterator<DataVector> it = lastData.iterator();
         DataVector d;
         double avg = 0.0;
         while(it.hasNext()) {
@@ -81,7 +81,16 @@ public class DrivingBehaviourProcessor extends EventProcessor implements IOSMRes
             avg += d.accZ;
         }
 
-        avg = avg/lastData.size();
+        avg = avg/lastData.size();*/
+
+        List<Double> acc = new ArrayList<Double>();
+        Iterator<DataVector> it = lastData.iterator();
+        while(it.hasNext()) {
+            acc.add(it.next().accZ);
+        }
+
+        double avg = MathFunctions.getAccEMASingle(acc, 0.3);
+
 
         Log.d("ACCELERATION Z", lastData.size() + ", " + avg + "");
 

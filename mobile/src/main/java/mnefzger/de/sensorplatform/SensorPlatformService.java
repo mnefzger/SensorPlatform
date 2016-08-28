@@ -73,6 +73,24 @@ public class SensorPlatformService extends Service implements IDataCallback{
     }
 
     public void subscribe() {
+        /**
+         * Logging
+         */
+        if(Preferences.rawLoggingActivated(prefs)) {
+            logRawData(true);
+        }
+
+        if(Preferences.eventLoggingActivated(prefs)) {
+            logEventData(true);
+        }
+
+        if(Preferences.rawLoggingActivated(prefs) || Preferences.eventLoggingActivated(prefs) ) {
+            lm.createNewFileSet();
+        }
+
+        /**
+         * Data Collection
+         */
         if(Preferences.accelerometerActivated(prefs)) {
             subscribeTo(DataType.ACCELERATION_RAW);
             subscribeTo(DataType.ACCELERATION_EVENT);
@@ -102,14 +120,6 @@ public class SensorPlatformService extends Service implements IDataCallback{
 
         if(Preferences.heartRateActivated(prefs)) {
             subscribeTo(DataType.HEART_RATE);
-        }
-
-        if(Preferences.rawLoggingActivated(prefs)) {
-            logRawData(true);
-        }
-
-        if(Preferences.eventLoggingActivated(prefs)) {
-            logEventData(true);
         }
 
         serviceRunning = true;

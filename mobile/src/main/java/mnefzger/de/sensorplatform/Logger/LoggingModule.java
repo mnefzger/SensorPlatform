@@ -31,15 +31,20 @@ public class LoggingModule {
     File rawFile;
     File eventFile;
 
+    long tripID;
+
     public LoggingModule() {
         File folder = new File(filePath);
         if (!folder.exists()) {
             folder.mkdir();
         }
-        // TODO only create if logging is selected
-        long time = System.currentTimeMillis();
-        createNewRawFile(fileNameRaw + time + ".csv");
-        createNewEventFile(fileNameEvent + time + ".csv");
+
+        tripID = System.currentTimeMillis();
+    }
+
+    public void createNewFileSet() {
+        createNewRawFile(fileNameRaw + tripID + ".csv");
+        createNewEventFile(fileNameEvent + tripID + ".csv");
     }
 
     private void createNewRawFile(String name) {
@@ -69,25 +74,25 @@ public class LoggingModule {
     }
 
     public void writeRawToCSV(DataVector v) {
-        String[] line = { v.toCSVString() };
+        String[] line = { tripID + ";" + v.toCSVString() };
 
         write(rawFile, line);
     }
 
     public void writeEventToCSV(EventVector v) {
-        String[] line = { v.toCSVString() };
+        String[] line = { tripID + ";" + v.toCSVString() };
 
         write(eventFile, line);
     }
 
     private void createHeadersRaw() {
-        String[] line = { "timestamp;dateTime;accelerationX;accelerationY;accelerationZ;rotationX;rotationY;rotationZ;light;latitude;longitude;gps_speed;obd_speed;obd_rpm;obd_fuel;heart_rate" };
+        String[] line = { "tripID;timestamp;dateTime;accelerationX;accelerationY;accelerationZ;rotationX;rotationY;rotationZ;light;latitude;longitude;gps_speed;obd_speed;obd_rpm;obd_fuel;heart_rate" };
 
         write(rawFile, line);
     }
 
     private void createHeadersEvent() {
-        String[] line = { "timestamp;description;value" };
+        String[] line = { "tripID;timestamp;description;value" };
 
         write(eventFile, line);
     }

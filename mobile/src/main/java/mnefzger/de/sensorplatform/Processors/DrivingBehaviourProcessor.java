@@ -8,6 +8,7 @@ import android.util.Log;
 import android.util.SparseArray;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 
@@ -73,33 +74,30 @@ public class DrivingBehaviourProcessor extends EventProcessor implements IOSMRes
     }
 
     private void checkForHardAcc(List<DataVector> lastData) {
-        /*Iterator<DataVector> it = lastData.iterator();
-        DataVector d;
-        double avg = 0.0;
-        while(it.hasNext()) {
-            d = it.next();
-            avg += d.accZ;
-        }
-
-        avg = avg/lastData.size();*/
-
         List<Double> acc = new ArrayList<Double>();
         Iterator<DataVector> it = lastData.iterator();
+        double max = 0;
+        long time = data.get(0).timestamp;
         while(it.hasNext()) {
-            acc.add(it.next().accZ);
+            DataVector next = it.next();
+            Double accelerationZ = next.accZ;
+            acc.add(accelerationZ);
+
+            // find the timestamp of the peak value
+            if(Math.abs(accelerationZ) > max) {
+                max = Math.abs(accelerationZ);
+                time = next.timestamp;
+            }
         }
 
         double avg = MathFunctions.getAccEMASingle(acc, 0.3);
 
-
-        Log.d("ACCELERATION Z", lastData.size() + ", " + avg + "");
-
         if(avg > ACC_THRESHOLD) {
-            EventVector ev = new EventVector(lastData.get(0).timestamp, "Hard brake", avg);
+            EventVector ev = new EventVector(time, "Hard brake", avg);
             callback.onEventDetected(ev);
         }
         if(avg < -ACC_THRESHOLD) {
-            EventVector ev = new EventVector(lastData.get(0).timestamp, "Hard acceleration", avg);
+            EventVector ev = new EventVector(time, "Hard acceleration", avg);
             callback.onEventDetected(ev);
         }
     }

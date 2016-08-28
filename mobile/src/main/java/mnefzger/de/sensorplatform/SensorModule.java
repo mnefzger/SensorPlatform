@@ -221,7 +221,7 @@ public class SensorModule implements ISensorCallback, IEventCallback{
          */
         if(last != null) {
             dataBuffer.add(last);
-            current.setAcc(last.accX, last.accY, last.accZ);
+            current.setAcc(0,0,0);
             current.setRotMatrix(last.rotMatrix);
             current.setLight(last.light);
             current.setLocation(last.location);
@@ -274,15 +274,12 @@ public class SensorModule implements ISensorCallback, IEventCallback{
      */
     @Override
     public void onAccelerometerData(double[] dataValues) {
-        // store average acceleration in current DataVector
-        /*
-        if(dataBuffer.size() > 0) {
-            current.setAcc( (current.accX+dataValues[0]) / 2.0, (current.accY+dataValues[1]) / 2.0, (current.accZ+dataValues[2]) / 2.0 );
-        } else {
+        /**
+         * Replace the current value only if the new value is more extreme.
+         * This guarantees that the same value is stored independent of the <code>RawDataSampling</code> setting.
+         */
+        if(Math.abs(dataValues[2]) > Math.abs(current.accZ))
             current.setAcc( dataValues[0], dataValues[1], dataValues[2] );
-        }
-        */
-        current.setAcc( dataValues[0], dataValues[1], dataValues[2] );
     }
 
     @Override

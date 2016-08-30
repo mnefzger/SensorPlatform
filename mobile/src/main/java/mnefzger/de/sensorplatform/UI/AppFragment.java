@@ -207,7 +207,7 @@ public class AppFragment extends Fragment {
                 else if (v.getEventDescription().equals("No Face detected"))
                     face.setText("Face detected: NO");
                 else {
-                    event.setText("Last event: " + v.getEventDescription() + ", " + v.getValue());
+                    event.setText("Last event: " + v.getEventDescription() + ", " + df.format(v.getValue()) );
                 }
             }
         });

@@ -285,8 +285,6 @@ public class ImageModule implements IEventCallback{
                 //byte[] processedImg = imgProc.processImage(bytes, img.getWidth(), img.getHeight());
                 //yuvimage = new YuvImage(processedImg, ImageFormat.NV21, img.getWidth(), img.getHeight(), null);
                 lastFrontProc = now;
-            } else {
-
             }
             yuvimage = new YuvImage(bytes, ImageFormat.NV21, w, h, null);
 
@@ -326,7 +324,7 @@ public class ImageModule implements IEventCallback{
             final int w = i.getWidth();
             final int h = i.getHeight();
             i.close();
-            YuvImage yuvimage;
+            YuvImage yuvimage = new YuvImage(bytes, ImageFormat.NV21, w, h, null);
 
             double now = System.currentTimeMillis();
 
@@ -337,16 +335,13 @@ public class ImageModule implements IEventCallback{
                 new Thread(new Runnable() {
                     @Override
                     public void run() {
-                        imgProc.processImageBack(bytes.clone(), w, h);
+                //        imgProc.processImageBack(bytes.clone(), w, h);
                     }
                 }).start();
-                //byte[] processedImg = imgProc.processImage(bytes, img.getWidth(), img.getHeight());
-                //yuvimage = new YuvImage(processedImg, ImageFormat.NV21, img.getWidth(), img.getHeight(), null);
-                lastFrontProc = now;
-            } else {
-
+                /*byte[] processedImg = imgProc.processImageBack(bytes.clone(), w, h);
+                yuvimage = new YuvImage(processedImg, ImageFormat.NV21, w, h, null);*/
+                lastBackProc = now;
             }
-            yuvimage = new YuvImage(bytes, ImageFormat.NV21, w, h, null);
 
             /**
              * Store the received image (either processed or raw) and write it to file
@@ -360,7 +355,7 @@ public class ImageModule implements IEventCallback{
                 backIt++;
                 lastBack = now;
 
-                mBackgroundHandler.post( new ImageSaver(yuvimage, "front") );
+                //mBackgroundHandler.post( new ImageSaver(yuvimage, "back") );
             }
 
             /**
@@ -370,8 +365,6 @@ public class ImageModule implements IEventCallback{
                 int key = backImages.keyAt(0);
                 backImages.remove(key);
             }
-
-            //mBackgroundHandler.post( new ImageSaver(yuvimage, "back") );
 
         }
     }

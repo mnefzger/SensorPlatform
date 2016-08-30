@@ -14,6 +14,7 @@
 extern "C" {
     JNIEXPORT jintArray Java_mnefzger_de_sensorplatform_Processors_ImageProcessor_nAsmFindFace(JNIEnv *env, jobject obj, jlong address, jlong returnadress);
     JNIEXPORT jintArray Java_mnefzger_de_sensorplatform_Processors_ImageProcessor_nAsmFindCars(JNIEnv *env, jobject obj, jlong address, jlong returnadress);
+    JNIEXPORT jint Java_mnefzger_de_sensorplatform_Processors_ImageProcessor_nInitCascades(JNIEnv *env, jobject obj);
 }
 
 using namespace cv;
@@ -23,22 +24,16 @@ CascadeClassifier faceCascadeHaar;
 CascadeClassifier faceCascadeLBP;
 CascadeClassifier faceCascadeLBP2;
 
-int initAsm();
-int initialized = initAsm();
-
-int initAsm() {
+JNIEXPORT jint Java_mnefzger_de_sensorplatform_Processors_ImageProcessor_nInitCascades(JNIEnv *env, jobject obj) {
     string haarFaceCascadePath = "/storage/emulated/0/SensorPlatform/haarcascade_frontalface_alt.xml";
     string lbpFaceCascadePath = "/storage/emulated/0/SensorPlatform/lbpcascade_frontalface.xml";
     string lbpFaceCascadePath2 = "/storage/emulated/0/SensorPlatform/visionary_FACES_01_LBP.xml";
 
-    if (initialized == 0) {
-		faceCascadeHaar.load(haarFaceCascadePath);
-		faceCascadeLBP.load(lbpFaceCascadePath);
-		faceCascadeLBP2.load(lbpFaceCascadePath2);
-		initialized = 1;
-    }
+	faceCascadeHaar.load(haarFaceCascadePath);
+	faceCascadeLBP.load(lbpFaceCascadePath);
+	faceCascadeLBP2.load(lbpFaceCascadePath2);
 
-	LOGI("ASM init complete.");
+	LOGI("Init cascades complete.");
 
 	return 1;
 }
@@ -112,6 +107,7 @@ JNIEXPORT jintArray Java_mnefzger_de_sensorplatform_Processors_ImageProcessor_nA
 
     Mat gray(image.rows, image.cols, image.depth());
     cvtColor(image, gray, COLOR_YUV2GRAY_I420);
+    flip(gray, gray, -1);
 
     vector< Rect > cars;
     //faceCascadeLBP.detectMultiScale( gray, cars, 1.1, 2, 0, Size(30, 30) );
@@ -134,7 +130,6 @@ JNIEXPORT jintArray Java_mnefzger_de_sensorplatform_Processors_ImageProcessor_nA
         result = env->NewIntArray(0);
     }
 
-    /*
     Mat bgr(gray.rows, gray.cols, CV_8UC3);
     cvtColor(gray, bgr, COLOR_GRAY2BGR);
 
@@ -144,7 +139,7 @@ JNIEXPORT jintArray Java_mnefzger_de_sensorplatform_Processors_ImageProcessor_nA
     Mat* mat = (Mat*) returnadress;
     mat->create(yuv.rows, yuv.cols, CV_8UC1);
     memcpy(mat->data, yuv.data, mat->rows * mat->cols );
-    */
+
 
     return result;
 }

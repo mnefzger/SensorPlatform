@@ -269,7 +269,9 @@ public class DrivingBehaviourProcessor extends EventProcessor implements IOSMRes
             currentSpeed = currentVector.speed;
 
         if(currentSpeedLimit > 0 && currentSpeed > currentSpeedLimit)
-            callback.onEventDetected(new EventVector(false, System.currentTimeMillis(), "Speeding", currentSpeed-currentSpeedLimit));
+            callback.onEventDetected(new EventVector(false, System.currentTimeMillis(), "Speeding", currentSpeed, currentSpeedLimit));
+        else if(currentSpeed > 110)
+            callback.onEventDetected(new EventVector(false, System.currentTimeMillis(), "Speeding above 110km/h", currentSpeed));
 
     }
 

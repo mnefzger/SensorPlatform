@@ -3,12 +3,15 @@ package mnefzger.de.sensorplatform;
 
 public class EventVector {
 
+    private boolean debug;
+
     private long timestamp;
     private String eventDescription;
     private double value;
     private String videoName;
 
-    public EventVector(long time, String event, double value) {
+    public EventVector(boolean debug, long time, String event, double value) {
+        this.debug = debug;
         this.timestamp = time;
         this.eventDescription = event;
         this.value = value;
@@ -28,6 +31,10 @@ public class EventVector {
 
     public void setVideoName(String videoName) {
         this.videoName = videoName;
+    }
+
+    public boolean isDebug() {
+        return this.debug;
     }
 
     public long getTimestamp() {

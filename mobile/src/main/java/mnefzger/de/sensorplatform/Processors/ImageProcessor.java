@@ -107,9 +107,9 @@ public class ImageProcessor{
 
         if(faces.length == 4) {
             Log.d("FACE_DETECTION", "Detected at (" + faces[0] + "," + faces[1]+")");
-            callback.onEventDetected(new EventVector(System.currentTimeMillis(), "Face detected", 0));
+            callback.onEventDetected(new EventVector(true, System.currentTimeMillis(), "Face detected", 0));
         } else {
-            callback.onEventDetected(new EventVector(System.currentTimeMillis(), "No Face detected", 0));
+            callback.onEventDetected(new EventVector(true, System.currentTimeMillis(), "No Face detected", 0));
         }
         faceProcRunning = false;
 
@@ -123,9 +123,9 @@ public class ImageProcessor{
 
         if(cars.length == 4) {
             Log.d("CAR_DETECTION", "Detected at (" + cars[0] + "," + cars[1]+")");
-            callback.onEventDetected(new EventVector(System.currentTimeMillis(), "Car detected", 0));
+            callback.onEventDetected(new EventVector(true, System.currentTimeMillis(), "Car detected", 0));
         } else {
-            callback.onEventDetected(new EventVector(System.currentTimeMillis(), "No Car detected", 0));
+            callback.onEventDetected(new EventVector(true, System.currentTimeMillis(), "No Car detected", 0));
         }
 
         return cars;

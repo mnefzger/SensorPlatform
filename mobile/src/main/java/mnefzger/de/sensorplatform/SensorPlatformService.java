@@ -183,11 +183,11 @@ public class SensorPlatformService extends Service implements IDataCallback{
 
     @Override
     public void onEventData(EventVector ev) {
-        if(ActiveSubscriptions.eventLoggingActive()) {
+        if(ActiveSubscriptions.eventLoggingActive() && !ev.isDebug()) {
             lm.writeEventToCSV(ev);
         }
 
-        if(Preferences.videoSavingActivated(prefs) && /**TODO: remove this ->*/ !ev.getEventDescription().contains("Face")) {
+        if(Preferences.videoSavingActivated(prefs) && !ev.isDebug()) {
             im.saveVideoAfterEvent(ev);
             ev.setVideoName("Video-" + ev.getTimestamp() + ".mp4");
         }

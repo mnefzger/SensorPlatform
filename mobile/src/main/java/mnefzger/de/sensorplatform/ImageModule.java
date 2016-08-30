@@ -63,6 +63,7 @@ public class ImageModule implements IEventCallback{
 
     private SparseArray<YuvImage> backImages = new SparseArray<>();
     private SparseArray<YuvImage> frontImages = new SparseArray<>();
+    private SparseArray<byte[]> frontImagesCV = new SparseArray<>();
     private SparseArray<byte[]> backImagesCV = new SparseArray<>();
 
     private int FRONT_MAX_FPS;
@@ -260,7 +261,7 @@ public class ImageModule implements IEventCallback{
                 @Override
                 public void run() {
                     if(Preferences.frontCameraActivated(prefs)) {
-                        new VideoSaver(frontImages, (int)FRONT_AVG_FPS, RES_W, RES_H, "front", v.getTimestamp());
+                        new VideoSaver2(frontImagesCV, (int)FRONT_AVG_FPS, RES_W, RES_H, "front", v.getTimestamp());
                     }
                     if(Preferences.backCameraActivated(prefs)) {
                         //new VideoSaver(backImages, (int)BACK_AVG_FPS, 640, 480, "back", v.getTimestamp());
@@ -300,7 +301,6 @@ public class ImageModule implements IEventCallback{
                 //yuvimage = new YuvImage(processedImg, ImageFormat.NV21, img.getWidth(), img.getHeight(), null);
                 lastFrontProc = now;
             }
-            yuvimage = new YuvImage(bytes, ImageFormat.NV21, w, h, null);
 
             /**
              * Store the received image (either processed or raw) and write it to file
@@ -308,9 +308,9 @@ public class ImageModule implements IEventCallback{
             if(now - lastFront >= (1000/(1+FRONT_MAX_FPS)) ) {
                 double latestFPS = 1000 / (now - lastFront);
                 FRONT_AVG_FPS = 0.995*FRONT_AVG_FPS + 0.005*latestFPS;
-                Log.d("FPS front", FRONT_AVG_FPS+", " +latestFPS);
+                //Log.d("FPS front", FRONT_AVG_FPS+", " +latestFPS);
 
-                frontImages.append(frontIt, yuvimage);
+                frontImagesCV.append(frontIt, bytes);
                 frontIt++;
                 lastFront = now;
 
@@ -320,9 +320,9 @@ public class ImageModule implements IEventCallback{
             /**
              * Only store the last ten seconds in the image buffer
              */
-            if(frontImages.size() > (10*FRONT_MAX_FPS) ) {
-                int key = frontImages.keyAt(0);
-                frontImages.remove(key);
+            if(frontImagesCV.size() > (10*FRONT_MAX_FPS) ) {
+                int key = frontImagesCV.keyAt(0);
+                frontImagesCV.remove(key);
             }
 
         }

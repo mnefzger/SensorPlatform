@@ -28,6 +28,17 @@
         <item>20 Hz</item>
     </string-array>
 
+    <string-array name="resolution_values">
+        <item>1280</item>
+        <item>640</item>
+        <item>320</item>
+    </string-array>
+    <string-array name="resolution_readable">
+        <item>1280x720</item>
+        <item>640x360</item>
+        <item>320x180</item>
+    </string-array>
+
     <string-array name="obd_values">
         <item>2000</item>
         <item>1000</item>
@@ -40,4 +51,6 @@
         <item>Fast (2Hz)</item>
         <item>Very Fast (4Hz)</item>
     </string-array>
+
+
 </resources>

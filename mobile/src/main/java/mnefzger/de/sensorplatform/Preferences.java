@@ -2,6 +2,7 @@ package mnefzger.de.sensorplatform;
 
 import android.content.Context;
 import android.content.SharedPreferences;
+import android.util.Log;
 
 /**
  * This class provides an interface to the res/xml/preferences.xml file
@@ -31,7 +32,7 @@ public class Preferences {
 
     public static final String VIDEO_SAVING = "image_saving";
 
-
+    public static final String VIDEO_RESOLUTION = "video_resolution";
 
 
     public static final String FREQUENCY_RAWDATA = "frequency_rawData";
@@ -408,6 +409,24 @@ public class Preferences {
 
         if (value <= 0) {
             value = context.getResources().getInteger(R.integer.back_processing_fps);
+        }
+
+        return value;
+    }
+
+    public static int getVideoResolution(SharedPreferences prefs) {
+        String valueString = prefs.getString(VIDEO_RESOLUTION, "640");
+
+        int value = context.getResources().getInteger(R.integer.video_resolution);
+
+        try {
+            value = Integer.valueOf(valueString);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        if (value <= 0) {
+            value = context.getResources().getInteger(R.integer.video_resolution);
         }
 
         return value;

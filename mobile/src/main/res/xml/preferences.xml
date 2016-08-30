@@ -140,6 +140,15 @@
         </PreferenceCategory>
 
         <PreferenceCategory android:title="Image Processing">
+            <ListPreference
+                android:summary="The video resolution"
+                android:defaultValue="@integer/rotation_delay_default"
+                android:entries="@array/resolution_readable"
+                android:entryValues="@array/resolution_values"
+                android:key="video_resolution"
+                android:persistent="true"
+                android:title="Video Resolution" />
+                />
             <EditTextPreference
                 android:key="front_max_fps"
                 android:title="Front camera max. FPS"

@@ -24,6 +24,12 @@ import android.support.v4.app.ActivityCompat;
 import android.util.Log;
 import android.util.SparseArray;
 
+import org.opencv.core.CvType;
+import org.opencv.core.Mat;
+import org.opencv.core.Size;
+import org.opencv.imgproc.Imgproc;
+import org.opencv.videoio.VideoWriter;
+
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileOutputStream;
@@ -57,6 +63,7 @@ public class ImageModule implements IEventCallback{
 
     private SparseArray<YuvImage> backImages = new SparseArray<>();
     private SparseArray<YuvImage> frontImages = new SparseArray<>();
+    private SparseArray<byte[]> backImagesCV = new SparseArray<>();
 
     private int FRONT_MAX_FPS;
     private double FRONT_AVG_FPS;
@@ -65,6 +72,9 @@ public class ImageModule implements IEventCallback{
     private int BACK_MAX_FPS;
     private double BACK_AVG_FPS;
     private int BACK_PROCESSING_FPS;
+
+    private int RES_W;
+    private int RES_H;
 
     private HandlerThread mBackgroundThread;
     private Handler mBackgroundHandler;
@@ -112,18 +122,22 @@ public class ImageModule implements IEventCallback{
     }
 
     private void open(String id) {
+        RES_W = Preferences.getVideoResolution(prefs);
+        RES_H = RES_W/16 * 9;
+
+        Log.d("RESOLUTION", RES_W + "x" + RES_H);
         try {
             int permission = ActivityCompat.checkSelfPermission(context, Manifest.permission.CAMERA);
             if(permission == PackageManager.PERMISSION_GRANTED) {
                 if(id == "0") {
-                    cameraManager.openCamera(id, backCameraStateCallback, null );
-                    imageReader_back = ImageReader.newInstance(480, 640, ImageFormat.YUV_420_888, 15);
+                    imageReader_back = ImageReader.newInstance(RES_H, RES_W, ImageFormat.YUV_420_888, 15);
                     imageReader_back.setOnImageAvailableListener(onBackImageAvailableListener, mBackgroundHandler);
+                    cameraManager.openCamera(id, backCameraStateCallback, null );
                 }
                 if(id == "1") {
-                    cameraManager.openCamera(id, frontCameraStateCallback, null );
-                    imageReader_front = ImageReader.newInstance(240, 320, ImageFormat.YUV_420_888, 15);
+                    imageReader_front = ImageReader.newInstance(RES_H, RES_W, ImageFormat.YUV_420_888, 15);
                     imageReader_front.setOnImageAvailableListener(onFrontImageAvailableListener, mBackgroundHandler);
+                    cameraManager.openCamera(id, frontCameraStateCallback, null );
                 }
             }
         } catch (CameraAccessException e) {
@@ -246,12 +260,12 @@ public class ImageModule implements IEventCallback{
                 @Override
                 public void run() {
                     if(Preferences.frontCameraActivated(prefs)) {
-                        new VideoSaver(frontImages, (int)FRONT_AVG_FPS, 320, 240, "front", v.getTimestamp());
+                        new VideoSaver(frontImages, (int)FRONT_AVG_FPS, RES_W, RES_H, "front", v.getTimestamp());
                     }
                     if(Preferences.backCameraActivated(prefs)) {
-                        new VideoSaver(backImages, (int)BACK_AVG_FPS, 640, 480, "back", v.getTimestamp());
+                        //new VideoSaver(backImages, (int)BACK_AVG_FPS, 640, 480, "back", v.getTimestamp());
+                        new VideoSaver2(backImagesCV, (int)BACK_AVG_FPS, RES_W, RES_H, "back", v.getTimestamp());
                     }
-
                 }
             }, 4000);
         }
@@ -324,7 +338,7 @@ public class ImageModule implements IEventCallback{
             final int w = i.getWidth();
             final int h = i.getHeight();
             i.close();
-            YuvImage yuvimage = new YuvImage(bytes, ImageFormat.NV21, w, h, null);
+            //YuvImage yuvimage = new YuvImage(bytes, ImageFormat.NV21, w, h, null);
 
             double now = System.currentTimeMillis();
 
@@ -349,9 +363,9 @@ public class ImageModule implements IEventCallback{
             if(now - lastBack >= (1000/(1+BACK_MAX_FPS)) ) {
                 double latestFPS = 1000 / (now - lastBack);
                 BACK_AVG_FPS = 0.995*BACK_AVG_FPS + 0.005*latestFPS;
-                Log.d("FPS back", BACK_AVG_FPS+", " +latestFPS);
+                //Log.d("FPS back", BACK_AVG_FPS+", " +latestFPS);
 
-                backImages.put(backIt, yuvimage);
+                backImagesCV.put(backIt, bytes);
                 backIt++;
                 lastBack = now;
 
@@ -361,9 +375,9 @@ public class ImageModule implements IEventCallback{
             /**
              * Only store the last ten seconds in the image buffer
              */
-            if(backImages.size() > (10*BACK_MAX_FPS) ) {
-                int key = backImages.keyAt(0);
-                backImages.remove(key);
+            if(backImagesCV.size() > (10*BACK_MAX_FPS) ) {
+                int key = backImagesCV.keyAt(0);
+                backImagesCV.remove(key);
             }
 
         }
@@ -474,6 +488,95 @@ public class ImageModule implements IEventCallback{
 
     }
 
+    private static class VideoSaver2 {
+        private SparseArray<byte[]> images;
+        private int FPS, w, h;
+        private String mode;
+
+        VideoWriter videoWriter;
+        String baseDir = android.os.Environment.getExternalStorageDirectory().getAbsolutePath();
+        String fileName;
+        String filePath = baseDir + "/SensorPlatform/videos/";
+        File mFile;
+
+        public VideoSaver2(SparseArray<byte[]> list, int FPS, int width, int height, String mode, long timestamp) {
+            this.images = copyByteList(list);
+            this.FPS = FPS;
+            this.w = width;
+            this.h = height;
+            this.mode = mode;
+
+            fileName = "Video-" + timestamp + ".avi";
+
+            if(mode == "front" && frontSaving == true) return;
+            if(mode == "back" && backSaving == true) return;
+
+            File folder = new File(filePath);
+            if (!folder.exists()) {
+                folder.mkdir();
+            }
+
+            // subdirectory /front or /back
+            filePath += mode;
+            folder = new File(filePath);
+            if (!folder.exists()) {
+                folder.mkdir();
+            }
+
+            mFile = new File(filePath + File.separator + fileName);
+            videoWriter = new VideoWriter(filePath + File.separator + fileName, VideoWriter.fourcc('M','J','P','G'), FPS, new Size(w,h));
+
+            save();
+        }
+
+        private void save() {
+            new Thread(new Runnable() {
+                public void run() {
+                    try {
+                        if(mode == "front") frontSaving = true;
+                        if(mode == "back") backSaving = true;
+                        videoWriter.open(filePath + File.separator + fileName, VideoWriter.fourcc('M','J','P','G'), FPS, new Size(w,h));
+                        Log.d("VIDEO", "Trying to save..." + images.size() + " frames, FPS " + FPS + ", path: " + filePath + File.separator + fileName + ", "+w+h);
+                        double start = System.currentTimeMillis();
+                        for (int i = 0; i < images.size(); i++) {
+                            byte[] image = images.get(i);
+                            Mat imgMat = new Mat(h + h/2, w, CvType.CV_8UC1);
+                            imgMat.put(0,0,image);
+                            Mat gray = new Mat(imgMat.height(), imgMat.width(), imgMat.depth());
+                            Imgproc.cvtColor(imgMat, gray, Imgproc.COLOR_YUV2GRAY_I420);
+                            Mat rgbMat = new Mat(h,w,CvType.CV_8UC3);
+                            Imgproc.cvtColor(gray, rgbMat, Imgproc.COLOR_GRAY2RGB);
+
+                            videoWriter.write(rgbMat);
+                            rgbMat.release();
+                            gray.release();
+                            imgMat.release();
+                            Log.d("VIDEO", "save image " + rgbMat);
+                        }
+                        videoWriter.release();
+
+                        double delta = (System.currentTimeMillis() - start)/1000;
+                        Log.d("VIDEO", "Saving finished in " + delta + "s!" );
+                        if(mode == "front") frontSaving = false;
+                        if(mode == "back") backSaving = false;
+
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
+                }
+            }).start();
+        }
+
+        private SparseArray<byte[]> copyByteList(SparseArray<byte[]> list) {
+            SparseArray<byte[]> temp = new SparseArray<>();
+            for(int i=0; i<list.size(); i++) {
+                temp.put(i, list.valueAt(i));
+            }
+            return temp;
+        }
+
+    }
+
     /**
      * Saves a JPEG {@link Image} into the specified {@link File}.
      */
@@ -534,6 +637,8 @@ public class ImageModule implements IEventCallback{
         }
 
     }
+
+
 
 
     /**

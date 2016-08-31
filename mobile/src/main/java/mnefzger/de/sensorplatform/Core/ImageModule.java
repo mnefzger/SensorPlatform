@@ -1,4 +1,4 @@
-package mnefzger.de.sensorplatform;
+package mnefzger.de.sensorplatform.Core;
 
 import android.Manifest;
 import android.app.Activity;

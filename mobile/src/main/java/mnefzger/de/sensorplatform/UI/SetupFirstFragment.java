@@ -10,12 +10,9 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
-import android.widget.EditText;
 import android.widget.RadioButton;
 
-import org.w3c.dom.Text;
-
-import mnefzger.de.sensorplatform.MainActivity;
+import mnefzger.de.sensorplatform.Core.MainActivity;
 import mnefzger.de.sensorplatform.R;
 
 

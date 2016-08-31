@@ -1,4 +1,4 @@
-package mnefzger.de.sensorplatform;
+package mnefzger.de.sensorplatform.Core;
 
 
 public class EventVector {

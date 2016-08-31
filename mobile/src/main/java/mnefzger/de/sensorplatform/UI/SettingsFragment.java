@@ -13,9 +13,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
-import org.w3c.dom.Text;
-
-import mnefzger.de.sensorplatform.MainActivity;
+import mnefzger.de.sensorplatform.Core.MainActivity;
 import mnefzger.de.sensorplatform.R;
 
 

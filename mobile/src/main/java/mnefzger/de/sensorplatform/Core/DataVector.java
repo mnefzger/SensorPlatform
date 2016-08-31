@@ -1,4 +1,4 @@
-package mnefzger.de.sensorplatform;
+package mnefzger.de.sensorplatform.Core;
 
 import android.location.Location;
 
@@ -34,6 +34,8 @@ public class DataVector {
      * vehicle speed in km/h
      */
     public double speed;
+
+    public String weather;
 
     public double obdSpeed;
 
@@ -84,6 +86,10 @@ public class DataVector {
         this.speed = s;
     }
 
+    public void setWeather(String weather) {
+        this.weather = weather;
+    }
+
     public void setOBDSpeed(double s) {
         this.obdSpeed = s;
     }
@@ -104,7 +110,7 @@ public class DataVector {
     public String toString() {
         return "time: " + timestamp + ", date: " + dateTime + ", accX: " + accX + ", accY: " + accY + ", accZ: " + accZ +
                 ", rotX: " + rotX + ", rotY: " + rotY + ", rotZ: " + rotZ + ", light: " + light + ", speed: " + speed +
-                ", OBD speed: " + obdSpeed + ", rpm: " + rpm + ", fuel: " + fuel + ", heart rate: " + heartRate;
+                ", OBD speed: " + obdSpeed + ", rpm: " + rpm + ", fuel: " + fuel + ", heart rate: " + heartRate + ", weather: " + weather;
     }
 
     public String toCSVString() {
@@ -112,7 +118,7 @@ public class DataVector {
         double lon = (location == null) ? 0 : location.getLongitude();
         return timestamp + ";" + dateTime + ";" + accX + ";" + accY + ";" + accZ + ";" +
                 rotX + ";" + rotY + ";" + rotZ + ";" + light + ";" +
-                lat + ";" + lon + ";" + speed + ";" + obdSpeed + ";" + rpm + ";" + fuel + ";" + heartRate;
+                lat + ";" + lon + ";" + speed + ";" + obdSpeed + ";" + rpm + ";" + fuel + ";" + heartRate + ";" + weather;
     }
 
 

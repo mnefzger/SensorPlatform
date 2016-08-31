@@ -1,4 +1,4 @@
-package mnefzger.de.sensorplatform;
+package mnefzger.de.sensorplatform.Core;
 
 
 public enum DataType {
@@ -34,6 +34,10 @@ public enum DataType {
      *
      */
     CAMERA_RAW,
+    /**
+     *
+     */
+    WEATHER,
     /**
      *
      */

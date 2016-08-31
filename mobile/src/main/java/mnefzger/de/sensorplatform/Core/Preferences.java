@@ -1,8 +1,10 @@
-package mnefzger.de.sensorplatform;
+package mnefzger.de.sensorplatform.Core;
 
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.util.Log;
+
+import mnefzger.de.sensorplatform.R;
 
 /**
  * This class provides an interface to the res/xml/preferences.xml file

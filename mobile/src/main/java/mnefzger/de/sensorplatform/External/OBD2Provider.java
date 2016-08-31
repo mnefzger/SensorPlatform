@@ -17,9 +17,9 @@ import java.io.OutputStream;
 import java.util.Timer;
 import java.util.TimerTask;
 
-import mnefzger.de.sensorplatform.DataProvider;
-import mnefzger.de.sensorplatform.ISensorCallback;
-import mnefzger.de.sensorplatform.Preferences;
+import mnefzger.de.sensorplatform.Core.DataProvider;
+import mnefzger.de.sensorplatform.Core.ISensorCallback;
+import mnefzger.de.sensorplatform.Core.Preferences;
 
 
 public class OBD2Provider extends DataProvider{

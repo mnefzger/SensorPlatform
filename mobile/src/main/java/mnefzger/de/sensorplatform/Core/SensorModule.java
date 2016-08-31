@@ -1,4 +1,4 @@
-package mnefzger.de.sensorplatform;
+package mnefzger.de.sensorplatform.Core;
 
 import android.content.Context;
 import android.content.SharedPreferences;
@@ -44,6 +44,10 @@ public class SensorModule implements ISensorCallback, IEventCallback{
      */
     private PositionProvider location;
     /**
+     * WeatherProvider to query current weather from Yahoo API
+     */
+    private WeatherProvider weather;
+    /**
      * OBD2Provider to collect vehicle data
      */
     private OBD2Provider obd2;
@@ -79,7 +83,8 @@ public class SensorModule implements ISensorCallback, IEventCallback{
      * int identifier for GPS Sensor
      */
     private final int GPS_IDENTIFIER = 100;
-    private final int OBD_IDENTIFIER = 101;
+    private final int WEATHER_IDENTIFIER = 101;
+    private final int OBD_IDENTIFIER = 102;
 
 
     public SensorModule(IDataCallback callback, Context app) {
@@ -92,6 +97,7 @@ public class SensorModule implements ISensorCallback, IEventCallback{
         orientation = new OrientationProvider(app, this);
         light = new LightProvider(app, this);
         location = new PositionProvider(app, this);
+        weather = new WeatherProvider(app, this);
         obd2 = new OBD2Provider(app, this);
         drivingBehProc = new DrivingBehaviourProcessor(this, app);
         fitness = FitnessSensorManager.getInstance(app);
@@ -136,7 +142,11 @@ public class SensorModule implements ISensorCallback, IEventCallback{
                 orientation.start();
                 activeProviders.add(orientation);
             }
+        }
 
+        if(t == WEATHER_IDENTIFIER && !activeProviders.contains(weather)) {
+            weather.start();
+            activeProviders.add(weather);
         }
 
         if(t == OBD_IDENTIFIER && !activeProviders.contains(obd2)) {
@@ -157,30 +167,35 @@ public class SensorModule implements ISensorCallback, IEventCallback{
     public void stopSensing(DataType type) {
         int t = getSensorTypeFromDataType(type);
 
-        Log.d("STOPPED", type+"");
+        Log.d("STOPPED", type + "");
 
         if (t == Sensor.TYPE_ACCELEROMETER) {
             accelerometer.stop();
-            if(activeProviders.contains(accelerometer))
+            if (activeProviders.contains(accelerometer))
                 activeProviders.remove(accelerometer);
 
         } else if (t == Sensor.TYPE_ROTATION_VECTOR) {
             orientation.stop();
-            if(activeProviders.contains(orientation))
+            if (activeProviders.contains(orientation))
                 activeProviders.remove(orientation);
 
         } else if (t == Sensor.TYPE_LIGHT) {
             light.stop();
-            if(activeProviders.contains(light))
+            if (activeProviders.contains(light))
                 activeProviders.remove(light);
 
-        } else if(t == GPS_IDENTIFIER) {
+        } else if (t == GPS_IDENTIFIER) {
             location.stop();
             orientation.stop();
-            if(activeProviders.contains(location))
+            if (activeProviders.contains(location))
                 activeProviders.remove(location);
-            if(activeProviders.contains(orientation))
+            if (activeProviders.contains(orientation))
                 activeProviders.remove(orientation);
+
+        } else if (t == WEATHER_IDENTIFIER){
+            weather.stop();
+            if(activeProviders.contains(weather))
+                activeProviders.remove(weather);
 
         } else if(t == OBD_IDENTIFIER) {
             obd2.stop();
@@ -224,7 +239,7 @@ public class SensorModule implements ISensorCallback, IEventCallback{
             current.setAcc(0,0,0);
             current.setRotMatrix(last.rotMatrix);
             current.setLight(last.light);
-            current.setLocation(new Location("empty"));
+            current.setLocation(null);
             current.setSpeed(0);
             current.setOBDSpeed(last.obdSpeed);
             current.setRPM(last.rpm);
@@ -292,11 +307,18 @@ public class SensorModule implements ISensorCallback, IEventCallback{
     public void onLocationData(Location location, double speed) {
         current.setLocation(location);
         current.setSpeed(speed);
+        // the WeatherProvider needs the most recent location for queries
+        weather.updateLocation(location);
     }
 
     @Override
     public void onLightData(double lux) {
         current.setLight(lux);
+    }
+
+    @Override
+    public void onWeatherData(double temp, String des, double wind) {
+        current.setWeather(des + ", " + temp + "°C, wind: " + wind + "km/h");
     }
 
     @Override
@@ -341,6 +363,8 @@ public class SensorModule implements ISensorCallback, IEventCallback{
             case LOCATION_RAW:
             case LOCATION_EVENT:
                 return GPS_IDENTIFIER;
+            case WEATHER:
+                return WEATHER_IDENTIFIER;
             case OBD:
                 return OBD_IDENTIFIER;
             case HEART_RATE:

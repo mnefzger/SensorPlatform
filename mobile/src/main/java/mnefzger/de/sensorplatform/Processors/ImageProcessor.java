@@ -1,11 +1,7 @@
 package mnefzger.de.sensorplatform.Processors;
 
 import android.content.Context;
-import android.content.res.Resources;
-import android.os.Environment;
 import android.util.Log;
-
-import com.opencsv.CSVWriter;
 
 import org.opencv.core.CvType;
 import org.opencv.core.Mat;
@@ -13,16 +9,14 @@ import org.opencv.core.Mat;
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.File;
-import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 
-import mnefzger.de.sensorplatform.EventVector;
-import mnefzger.de.sensorplatform.IEventCallback;
-import mnefzger.de.sensorplatform.ImageModule;
-import mnefzger.de.sensorplatform.R;
+import mnefzger.de.sensorplatform.Core.EventVector;
+import mnefzger.de.sensorplatform.Core.IEventCallback;
+import mnefzger.de.sensorplatform.Core.ImageModule;
 
 /**
  * This class includes all image analysis functions for

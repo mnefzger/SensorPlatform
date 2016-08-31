@@ -2,7 +2,6 @@ package mnefzger.de.sensorplatform.UI;
 
 
 import android.app.Activity;
-import android.app.PendingIntent;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
@@ -12,17 +11,14 @@ import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.TextView;
 
-import org.w3c.dom.Text;
-
 import java.text.DecimalFormat;
 
-import mnefzger.de.sensorplatform.ActiveSubscriptions;
-import mnefzger.de.sensorplatform.DataVector;
-import mnefzger.de.sensorplatform.EventVector;
-import mnefzger.de.sensorplatform.MainActivity;
+import mnefzger.de.sensorplatform.Core.ActiveSubscriptions;
+import mnefzger.de.sensorplatform.Core.DataVector;
+import mnefzger.de.sensorplatform.Core.EventVector;
+import mnefzger.de.sensorplatform.Core.MainActivity;
 import mnefzger.de.sensorplatform.R;
-import mnefzger.de.sensorplatform.SensorModule;
-import mnefzger.de.sensorplatform.SensorPlatformService;
+import mnefzger.de.sensorplatform.Core.SensorPlatformService;
 
 
 public class AppFragment extends Fragment {

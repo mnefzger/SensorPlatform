@@ -1,23 +1,20 @@
 package mnefzger.de.sensorplatform.Processors;
 
 import android.content.Context;
-import android.content.IntentFilter;
 import android.content.SharedPreferences;
 import android.hardware.SensorManager;
-import android.preference.PreferenceManager;
 import android.util.Log;
 import android.util.SparseArray;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 
-import mnefzger.de.sensorplatform.DataVector;
-import mnefzger.de.sensorplatform.EventVector;
-import mnefzger.de.sensorplatform.Preferences;
+import mnefzger.de.sensorplatform.Core.DataVector;
+import mnefzger.de.sensorplatform.Core.EventVector;
+import mnefzger.de.sensorplatform.Core.Preferences;
 import mnefzger.de.sensorplatform.R;
-import mnefzger.de.sensorplatform.SensorModule;
+import mnefzger.de.sensorplatform.Core.SensorModule;
 import mnefzger.de.sensorplatform.Utilities.IOSMResponse;
 import mnefzger.de.sensorplatform.Utilities.MathFunctions;
 import mnefzger.de.sensorplatform.Utilities.OSMQueryAdapter;
@@ -169,7 +166,7 @@ public class DrivingBehaviourProcessor extends EventProcessor implements IOSMRes
     private void checkForSpeeding(DataVector last) {
         long now = System.currentTimeMillis();
         // without location, there is nothing to process
-        if( last.location != null ) {
+        if( last.location != null && !(last.location.getLatitude() == 0 && last.location.getLongitude() == 0) ) {
             // query every OSM_REQUEST_RATE seconds
             if( now-lastRequest > OSM_REQUEST_RATE ) {
                 qAdapter.startSearchForRoad(last.location);

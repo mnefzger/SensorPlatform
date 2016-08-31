@@ -1,4 +1,4 @@
-package mnefzger.de.sensorplatform;
+package mnefzger.de.sensorplatform.Core;
 
 import android.app.Notification;
 import android.app.NotificationManager;
@@ -11,7 +11,6 @@ import android.os.Binder;
 import android.os.IBinder;
 import android.preference.PreferenceManager;
 import android.support.v4.app.NotificationCompat;
-import android.support.v4.app.NotificationManagerCompat;
 import android.util.Log;
 
 import com.jakewharton.threetenabp.AndroidThreeTen;
@@ -19,6 +18,7 @@ import com.jakewharton.threetenabp.AndroidThreeTen;
 import java.util.Iterator;
 
 import mnefzger.de.sensorplatform.Logger.LoggingModule;
+import mnefzger.de.sensorplatform.R;
 
 /**
  * This class is the main service managing the data collection.
@@ -121,6 +121,8 @@ public class SensorPlatformService extends Service implements IDataCallback{
         if(Preferences.heartRateActivated(prefs)) {
             subscribeTo(DataType.HEART_RATE);
         }
+
+        subscribeTo(DataType.WEATHER);
 
         serviceRunning = true;
     }

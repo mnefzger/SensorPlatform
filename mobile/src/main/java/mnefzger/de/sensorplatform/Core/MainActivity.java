@@ -1,4 +1,4 @@
-package mnefzger.de.sensorplatform;
+package mnefzger.de.sensorplatform.Core;
 
 import android.content.ComponentName;
 import android.content.Context;
@@ -17,6 +17,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 
 import mnefzger.de.sensorplatform.External.OBD2Connection;
+import mnefzger.de.sensorplatform.R;
 import mnefzger.de.sensorplatform.UI.AppFragment;
 import mnefzger.de.sensorplatform.UI.SettingsFragment;
 import mnefzger.de.sensorplatform.UI.SetupFirstFragment;

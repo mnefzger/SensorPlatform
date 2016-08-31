@@ -1,11 +1,6 @@
 package mnefzger.de.sensorplatform.Logger;
 
-import android.Manifest;
-import android.app.Activity;
-import android.content.Context;
-import android.content.pm.PackageManager;
 import android.os.Environment;
-import android.support.v4.app.ActivityCompat;
 
 import com.opencsv.CSVWriter;
 
@@ -13,8 +8,8 @@ import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 
-import mnefzger.de.sensorplatform.DataVector;
-import mnefzger.de.sensorplatform.EventVector;
+import mnefzger.de.sensorplatform.Core.DataVector;
+import mnefzger.de.sensorplatform.Core.EventVector;
 
 /**
  * This class writes Raw Data and Event Data to csv files on the phone

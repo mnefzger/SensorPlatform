@@ -1,8 +1,5 @@
 package mnefzger.de.sensorplatform.UI;
 
-import android.content.Context;
-import android.content.Intent;
-import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.util.Log;
@@ -11,9 +8,9 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 
-import mnefzger.de.sensorplatform.MainActivity;
+import mnefzger.de.sensorplatform.Core.MainActivity;
 import mnefzger.de.sensorplatform.R;
-import mnefzger.de.sensorplatform.SensorPlatformService;
+import mnefzger.de.sensorplatform.Core.SensorPlatformService;
 
 public class StartFragment extends Fragment {
 

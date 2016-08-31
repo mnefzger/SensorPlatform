@@ -1,15 +1,13 @@
 package mnefzger.de.sensorplatform.Processors;
 
 
-import android.preference.PreferenceManager;
 import android.util.Log;
 
 import java.util.List;
 
-import mnefzger.de.sensorplatform.DataVector;
-import mnefzger.de.sensorplatform.IEventCallback;
-import mnefzger.de.sensorplatform.Preferences;
-import mnefzger.de.sensorplatform.SensorModule;
+import mnefzger.de.sensorplatform.Core.DataVector;
+import mnefzger.de.sensorplatform.Core.IEventCallback;
+import mnefzger.de.sensorplatform.Core.SensorModule;
 
 public abstract class EventProcessor {
 
@@ -24,6 +22,7 @@ public abstract class EventProcessor {
         this.data = data;
     }
 
+    // TODO this method needs to be revisited, yields wrong results sometimes
     protected List<DataVector> getLastData(int ms) {
         if( !(data.get(0).timestamp == 0) && data.size() > 1 ) {
 

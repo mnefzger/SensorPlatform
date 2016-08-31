@@ -13,8 +13,8 @@ import com.google.android.gms.wearable.Wearable;
 
 import java.util.List;
 
-import mnefzger.de.sensorplatform.DataProvider;
-import mnefzger.de.sensorplatform.ISensorCallback;
+import mnefzger.de.sensorplatform.Core.DataProvider;
+import mnefzger.de.sensorplatform.Core.ISensorCallback;
 
 public class FitnessSensorManager extends DataProvider{
 

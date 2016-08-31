@@ -1,4 +1,4 @@
-package mnefzger.de.sensorplatform;
+package mnefzger.de.sensorplatform.Core;
 
 
 import android.location.Location;
@@ -14,6 +14,8 @@ public interface ISensorCallback {
     void onOBD2Data(double[] values);
 
     void onLightData(double value);
+
+    void onWeatherData(double temp, String description, double wind);
 
     void onHeartData(double value);
 }

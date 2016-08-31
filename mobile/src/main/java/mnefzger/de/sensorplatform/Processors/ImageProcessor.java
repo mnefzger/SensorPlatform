@@ -119,11 +119,36 @@ public class ImageProcessor{
         if(cars.length > 0) {
             Log.d("CAR_DETECTION", "Detected " +  cars.length/4 + " cars");
             callback.onEventDetected(new EventVector(true, System.currentTimeMillis(), "Cars detected", cars.length/4));
+
+            int max = 0;
+            for(int c=0; c<cars.length; c+=4) {
+                int pixel_width = cars[c + 2];
+                if(pixel_width > max)
+                    max = pixel_width;
+            }
+            calculateDist(max);
+
+
         } else {
             callback.onEventDetected(new EventVector(true, System.currentTimeMillis(), "No Car detected", 0));
         }
 
         return cars;
+    }
+
+    private void calculateDist(int pixel_width) {
+        double sensor_width = 6.17; //mm
+        double f = 4.67; //mm
+        int img_width = 320; //pixel
+        int real_width = 1847; //mm
+
+        double distance_to_car = (f * real_width * img_width) / (pixel_width * sensor_width); //mm
+        distance_to_car /= 1000; //m
+
+       // Log.d("CAR_DETECTION_DISTANCE", distance_to_car + "m");
+        callback.onEventDetected(new EventVector(true, System.currentTimeMillis(), "Distance to front car", distance_to_car));
+
+        if(distance_to_car < 8) callback.onEventDetected(new EventVector(false, System.currentTimeMillis(), "Tailgating", distance_to_car));
     }
 
 

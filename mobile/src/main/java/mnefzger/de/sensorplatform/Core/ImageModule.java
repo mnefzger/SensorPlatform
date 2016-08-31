@@ -124,7 +124,7 @@ public class ImageModule implements IEventCallback{
 
     private void open(String id) {
         RES_W = Preferences.getVideoResolution(prefs);
-        if(RES_W  == 1280) RES_H = 720;
+        if(RES_W  == 1024) RES_H = 768;
         else if(RES_W == 640) RES_H = 480;
         else if(RES_W == 320) RES_H = 240;
 
@@ -270,7 +270,7 @@ public class ImageModule implements IEventCallback{
                         new VideoSaver2(backImagesCV, (int)BACK_AVG_FPS, RES_W, RES_H, "back", v.getTimestamp());
                     }
                 }
-            }, 4000);
+            }, 5000);
         }
     }
 
@@ -322,7 +322,7 @@ public class ImageModule implements IEventCallback{
             /**
              * Only store the last ten seconds in the image buffer
              */
-            if(frontImagesCV.size() > (10*FRONT_MAX_FPS) ) {
+            if(frontImagesCV.size() > (12*FRONT_MAX_FPS) ) {
                 int key = frontImagesCV.keyAt(0);
                 frontImagesCV.remove(key);
             }
@@ -348,15 +348,15 @@ public class ImageModule implements IEventCallback{
              * Decide if frame is to be processed or not
              */
             if(Preferences.backImagesProcessingActivated(prefs) && now - lastBackProc >= (1000 / BACK_PROCESSING_FPS) ) {
-                /*new Thread(new Runnable() {
+                new Thread(new Runnable() {
                     @Override
                     public void run() {
                         imgProc.processImageBack(bytes.clone(), w, h);
                     }
-                }).start();*/
-                byte[] processedImg = imgProc.processImageBack(bytes.clone(), w, h);
-                yuvimage = new YuvImage(processedImg, ImageFormat.NV21, 320, 240, null);
-                mBackgroundHandler.post( new ImageSaver(yuvimage, "back") );
+                }).start();
+                //byte[] processedImg = imgProc.processImageBack(bytes.clone(), w, h);
+                //yuvimage = new YuvImage(processedImg, ImageFormat.NV21, 320, 240, null);
+                //mBackgroundHandler.post( new ImageSaver(yuvimage, "back") );
                 lastBackProc = now;
             }
 
@@ -378,7 +378,7 @@ public class ImageModule implements IEventCallback{
             /**
              * Only store the last ten seconds in the image buffer
              */
-            if(backImagesCV.size() > (10*BACK_MAX_FPS) ) {
+            if(backImagesCV.size() > (12*BACK_MAX_FPS) ) {
                 int key = backImagesCV.keyAt(0);
                 backImagesCV.remove(key);
             }

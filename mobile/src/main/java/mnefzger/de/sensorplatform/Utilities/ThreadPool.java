@@ -31,6 +31,7 @@ public class ThreadPool {
     }
 
     public static void finish() {
-        mInstance.mThreadPoolExec.shutdown();
+        if(mInstance != null)
+            mInstance.mThreadPoolExec.shutdown();
     }
 }

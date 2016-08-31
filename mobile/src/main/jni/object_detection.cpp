@@ -133,6 +133,19 @@ JNIEXPORT jintArray Java_mnefzger_de_sensorplatform_Processors_ImageProcessor_nA
 		env->SetIntArrayRegion(result, i*4, 4, tmp_array);
 
         rectangle(gray_small, cars[i], CV_RGB(255, 255, 255), 1);
+
+        /*
+        double sensor_width = 6.17; //mm
+        double f = 4.67; //mm
+        int img_width = 320; //pixel
+        int real_width = 1847; //mm
+
+        double distance_to_car = (f * real_width * img_width) / (cars[i].width * sensor_width); //mm
+        distance_to_car = distance_to_car/1000;
+        std::stringstream s;
+        s << distance_to_car;
+        putText(gray_small, s.str(), Point(cars[i].x, cars[i].y+1.3*cars[i].height), FONT_HERSHEY_SIMPLEX, 0.3, Scalar(255,255,255), 1);
+        */
     }
 
     Mat bgr(gray_small.rows, gray_small.cols, CV_8UC3);

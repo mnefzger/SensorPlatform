@@ -55,7 +55,8 @@ public class FitnessSensorManager extends DataProvider{
     }
 
     public void handleIncomingData(float heartbeat) {
-        callback.onHeartData(heartbeat);
+        if(callback != null)
+            callback.onHeartData(heartbeat);
     }
 
     public void startMeasurement() {

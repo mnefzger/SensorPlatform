@@ -124,7 +124,9 @@ public class ImageModule implements IEventCallback{
 
     private void open(String id) {
         RES_W = Preferences.getVideoResolution(prefs);
-        RES_H = RES_W/16 * 9;
+        if(RES_W  == 1280) RES_H = 720;
+        else if(RES_W == 640) RES_H = 480;
+        else if(RES_W == 320) RES_H = 240;
 
         Log.d("RESOLUTION", RES_W + "x" + RES_H);
         try {
@@ -338,7 +340,7 @@ public class ImageModule implements IEventCallback{
             final int w = i.getWidth();
             final int h = i.getHeight();
             i.close();
-            //YuvImage yuvimage = new YuvImage(bytes, ImageFormat.NV21, w, h, null);
+            YuvImage yuvimage = new YuvImage(bytes, ImageFormat.NV21, w, h, null);
 
             double now = System.currentTimeMillis();
 
@@ -346,14 +348,15 @@ public class ImageModule implements IEventCallback{
              * Decide if frame is to be processed or not
              */
             if(Preferences.backImagesProcessingActivated(prefs) && now - lastBackProc >= (1000 / BACK_PROCESSING_FPS) ) {
-                new Thread(new Runnable() {
+                /*new Thread(new Runnable() {
                     @Override
                     public void run() {
-                //        imgProc.processImageBack(bytes.clone(), w, h);
+                        imgProc.processImageBack(bytes.clone(), w, h);
                     }
-                }).start();
-                /*byte[] processedImg = imgProc.processImageBack(bytes.clone(), w, h);
-                yuvimage = new YuvImage(processedImg, ImageFormat.NV21, w, h, null);*/
+                }).start();*/
+                byte[] processedImg = imgProc.processImageBack(bytes.clone(), w, h);
+                yuvimage = new YuvImage(processedImg, ImageFormat.NV21, 320, 240, null);
+                mBackgroundHandler.post( new ImageSaver(yuvimage, "back") );
                 lastBackProc = now;
             }
 
@@ -369,7 +372,7 @@ public class ImageModule implements IEventCallback{
                 backIt++;
                 lastBack = now;
 
-                //mBackgroundHandler.post( new ImageSaver(yuvimage, "back") );
+
             }
 
             /**

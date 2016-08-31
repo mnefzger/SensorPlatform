@@ -191,7 +191,7 @@ public class SensorPlatformService extends Service implements IDataCallback{
 
         if(Preferences.videoSavingActivated(prefs) && !ev.isDebug()) {
             im.saveVideoAfterEvent(ev);
-            ev.setVideoName("Video-" + ev.getTimestamp() + ".mp4");
+            ev.setVideoName("Video-" + ev.getTimestamp() + ".avi");
         }
 
         if(appCallback != null)

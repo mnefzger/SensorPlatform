@@ -35,8 +35,8 @@
     </string-array>
     <string-array name="resolution_readable">
         <item>1280x720</item>
-        <item>640x360</item>
-        <item>320x180</item>
+        <item>640x480</item>
+        <item>320x240</item>
     </string-array>
 
     <string-array name="obd_values">

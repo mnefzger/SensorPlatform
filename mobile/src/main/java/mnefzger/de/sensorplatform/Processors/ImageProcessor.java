@@ -42,7 +42,8 @@ public class ImageProcessor{
 
     public ImageProcessor(ImageModule im, Context c) {
         callback = im;
-        writeCascadeToFileSystem(c);
+        writeCascadeToFileSystem(c, "lbpcascade_frontalface.xml");
+        writeCascadeToFileSystem(c, "haarcascade_vehicles.xml");
         nInitCascades();
     }
 
@@ -115,9 +116,9 @@ public class ImageProcessor{
         int[] cars = nAsmFindCars(adress1, adress2);
         Log.d("CAR_DETECTION_FRAME", System.currentTimeMillis()-time + "");
 
-        if(cars.length == 4) {
-            Log.d("CAR_DETECTION", "Detected at (" + cars[0] + "," + cars[1]+")");
-            callback.onEventDetected(new EventVector(true, System.currentTimeMillis(), "Car detected", 0));
+        if(cars.length > 0) {
+            Log.d("CAR_DETECTION", "Detected " +  cars.length/4 + " cars");
+            callback.onEventDetected(new EventVector(true, System.currentTimeMillis(), "Cars detected", cars.length/4));
         } else {
             callback.onEventDetected(new EventVector(true, System.currentTimeMillis(), "No Car detected", 0));
         }
@@ -126,7 +127,7 @@ public class ImageProcessor{
     }
 
 
-    private void writeCascadeToFileSystem(Context c) {
+    private void writeCascadeToFileSystem(Context c, String filename) {
         String baseDir = android.os.Environment.getExternalStorageDirectory().getAbsolutePath();
         String filePath = baseDir + "/SensorPlatform/";
         Log.d("CASCADES", "writing to " + filePath);
@@ -137,9 +138,9 @@ public class ImageProcessor{
         }
 
         try {
-            InputStream inStream = c.getAssets().open("lbpcascade_frontalface.xml");
+            InputStream inStream = c.getAssets().open(filename);
             BufferedReader br = new BufferedReader(new InputStreamReader(inStream));
-            File toFile = new File(toPath, "lbpcascade_frontalface.xml");
+            File toFile = new File(toPath, filename);
             copyAssetFile(br, toFile);
         } catch (IOException e) {
         }

@@ -24,14 +24,18 @@ CascadeClassifier faceCascadeHaar;
 CascadeClassifier faceCascadeLBP;
 CascadeClassifier faceCascadeLBP2;
 
-JNIEXPORT jint Java_mnefzger_de_sensorplatform_Processors_ImageProcessor_nInitCascades(JNIEnv *env, jobject obj) {
-    string haarFaceCascadePath = "/storage/emulated/0/SensorPlatform/haarcascade_frontalface_alt.xml";
-    string lbpFaceCascadePath = "/storage/emulated/0/SensorPlatform/lbpcascade_frontalface.xml";
-    string lbpFaceCascadePath2 = "/storage/emulated/0/SensorPlatform/visionary_FACES_01_LBP.xml";
+CascadeClassifier vehicleCascadeHaar;
 
-	faceCascadeHaar.load(haarFaceCascadePath);
+JNIEXPORT jint Java_mnefzger_de_sensorplatform_Processors_ImageProcessor_nInitCascades(JNIEnv *env, jobject obj) {
+    //string haarFaceCascadePath = "/storage/emulated/0/SensorPlatform/haarcascade_frontalface_alt.xml";
+    string lbpFaceCascadePath = "/storage/emulated/0/SensorPlatform/lbpcascade_frontalface.xml";
+    //string lbpFaceCascadePath2 = "/storage/emulated/0/SensorPlatform/visionary_FACES_01_LBP.xml";
+    string vehicleHaarCascadePath = "/storage/emulated/0/SensorPlatform/haarcascade_vehicles.xml";
+
+	//faceCascadeHaar.load(haarFaceCascadePath);
 	faceCascadeLBP.load(lbpFaceCascadePath);
-	faceCascadeLBP2.load(lbpFaceCascadePath2);
+	//faceCascadeLBP2.load(lbpFaceCascadePath2);
+    vehicleCascadeHaar.load(vehicleHaarCascadePath);
 
 	LOGI("Init cascades complete.");
 
@@ -109,29 +113,30 @@ JNIEXPORT jintArray Java_mnefzger_de_sensorplatform_Processors_ImageProcessor_nA
     cvtColor(image, gray, COLOR_YUV2GRAY_I420);
     flip(gray, gray, -1);
 
+    Size size(320, 240);
+    Mat gray_small(240, 320, gray.depth());
+    resize(gray, gray_small, size);
+
     vector< Rect > cars;
-    //faceCascadeLBP.detectMultiScale( gray, cars, 1.1, 2, 0, Size(30, 30) );
+    vehicleCascadeHaar.detectMultiScale( gray_small, cars, 1.1, 2, 0, Size(30, 30) );
 
+    result = env->NewIntArray(4 * cars.size());
 
-    if (cars.size()) {
-    	result = env->NewIntArray(4);
+    for (int i=0; i<cars.size(); i++) {
     	jint tmp_array[4];
 
-    	tmp_array[0] = cars[0].x;
-    	tmp_array[1] = cars[0].y;
-    	tmp_array[2] = cars[0].width;
-    	tmp_array[3] = cars[0].height;
+    	tmp_array[0] = cars[i].x;
+    	tmp_array[1] = cars[i].y;
+    	tmp_array[2] = cars[i].width;
+    	tmp_array[3] = cars[i].height;
 
-		env->SetIntArrayRegion(result, 0, 4, tmp_array);
+		env->SetIntArrayRegion(result, i*4, 4, tmp_array);
 
-        rectangle(gray, cars[0], CV_RGB(255, 255, 255), 1);
-
-    } else {
-        result = env->NewIntArray(0);
+        rectangle(gray_small, cars[i], CV_RGB(255, 255, 255), 1);
     }
 
-    Mat bgr(gray.rows, gray.cols, CV_8UC3);
-    cvtColor(gray, bgr, COLOR_GRAY2BGR);
+    Mat bgr(gray_small.rows, gray_small.cols, CV_8UC3);
+    cvtColor(gray_small, bgr, COLOR_GRAY2BGR);
 
     Mat yuv;
     cvtColor(bgr, yuv, COLOR_BGR2YUV_I420);

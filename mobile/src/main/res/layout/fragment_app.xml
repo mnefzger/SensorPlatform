@@ -14,7 +14,7 @@
         android:paddingTop="@dimen/activity_vertical_margin"
         android:paddingBottom="@dimen/activity_vertical_margin"
         android:keepScreenOn="true"
-        tools:context="mnefzger.de.sensorplatform.MainActivity">
+        tools:context=".Core.MainActivity">
 
         <LinearLayout
             android:orientation="horizontal"

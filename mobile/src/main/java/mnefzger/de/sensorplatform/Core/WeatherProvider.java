@@ -25,22 +25,23 @@ public class WeatherProvider extends DataProvider{
     private final String BASE_URL = "https://query.yahooapis.com/v1/public/yql?q=select%20*%20from%20weather.forecast%20where%20woeid%20in%20(SELECT%20woeid%20FROM%20geo.places%20WHERE%20text%3D%22(LATITUDE%2CLONGITUDE)%22)&format=json&env=store%3A%2F%2Fdatatables.org%2Falltableswithkeys";
     private boolean running = false;
 
-    private Location current;
+    private Location current = null;
 
     public WeatherProvider(Context c, SensorModule m) {
         this.context = c;
         this.callback = m;
-        Location mock = new Location("mock");
+        /*Location mock = new Location("mock");
         mock.setLongitude(153.015858);
         mock.setLatitude(-27.447945);
-        current = mock;
+        current = mock;*/
     }
 
     @Override
     public void start() {
         running = true;
         // do first query instantly
-        queryWeather();
+        if(current != null)
+            queryWeather();
         // start periodic updates
         getWeatherPeriodically();
     }
@@ -59,7 +60,8 @@ public class WeatherProvider extends DataProvider{
                 new java.util.TimerTask() {
                     @Override
                     public void run() {
-                        queryWeather();
+                        if(current != null)
+                            queryWeather();
 
                         if(running)
                            getWeatherPeriodically();

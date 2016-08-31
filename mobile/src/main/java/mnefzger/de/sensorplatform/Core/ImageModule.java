@@ -38,6 +38,7 @@ import java.nio.ByteBuffer;
 import java.util.Arrays;
 
 import mnefzger.de.sensorplatform.Processors.ImageProcessor;
+import mnefzger.de.sensorplatform.Utilities.ThreadPool;
 import mnefzger.de.sensorplatform.Utilities.SequenceEncoderWrapper;
 
 /**
@@ -79,6 +80,7 @@ public class ImageModule implements IEventCallback{
 
     private HandlerThread mBackgroundThread;
     private Handler mBackgroundHandler;
+    private Handler h;
 
     private final String TAG = "CAMERA_SENSORPLATFORM";
 
@@ -94,6 +96,8 @@ public class ImageModule implements IEventCallback{
 
         prefs = PreferenceManager.getDefaultSharedPreferences(app);
         setPrefs();
+
+        h = new Handler();
     }
 
     private void setPrefs() {
@@ -116,10 +120,19 @@ public class ImageModule implements IEventCallback{
     public void stopCapture() {
         if(mBackgroundThread != null)
             stopBackgroundThread();
-        if(camera_front != null)
+
+        ThreadPool.finish();
+
+        if(camera_front != null) {
             camera_front.close();
-        if(camera_back != null)
+            imageReader_front.close();
+        }
+
+        if(camera_back != null) {
             camera_back.close();
+            imageReader_back.close();
+        }
+
     }
 
     private void open(String id) {
@@ -259,24 +272,23 @@ public class ImageModule implements IEventCallback{
     public void saveVideoAfterEvent(EventVector ev) {
         final EventVector v = ev;
         if(!frontSaving && !backSaving) {
-            mBackgroundHandler.postDelayed(new Runnable() {
+            h.postDelayed(new Runnable() {
                 @Override
                 public void run() {
                     if(Preferences.frontCameraActivated(prefs)) {
-                        new VideoSaver2(frontImagesCV, (int)FRONT_AVG_FPS, RES_W, RES_H, "front", v.getTimestamp());
+                        new VideoSaver2(copyByteList(frontImagesCV), (int)FRONT_AVG_FPS, RES_W, RES_H, "front", v.getTimestamp());
                     }
                     if(Preferences.backCameraActivated(prefs)) {
                         //new VideoSaver(backImages, (int)BACK_AVG_FPS, 640, 480, "back", v.getTimestamp());
-                        new VideoSaver2(backImagesCV, (int)BACK_AVG_FPS, RES_W, RES_H, "back", v.getTimestamp());
+                        new VideoSaver2(copyByteList(backImagesCV), (int)BACK_AVG_FPS, RES_W, RES_H, "back", v.getTimestamp());
                     }
                 }
-            }, 5000);
+            }, 4500);
         }
     }
 
     private double lastFront = System.currentTimeMillis();
     private double lastFrontProc = System.currentTimeMillis();
-    private double lastFrontSaved = System.currentTimeMillis();
     private int frontIt = 0;
     private void handleImageFront(Image i) {
         if(i != null) {
@@ -284,7 +296,7 @@ public class ImageModule implements IEventCallback{
             final int w = i.getWidth();
             final int h = i.getHeight();
             i.close();
-            YuvImage yuvimage;
+            //YuvImage yuvimage;
 
             double now = System.currentTimeMillis();
 
@@ -292,13 +304,12 @@ public class ImageModule implements IEventCallback{
              * Decide if frame is to be processed or not
              */
             if(Preferences.frontImagesProcessingActivated(prefs) && now - lastFrontProc >= (1000 / FRONT_PROCESSING_FPS) ) {
-
-                new Thread(new Runnable() {
+                mBackgroundHandler.post(new Runnable() {
                     @Override
                     public void run() {
-                        imgProc.processImageFront(bytes.clone(), w, h);
+                        imgProc.processImageFront(bytes, w, h);
                     }
-                }).start();
+                });
                 //byte[] processedImg = imgProc.processImage(bytes, img.getWidth(), img.getHeight());
                 //yuvimage = new YuvImage(processedImg, ImageFormat.NV21, img.getWidth(), img.getHeight(), null);
                 lastFrontProc = now;
@@ -322,7 +333,7 @@ public class ImageModule implements IEventCallback{
             /**
              * Only store the last ten seconds in the image buffer
              */
-            if(frontImagesCV.size() > (12*FRONT_MAX_FPS) ) {
+            if(frontImagesCV.size() > (10*FRONT_MAX_FPS) ) {
                 int key = frontImagesCV.keyAt(0);
                 frontImagesCV.remove(key);
             }
@@ -332,7 +343,6 @@ public class ImageModule implements IEventCallback{
 
     private double lastBack = System.currentTimeMillis();
     private double lastBackProc = System.currentTimeMillis();
-    private double lastBackSaved = System.currentTimeMillis();
     private int backIt = 0;
     private void handleImageBack(Image i) {
         if(i != null) {
@@ -340,7 +350,7 @@ public class ImageModule implements IEventCallback{
             final int w = i.getWidth();
             final int h = i.getHeight();
             i.close();
-            YuvImage yuvimage = new YuvImage(bytes, ImageFormat.NV21, w, h, null);
+            //YuvImage yuvimage = new YuvImage(bytes, ImageFormat.NV21, w, h, null);
 
             double now = System.currentTimeMillis();
 
@@ -348,12 +358,12 @@ public class ImageModule implements IEventCallback{
              * Decide if frame is to be processed or not
              */
             if(Preferences.backImagesProcessingActivated(prefs) && now - lastBackProc >= (1000 / BACK_PROCESSING_FPS) ) {
-                new Thread(new Runnable() {
+                mBackgroundHandler.post(new Runnable() {
                     @Override
                     public void run() {
-                        imgProc.processImageBack(bytes.clone(), w, h);
+                        imgProc.processImageBack(bytes, w, h);
                     }
-                }).start();
+                });
                 //byte[] processedImg = imgProc.processImageBack(bytes.clone(), w, h);
                 //yuvimage = new YuvImage(processedImg, ImageFormat.NV21, 320, 240, null);
                 //mBackgroundHandler.post( new ImageSaver(yuvimage, "back") );
@@ -371,19 +381,26 @@ public class ImageModule implements IEventCallback{
                 backImagesCV.put(backIt, bytes);
                 backIt++;
                 lastBack = now;
-
-
             }
+
 
             /**
              * Only store the last ten seconds in the image buffer
              */
-            if(backImagesCV.size() > (12*BACK_MAX_FPS) ) {
+            if(backImagesCV.size() > (10*BACK_MAX_FPS) ) {
                 int key = backImagesCV.keyAt(0);
                 backImagesCV.remove(key);
             }
 
         }
+    }
+
+    private SparseArray<byte[]> copyByteList(SparseArray<byte[]> list) {
+        SparseArray<byte[]> temp = new SparseArray<>();
+        for(int i=0; i<list.size(); i++) {
+            temp.put(i, list.valueAt(i));
+        }
+        return temp;
     }
 
     private byte[] getBytes(Image img) {
@@ -491,6 +508,7 @@ public class ImageModule implements IEventCallback{
 
     }
 
+
     private static class VideoSaver2 {
         private SparseArray<byte[]> images;
         private int FPS, w, h;
@@ -533,7 +551,7 @@ public class ImageModule implements IEventCallback{
         }
 
         private void save() {
-            new Thread(new Runnable() {
+            ThreadPool.post(new Runnable() {
                 public void run() {
                     try {
                         if(mode == "front") frontSaving = true;
@@ -567,7 +585,7 @@ public class ImageModule implements IEventCallback{
                         e.printStackTrace();
                     }
                 }
-            }).start();
+            });
         }
 
         private SparseArray<byte[]> copyByteList(SparseArray<byte[]> list) {
@@ -577,6 +595,7 @@ public class ImageModule implements IEventCallback{
             }
             return temp;
         }
+
 
     }
 
@@ -640,8 +659,6 @@ public class ImageModule implements IEventCallback{
         }
 
     }
-
-
 
 
     /**

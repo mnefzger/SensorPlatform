@@ -113,7 +113,7 @@ public class MainActivity extends AppCompatActivity implements IDataCallback{
 
     @Override
     public void onEventData(EventVector v) {
-        Log.d("EventData @ App  ", v.toString());
+        //Log.d("EventData @ App  ", v.toString());
         if( appFragment != null && appFragment.isVisible())
             appFragment.updateUI(v);
     }

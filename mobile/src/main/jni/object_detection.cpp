@@ -118,7 +118,7 @@ JNIEXPORT jintArray Java_mnefzger_de_sensorplatform_Processors_ImageProcessor_nA
     resize(gray, gray_small, size);
 
     vector< Rect > cars;
-    vehicleCascadeHaar.detectMultiScale( gray_small, cars, 1.1, 2, 0, Size(30, 30) );
+    vehicleCascadeHaar.detectMultiScale( gray_small, cars, 1.06, 2, 0, Size(5, 5) );
 
     result = env->NewIntArray(4 * cars.size());
 

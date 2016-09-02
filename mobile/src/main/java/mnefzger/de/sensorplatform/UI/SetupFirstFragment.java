@@ -10,6 +10,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.FrameLayout;
 import android.widget.RadioButton;
 
 import mnefzger.de.sensorplatform.Core.MainActivity;
@@ -18,7 +19,7 @@ import mnefzger.de.sensorplatform.R;
 
 public class SetupFirstFragment extends Fragment {
 
-    private Button setup_next;
+    private FrameLayout setup_next;
     private TextInputLayout input_name, input_id, input_pid, input_age;
     private TextInputEditText study_name;
     private TextInputEditText study_ID;
@@ -60,7 +61,7 @@ public class SetupFirstFragment extends Fragment {
         input_age = (TextInputLayout) v.findViewById(R.id.input_layout_age);
         participant_age = (TextInputEditText) v.findViewById(R.id.participant_age);
 
-        setup_next = (Button) v.findViewById(R.id.next_button);
+        setup_next = (FrameLayout) v.findViewById(R.id.next_button);
         setup_next.setOnClickListener(nextStepButtonListener);
 
         return v;
@@ -119,8 +120,6 @@ public class SetupFirstFragment extends Fragment {
     private void writePreferences() {
         SharedPreferences studyPrefs = getActivity().getSharedPreferences(getString(R.string.study_preferences_key), Context.MODE_PRIVATE);
         SharedPreferences.Editor editor = studyPrefs.edit();
-
-
 
         editor.putString("study_name", s_name);
         editor.putString("study_ID", s_id);

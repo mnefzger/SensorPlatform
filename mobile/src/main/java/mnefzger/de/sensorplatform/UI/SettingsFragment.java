@@ -11,7 +11,11 @@ import android.support.design.widget.FloatingActionButton;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
+import android.widget.FrameLayout;
 import android.widget.TextView;
+
+import org.jcodec.codecs.h264.io.model.Frame;
 
 import mnefzger.de.sensorplatform.Core.MainActivity;
 import mnefzger.de.sensorplatform.R;
@@ -33,8 +37,8 @@ public class SettingsFragment extends PreferenceFragment
         addPreferencesFromResource(R.xml.preferences);
         View v = inflater.inflate(R.layout.fragment_settings, container, false);
 
-        FloatingActionButton b = (FloatingActionButton) v.findViewById(R.id.start_button);
-        b.setOnClickListener(this);
+        FrameLayout fl = (FrameLayout) v.findViewById(R.id.start_button);
+        fl.setOnClickListener(this);
 
         getPreferenceManager().getSharedPreferences().registerOnSharedPreferenceChangeListener(this);
 

@@ -39,7 +39,6 @@ import java.util.Arrays;
 
 import mnefzger.de.sensorplatform.Processors.ImageProcessor;
 import mnefzger.de.sensorplatform.Utilities.ThreadPool;
-import mnefzger.de.sensorplatform.Utilities.SequenceEncoderWrapper;
 
 /**
  * This class provides the connection to front and back camera.
@@ -77,6 +76,8 @@ public class ImageModule implements IEventCallback{
 
     private int RES_W;
     private int RES_H;
+
+    private int VIDEO_DURATION = 10;
 
     private HandlerThread mBackgroundThread;
     private Handler mBackgroundHandler;
@@ -276,11 +277,10 @@ public class ImageModule implements IEventCallback{
                 @Override
                 public void run() {
                     if(Preferences.frontCameraActivated(prefs)) {
-                        new VideoSaver2(copyByteList(frontImagesCV), (int)FRONT_AVG_FPS, RES_W, RES_H, "front", v.getTimestamp());
+                        new VideoSaver(copyByteList(frontImagesCV), FRONT_AVG_FPS, RES_W, RES_H, "front", v.getTimestamp());
                     }
                     if(Preferences.backCameraActivated(prefs)) {
-                        //new VideoSaver(backImages, (int)BACK_AVG_FPS, 640, 480, "back", v.getTimestamp());
-                        new VideoSaver2(copyByteList(backImagesCV), (int)BACK_AVG_FPS, RES_W, RES_H, "back", v.getTimestamp());
+                        new VideoSaver(copyByteList(backImagesCV), BACK_AVG_FPS, RES_W, RES_H, "back", v.getTimestamp());
                     }
                 }
             }, 4500);
@@ -428,90 +428,9 @@ public class ImageModule implements IEventCallback{
     }
 
     private static class VideoSaver {
-
-        private SparseArray<YuvImage> images = new SparseArray<>();
-        private int FPS, w, h;
-        private String mode;
-
-        SequenceEncoderWrapper encoder;
-        String baseDir = android.os.Environment.getExternalStorageDirectory().getAbsolutePath();
-        String fileName;
-        String filePath = baseDir + "/SensorPlatform/videos/";
-        File mFile;
-
-        public VideoSaver(SparseArray<YuvImage> list, int FPS, int width, int height, String mode, long timestamp) {
-            this.images = copy(list);
-            this.FPS = FPS;
-            this.w = width;
-            this.h = height;
-            this.mode = mode;
-
-            fileName = "Video-" + timestamp + ".mp4";
-
-            if(mode == "front" && frontSaving == true) return;
-            if(mode == "back" && backSaving == true) return;
-
-            File folder = new File(filePath);
-            if (!folder.exists()) {
-                folder.mkdir();
-            }
-
-            // subdirectory /front or /back
-            filePath += mode;
-            folder = new File(filePath);
-            if (!folder.exists()) {
-                folder.mkdir();
-            }
-
-            mFile = new File(filePath + File.separator + fileName);
-
-            save();
-        }
-
-        private void save() {
-            new Thread(new Runnable() {
-                public void run() {
-                    try {
-                        if(mode == "front") frontSaving = true;
-                        if(mode == "back") backSaving = true;
-                        Log.d("VIDEO", "Trying to save..." + images.size() + " frames, FPS " + FPS);
-                        double start = System.currentTimeMillis();
-                        encoder = new SequenceEncoderWrapper(mFile, images.size(), FPS, w, h);
-                        for (int i = 0; i < images.size(); i++) {
-                            YuvImage image = images.get(i);
-                            if (image != null) {
-                                Bitmap bi = getBitmapImageFromYUV(image, image.getWidth(), image.getHeight());
-                                encoder.encodeImage(bi);
-                            }
-                        }
-                        encoder.finish();
-
-                        double delta = (System.currentTimeMillis() - start)/1000;
-                        Log.d("VIDEO", "Saving finished in " + delta + "s!" );
-                        if(mode == "front") frontSaving = false;
-                        if(mode == "back") backSaving = false;
-
-                    } catch (IOException e) {
-                        e.printStackTrace();
-                    }
-                }
-            }).start();
-        }
-
-        private SparseArray<YuvImage> copy(SparseArray<YuvImage> list) {
-            SparseArray<YuvImage> temp = new SparseArray<>();
-            for(int i=0; i<list.size(); i++) {
-                temp.put(i, list.valueAt(i));
-            }
-            return temp;
-        }
-
-    }
-
-
-    private static class VideoSaver2 {
         private SparseArray<byte[]> images;
-        private int FPS, w, h;
+        private double FPS;
+        private int w, h;
         private String mode;
 
         VideoWriter videoWriter;
@@ -520,7 +439,7 @@ public class ImageModule implements IEventCallback{
         String filePath = baseDir + "/SensorPlatform/videos/";
         File mFile;
 
-        public VideoSaver2(SparseArray<byte[]> list, int FPS, int width, int height, String mode, long timestamp) {
+        public VideoSaver(SparseArray<byte[]> list, double FPS, int width, int height, String mode, long timestamp) {
             this.images = copyByteList(list);
             this.FPS = FPS;
             this.w = width;
@@ -557,7 +476,7 @@ public class ImageModule implements IEventCallback{
                         if(mode == "front") frontSaving = true;
                         if(mode == "back") backSaving = true;
                         videoWriter.open(filePath + File.separator + fileName, VideoWriter.fourcc('M','J','P','G'), FPS, new Size(w,h));
-                        Log.d("VIDEO", "Trying to save..." + images.size() + " frames, FPS " + FPS + ", path: " + filePath + File.separator + fileName + ", "+w+h);
+                        Log.d("VIDEO", "Trying to save..." + images.size() + " frames, FPS " + FPS + ", path: " + filePath + File.separator + fileName + ", "+w+"x"+h);
                         double start = System.currentTimeMillis();
                         for (int i = 0; i < images.size(); i++) {
                             byte[] image = images.get(i);

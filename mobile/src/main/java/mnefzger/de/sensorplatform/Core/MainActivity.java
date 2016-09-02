@@ -62,6 +62,15 @@ public class MainActivity extends AppCompatActivity implements IDataCallback{
             PreferenceManager.setDefaultValues(this, R.xml.preferences, false);
         }
 
+        SharedPreferences study_prefs = this.getSharedPreferences(getString(R.string.study_preferences_key), Context.MODE_PRIVATE);
+        study_prefs.edit().clear();
+        if(prefs.getAll().isEmpty()) {
+            PreferenceManager.setDefaultValues(this, R.xml.study_preferences, true);
+            prefs.edit().commit();
+        } else {
+            PreferenceManager.setDefaultValues(this, R.xml.study_preferences, false);
+        }
+
         if(savedInstanceState == null) {
             Log.d("CREATE", "New activity");
             // bind and start service running in the background

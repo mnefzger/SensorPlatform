@@ -64,6 +64,11 @@ public class SetupFirstFragment extends Fragment {
         setup_next = (FrameLayout) v.findViewById(R.id.next_button);
         setup_next.setOnClickListener(nextStepButtonListener);
 
+
+        SharedPreferences studyPrefs = getActivity().getSharedPreferences(getString(R.string.study_preferences_key), Context.MODE_PRIVATE);
+        study_name.setText( studyPrefs.getString("study_name", "") );
+        study_ID.setText( studyPrefs.getString("study_ID", "") );
+
         return v;
     }
 

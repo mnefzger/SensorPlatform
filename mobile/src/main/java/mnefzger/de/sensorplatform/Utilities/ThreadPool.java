@@ -5,6 +5,7 @@ import android.util.Log;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.RejectedExecutionException;
+import java.util.concurrent.RejectedExecutionHandler;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 
@@ -19,11 +20,7 @@ public class ThreadPool {
         if (mInstance == null) {
             mInstance = new ThreadPool();
         }
-        try{
-            mInstance.mThreadPoolExec.execute(runnable);
-        } catch (RejectedExecutionException e) {
-            Log.e("THREADPOOL", "Execution rejected: " + e);
-        }
+        mInstance.mThreadPoolExec.execute(runnable);
     }
 
     private ThreadPool() {
@@ -34,7 +31,15 @@ public class ThreadPool {
                 MAX_POOL_SIZE,
                 KEEP_ALIVE,
                 TimeUnit.SECONDS,
-                workQueue);
+                workQueue,
+                new RejectedExecutionHandler() {
+                    @Override
+                    public void rejectedExecution(Runnable runnable, ThreadPoolExecutor threadPoolExecutor) {
+                        Log.d("THREADPOOL", runnable.toString() + " was rejected");
+                    }
+                });
+
+
     }
 
     public static void finish() {

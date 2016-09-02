@@ -272,7 +272,7 @@ public class ImageModule implements IEventCallback{
 
     public void saveVideoAfterEvent(EventVector ev) {
         final EventVector v = ev;
-        if(!frontSaving && !backSaving) {
+        if(!isSaving()) {
             h.postDelayed(new Runnable() {
                 @Override
                 public void run() {
@@ -285,6 +285,10 @@ public class ImageModule implements IEventCallback{
                 }
             }, 4500);
         }
+    }
+
+    public boolean isSaving() {
+        return (frontSaving || backSaving);
     }
 
     private double lastFront = System.currentTimeMillis();

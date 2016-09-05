@@ -58,6 +58,7 @@ public class MainActivity extends AppCompatActivity {
                     @Override
                     public void run() {
                         connectTo(device);
+                        //device.createBond();
                     }
                 }).start();
 
@@ -159,7 +160,7 @@ public class MainActivity extends AppCompatActivity {
 
         Log.d(TAG, "Starting Bluetooth connection..");
         try {
-            sock = dev.createRfcommSocketToServiceRecord(UUID.randomUUID());
+            sock = dev.createInsecureRfcommSocketToServiceRecord(UUID.randomUUID());
             sock.connect();
         } catch (Exception e1) {
             Log.e(TAG, "There was an error while establishing Bluetooth connection. Falling back..", e1);

@@ -29,6 +29,8 @@ public class PhoneInteractionService extends Service implements View.OnTouchList
     private final String TAG = "USER_INTERACTION_SVC";
     private LinearLayout touchLayout;
 
+    private static BluetoothSocket socket = null;
+
     @Nullable
     @Override
     public IBinder onBind(Intent intent) {
@@ -69,6 +71,7 @@ public class PhoneInteractionService extends Service implements View.OnTouchList
             startActivity(new Intent(Settings.ACTION_MANAGE_OVERLAY_PERMISSION));
         }
 
+        socket = BluetoothConnection.socket;
         Log.d(TAG, "Service created");
     }
 
@@ -113,8 +116,12 @@ public class PhoneInteractionService extends Service implements View.OnTouchList
     }
 
     public static void sendDataToPairedDevice(String message){
+        if(!BluetoothConnection.connected && socket == null)
+            return;
+        else if(socket == null)
+            socket = BluetoothConnection.socket;
+
         byte[] toSend = message.getBytes();
-        BluetoothSocket socket = BluetoothConnection.socket;
         try {
             OutputStream mmOutStream = socket.getOutputStream();
             mmOutStream.write(toSend);

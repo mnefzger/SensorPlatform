@@ -2,6 +2,8 @@ package mnefzger.de.sensorplatform;
 
 
 import android.app.Service;
+import android.bluetooth.BluetoothAdapter;
+import android.bluetooth.BluetoothDevice;
 import android.bluetooth.BluetoothSocket;
 import android.content.BroadcastReceiver;
 import android.content.Context;
@@ -26,10 +28,12 @@ import java.io.OutputStream;
 public class PhoneInteractionService extends Service implements View.OnTouchListener {
     NotificationReceiver nReceiver;
     ScreenUnlockReceiver sReceiver;
+    ConnectionStatusReceiver cReceiver;
     private final String TAG = "USER_INTERACTION_SVC";
     private LinearLayout touchLayout;
 
     private static BluetoothSocket socket = null;
+    private static String deviceAddress = null;
 
     @Nullable
     @Override
@@ -48,6 +52,11 @@ public class PhoneInteractionService extends Service implements View.OnTouchList
         IntentFilter filter_screen = new IntentFilter();
         filter_screen.addAction(Intent.ACTION_SCREEN_ON);
         registerReceiver(sReceiver,filter_screen);
+
+        cReceiver = new ConnectionStatusReceiver();
+        IntentFilter filter_bt = new IntentFilter();
+        filter_bt.addAction(BluetoothDevice.ACTION_ACL_DISCONNECTED);
+        registerReceiver(cReceiver,filter_bt);
 
         if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.M ) {
             if(Settings.canDrawOverlays(getApplicationContext()) == true) {
@@ -72,6 +81,7 @@ public class PhoneInteractionService extends Service implements View.OnTouchList
     public void onDestroy() {
         unregisterReceiver(nReceiver);
         unregisterReceiver(sReceiver);
+        unregisterReceiver(cReceiver);
         super.onDestroy();
     }
 
@@ -121,12 +131,35 @@ public class PhoneInteractionService extends Service implements View.OnTouchList
         }
     }
 
-    public static void sendDataToPairedDevice(String message){
-        Log.d("BluetoothSend", socket + ", " + BluetoothConnection.connected);
-        if(!BluetoothConnection.connected && socket == null)
-            return;
-        else if(socket == null)
+    class ConnectionStatusReceiver extends BroadcastReceiver {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            final BluetoothDevice device = intent.getParcelableExtra( BluetoothDevice.EXTRA_DEVICE );
+            Log.d("Bluetooth", intent.getAction());
+            if (intent.getAction().equals(device.ACTION_ACL_DISCONNECTED)) {
+                Log.d("Bluetooth", "Disconnect detected, start reconnect..." + deviceAddress);
+                BluetoothConnection.socket = null;
+                BluetoothConnection.connected = false;
+                BluetoothConnection.device = null;
+                if(deviceAddress != null)
+                    reconnect();
+            }
+        }
+    }
+
+    public void sendDataToPairedDevice(String message){
+        if(socket == null && BluetoothConnection.socket != null) {
+            Log.d("BluetoothSend", "First time assignment");
             socket = BluetoothConnection.socket;
+            deviceAddress = socket.getRemoteDevice().getAddress();
+        }  else if(BluetoothConnection.connected == false && deviceAddress != null) {
+            Log.d("BluetoothSend", "Socket dead, reconnect.");
+            reconnect();
+            return;
+        }   else if(socket == null || BluetoothConnection.connected == false){
+            Log.d("BluetoothSend", "Socket still dead.");
+            return;
+        }
 
         byte[] toSend = message.getBytes();
         try {
@@ -138,6 +171,20 @@ public class PhoneInteractionService extends Service implements View.OnTouchList
             Log.e("BluetoothSend", "Exception during write", e);
         }
 
+    }
 
+    private void reconnect() {
+        Log.d(TAG, "Trying to reconnect....");
+        BluetoothAdapter bAdapter = BluetoothAdapter.getDefaultAdapter();
+        BluetoothDevice d = bAdapter.getRemoteDevice(deviceAddress);
+        try{
+            BluetoothConnection.socket = BluetoothConnection.connect(d);
+            Log.d(TAG, "Reconnected!");
+            BluetoothConnection.connected = true;
+            BluetoothConnection.device = d;
+            socket = BluetoothConnection.socket;
+        } catch (IOException e) {
+            Log.d(TAG, "Could not reconnect. " + e);
+        }
     }
 }

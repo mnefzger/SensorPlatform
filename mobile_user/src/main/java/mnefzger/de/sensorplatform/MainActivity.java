@@ -12,6 +12,8 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.pm.PackageManager;
 import android.net.Uri;
+import android.os.Build;
+import android.provider.Settings;
 import android.support.v4.app.ActivityCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -62,18 +64,38 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
-        verifyLocationPermissions(this);
+        verifyPermissions(this);
 
-        Intent intent = new Intent(this, PhoneInteractionService.class);
-        startService(intent);
+        if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.M && !Settings.canDrawOverlays(this)) {
+            Intent overlay_p=new Intent("android.settings.ACTION_MANAGE_OVERLAY_PERMISSION");
+            startActivityForResult(overlay_p,1337);
+        } else {
+            Intent notifications_p=new Intent("android.settings.ACTION_NOTIFICATION_LISTENER_SETTINGS");
+            startActivityForResult(notifications_p, 1338);
+            setup();
+        }
 
-        Intent i=new Intent("android.settings.ACTION_NOTIFICATION_LISTENER_SETTINGS");
-        startActivity(i);
 
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        if (requestCode == 1337) {
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M && Settings.canDrawOverlays(this)) {
+                Intent notifications_p=new Intent("android.settings.ACTION_NOTIFICATION_LISTENER_SETTINGS");
+                startActivityForResult(notifications_p, 1338);
+            }
+        } else if(requestCode == 1338) {
+            setup();
+        }
+    }
+
+    private void setup() {
         bAdapter = BluetoothAdapter.getDefaultAdapter();
         startDiscovery();
 
-
+        Intent intent = new Intent(this, PhoneInteractionService.class);
+        startService(intent);
     }
 
     private void startDiscovery() {
@@ -161,12 +183,17 @@ public class MainActivity extends AppCompatActivity {
     private static String[] PERMISSIONS_LOCATION = {
             Manifest.permission.ACCESS_COARSE_LOCATION
     };
+
+    private static final int REQUEST_ALERT = 2;
+    private static String[] PERMISSIONS_ALERT = {
+            Manifest.permission.SYSTEM_ALERT_WINDOW
+    };
     /**
      * Checks if the app has permission to write to device storage
      * If the app does not has permission then the user will be prompted to grant permissions
      * @param context
      */
-    private static void verifyLocationPermissions(Context context) {
+    private static void verifyPermissions(Context context) {
         // Check if we have write permission
         int permission = ActivityCompat.checkSelfPermission(context, Manifest.permission.ACCESS_FINE_LOCATION);
 

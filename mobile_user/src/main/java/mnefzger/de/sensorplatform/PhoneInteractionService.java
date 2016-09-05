@@ -7,17 +7,27 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.graphics.PixelFormat;
+import android.os.Build;
 import android.os.IBinder;
+import android.provider.Settings;
 import android.support.annotation.Nullable;
 import android.util.Log;
+import android.view.Gravity;
+import android.view.MotionEvent;
+import android.view.View;
+import android.view.WindowManager;
+import android.widget.LinearLayout;
 
 import java.io.IOException;
 import java.io.OutputStream;
 
-public class PhoneInteractionService extends Service {
+
+public class PhoneInteractionService extends Service implements View.OnTouchListener {
     NotificationReceiver nReceiver;
     ScreenUnlockReceiver sReceiver;
     private final String TAG = "USER_INTERACTION_SVC";
+    private LinearLayout touchLayout;
 
     @Nullable
     @Override
@@ -37,6 +47,28 @@ public class PhoneInteractionService extends Service {
         filter_screen.addAction(Intent.ACTION_SCREEN_ON);
         registerReceiver(sReceiver,filter_screen);
 
+        if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.M && Settings.canDrawOverlays(getApplicationContext()) == true) {
+            touchLayout = new LinearLayout(this);
+            LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(1,1);
+
+            touchLayout.setLayoutParams(lp);
+            touchLayout.setOnTouchListener(this);
+            touchLayout.setBackgroundColor(1);
+            WindowManager wm = (WindowManager) getSystemService(WINDOW_SERVICE);
+            WindowManager.LayoutParams mParams = new WindowManager.LayoutParams(
+                    1,1,
+                    WindowManager.LayoutParams.TYPE_PHONE,
+                    WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE |
+                    WindowManager.LayoutParams.FLAG_NOT_TOUCH_MODAL |
+                    WindowManager.LayoutParams.FLAG_WATCH_OUTSIDE_TOUCH,
+                    PixelFormat.TRANSLUCENT);
+            mParams.gravity = Gravity.START;
+            wm.addView(touchLayout, mParams);
+
+        } else {
+            startActivity(new Intent(Settings.ACTION_MANAGE_OVERLAY_PERMISSION));
+        }
+
         Log.d(TAG, "Service created");
     }
 
@@ -53,13 +85,20 @@ public class PhoneInteractionService extends Service {
         super.onDestroy();
     }
 
+    @Override
+    public boolean onTouch(View view, MotionEvent motionEvent) {
+        Log.d(TAG, "Touched!");
+        sendDataToPairedDevice(InteractionEvents.TOUCH);
+        return false;
+    }
+
     class NotificationReceiver extends BroadcastReceiver {
         @Override
         public void onReceive(Context context, Intent intent) {
             String temp = intent.getStringExtra("notification_event");
             Log.d(TAG, temp);
 
-            sendDataToPairedDevice(temp);
+            sendDataToPairedDevice(InteractionEvents.NOTIFICATION);
         }
     }
 
@@ -68,6 +107,7 @@ public class PhoneInteractionService extends Service {
         public void onReceive(Context context, Intent intent) {
             if (intent.getAction().equals(Intent.ACTION_SCREEN_ON)) {
                 Log.d(TAG, Intent.ACTION_SCREEN_ON);
+                sendDataToPairedDevice(InteractionEvents.SCREEN_ON);
             }
         }
     }

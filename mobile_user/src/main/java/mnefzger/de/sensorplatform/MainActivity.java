@@ -19,6 +19,7 @@ import android.util.Log;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ListView;
+import android.widget.TextView;
 
 import com.google.android.gms.appindexing.Action;
 import com.google.android.gms.appindexing.AppIndex;
@@ -32,6 +33,7 @@ public class MainActivity extends AppCompatActivity {
     BluetoothAdapter bAdapter;
     private ListView deviceList;
     private DeviceListAdapter listAdapter;
+    private TextView successText;
 
     private static final String TAG = "USER_PHONE_MAIN";
 
@@ -44,16 +46,26 @@ public class MainActivity extends AppCompatActivity {
         deviceList = (ListView) findViewById(R.id.deviceListView);
         listAdapter = new DeviceListAdapter(this);
         deviceList.setAdapter(listAdapter);
+        successText = (TextView) findViewById(R.id.successText);
 
         deviceList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
-                BluetoothDevice device = listAdapter.getItem(i);
-                connectTo(device);
+                final BluetoothDevice device = listAdapter.getItem(i);
+                new Thread(new Runnable() {
+                    @Override
+                    public void run() {
+                        connectTo(device);
+                    }
+                }).start();
+
             }
         });
 
         verifyLocationPermissions(this);
+
+        Intent intent = new Intent(this, PhoneInteractionService.class);
+        startService(intent);
 
         Intent i=new Intent("android.settings.ACTION_NOTIFICATION_LISTENER_SETTINGS");
         startActivity(i);
@@ -61,8 +73,7 @@ public class MainActivity extends AppCompatActivity {
         bAdapter = BluetoothAdapter.getDefaultAdapter();
         startDiscovery();
 
-        Intent intent = new Intent(this, PhoneInteractionService.class);
-        startService(intent);
+
     }
 
     private void startDiscovery() {
@@ -81,6 +92,14 @@ public class MainActivity extends AppCompatActivity {
             BluetoothConnection.connected = true;
             BluetoothConnection.device = device;
             Log.d(TAG, "Connected to: " + BluetoothConnection.device.getName() + "-> " + BluetoothConnection.socket.isConnected());
+
+            runOnUiThread(new Runnable() {
+                public void run() {
+                    deviceList.setVisibility(View.INVISIBLE);
+                    successText.setText("Connected to: " + BluetoothConnection.device.getName() + ".");
+                    successText.setVisibility(View.VISIBLE);
+                }
+            });
 
             /*Intent intent = new Intent(this, PhoneInteractionService.class);
             startService(intent);*/

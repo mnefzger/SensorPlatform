@@ -17,6 +17,7 @@ import com.jakewharton.threetenabp.AndroidThreeTen;
 
 import java.util.Iterator;
 
+import mnefzger.de.sensorplatform.External.UserPhoneBluetoothServer;
 import mnefzger.de.sensorplatform.Logger.LoggingModule;
 import mnefzger.de.sensorplatform.R;
 
@@ -31,6 +32,7 @@ public class SensorPlatformService extends Service implements IDataCallback{
     private SensorModule sm;
     private LoggingModule lm;
     private ImageModule im;
+    private UserPhoneBluetoothServer server;
     private IDataCallback appCallback;
 
     private final IBinder mBinder = new LocalBinder();
@@ -70,6 +72,8 @@ public class SensorPlatformService extends Service implements IDataCallback{
         this.lm = new LoggingModule();
 
         this.im = new ImageModule(this, getApplication());
+        this.server = new UserPhoneBluetoothServer(getApplication());
+
     }
 
     public void subscribe() {

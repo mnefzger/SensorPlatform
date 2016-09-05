@@ -38,6 +38,7 @@ public class MainActivity extends AppCompatActivity {
     private TextView successText;
 
     private static final String TAG = "USER_PHONE_MAIN";
+    private static final String uuid = "00001101-0000-1000-8000-00805F9B34FB";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -124,9 +125,6 @@ public class MainActivity extends AppCompatActivity {
                 }
             });
 
-            /*Intent intent = new Intent(this, PhoneInteractionService.class);
-            startService(intent);*/
-
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -160,7 +158,7 @@ public class MainActivity extends AppCompatActivity {
 
         Log.d(TAG, "Starting Bluetooth connection..");
         try {
-            sock = dev.createInsecureRfcommSocketToServiceRecord(UUID.randomUUID());
+            sock = dev.createRfcommSocketToServiceRecord(UUID.fromString(uuid));
             sock.connect();
         } catch (Exception e1) {
             Log.e(TAG, "There was an error while establishing Bluetooth connection. Falling back..", e1);

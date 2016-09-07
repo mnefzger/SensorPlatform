@@ -84,8 +84,7 @@
                 android:entryValues="@array/obd_values"
                 android:key="obdRequest_frequency"
                 android:persistent="true"
-                android:title="OBD2 request frequency"
-                android:dependency="obd_raw"/>
+                android:title="OBD2 request frequency"/>
         </PreferenceCategory>
 
         <PreferenceCategory android:title="Acceleration and Braking">

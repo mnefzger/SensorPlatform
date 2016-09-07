@@ -4,7 +4,6 @@ import android.bluetooth.BluetoothSocket;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.preference.PreferenceManager;
 import android.util.Log;
 
 import com.github.pires.obd.commands.ObdCommand;
@@ -25,7 +24,8 @@ import mnefzger.de.sensorplatform.R;
 
 
 public class OBD2Provider extends DataProvider implements OBD2Connector.IConnectionEstablished{
-    SharedPreferences prefs;
+    SharedPreferences setting_prefs;
+    SharedPreferences sensor_prefs;
     ISensorCallback callback;
     private int OBD_DELAY;
 
@@ -41,12 +41,14 @@ public class OBD2Provider extends DataProvider implements OBD2Connector.IConnect
         this.callback = callback;
         this.app = app;
 
-        prefs = app.getSharedPreferences(app.getString(R.string.preferences_key), Context.MODE_PRIVATE);
-        OBD_DELAY = Preferences.getOBDDelay(prefs);
+        setting_prefs = app.getSharedPreferences(app.getString(R.string.settings_preferences_key), Context.MODE_PRIVATE);
+        sensor_prefs = app.getSharedPreferences(app.getString(R.string.sensor_preferences_key), Context.MODE_PRIVATE);
+        OBD_DELAY = Preferences.getOBDDelay(setting_prefs);
     }
 
     public void connect() {
-        if(Preferences.OBDActivated(prefs) && OBD2Connection.connected == false) {
+        Log.d("OBD", Preferences.OBDActivated(sensor_prefs) +","+ OBD2Connection.connected);
+        if(Preferences.OBDActivated(sensor_prefs) && OBD2Connection.connected == false) {
             reset();
         }
     }

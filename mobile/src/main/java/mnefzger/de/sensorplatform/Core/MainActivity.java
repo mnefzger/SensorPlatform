@@ -20,6 +20,7 @@ import mnefzger.de.sensorplatform.External.OBD2Connection;
 import mnefzger.de.sensorplatform.R;
 import mnefzger.de.sensorplatform.UI.AppFragment;
 import mnefzger.de.sensorplatform.UI.OBDSetupFragment;
+import mnefzger.de.sensorplatform.UI.SensorSetupFragment;
 import mnefzger.de.sensorplatform.UI.SettingsFragment;
 import mnefzger.de.sensorplatform.UI.SetupFirstFragment;
 import mnefzger.de.sensorplatform.UI.StartFragment;
@@ -39,11 +40,11 @@ public class MainActivity extends AppCompatActivity implements IDataCallback{
 
     StartFragment startFragment;
     SetupFirstFragment setupFragment;
+    SensorSetupFragment sensorsFragment;
     OBDSetupFragment obdFragment;
     SettingsFragment settings;
     AppFragment appFragment;
 
-    SharedPreferences prefs;
     SensorPlatformService sPS;
     boolean mBound = false;
     boolean started = false;
@@ -55,24 +56,7 @@ public class MainActivity extends AppCompatActivity implements IDataCallback{
 
         PermissionManager.verifyPermissions(this);
 
-
-        prefs = this.getSharedPreferences(getString(R.string.preferences_key), Context.MODE_PRIVATE);
-        prefs.edit().clear();
-        if(prefs.getAll().isEmpty()) {
-            PreferenceManager.setDefaultValues(this, getString(R.string.preferences_key), Context.MODE_PRIVATE,  R.xml.preferences, true);
-            prefs.edit().commit();
-        } else {
-            PreferenceManager.setDefaultValues(this, getString(R.string.preferences_key), Context.MODE_PRIVATE,  R.xml.preferences, false);
-        }
-
-        SharedPreferences study_prefs = this.getSharedPreferences(getString(R.string.study_preferences_key), Context.MODE_PRIVATE);
-        study_prefs.edit().clear();
-        if(study_prefs.getAll().isEmpty()) {
-            PreferenceManager.setDefaultValues(this, getString(R.string.study_preferences_key), Context.MODE_PRIVATE,  R.xml.study_preferences, true);
-            study_prefs.edit().commit();
-        } else {
-            PreferenceManager.setDefaultValues(this, getString(R.string.study_preferences_key), Context.MODE_PRIVATE,  R.xml.study_preferences, false);
-        }
+        setupPreferences();
 
         if(savedInstanceState == null) {
             Log.d("CREATE", "New activity");
@@ -103,6 +87,36 @@ public class MainActivity extends AppCompatActivity implements IDataCallback{
             }
         }
 
+    }
+
+    // make sure the preference files are filled with the right values
+    public void setupPreferences() {
+        SharedPreferences sensor_prefs = this.getSharedPreferences(getString(R.string.sensor_preferences_key), Context.MODE_PRIVATE);
+        sensor_prefs.edit().clear();
+        if(sensor_prefs.getAll().isEmpty()) {
+            PreferenceManager.setDefaultValues(this, getString(R.string.sensor_preferences_key), Context.MODE_PRIVATE,  R.xml.sensor_preferences, true);
+            sensor_prefs.edit().commit();
+        } else {
+            PreferenceManager.setDefaultValues(this, getString(R.string.sensor_preferences_key), Context.MODE_PRIVATE,  R.xml.sensor_preferences, false);
+        }
+
+        SharedPreferences setting_prefs = this.getSharedPreferences(getString(R.string.settings_preferences_key), Context.MODE_PRIVATE);
+        setting_prefs.edit().clear();
+        if(setting_prefs.getAll().isEmpty()) {
+            PreferenceManager.setDefaultValues(this, getString(R.string.settings_preferences_key), Context.MODE_PRIVATE,  R.xml.settings_preferences, true);
+            setting_prefs.edit().commit();
+        } else {
+            PreferenceManager.setDefaultValues(this, getString(R.string.settings_preferences_key), Context.MODE_PRIVATE,  R.xml.settings_preferences, false);
+        }
+
+        SharedPreferences study_prefs = this.getSharedPreferences(getString(R.string.study_preferences_key), Context.MODE_PRIVATE);
+        study_prefs.edit().clear();
+        if(study_prefs.getAll().isEmpty()) {
+            PreferenceManager.setDefaultValues(this, getString(R.string.study_preferences_key), Context.MODE_PRIVATE,  R.xml.study_preferences, true);
+            study_prefs.edit().commit();
+        } else {
+            PreferenceManager.setDefaultValues(this, getString(R.string.study_preferences_key), Context.MODE_PRIVATE,  R.xml.study_preferences, false);
+        }
     }
 
     public void startMeasuring() {
@@ -207,6 +221,14 @@ public class MainActivity extends AppCompatActivity implements IDataCallback{
     public void goToNewStudyFragment() {
         setupFragment = new SetupFirstFragment();
         changeFragment(setupFragment, true, true);
+        this.setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_UNSPECIFIED);
+    }
+
+    public void goToSensorSetupFragment() {
+        sensorsFragment = new SensorSetupFragment();
+        android.app.FragmentTransaction transaction = getFragmentManager().beginTransaction();
+        transaction.setCustomAnimations(R.animator.slide_in_right_animator, R.animator.slide_out_left_animator);
+        transaction.replace(R.id.fragment_container, sensorsFragment).commit();
         this.setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_UNSPECIFIED);
     }
 

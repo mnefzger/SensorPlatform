@@ -16,7 +16,7 @@ public class LightProvider extends SensorProvider {
         if (sensorManager.getDefaultSensor(Sensor.TYPE_LIGHT) != null) {
             lightSensor = sensorManager.getDefaultSensor(Sensor.TYPE_LIGHT);
 
-            sensorManager.registerListener(this, lightSensor, Preferences.getLightDelay(prefs));
+            sensorManager.registerListener(this, lightSensor, Preferences.getLightDelay(setting_prefs));
         }
 
     }

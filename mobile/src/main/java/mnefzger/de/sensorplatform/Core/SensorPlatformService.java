@@ -9,7 +9,6 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Binder;
 import android.os.IBinder;
-import android.preference.PreferenceManager;
 import android.support.v4.app.NotificationCompat;
 import android.util.Log;
 
@@ -28,7 +27,9 @@ import mnefzger.de.sensorplatform.R;
  */
 
 public class SensorPlatformService extends Service implements IDataCallback{
-    private SharedPreferences prefs;
+    private SharedPreferences setting_prefs;
+    private SharedPreferences sensor_prefs;
+
     private SensorModule sm;
     private LoggingModule lm;
     private ImageModule im;
@@ -66,7 +67,8 @@ public class SensorPlatformService extends Service implements IDataCallback{
         AndroidThreeTen.init(getApplication());
 
         Preferences.setContext(getApplication());
-        prefs = getApplicationContext().getSharedPreferences(getApplicationContext().getString(R.string.preferences_key), Context.MODE_PRIVATE);
+        setting_prefs = getApplicationContext().getSharedPreferences(getApplicationContext().getString(R.string.settings_preferences_key), Context.MODE_PRIVATE);
+        sensor_prefs = getApplicationContext().getSharedPreferences(getApplicationContext().getString(R.string.sensor_preferences_key), Context.MODE_PRIVATE);
 
         this.sm = new SensorModule(this, getApplication());
         this.lm = new LoggingModule();
@@ -80,52 +82,53 @@ public class SensorPlatformService extends Service implements IDataCallback{
         /**
          * Logging
          */
-        if(Preferences.rawLoggingActivated(prefs)) {
+        if(Preferences.rawLoggingActivated(setting_prefs)) {
             logRawData(true);
         }
 
-        if(Preferences.eventLoggingActivated(prefs)) {
+        if(Preferences.eventLoggingActivated(setting_prefs)) {
             logEventData(true);
         }
 
-        if(Preferences.rawLoggingActivated(prefs) || Preferences.eventLoggingActivated(prefs) ) {
+        if(Preferences.rawLoggingActivated(setting_prefs) || Preferences.eventLoggingActivated(setting_prefs) ) {
             lm.createNewFileSet();
         }
 
         /**
          * Data Collection
          */
-        if(Preferences.accelerometerActivated(prefs)) {
+        if(Preferences.accelerometerActivated(sensor_prefs)) {
             subscribeTo(DataType.ACCELERATION_RAW);
             subscribeTo(DataType.ACCELERATION_EVENT);
         }
 
-        if(Preferences.rotationActivated(prefs)) {
+        if(Preferences.rotationActivated(sensor_prefs)) {
             subscribeTo(DataType.ROTATION_RAW);
             subscribeTo(DataType.ROTATION_EVENT);
         }
 
-        if(Preferences.locationActivated(prefs)) {
+        if(Preferences.locationActivated(sensor_prefs)) {
             subscribeTo(DataType.LOCATION_RAW);
             subscribeTo(DataType.LOCATION_EVENT);
         }
 
-        if(Preferences.lightActivated(prefs)) {
+        if(Preferences.lightActivated(sensor_prefs)) {
             subscribeTo(DataType.LIGHT);
         }
 
-        if(Preferences.frontCameraActivated(prefs) || Preferences.backCameraActivated(prefs)) {
+        if(Preferences.frontCameraActivated(sensor_prefs) || Preferences.backCameraActivated(sensor_prefs)) {
             subscribeTo(DataType.CAMERA_RAW);
         }
-        
-        if(Preferences.OBDActivated(prefs)) {
+
+        if(Preferences.OBDActivated(sensor_prefs)) {
             subscribeTo(DataType.OBD);
         }
 
-        if(Preferences.heartRateActivated(prefs)) {
+        if(Preferences.heartRateActivated(sensor_prefs)) {
             subscribeTo(DataType.HEART_RATE);
         }
 
+        //TODO
         subscribeTo(DataType.WEATHER);
 
         serviceRunning = true;
@@ -189,7 +192,7 @@ public class SensorPlatformService extends Service implements IDataCallback{
 
     @Override
     public void onEventData(EventVector ev) {
-        if(Preferences.videoSavingActivated(prefs) && !ev.isDebug()) {
+        if(Preferences.videoSavingActivated(setting_prefs) && !ev.isDebug()) {
             // Check if a video is currently being saved...
             if(!im.isSaving()) {
                 im.saveVideoAfterEvent(ev);

@@ -7,7 +7,7 @@ import android.util.Log;
 import mnefzger.de.sensorplatform.R;
 
 /**
- * This class provides an interface to the res/xml/preferences.xml file
+ * This class provides an interface to the res/xml/settings_preferences.xmlences.xml file
  */
 
 public class Preferences {

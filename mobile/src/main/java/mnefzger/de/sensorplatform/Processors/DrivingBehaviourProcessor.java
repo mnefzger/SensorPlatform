@@ -21,7 +21,8 @@ import mnefzger.de.sensorplatform.Utilities.OSMQueryAdapter;
 import mnefzger.de.sensorplatform.Utilities.OSMRespone;
 
 public class DrivingBehaviourProcessor extends EventProcessor implements IOSMResponse {
-    private SharedPreferences prefs;
+    private SharedPreferences setting_prefs;
+    private SharedPreferences sensor_prefs;
     private OSMQueryAdapter qAdapter;
     private boolean turned = false;
     private OSMRespone lastResponse;
@@ -45,13 +46,14 @@ public class DrivingBehaviourProcessor extends EventProcessor implements IOSMRes
     public DrivingBehaviourProcessor(SensorModule m, Context a) {
         super(m);
         qAdapter = new OSMQueryAdapter(this, a);
-        //prefs = PreferenceManager.getDefaultSharedPreferences(a);
-        prefs = a.getSharedPreferences(a.getString(R.string.preferences_key), Context.MODE_PRIVATE);
 
-        ACC_THRESHOLD = Preferences.getAccelerometerThreshold(prefs);
-        TURN_THRESHOLD = Preferences.getTurnThreshold(prefs);
-        TURN_THRESHOLD_SHARP = Preferences.getSharpTurnThreshold(prefs);
-        OSM_REQUEST_RATE = Preferences.getOSMRequestRate(prefs);
+        setting_prefs = a.getSharedPreferences(a.getString(R.string.settings_preferences_key), Context.MODE_PRIVATE);
+        sensor_prefs = a.getSharedPreferences(a.getString(R.string.settings_preferences_key), Context.MODE_PRIVATE);
+
+        ACC_THRESHOLD = Preferences.getAccelerometerThreshold(setting_prefs);
+        TURN_THRESHOLD = Preferences.getTurnThreshold(setting_prefs);
+        TURN_THRESHOLD_SHARP = Preferences.getSharpTurnThreshold(setting_prefs);
+        OSM_REQUEST_RATE = Preferences.getOSMRequestRate(setting_prefs);
 
     }
 
@@ -260,7 +262,7 @@ public class DrivingBehaviourProcessor extends EventProcessor implements IOSMRes
 
 
         double currentSpeed;
-        if(Preferences.OBDActivated(prefs) && currentVector.obdSpeed != 0)
+        if(Preferences.OBDActivated(sensor_prefs) && currentVector.obdSpeed != 0)
             currentSpeed = currentVector.obdSpeed;
         else
             currentSpeed = currentVector.speed;

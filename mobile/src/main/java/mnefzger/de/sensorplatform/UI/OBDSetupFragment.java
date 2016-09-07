@@ -1,7 +1,6 @@
 package mnefzger.de.sensorplatform.UI;
 
 
-import android.bluetooth.BluetoothDevice;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
@@ -14,7 +13,6 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.CompoundButton;
 import android.widget.FrameLayout;
 import android.widget.LinearLayout;
 import android.widget.TextView;
@@ -23,7 +21,6 @@ import org.w3c.dom.Text;
 
 import mnefzger.de.sensorplatform.Core.MainActivity;
 import mnefzger.de.sensorplatform.Core.Preferences;
-import mnefzger.de.sensorplatform.External.OBD2Connection;
 import mnefzger.de.sensorplatform.R;
 
 /**
@@ -34,6 +31,7 @@ public class OBDSetupFragment extends Fragment {
     AppCompatCheckBox obdActive;
     LinearLayout obd_setup_details;
 
+    TextView searching;
     TextView connecting;
     TextView setup;
     TextView ready;
@@ -49,11 +47,12 @@ public class OBDSetupFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
 
-        View v = inflater.inflate(R.layout.fragment_obdsetup, container, false);
+        View v = inflater.inflate(R.layout.fragment_obd_setup, container, false);
 
         obdActive = (AppCompatCheckBox) v.findViewById(R.id.obd_checkbox);
         obd_setup_details = (LinearLayout) v.findViewById(R.id.obd_setup_details);
 
+        searching = (TextView) v.findViewById(R.id.searchingOBDText);
         connecting = (TextView) v.findViewById(R.id.connectingOBDText);
         setup = (TextView) v.findViewById(R.id.setupOBDText);
         ready = (TextView) v.findViewById(R.id.readyOBDText);
@@ -72,25 +71,28 @@ public class OBDSetupFragment extends Fragment {
         public void onClick(View view) {
             boolean checked = obdActive.isChecked();
             MainActivity app = (MainActivity) getActivity();
-            SharedPreferences prefs = getActivity().getSharedPreferences(getString(R.string.preferences_key), Context.MODE_PRIVATE);
-            SharedPreferences.Editor editor = prefs.edit();
+            SharedPreferences sensor_prefs = getActivity().getSharedPreferences(getString(R.string.sensor_preferences_key), Context.MODE_PRIVATE);
+            SharedPreferences.Editor editor = sensor_prefs.edit();
 
             if(checked) {
                 editor.putBoolean("obd_raw", true);
-
+                editor.apply();
                 obd_setup_details.setVisibility(View.VISIBLE);
+
+                Log.d("OBD setup", Preferences.OBDActivated(sensor_prefs) +", "+sensor_prefs.getBoolean("obd_raw", false));
 
                 app.getService().initiateOBDConnection();
 
                 IntentFilter filter = new IntentFilter();
+                filter.addAction("OBD_FOUND");
                 filter.addAction("OBD_CONNECTED");
                 filter.addAction("OBD_SETUP_COMPLETE");
                 app.registerReceiver(mReceiver, filter);
             } else {
                 editor.putBoolean("obd_raw", false);
+                editor.apply();
                 obd_setup_details.setVisibility(View.INVISIBLE);
             }
-            editor.commit();
         }
     };
 
@@ -101,6 +103,11 @@ public class OBDSetupFragment extends Fragment {
             app.goToSettingsFragment();
         }
     };
+
+    public void searchComplete() {
+        searching.setText("Looking for nearby OBD-II … Done.");
+        connecting.setText("Connecting to OBD-II …");
+    }
 
     public void connectionComplete() {
         connecting.setText("Connecting to OBD-II … Done.");
@@ -120,8 +127,12 @@ public class OBDSetupFragment extends Fragment {
         public void onReceive(Context context, Intent intent) {
             String action = intent.getAction();
 
-            if(action.equals("OBD_CONNECTED")) {
+            if(action.equals("OBD_FOUND")) {
+                searchComplete();
+
+            } else if(action.equals("OBD_CONNECTED")) {
                 connectionComplete();
+
             } else if(action.equals("OBD_SETUP_COMPLETE")) {
                 setupComplete();
                 // we are finished here, unregister receiver

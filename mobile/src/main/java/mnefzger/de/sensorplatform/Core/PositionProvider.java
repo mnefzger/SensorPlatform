@@ -9,7 +9,6 @@ import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
 import android.os.Bundle;
-import android.preference.PreferenceManager;
 import android.support.v4.content.ContextCompat;
 
 import java.util.ArrayList;
@@ -19,7 +18,7 @@ import mnefzger.de.sensorplatform.R;
 import mnefzger.de.sensorplatform.Utilities.MathFunctions;
 
 public class PositionProvider extends DataProvider implements LocationListener{
-    private SharedPreferences prefs;
+    private SharedPreferences setting_prefs;
     private LocationManager locationManager;
     private Context context;
     private ISensorCallback callback;
@@ -33,9 +32,9 @@ public class PositionProvider extends DataProvider implements LocationListener{
     public PositionProvider(Context app, ISensorCallback m) {
         context = app;
         callback = m;
-        prefs = app.getSharedPreferences(app.getString(R.string.preferences_key), Context.MODE_PRIVATE);
+        setting_prefs = app.getSharedPreferences(app.getString(R.string.settings_preferences_key), Context.MODE_PRIVATE);
 
-        LOCATION_REFRESH_TIME = Preferences.getGPSRequestRate(prefs);
+        LOCATION_REFRESH_TIME = Preferences.getGPSRequestRate(setting_prefs);
     }
 
     @Override

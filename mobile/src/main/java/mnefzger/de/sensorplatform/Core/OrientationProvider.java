@@ -26,7 +26,7 @@ public class OrientationProvider extends SensorProvider {
         if (sensorManager.getDefaultSensor(Sensor.TYPE_ROTATION_VECTOR) != null){
             rotationSensor = sensorManager.getDefaultSensor(Sensor.TYPE_ROTATION_VECTOR);
 
-            sensorManager.registerListener(this, rotationSensor, Preferences.getOrientationDelay(prefs));
+            sensorManager.registerListener(this, rotationSensor, Preferences.getOrientationDelay(setting_prefs));
         } else {
             Log.d("SENSOR", "TYPE_ROTATION_VECTOR not available on device");
         }

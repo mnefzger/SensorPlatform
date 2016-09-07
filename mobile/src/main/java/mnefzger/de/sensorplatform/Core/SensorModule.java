@@ -4,7 +4,6 @@ import android.content.Context;
 import android.content.SharedPreferences;
 import android.hardware.Sensor;
 import android.location.Location;
-import android.preference.PreferenceManager;
 import android.util.Log;
 
 import java.util.ArrayList;
@@ -23,7 +22,7 @@ import mnefzger.de.sensorplatform.R;
  */
 
 public class SensorModule implements ISensorCallback, IEventCallback{
-    private SharedPreferences prefs;
+    private SharedPreferences setting_prefs;
     /**
      * Callback implemented by SensorPlatformService
      */
@@ -89,7 +88,7 @@ public class SensorModule implements ISensorCallback, IEventCallback{
 
 
     public SensorModule(IDataCallback callback, Context app) {
-        prefs = app.getSharedPreferences(app.getString(R.string.preferences_key), Context.MODE_PRIVATE);
+        setting_prefs = app.getSharedPreferences(app.getString(R.string.settings_preferences_key), Context.MODE_PRIVATE);
         this.callback = callback;
 
         activeProviders = new ArrayList<>();
@@ -113,7 +112,7 @@ public class SensorModule implements ISensorCallback, IEventCallback{
     public void startSensing(DataType type) {
 
         if(!sensing) {
-            int sampling = Preferences.getRawDataDelay(prefs);
+            int sampling = Preferences.getRawDataDelay(setting_prefs);
             aggregateData( sampling );
             sensing = true;
         }

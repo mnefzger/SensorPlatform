@@ -19,7 +19,6 @@ import android.media.Image;
 import android.media.ImageReader;
 import android.os.Handler;
 import android.os.HandlerThread;
-import android.preference.PreferenceManager;
 import android.support.v4.app.ActivityCompat;
 import android.util.Log;
 import android.util.SparseArray;
@@ -52,7 +51,8 @@ public class ImageModule implements IEventCallback{
     private Context context;
     protected ImageProcessor imgProc;
     private IDataCallback callback;
-    private SharedPreferences prefs;
+    private SharedPreferences setting_prefs;
+    private SharedPreferences sensor_prefs;
 
     private CameraManager cameraManager;
     private CameraDevice camera_front;
@@ -96,27 +96,27 @@ public class ImageModule implements IEventCallback{
         cameraManager = (CameraManager) app.getSystemService(Activity.CAMERA_SERVICE);
         imgProc = new ImageProcessor(this, app);
 
-        prefs = app.getSharedPreferences(app.getString(R.string.preferences_key), Context.MODE_PRIVATE);
+        setting_prefs = app.getSharedPreferences(app.getString(R.string.settings_preferences_key), Context.MODE_PRIVATE);
+        sensor_prefs = app.getSharedPreferences(app.getString(R.string.sensor_preferences_key), Context.MODE_PRIVATE);
         setPrefs();
 
         h = new Handler();
     }
 
     private void setPrefs() {
-        FRONT_MAX_FPS = Preferences.getFrontFPS(prefs);
-        FRONT_PROCESSING_FPS = Preferences.getFrontProcessingFPS(prefs);
+        FRONT_MAX_FPS = Preferences.getFrontFPS(setting_prefs);
+        FRONT_PROCESSING_FPS = Preferences.getFrontProcessingFPS(setting_prefs);
         FRONT_AVG_FPS = FRONT_MAX_FPS;
 
-        BACK_MAX_FPS = Preferences.getBackFPS(prefs);
-        BACK_PROCESSING_FPS = Preferences.getBackProcessingFPS(prefs);
+        BACK_MAX_FPS = Preferences.getBackFPS(setting_prefs);
+        BACK_PROCESSING_FPS = Preferences.getBackProcessingFPS(setting_prefs);
         BACK_AVG_FPS = BACK_MAX_FPS;
     }
 
     public void startCapture() {
         startBackgroundThread();
-        Log.d("CAMERA", ""+Preferences.backCameraActivated(prefs) );
-        if( Preferences.backCameraActivated(prefs) ) open("0");
-        if( Preferences.frontCameraActivated(prefs) ) open("1");
+        if( Preferences.backCameraActivated(sensor_prefs) ) open("0");
+        if( Preferences.frontCameraActivated(sensor_prefs) ) open("1");
     }
 
     public void stopCapture() {
@@ -138,7 +138,7 @@ public class ImageModule implements IEventCallback{
     }
 
     private void open(String id) {
-        RES_W = Preferences.getVideoResolution(prefs);
+        RES_W = Preferences.getVideoResolution(setting_prefs);
         if(RES_W  == 1024) RES_H = 768;
         else if(RES_W == 640) RES_H = 480;
         else if(RES_W == 320) RES_H = 240;
@@ -277,10 +277,10 @@ public class ImageModule implements IEventCallback{
             h.postDelayed(new Runnable() {
                 @Override
                 public void run() {
-                    if(Preferences.frontCameraActivated(prefs)) {
+                    if(Preferences.frontCameraActivated(sensor_prefs)) {
                         new VideoSaver(copyByteList(frontImagesCV), FRONT_AVG_FPS, RES_W, RES_H, "front", v.getTimestamp());
                     }
-                    if(Preferences.backCameraActivated(prefs)) {
+                    if(Preferences.backCameraActivated(sensor_prefs)) {
                         new VideoSaver(copyByteList(backImagesCV), BACK_AVG_FPS, RES_W, RES_H, "back", v.getTimestamp());
                     }
                 }
@@ -308,7 +308,7 @@ public class ImageModule implements IEventCallback{
             /**
              * Decide if frame is to be processed or not
              */
-            if(Preferences.frontImagesProcessingActivated(prefs) && now - lastFrontProc >= (1000 / FRONT_PROCESSING_FPS) ) {
+            if(Preferences.frontImagesProcessingActivated(setting_prefs) && now - lastFrontProc >= (1000 / FRONT_PROCESSING_FPS) ) {
                 mBackgroundHandler.post(new Runnable() {
                     @Override
                     public void run() {
@@ -362,7 +362,7 @@ public class ImageModule implements IEventCallback{
             /**
              * Decide if frame is to be processed or not
              */
-            if(Preferences.backImagesProcessingActivated(prefs) && now - lastBackProc >= (1000 / BACK_PROCESSING_FPS) ) {
+            if(Preferences.backImagesProcessingActivated(setting_prefs) && now - lastBackProc >= (1000 / BACK_PROCESSING_FPS) ) {
                 mBackgroundHandler.post(new Runnable() {
                     @Override
                     public void run() {

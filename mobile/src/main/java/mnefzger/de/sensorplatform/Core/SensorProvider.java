@@ -6,15 +6,14 @@ import android.hardware.Sensor;
 import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
-import android.preference.PreferenceManager;
 
 import mnefzger.de.sensorplatform.R;
 
 public abstract class SensorProvider extends DataProvider implements SensorEventListener{
     private Context context;
     protected ISensorCallback sensorCallback;
-    protected SharedPreferences prefs;
-    protected Preferences preferences;
+    protected SharedPreferences setting_prefs;
+    protected SharedPreferences sensor_prefs;
 
     protected SensorManager sensorManager;
 
@@ -22,7 +21,8 @@ public abstract class SensorProvider extends DataProvider implements SensorEvent
         this.context = app.getApplicationContext();
         sensorManager = (SensorManager) context.getSystemService(Context.SENSOR_SERVICE);
         sensorCallback = m;
-        prefs = app.getSharedPreferences(app.getString(R.string.preferences_key), Context.MODE_PRIVATE);
+        setting_prefs = app.getSharedPreferences(app.getString(R.string.settings_preferences_key), Context.MODE_PRIVATE);
+        sensor_prefs = app.getSharedPreferences(app.getString(R.string.sensor_preferences_key), Context.MODE_PRIVATE);
     }
 
     @Override

@@ -39,6 +39,8 @@ public class OBD2Connector {
 
                 if(device != null) {
                     if(device.getName() != null && device.getName().equals("OBDII")) {
+                        app.sendBroadcast(new Intent("OBD_FOUND"));
+
                         OBD2Connection.obd2Device = device;
                         app.unregisterReceiver(mReceiver);
                         receiverRegistered = false;

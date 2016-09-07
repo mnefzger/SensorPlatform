@@ -23,7 +23,7 @@
                 android:layout_height="wrap_content"
                 android:textAppearance="?android:attr/textAppearanceMedium"
                 android:text="New Study (1/5)"
-                android:id="@+id/textView2"
+                android:id="@+id/study_topbar_text"
                 android:layout_weight="0.2"
                 android:layout_gravity="center_vertical"
                 android:layout_marginLeft="25dp"

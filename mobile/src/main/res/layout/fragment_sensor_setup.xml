@@ -1,0 +1,70 @@
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".UI.SetupFirstFragment"
+    android:background="@drawable/gradient">
+
+    <LinearLayout
+        android:orientation="horizontal"
+        android:layout_width="match_parent"
+        android:layout_height="50dp"
+        android:layout_marginBottom="25dp">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textAppearance="?android:attr/textAppearanceMedium"
+            android:text="New Study (2/5)"
+            android:id="@+id/sensors_topbar_text"
+            android:layout_weight="0.2"
+            android:layout_gravity="center_vertical"
+            android:layout_marginStart="25dp"
+            android:textSize="25sp"
+            android:textColor="#fff"
+            android:textStyle="bold" />
+    </LinearLayout>
+
+    <tools:android.support.design.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:tools="http://schemas.android.com/tools"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        tools:context=".UI.SettingsFragment"
+        >
+
+        <ListView android:id="@android:id/list"
+            android:layout_width="fill_parent"
+            android:layout_height="fill_parent"
+            android:paddingTop="50dp"
+            android:paddingBottom="60dp"/>
+
+        <FrameLayout
+            android:layout_width="match_parent"
+            android:layout_height="60dp"
+            android:layout_gravity="bottom"
+            android:background="@color/colorPrimaryDark"
+            android:id="@+id/next_button">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="32dp"
+                android:textSize="22dp"
+                android:textStyle="bold"
+                android:text="Start"
+                android:id="@+id/textView3"
+                android:layout_gravity="center_vertical|end"
+                android:layout_marginEnd="60dp"
+                android:textColor="#fff"/>
+
+            <ImageView
+                android:layout_width="24dp"
+                android:layout_height="32dp"
+                android:id="@+id/imageView2"
+                android:src="@drawable/arrow"
+                android:layout_gravity="center_vertical|end"
+                android:layout_marginRight="25dp" />
+        </FrameLayout>
+
+    </tools:android.support.design.widget.CoordinatorLayout>
+
+</FrameLayout>

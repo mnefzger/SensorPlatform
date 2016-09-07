@@ -1,7 +1,5 @@
 package mnefzger.de.sensorplatform.Utilities;
 
-import java.util.ArrayList;
-
 public class WeatherResponse {
     public Query query;
 

@@ -2,6 +2,7 @@ package mnefzger.de.sensorplatform.External;
 
 import android.bluetooth.BluetoothSocket;
 import android.content.Context;
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.preference.PreferenceManager;
 import android.util.Log;
@@ -20,9 +21,10 @@ import java.util.TimerTask;
 import mnefzger.de.sensorplatform.Core.DataProvider;
 import mnefzger.de.sensorplatform.Core.ISensorCallback;
 import mnefzger.de.sensorplatform.Core.Preferences;
+import mnefzger.de.sensorplatform.R;
 
 
-public class OBD2Provider extends DataProvider{
+public class OBD2Provider extends DataProvider implements OBD2Connector.IConnectionEstablished{
     SharedPreferences prefs;
     ISensorCallback callback;
     private int OBD_DELAY;
@@ -39,10 +41,16 @@ public class OBD2Provider extends DataProvider{
         this.callback = callback;
         this.app = app;
 
-        prefs = PreferenceManager.getDefaultSharedPreferences(app);
+        prefs = app.getSharedPreferences(app.getString(R.string.preferences_key), Context.MODE_PRIVATE);
         OBD_DELAY = Preferences.getOBDDelay(prefs);
-        if(Preferences.OBDActivated(prefs) && OBD2Connection.connected == false)
+    }
+
+    public void connect() {
+        Log.d("OBD", Preferences.OBDActivated(prefs) + ", " + OBD2Connection.connected);
+        if(Preferences.OBDActivated(prefs) && OBD2Connection.connected == false) {
             reset();
+        }
+
     }
 
     @Override
@@ -60,8 +68,14 @@ public class OBD2Provider extends DataProvider{
     public void reset() {
         Log.d(TAG, "reset");
         OBD2Connection.sock = null;
+        OBD2Connection.connected = false;
         setupComplete = false;
-        OBD2Connection.connector = new OBD2Connector(app);
+        OBD2Connection.connector = new OBD2Connector(app, this);
+    }
+
+    @Override
+    public void onConnectionEstablished() {
+        setup();
     }
 
     private void setup() {
@@ -83,6 +97,8 @@ public class OBD2Provider extends DataProvider{
 
         RPMCommand rpm_cmd = new RPMCommand();
         runCommand(OBD2Connection.sock, rpm_cmd);
+
+        app.sendBroadcast(new Intent("OBD_SETUP_COMPLETE"));
 
         setupComplete = true;
         setupRunning = false;
@@ -203,5 +219,6 @@ public class OBD2Provider extends DataProvider{
 
         return rawData;
     }
+
 
 }

@@ -15,7 +15,13 @@ import java.io.IOException;
  * It stores the device and socket in the class variables of OBD2Connection
  */
 public class OBD2Connector {
+
+    public interface IConnectionEstablished {
+        public void onConnectionEstablished();
+    }
+
     private Context app;
+    private IConnectionEstablished callback;
     private final String TAG = "OBD_CONNECTOR";
 
     private boolean receiverRegistered = false;
@@ -50,8 +56,10 @@ public class OBD2Connector {
     };
 
 
-    public OBD2Connector(Context app) {
+    public OBD2Connector(Context app, IConnectionEstablished callback) {
+        Log.d("OBD", "Init connector.");
         this.app = app;
+        this.callback = callback;
 
         btAdapter = BluetoothAdapter.getDefaultAdapter();
 
@@ -86,6 +94,9 @@ public class OBD2Connector {
             OBD2Connection.sock = BluetoothManager.connect(OBD2Connection.obd2Device);
             OBD2Connection.connected = true;
             Log.d(TAG, "Connected to: " + OBD2Connection.obd2Device.getName() + "-> " + OBD2Connection.sock.isConnected());
+            app.sendBroadcast(new Intent("OBD_CONNECTED"));
+            callback.onConnectionEstablished();
+
 
         } catch (IOException e) {
             e.printStackTrace();

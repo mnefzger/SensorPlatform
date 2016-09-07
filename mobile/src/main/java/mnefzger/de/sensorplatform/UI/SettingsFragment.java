@@ -42,7 +42,7 @@ public class SettingsFragment extends PreferenceFragment
 
         getPreferenceManager().getSharedPreferences().registerOnSharedPreferenceChangeListener(this);
 
-        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(getActivity());
+        SharedPreferences prefs = getActivity().getSharedPreferences(getActivity().getString(R.string.preferences_key), Context.MODE_PRIVATE);
         if(prefs.getBoolean("front_active", true) == false && prefs.getBoolean("back_active", true) == false ) {
             CheckBoxPreference box = (CheckBoxPreference) findPreference("image_saving");
             box.setChecked(false);

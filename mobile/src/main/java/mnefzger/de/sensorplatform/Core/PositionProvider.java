@@ -15,6 +15,7 @@ import android.support.v4.content.ContextCompat;
 import java.util.ArrayList;
 import java.util.List;
 
+import mnefzger.de.sensorplatform.R;
 import mnefzger.de.sensorplatform.Utilities.MathFunctions;
 
 public class PositionProvider extends DataProvider implements LocationListener{
@@ -32,7 +33,7 @@ public class PositionProvider extends DataProvider implements LocationListener{
     public PositionProvider(Context app, ISensorCallback m) {
         context = app;
         callback = m;
-        prefs = PreferenceManager.getDefaultSharedPreferences(app);
+        prefs = app.getSharedPreferences(app.getString(R.string.preferences_key), Context.MODE_PRIVATE);
 
         LOCATION_REFRESH_TIME = Preferences.getGPSRequestRate(prefs);
     }

@@ -66,7 +66,7 @@ public class SensorPlatformService extends Service implements IDataCallback{
         AndroidThreeTen.init(getApplication());
 
         Preferences.setContext(getApplication());
-        prefs = PreferenceManager.getDefaultSharedPreferences(getApplication());
+        prefs = getApplication().getSharedPreferences(getApplication().getString(R.string.preferences_key), Context.MODE_PRIVATE);
 
         this.sm = new SensorModule(this, getApplication());
         this.lm = new LoggingModule();
@@ -204,6 +204,10 @@ public class SensorPlatformService extends Service implements IDataCallback{
         if(appCallback != null)
             appCallback.onEventData(ev);
 
+    }
+
+    public void initiateOBDConnection() {
+        this.sm.initiateOBDSetup();
     }
 
     @Override

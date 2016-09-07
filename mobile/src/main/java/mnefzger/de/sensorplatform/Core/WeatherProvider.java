@@ -21,7 +21,7 @@ import mnefzger.de.sensorplatform.Utilities.WeatherResponse;
 public class WeatherProvider extends DataProvider{
     private Context context;
     private ISensorCallback callback;
-    private final int WEATHER_QUERY_DELAY = 60000;
+    private final int WEATHER_QUERY_DELAY = 300000;
     private final String BASE_URL = "https://query.yahooapis.com/v1/public/yql?q=select%20*%20from%20weather.forecast%20where%20woeid%20in%20(SELECT%20woeid%20FROM%20geo.places%20WHERE%20text%3D%22(LATITUDE%2CLONGITUDE)%22)&format=json&env=store%3A%2F%2Fdatatables.org%2Falltableswithkeys";
     private boolean running = false;
 

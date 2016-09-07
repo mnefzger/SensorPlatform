@@ -38,6 +38,7 @@ import java.nio.ByteBuffer;
 import java.util.Arrays;
 
 import mnefzger.de.sensorplatform.Processors.ImageProcessor;
+import mnefzger.de.sensorplatform.R;
 import mnefzger.de.sensorplatform.Utilities.ThreadPool;
 
 /**
@@ -95,7 +96,7 @@ public class ImageModule implements IEventCallback{
         cameraManager = (CameraManager) app.getSystemService(Activity.CAMERA_SERVICE);
         imgProc = new ImageProcessor(this, app);
 
-        prefs = PreferenceManager.getDefaultSharedPreferences(app);
+        prefs = app.getSharedPreferences(app.getString(R.string.preferences_key), Context.MODE_PRIVATE);
         setPrefs();
 
         h = new Handler();

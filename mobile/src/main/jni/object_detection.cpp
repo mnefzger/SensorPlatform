@@ -135,6 +135,8 @@ JNIEXPORT jintArray Java_mnefzger_de_sensorplatform_Processors_ImageProcessor_nA
         rectangle(gray_small, cars[i], CV_RGB(255, 255, 255), 1);
 
         /*
+        * uncomment this block to draw the distance on the images
+        *
         double sensor_width = 6.17; //mm
         double f = 4.67; //mm
         int img_width = 320; //pixel

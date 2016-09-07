@@ -19,6 +19,7 @@ import android.util.Log;
 import mnefzger.de.sensorplatform.External.OBD2Connection;
 import mnefzger.de.sensorplatform.R;
 import mnefzger.de.sensorplatform.UI.AppFragment;
+import mnefzger.de.sensorplatform.UI.OBDSetupFragment;
 import mnefzger.de.sensorplatform.UI.SettingsFragment;
 import mnefzger.de.sensorplatform.UI.SetupFirstFragment;
 import mnefzger.de.sensorplatform.UI.StartFragment;
@@ -37,9 +38,11 @@ public class MainActivity extends AppCompatActivity implements IDataCallback{
     }
 
     StartFragment startFragment;
+    SetupFirstFragment setupFragment;
+    OBDSetupFragment obdFragment;
     SettingsFragment settings;
     AppFragment appFragment;
-    SetupFirstFragment setupFragment;
+
     SharedPreferences prefs;
     SensorPlatformService sPS;
     boolean mBound = false;
@@ -150,6 +153,10 @@ public class MainActivity extends AppCompatActivity implements IDataCallback{
         }
     };
 
+    public SensorPlatformService getService() {
+        return sPS;
+    }
+
     @Override
     public void onSaveInstanceState(Bundle savedInstanceState) {
         super.onSaveInstanceState(savedInstanceState);
@@ -200,6 +207,12 @@ public class MainActivity extends AppCompatActivity implements IDataCallback{
     public void goToNewStudyFragment() {
         setupFragment = new SetupFirstFragment();
         changeFragment(setupFragment, true, true);
+        this.setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_UNSPECIFIED);
+    }
+
+    public void goToOBDSetupFragment() {
+        obdFragment = new OBDSetupFragment();
+        changeFragment(obdFragment, true, true);
         this.setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_UNSPECIFIED);
     }
 

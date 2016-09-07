@@ -15,6 +15,7 @@ import java.util.TimerTask;
 import mnefzger.de.sensorplatform.External.FitnessSensorManager;
 import mnefzger.de.sensorplatform.External.OBD2Provider;
 import mnefzger.de.sensorplatform.Processors.DrivingBehaviourProcessor;
+import mnefzger.de.sensorplatform.R;
 
 /**
  * This class is the central unit of data collection.
@@ -88,7 +89,7 @@ public class SensorModule implements ISensorCallback, IEventCallback{
 
 
     public SensorModule(IDataCallback callback, Context app) {
-        prefs = PreferenceManager.getDefaultSharedPreferences(app);
+        prefs = app.getSharedPreferences(app.getString(R.string.preferences_key), Context.MODE_PRIVATE);
         this.callback = callback;
 
         activeProviders = new ArrayList<>();
@@ -280,6 +281,10 @@ public class SensorModule implements ISensorCallback, IEventCallback{
 
     public void clearDataBuffer() {
         dataBuffer.clear();
+    }
+
+    public void initiateOBDSetup() {
+        obd2.connect();
     }
 
     /**

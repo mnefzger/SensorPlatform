@@ -29,6 +29,14 @@ public class SettingsFragment extends PreferenceFragment
     TextView topbar;
 
     @Override
+    public void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+
+        getPreferenceManager().setSharedPreferencesName(getActivity().getString(R.string.preferences_key));
+        addPreferencesFromResource(R.xml.preferences);
+    }
+
+    @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
 
@@ -36,15 +44,13 @@ public class SettingsFragment extends PreferenceFragment
             container.removeAllViews();
         }
 
-        addPreferencesFromResource(R.xml.preferences);
         View v = inflater.inflate(R.layout.fragment_settings, container, false);
 
         FrameLayout fl = (FrameLayout) v.findViewById(R.id.start_button);
         fl.setOnClickListener(this);
 
-        getPreferenceManager().getSharedPreferences().registerOnSharedPreferenceChangeListener(this);
-
         SharedPreferences prefs = getActivity().getSharedPreferences(getActivity().getString(R.string.preferences_key), Context.MODE_PRIVATE);
+        prefs.registerOnSharedPreferenceChangeListener(this);
 
         if(prefs.getBoolean("front_active", true) == false && prefs.getBoolean("back_active", true) == false ) {
             CheckBoxPreference box = (CheckBoxPreference) findPreference("image_saving");
@@ -91,6 +97,12 @@ public class SettingsFragment extends PreferenceFragment
                 findPreference("image_saving").setEnabled(true);
                 findPreference("image_saving").setSelectable(true);
             }
+        } else if(key.equals("obd_raw")) {
+            Log.d("OBD PREF", "Changed.");
+            boolean obd = sharedPreferences.getBoolean("obd_raw", false);
+            SharedPreferences.Editor editor = sharedPreferences.edit();
+            editor.putBoolean("obd_raw", obd);
+            editor.commit();
         }
     }
 }

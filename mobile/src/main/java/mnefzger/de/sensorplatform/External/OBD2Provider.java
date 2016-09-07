@@ -46,11 +46,9 @@ public class OBD2Provider extends DataProvider implements OBD2Connector.IConnect
     }
 
     public void connect() {
-        Log.d("OBD", Preferences.OBDActivated(prefs) + ", " + OBD2Connection.connected);
         if(Preferences.OBDActivated(prefs) && OBD2Connection.connected == false) {
             reset();
         }
-
     }
 
     @Override
@@ -62,6 +60,7 @@ public class OBD2Provider extends DataProvider implements OBD2Connector.IConnect
     @Override
     public void stop() {
         collecting = false;
+        OBD2Connection.connected = false;
     }
 
     // Is called in case of IOException with broken pipe

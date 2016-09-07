@@ -66,7 +66,7 @@ public class SensorPlatformService extends Service implements IDataCallback{
         AndroidThreeTen.init(getApplication());
 
         Preferences.setContext(getApplication());
-        prefs = getApplication().getSharedPreferences(getApplication().getString(R.string.preferences_key), Context.MODE_PRIVATE);
+        prefs = getApplicationContext().getSharedPreferences(getApplicationContext().getString(R.string.preferences_key), Context.MODE_PRIVATE);
 
         this.sm = new SensorModule(this, getApplication());
         this.lm = new LoggingModule();
@@ -117,7 +117,7 @@ public class SensorPlatformService extends Service implements IDataCallback{
         if(Preferences.frontCameraActivated(prefs) || Preferences.backCameraActivated(prefs)) {
             subscribeTo(DataType.CAMERA_RAW);
         }
-
+        
         if(Preferences.OBDActivated(prefs)) {
             subscribeTo(DataType.OBD);
         }

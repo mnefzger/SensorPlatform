@@ -77,7 +77,7 @@ public class OBDSetupFragment extends Fragment {
 
             if(checked) {
                 editor.putBoolean("obd_raw", true);
-                Log.d("PREFS", Preferences.OBDActivated(prefs)+"");
+
                 obd_setup_details.setVisibility(View.VISIBLE);
 
                 app.getService().initiateOBDConnection();

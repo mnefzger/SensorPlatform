@@ -55,7 +55,7 @@ public class MainActivity extends AppCompatActivity implements IDataCallback{
 
         PermissionManager.verifyPermissions(this);
 
-        /*
+
         prefs = this.getSharedPreferences(getString(R.string.preferences_key), Context.MODE_PRIVATE);
         prefs.edit().clear();
         if(prefs.getAll().isEmpty()) {
@@ -63,7 +63,7 @@ public class MainActivity extends AppCompatActivity implements IDataCallback{
             prefs.edit().commit();
         } else {
             PreferenceManager.setDefaultValues(this, getString(R.string.preferences_key), Context.MODE_PRIVATE,  R.xml.preferences, false);
-        }*/
+        }
 
         SharedPreferences study_prefs = this.getSharedPreferences(getString(R.string.study_preferences_key), Context.MODE_PRIVATE);
         study_prefs.edit().clear();

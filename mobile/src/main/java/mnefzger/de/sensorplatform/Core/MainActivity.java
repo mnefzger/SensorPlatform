@@ -55,23 +55,23 @@ public class MainActivity extends AppCompatActivity implements IDataCallback{
 
         PermissionManager.verifyPermissions(this);
 
-        //prefs = PreferenceManager.getDefaultSharedPreferences(this);
+        /*
         prefs = this.getSharedPreferences(getString(R.string.preferences_key), Context.MODE_PRIVATE);
         prefs.edit().clear();
         if(prefs.getAll().isEmpty()) {
-            PreferenceManager.setDefaultValues(this, R.xml.preferences, true);
+            PreferenceManager.setDefaultValues(this, getString(R.string.preferences_key), Context.MODE_PRIVATE,  R.xml.preferences, true);
             prefs.edit().commit();
         } else {
-            PreferenceManager.setDefaultValues(this, R.xml.preferences, false);
-        }
+            PreferenceManager.setDefaultValues(this, getString(R.string.preferences_key), Context.MODE_PRIVATE,  R.xml.preferences, false);
+        }*/
 
         SharedPreferences study_prefs = this.getSharedPreferences(getString(R.string.study_preferences_key), Context.MODE_PRIVATE);
         study_prefs.edit().clear();
-        if(prefs.getAll().isEmpty()) {
-            PreferenceManager.setDefaultValues(this, R.xml.study_preferences, true);
-            prefs.edit().commit();
+        if(study_prefs.getAll().isEmpty()) {
+            PreferenceManager.setDefaultValues(this, getString(R.string.study_preferences_key), Context.MODE_PRIVATE,  R.xml.study_preferences, true);
+            study_prefs.edit().commit();
         } else {
-            PreferenceManager.setDefaultValues(this, R.xml.study_preferences, false);
+            PreferenceManager.setDefaultValues(this, getString(R.string.study_preferences_key), Context.MODE_PRIVATE,  R.xml.study_preferences, false);
         }
 
         if(savedInstanceState == null) {

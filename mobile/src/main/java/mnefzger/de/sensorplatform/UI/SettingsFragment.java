@@ -8,6 +8,7 @@ import android.preference.CheckBoxPreference;
 import android.preference.PreferenceFragment;
 import android.preference.PreferenceManager;
 import android.support.design.widget.FloatingActionButton;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -18,6 +19,7 @@ import android.widget.TextView;
 import org.jcodec.codecs.h264.io.model.Frame;
 
 import mnefzger.de.sensorplatform.Core.MainActivity;
+import mnefzger.de.sensorplatform.Core.Preferences;
 import mnefzger.de.sensorplatform.R;
 
 
@@ -43,11 +45,17 @@ public class SettingsFragment extends PreferenceFragment
         getPreferenceManager().getSharedPreferences().registerOnSharedPreferenceChangeListener(this);
 
         SharedPreferences prefs = getActivity().getSharedPreferences(getActivity().getString(R.string.preferences_key), Context.MODE_PRIVATE);
+
         if(prefs.getBoolean("front_active", true) == false && prefs.getBoolean("back_active", true) == false ) {
             CheckBoxPreference box = (CheckBoxPreference) findPreference("image_saving");
             box.setChecked(false);
             box.setEnabled(false);
             box.setSelectable(false);
+        }
+
+        if(prefs.getBoolean("obd_raw", false) == true) {
+            CheckBoxPreference box = (CheckBoxPreference) findPreference("obd_raw");
+            box.setChecked(true);
         }
 
         topbar = (TextView) v.findViewById(R.id.settings_topbar_text);

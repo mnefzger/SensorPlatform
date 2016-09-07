@@ -86,7 +86,8 @@
                 android:entryValues="@array/obd_values"
                 android:key="obdRequest_frequency"
                 android:persistent="true"
-                android:title="OBD2 request frequency" />
+                android:title="OBD2 request frequency"
+                android:dependency="obd_raw"/>
         </PreferenceCategory>
 
         <PreferenceCategory android:title="Fitness Wearable">

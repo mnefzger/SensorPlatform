@@ -127,7 +127,7 @@ public class MainActivity extends AppCompatActivity implements IDataCallback{
         startService(startIntent);
         started = true;
 
-        sPS.subscribe();
+        sPS.startWaitBehaviour();
     }
 
     @Override

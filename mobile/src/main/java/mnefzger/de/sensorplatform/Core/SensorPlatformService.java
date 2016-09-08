@@ -26,7 +26,7 @@ import mnefzger.de.sensorplatform.R;
  * as well as to (un)subscribe to specific data values or events.
  */
 
-public class SensorPlatformService extends Service implements IDataCallback{
+public class SensorPlatformService extends Service implements IDataCallback, ITripDetectionCallback{
     private SharedPreferences setting_prefs;
     private SharedPreferences sensor_prefs;
 
@@ -34,6 +34,7 @@ public class SensorPlatformService extends Service implements IDataCallback{
     private LoggingModule lm;
     private ImageModule im;
     private UserPhoneBluetoothServer server;
+    private TripStartDetector tsDetector;
     private IDataCallback appCallback;
 
     private final IBinder mBinder = new LocalBinder();
@@ -77,6 +78,17 @@ public class SensorPlatformService extends Service implements IDataCallback{
         this.server = new UserPhoneBluetoothServer(getApplication());
 
     }
+
+    public void startWaitBehaviour() {
+        tsDetector = new TripStartDetector(getApplication(), this);
+    }
+
+    @Override
+    public void onTripStart() {
+        tsDetector.cancel();
+        subscribe();
+    }
+
 
     public void subscribe() {
         /**
@@ -289,7 +301,6 @@ public class SensorPlatformService extends Service implements IDataCallback{
         // remove notification
         NotificationManager nm = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
         nm.cancelAll();
-
 
     }
 

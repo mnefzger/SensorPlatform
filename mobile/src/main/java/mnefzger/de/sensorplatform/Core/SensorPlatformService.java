@@ -86,6 +86,7 @@ public class SensorPlatformService extends Service implements IDataCallback, ITr
     @Override
     public void onTripStart() {
         tsDetector.cancel();
+        this.onEventData(new EventVector(true, System.currentTimeMillis(), "Trip Start Detected", 0));
         subscribe();
     }
 

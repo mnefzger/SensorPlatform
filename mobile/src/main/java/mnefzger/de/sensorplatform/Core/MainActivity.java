@@ -128,6 +128,7 @@ public class MainActivity extends AppCompatActivity implements IDataCallback{
         started = true;
 
         sPS.startWaitBehaviour();
+        this.onEventData(new EventVector(true, System.currentTimeMillis(), "Waiting for trip to start...", 0));
     }
 
     @Override
@@ -139,7 +140,7 @@ public class MainActivity extends AppCompatActivity implements IDataCallback{
 
     @Override
     public void onEventData(EventVector v) {
-        //Log.d("EventData @ App  ", v.toString());
+        Log.d("EventData @ App  ", v.toString());
         if( appFragment != null && appFragment.isVisible())
             appFragment.updateUI(v);
     }

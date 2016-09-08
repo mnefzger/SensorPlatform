@@ -3,24 +3,37 @@ package mnefzger.de.sensorplatform.Core;
 import android.Manifest;
 import android.content.Context;
 import android.content.pm.PackageManager;
+import android.hardware.Sensor;
+import android.hardware.SensorManager;
+import android.hardware.TriggerEvent;
+import android.hardware.TriggerEventListener;
 import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
 import android.os.Bundle;
 import android.support.v4.content.ContextCompat;
+import android.util.Log;
 
 import mnefzger.de.sensorplatform.Utilities.MathFunctions;
 
-
+/**
+ * An instance of this class monitors two sources to detect the start of a trip:
+ * a. The "Significant Motion Sensor": >> A significant motion is a motion that might lead to a change in the user's location; for example walking, biking, or sitting in a moving car. <<
+ * b. GPS location, queried every 5 seconds, checks if there was a significant change in location (> 25m since last location)
+ */
 public class TripStartDetector implements LocationListener {
     private ITripDetectionCallback callback;
-    private LocationManager locationManager;
     private Context context;
 
+    private SensorManager mSensorManager;
+    private Sensor mSensor;
+
+    private LocationManager locationManager;
     final int LOCATION_REFRESH_TIME = 5000;
     final int LOCATION_REFRESH_DISTANCE = 10;
 
     private Location previous = null;
+    private int checkCount = 0;
 
     public TripStartDetector(Context context, ITripDetectionCallback callback) {
         this.callback = callback;
@@ -33,6 +46,11 @@ public class TripStartDetector implements LocationListener {
                     LOCATION_REFRESH_DISTANCE, this);
         }
 
+        mSensorManager = (SensorManager) context.getSystemService(Context.SENSOR_SERVICE);
+        mSensor = mSensorManager.getDefaultSensor(Sensor.TYPE_SIGNIFICANT_MOTION);
+        mSensorManager.requestTriggerSensor(significantMotionListener, mSensor);
+
+        Log.d("TRIP START DETECTION", "Fired up");
     }
 
     public void cancel() {
@@ -41,21 +59,32 @@ public class TripStartDetector implements LocationListener {
             if(locationManager != null)
                 locationManager.removeUpdates(this);
         }
+
+        mSensorManager.cancelTriggerSensor(significantMotionListener, mSensor);
     }
+
+    TriggerEventListener significantMotionListener = new TriggerEventListener() {
+        @Override
+        public void onTrigger(TriggerEvent event) {
+            callback.onTripStart();
+        }
+    };
 
     @Override
     public void onLocationChanged(Location location) {
+        checkCount += 1;
+
         if(previous == null) {
             previous = location;
         } else {
             double distance = MathFunctions.calculateDistance(location.getLatitude(), location.getLongitude(), previous.getLatitude(), previous.getLongitude());
-            if(distance > 15) {
+            Log.d("TRIP DETECTOR", "checking location ..." + distance);
+            if(checkCount >= 3 && distance > 25) {
                 callback.onTripStart();
             } else {
                 previous = location;
             }
         }
-
 
     }
 

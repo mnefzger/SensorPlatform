@@ -29,6 +29,7 @@ import mnefzger.de.sensorplatform.R;
 public class OBDSetupFragment extends Fragment {
 
     AppCompatCheckBox obdActive;
+    TextView hint;
     LinearLayout obd_setup_details;
 
     TextView searching;
@@ -37,6 +38,8 @@ public class OBDSetupFragment extends Fragment {
     TextView ready;
 
     FrameLayout setup_next;
+
+    boolean receiverRegistered = false;
 
     public OBDSetupFragment() {
         // Required empty public constructor
@@ -50,6 +53,7 @@ public class OBDSetupFragment extends Fragment {
         View v = inflater.inflate(R.layout.fragment_obd_setup, container, false);
 
         obdActive = (AppCompatCheckBox) v.findViewById(R.id.obd_checkbox);
+        hint = (TextView) v.findViewById(R.id.obd_hint);
         obd_setup_details = (LinearLayout) v.findViewById(R.id.obd_setup_details);
 
         searching = (TextView) v.findViewById(R.id.searchingOBDText);
@@ -77,6 +81,7 @@ public class OBDSetupFragment extends Fragment {
             if(checked) {
                 editor.putBoolean("obd_raw", true);
                 editor.apply();
+                hint.setVisibility(View.INVISIBLE);
                 obd_setup_details.setVisibility(View.VISIBLE);
 
                 Log.d("OBD setup", Preferences.OBDActivated(sensor_prefs) +", "+sensor_prefs.getBoolean("obd_raw", false));
@@ -88,10 +93,15 @@ public class OBDSetupFragment extends Fragment {
                 filter.addAction("OBD_CONNECTED");
                 filter.addAction("OBD_SETUP_COMPLETE");
                 app.registerReceiver(mReceiver, filter);
+                receiverRegistered = true;
             } else {
                 editor.putBoolean("obd_raw", false);
                 editor.apply();
                 obd_setup_details.setVisibility(View.INVISIBLE);
+                hint.setVisibility(View.VISIBLE);
+
+                if(receiverRegistered)
+                    app.unregisterReceiver(mReceiver);
             }
         }
     };

@@ -65,6 +65,15 @@
                     android:layout_weight="0.2" />
             </LinearLayout>
 
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Hint: A connected OBD-II adapter will add data on accurate speed, fuel consumption and engine speed."
+                android:id="@+id/obd_hint"
+                android:layout_marginTop="75dp"
+                android:textSize="19sp"
+                android:textColor="@color/colorAccent"/>
+
             <LinearLayout
                 android:orientation="vertical"
                 android:layout_width="match_parent"

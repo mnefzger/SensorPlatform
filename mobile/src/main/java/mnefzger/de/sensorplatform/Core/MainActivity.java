@@ -199,6 +199,23 @@ public class MainActivity extends AppCompatActivity implements IDataCallback{
 
     }
 
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+
+        if(!started) {
+            try {
+                Intent intent = new Intent(this, SensorPlatformService.class);
+                intent.setAction("SERVICE_STOP");
+                stopService(intent);
+                Log.d("ON DESTROY", "Killed Service");
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
+
+    }
+
     public void goToAppFragment() {
         if(started) {
             String frag = null;

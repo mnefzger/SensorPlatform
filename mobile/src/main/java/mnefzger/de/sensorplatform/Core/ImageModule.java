@@ -142,6 +142,10 @@ public class ImageModule implements IEventCallback{
         if(RES_W  == 1024) RES_H = 768;
         else if(RES_W == 640) RES_H = 480;
         else if(RES_W == 320) RES_H = 240;
+        else {
+            RES_W = context.getResources().getInteger(R.integer.video_resolution);
+            RES_H = (int) (context.getResources().getInteger(R.integer.video_resolution) * 0.75);
+        }
 
         Log.d("RESOLUTION", RES_W + "x" + RES_H);
         try {

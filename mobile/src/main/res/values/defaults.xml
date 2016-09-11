@@ -37,6 +37,6 @@
 
     <integer name="back_processing_fps">5</integer>
 
-    <integer name="video_resolution">640</integer>
+    <integer name="video_resolution">320</integer>
 
 </resources>

@@ -15,9 +15,6 @@ import android.util.Log;
 import java.io.IOException;
 import java.util.UUID;
 
-/**
- * Created by matthias on 05/09/16.
- */
 public class UserPhoneBluetoothServer {
 
     private BluetoothAdapter bAdapter;
@@ -31,6 +28,9 @@ public class UserPhoneBluetoothServer {
 
     private void setupServer(Context c) {
         bAdapter = BluetoothAdapter.getDefaultAdapter();
+        if(!bAdapter.isEnabled())
+            bAdapter.enable();
+
         Intent discoverableIntent = new Intent(BluetoothAdapter.ACTION_REQUEST_DISCOVERABLE);
         discoverableIntent.putExtra(BluetoothAdapter.EXTRA_DISCOVERABLE_DURATION, 0); // 0 = always discoverable
         c.startActivity(discoverableIntent);

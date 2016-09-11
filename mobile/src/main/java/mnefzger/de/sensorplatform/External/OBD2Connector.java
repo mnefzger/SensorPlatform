@@ -65,9 +65,8 @@ public class OBD2Connector {
 
         btAdapter = BluetoothAdapter.getDefaultAdapter();
 
-        if(!btAdapter.isEnabled()) {
+        if(!btAdapter.isEnabled())
             btAdapter.enable();
-        }
 
         registerReceiver();
 

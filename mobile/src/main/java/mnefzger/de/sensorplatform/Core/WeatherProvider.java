@@ -27,6 +27,8 @@ public class WeatherProvider extends DataProvider{
 
     private Location current = null;
 
+    private boolean first = true;
+
     public WeatherProvider(Context c, SensorModule m) {
         this.context = c;
         this.callback = m;
@@ -38,10 +40,8 @@ public class WeatherProvider extends DataProvider{
 
     @Override
     public void start() {
+        Log.d("WEATHER", "Started Weather");
         running = true;
-        // do first query instantly
-        if(current != null)
-            queryWeather();
         // start periodic updates
         getWeatherPeriodically();
     }
@@ -53,6 +53,10 @@ public class WeatherProvider extends DataProvider{
 
     public void updateLocation(Location loc) {
         this.current = loc;
+        if(first){
+            queryWeather();
+            first = false;
+        }
     }
 
     private void getWeatherPeriodically() {
@@ -72,6 +76,7 @@ public class WeatherProvider extends DataProvider{
     }
 
     private void queryWeather() {
+        Log.d("WEATHER", "Queried Weather");
         RequestQueue queue = Volley.newRequestQueue(context);
 
         String url = BASE_URL.replace("LATITUDE", current.getLatitude() + "");

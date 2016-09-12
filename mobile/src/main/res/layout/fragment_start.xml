@@ -81,6 +81,7 @@
                 android:textAlignment="center"
                 android:layout_gravity="center_horizontal"
                 android:textColor="@drawable/start_button_text_color"
+                android:enabled="false"
                 />
 
         </LinearLayout>

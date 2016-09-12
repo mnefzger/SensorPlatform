@@ -1,8 +1,10 @@
 package mnefzger.de.sensorplatform.Core;
 
+import android.app.*;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.content.ServiceConnection;
 import android.content.SharedPreferences;
 import android.content.pm.ActivityInfo;
@@ -27,7 +29,7 @@ import mnefzger.de.sensorplatform.UI.StartFragment;
 import mnefzger.de.sensorplatform.Utilities.PermissionManager;
 
 
-public class MainActivity extends AppCompatActivity implements IDataCallback{
+public class MainActivity extends AppCompatActivity {
 
     static {
         try {
@@ -46,8 +48,8 @@ public class MainActivity extends AppCompatActivity implements IDataCallback{
     AppFragment appFragment;
 
     SensorPlatformService sPS;
-    boolean mBound = false;
-    boolean started = false;
+    public static boolean mBound = false;
+    public static boolean started = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -60,31 +62,43 @@ public class MainActivity extends AppCompatActivity implements IDataCallback{
 
         if(savedInstanceState == null) {
             Log.d("CREATE", "New activity");
+
             // bind and start service running in the background
-            Intent intent = new Intent(this, SensorPlatformService.class);
-            bindService(intent, mConnection, Context.BIND_AUTO_CREATE);
-            startService(intent);
+            if(!checkIfServiceRunning()) {
+                Log.d("CREATE", "Service not running, go to start");
+                Intent intent = new Intent(this, SensorPlatformService.class);
+                bindService(intent, mConnection, Context.BIND_AUTO_CREATE);
+                startService(intent);
 
-            goToStartFragment(0);
+                goToStartFragment(0);
 
-        } else {
-            // if the data collection was already started, set reference to the UI fragment that shows live data
-            started = savedInstanceState.getBoolean("started");
-            mBound = savedInstanceState.getBoolean("bound");
+            } else {
+                started = true;
 
-            if(SensorPlatformService.serviceRunning == false)
-                started = false;
+                Log.d("CREATE", "Service running, binding it and changing fragment");
+                Intent intent = new Intent(this, SensorPlatformService.class);
+                bindService(intent, mConnection, Context.BIND_AUTO_CREATE);
+                startService(intent);
 
-            Log.d("RECREATE", "started:"+started+", bound:"+mBound);
-            if(started) {
                 goToAppFragment();
 
-            } else if(!mBound) {
+            }
+
+        } else {
+
+            // if the data collection was already started, set reference to the UI fragment that shows live data
+            started = savedInstanceState.getBoolean("started");
+
+            if(!mBound) {
                 Log.d("BINDING", "Rebinding service");
                 Intent intent = new Intent(this, SensorPlatformService.class);
                 bindService(intent, mConnection, Context.BIND_AUTO_CREATE);
-
             }
+
+            Log.d("RECREATE", "started:"+started+", bound:"+mBound);
+
+            if(started)
+                goToAppFragment();
         }
 
     }
@@ -128,38 +142,26 @@ public class MainActivity extends AppCompatActivity implements IDataCallback{
         started = true;
 
         sPS.startWaitBehaviour();
-        this.onEventData(new EventVector(true, System.currentTimeMillis(), "Waiting for trip to start...", 0));
+        //sPS.subscribe();
     }
 
-    @Override
-    public void onRawData(DataVector v) {
-        Log.d("RawData @ App  ", v.toString());
-        if( appFragment != null && appFragment.isVisible())
-            appFragment.updateUI(v);
-    }
-
-    @Override
-    public void onEventData(EventVector v) {
-        Log.d("EventData @ App  ", v.toString());
-        if( appFragment != null && appFragment.isVisible())
-            appFragment.updateUI(v);
-    }
-
-    IDataCallback getActivity() {
-        return this;
+    private void doUnbindService() {
+        try {
+            unbindService(mConnection);
+            mBound = false;
+        } catch (Exception e) {
+            Log.e("MAIN", e.toString());
+        }
     }
 
     private ServiceConnection mConnection = new ServiceConnection() {
-
         @Override
-        public void onServiceConnected(ComponentName className,
-                                       IBinder service) {
+        public void onServiceConnected(ComponentName className, IBinder service) {
             // We've bound to LocalService, cast the IBinder and get SensorPlatformService instance
             SensorPlatformService.LocalBinder binder = (SensorPlatformService.LocalBinder) service;
             sPS = binder.getService();
             mBound = true;
-            sPS.setAppCallback(getActivity());
-            Log.d("SERVICE", "is connected");
+            Log.d("SERVICE", "is bound: " + mBound);
         }
 
         @Override
@@ -172,12 +174,30 @@ public class MainActivity extends AppCompatActivity implements IDataCallback{
         return sPS;
     }
 
+    public boolean checkIfServiceRunning() {
+        ActivityManager manager = (ActivityManager) getSystemService(Context.ACTIVITY_SERVICE);
+        for (ActivityManager.RunningServiceInfo service : manager.getRunningServices(Integer.MAX_VALUE)) {
+            if (SensorPlatformService.class.getName().equals(service.service.getClassName())) {
+                return true;
+            }
+        }
+        return false;
+    }
+
     @Override
     public void onSaveInstanceState(Bundle savedInstanceState) {
         super.onSaveInstanceState(savedInstanceState);
         Log.d("SAVE", "saving state...");
         savedInstanceState.putBoolean("started", started);
-        savedInstanceState.putBoolean("bound", mBound);
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+
+        Intent intent = new Intent(this, SensorPlatformService.class);
+        bindService(intent, mConnection, Context.BIND_AUTO_CREATE);
+        startService(intent);
     }
 
     @Override
@@ -188,13 +208,9 @@ public class MainActivity extends AppCompatActivity implements IDataCallback{
         if(OBD2Connection.connector != null)
             OBD2Connection.connector.unregisterReceiver();
 
-        if(mBound) {
-            try {
-                unbindService(mConnection);
-                mBound = false;
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
+
+        if(checkIfServiceRunning()) {
+            doUnbindService();
         }
 
     }
@@ -203,37 +219,39 @@ public class MainActivity extends AppCompatActivity implements IDataCallback{
     public void onDestroy() {
         super.onDestroy();
 
-        if(!started) {
-            try {
-                Intent intent = new Intent(this, SensorPlatformService.class);
-                intent.setAction("SERVICE_STOP");
-                stopService(intent);
-                Log.d("ON DESTROY", "Killed Service");
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
+        if(checkIfServiceRunning() && !started && !sPS.serviceRunning) {
+            Intent intent = new Intent(this, SensorPlatformService.class);
+            intent.setAction("SERVICE_STOP");
+            stopService(intent);
+            Log.d("On Destroy", "Killed Service");
         }
-
     }
 
+
     public void goToAppFragment() {
-        if(started) {
-            String frag = null;
-            for(int i=1; i<getSupportFragmentManager().getBackStackEntryCount(); i++) {
-                frag = getSupportFragmentManager().getBackStackEntryAt(getSupportFragmentManager().getBackStackEntryCount() - i).getName();
-                Log.d("FRAGMENT", frag);
-                if( frag.equals("mnefzger.de.sensorplatform.UI.AppFragment") ) {
-                    appFragment = (AppFragment) getSupportFragmentManager().findFragmentByTag(frag);
-                    break;
-                }
-            }
-        } else {
-            appFragment = new AppFragment();
-        }
+        this.appFragment = new AppFragment();
+        changeFragment(this.appFragment, true, true);
 
-        changeFragment(appFragment, true, true);
         this.setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_REVERSE_LANDSCAPE);
+    }
 
+    private Fragment getCurrentFragment() {
+        FragmentManager fragmentManager = getSupportFragmentManager();
+        int stackCount = fragmentManager.getBackStackEntryCount();
+        if( fragmentManager.getFragments() != null ) return fragmentManager.getFragments().get( stackCount > 0 ? stackCount-1 : stackCount );
+        else return null;
+    }
+
+    private Fragment findFragmentInStack(String name) {
+        String frag;
+        for(int i=1; i<getSupportFragmentManager().getBackStackEntryCount(); i++) {
+            frag = getSupportFragmentManager().getBackStackEntryAt(getSupportFragmentManager().getBackStackEntryCount() - i).getName();
+            Log.d("FRAGMENT", frag);
+            if( frag.equals(name) ) {
+                return getSupportFragmentManager().findFragmentByTag(frag);
+            }
+        }
+        return null;
     }
 
     public void goToNewStudyFragment() {
@@ -264,6 +282,10 @@ public class MainActivity extends AppCompatActivity implements IDataCallback{
         this.setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_UNSPECIFIED);
     }
 
+    MainActivity getActivity() {
+        return this;
+    }
+
     /**
      * Changing to the StartFragment allows for a short delay to allow the service to shut down completely
      */
@@ -275,7 +297,7 @@ public class MainActivity extends AppCompatActivity implements IDataCallback{
             @Override
             public void run() {
                 changeFragment(startFragment, true, true);
-                MainActivity that = (MainActivity) getActivity();
+                MainActivity that = getActivity();
                 that.setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_UNSPECIFIED);
             }
         }, ms);
@@ -290,6 +312,7 @@ public class MainActivity extends AppCompatActivity implements IDataCallback{
             boolean fragmentPopped = manager.popBackStackImmediate(backStateName, 0);
 
             if (!fragmentPopped && manager.findFragmentByTag(backStateName) == null) {
+                Log.w("FRAGMENT", "Create new Fragment: " + backStateName + ", " + frag);
                 //fragment not in back stack, create it.
                 FragmentTransaction transaction = manager.beginTransaction();
 
@@ -305,12 +328,15 @@ public class MainActivity extends AppCompatActivity implements IDataCallback{
                 }
 
                 transaction.commit();
+
             } else {
-                // custom effect if fragment is already instanciated
+                Log.w("FRAGMENT", "Already instatiated, popped back: " + backStateName);
             }
         } catch (IllegalStateException exception) {
-            Log.w("FRAGMENT", "Unable to commit fragment, could be activity as been killed in background. " + exception.toString());
+            Log.w("FRAGMENT", "Unable to commit fragment, could be activity has been killed in background. " + exception.toString());
         }
     }
+
+
 
 }

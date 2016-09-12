@@ -10,8 +10,10 @@ import android.content.SharedPreferences;
 import android.os.Binder;
 import android.os.IBinder;
 import android.support.v4.app.NotificationCompat;
+import android.support.v4.content.LocalBroadcastManager;
 import android.util.Log;
 
+import com.google.gson.Gson;
 import com.jakewharton.threetenabp.AndroidThreeTen;
 
 import java.util.Iterator;
@@ -35,7 +37,6 @@ public class SensorPlatformService extends Service implements IDataCallback, ITr
     private ImageModule im;
     private UserPhoneBluetoothServer server;
     private TripStartDetector tsDetector;
-    private IDataCallback appCallback;
 
     private final IBinder mBinder = new LocalBinder();
 
@@ -55,12 +56,7 @@ public class SensorPlatformService extends Service implements IDataCallback, ITr
     public SensorPlatformService() {}
 
     public SensorPlatformService(Context c, IDataCallback app) {
-        setAppCallback(app);
         setup();
-    }
-
-    public void setAppCallback(IDataCallback app) {
-        this.appCallback = app;
     }
 
     private void setup() {
@@ -75,12 +71,13 @@ public class SensorPlatformService extends Service implements IDataCallback, ITr
         this.lm = new LoggingModule();
 
         this.im = new ImageModule(this, getApplication());
-        this.server = new UserPhoneBluetoothServer(getApplication());
+        //this.server = new UserPhoneBluetoothServer(getApplication());
 
     }
 
     public void startWaitBehaviour() {
         tsDetector = new TripStartDetector(getApplication(), this);
+        serviceRunning = true;
     }
 
     @Override
@@ -143,8 +140,6 @@ public class SensorPlatformService extends Service implements IDataCallback, ITr
 
         //TODO
         subscribeTo(DataType.WEATHER);
-
-        serviceRunning = true;
     }
 
     public boolean subscribeTo(DataType type) {
@@ -195,8 +190,10 @@ public class SensorPlatformService extends Service implements IDataCallback, ITr
 
     @Override
     public void onRawData(DataVector dv) {
-        if(appCallback != null)
-            appCallback.onRawData(dv);
+
+        Intent raw = new Intent("mnefzger.de.sensorplatform.RawData");
+        raw.putExtra("RawData", new Gson().toJson(dv));
+        sendBroadcast(raw);
 
         if(ActiveSubscriptions.rawLoggingActive()) {
             lm.writeRawToCSV(dv);
@@ -217,8 +214,9 @@ public class SensorPlatformService extends Service implements IDataCallback, ITr
             lm.writeEventToCSV(ev);
         }
 
-        if(appCallback != null)
-            appCallback.onEventData(ev);
+        Intent event = new Intent("mnefzger.de.sensorplatform.EventData");
+        event.putExtra("EventData", new Gson().toJson(ev));
+        sendBroadcast(event);
 
     }
 
@@ -280,12 +278,12 @@ public class SensorPlatformService extends Service implements IDataCallback, ITr
 
     @Override
     public void onDestroy() {
-        Log.d("SENSOR PLATFORM", "Destroy Service");
+        Log.d("SENSOR PLATFORM SERVICE", "Destroy Service");
         super.onDestroy();
     }
 
     public void stopService() {
-        Log.d("SENSOR PLATFORM", "Stop Service");
+        Log.d("SENSOR PLATFORM SERVICE", "Stop Service");
         Iterator<Subscription> it = ActiveSubscriptions.get().iterator();
         while(it.hasNext()) {
             Subscription sub = it.next();

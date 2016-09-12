@@ -2,14 +2,22 @@ package mnefzger.de.sensorplatform.UI;
 
 
 import android.app.Activity;
+import android.bluetooth.BluetoothDevice;
+import android.content.BroadcastReceiver;
+import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
+
+import com.google.gson.Gson;
 
 import java.text.DecimalFormat;
 
@@ -17,11 +25,15 @@ import mnefzger.de.sensorplatform.Core.ActiveSubscriptions;
 import mnefzger.de.sensorplatform.Core.DataVector;
 import mnefzger.de.sensorplatform.Core.EventVector;
 import mnefzger.de.sensorplatform.Core.MainActivity;
+import mnefzger.de.sensorplatform.External.OBD2Connection;
 import mnefzger.de.sensorplatform.R;
 import mnefzger.de.sensorplatform.Core.SensorPlatformService;
 
 
 public class AppFragment extends Fragment {
+
+    RelativeLayout dataLayout;
+    TextView waitingText;
 
     TextView accX;
     TextView accY;
@@ -51,9 +63,10 @@ public class AppFragment extends Fragment {
     Button pauseButton;
     Button resumeButton;
 
-    Activity main;
-
     DecimalFormat df = new DecimalFormat("#.####");
+
+    boolean rawRegistered = false;
+    boolean eventRegistered = false;
 
     public AppFragment() {
         // Required empty public constructor
@@ -64,10 +77,18 @@ public class AppFragment extends Fragment {
         super.onCreate(savedInstanceState);
         setRetainInstance(true);
 
-        main = getActivity();
-
     }
 
+
+    private void registerReceivers() {
+        IntentFilter f = new IntentFilter("mnefzger.de.sensorplatform.RawData");
+        rawRegistered = true;
+        getActivity().registerReceiver(rawReceiver, f);
+
+        IntentFilter f2 = new IntentFilter("mnefzger.de.sensorplatform.EventData");
+        eventRegistered = true;
+        getActivity().registerReceiver(eventReceiver, f2);
+    }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -78,6 +99,9 @@ public class AppFragment extends Fragment {
         }
 
         View v = inflater.inflate(R.layout.fragment_app, container, false);
+
+        dataLayout = (RelativeLayout) v.findViewById(R.id.dataLayout);
+        waitingText = (TextView) v.findViewById(R.id.waiting_text);
 
         accX = (TextView) v.findViewById(R.id.accXText);
         accY = (TextView) v.findViewById(R.id.accYText);
@@ -123,7 +147,9 @@ public class AppFragment extends Fragment {
             resumeButton.setEnabled(false);
             pauseButton.setEnabled(false);
 
-            MainActivity app = (MainActivity)getActivity();
+            MainActivity app = (MainActivity) getActivity();
+            app.started = false;
+            app.mBound = false;
             app.goToStartFragment(25);
 
         }
@@ -156,7 +182,7 @@ public class AppFragment extends Fragment {
     public void updateUI(DataVector vector) {
         final DataVector v = vector;
 
-        main.runOnUiThread(new Runnable() {
+        getActivity().runOnUiThread(new Runnable() {
             @Override
             public void run() {
                 accX.setText("AccX: " + df.format(v.accX) );
@@ -193,7 +219,7 @@ public class AppFragment extends Fragment {
     public void updateUI(EventVector vector) {
         final EventVector v = vector;
 
-        main.runOnUiThread(new Runnable() {
+        getActivity().runOnUiThread(new Runnable() {
             @Override
             public void run() {
                 if (v.getEventDescription().contains("ROAD"))
@@ -202,11 +228,79 @@ public class AppFragment extends Fragment {
                     face.setText("Face detected: YES");
                 else if (v.getEventDescription().equals("No Face detected"))
                     face.setText("Face detected: NO");
-                else {
+                else if (v.getEventDescription().equals("Trip Start Detected")) {
+                    waitingText.setVisibility(View.INVISIBLE);
+                    dataLayout.setVisibility(View.VISIBLE);
+                } else
                     event.setText("Last event: " + v.getEventDescription() + ", " + df.format(v.getValue()) );
-                }
             }
         });
+    }
+
+    BroadcastReceiver rawReceiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            Bundle b = intent.getExtras();
+            DataVector v = new Gson().fromJson(b.getString("RawData"), DataVector.class);
+
+            Log.d("RawData @ App  ", v.toString());
+
+            if(dataLayout.getVisibility() == View.INVISIBLE) {
+                waitingText.setVisibility(View.INVISIBLE);
+                dataLayout.setVisibility(View.VISIBLE);
+            }
+            
+            updateUI(v);
+        }
+    };
+
+    BroadcastReceiver eventReceiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            Bundle b = intent.getExtras();
+            EventVector v = new Gson().fromJson(b.getString("EventData"), EventVector.class);
+
+            Log.d("EventData @ App  ", v.toString());
+
+            if(dataLayout.getVisibility() == View.INVISIBLE) {
+                waitingText.setVisibility(View.INVISIBLE);
+                dataLayout.setVisibility(View.VISIBLE);
+            }
+
+            updateUI(v);
+        }
+    };
+
+
+    @Override
+    public void onPause() {
+        super.onPause();
+
+        if(rawRegistered) {
+            try {
+                getActivity().unregisterReceiver(rawReceiver);
+                rawRegistered = false;
+            } catch (IllegalArgumentException e) {
+                Log.e("APP FRAGMENT", e.toString());
+            }
+
+        }
+
+        if(eventRegistered) {
+            try {
+                getActivity().unregisterReceiver(eventReceiver);
+                eventRegistered = false;
+            } catch (IllegalArgumentException e) {
+                Log.e("APP FRAGMENT", e.toString());
+            }
+        }
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        if(!rawRegistered || !eventRegistered)
+            registerReceivers();
     }
 
 

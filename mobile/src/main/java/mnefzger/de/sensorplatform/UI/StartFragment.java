@@ -1,5 +1,10 @@
 package mnefzger.de.sensorplatform.UI;
 
+import android.app.ActivityManager;
+import android.content.BroadcastReceiver;
+import android.content.Context;
+import android.content.Intent;
+import android.content.IntentFilter;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.util.Log;
@@ -40,9 +45,10 @@ public class StartFragment extends Fragment {
         newStudy.setOnClickListener(newStudyButtonListener);
         currentStudy.setOnClickListener(currentStudyButtonListener);
 
-        Log.d("START_FRAGMENT", "serviceRunning = " + SensorPlatformService.serviceRunning);
-        if(SensorPlatformService.serviceRunning == false) {
-            currentStudy.setEnabled(false);
+        MainActivity app = (MainActivity)getActivity();
+        if(app.started) {
+            currentStudy.setEnabled(true);
+            Log.d("START_FRAGMENT", "serviceRunning = true");
         }
 
         return v;
@@ -63,5 +69,6 @@ public class StartFragment extends Fragment {
             app.goToAppFragment();
         }
     };
+
 
 }

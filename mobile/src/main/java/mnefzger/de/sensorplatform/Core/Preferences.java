@@ -417,7 +417,7 @@ public class Preferences {
     }
 
     public static int getVideoResolution(SharedPreferences prefs) {
-        String valueString = prefs.getString(VIDEO_RESOLUTION, "640");
+        String valueString = prefs.getString(VIDEO_RESOLUTION, "320");
 
         int value = context.getResources().getInteger(R.integer.video_resolution);
 

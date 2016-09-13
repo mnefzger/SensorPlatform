@@ -251,7 +251,8 @@ public class AppFragment extends Fragment {
                 dataLayout.setVisibility(View.VISIBLE);
             }
 
-            updateUI(v);
+            if(getActivity() != null)
+                updateUI(v);
         }
     };
 
@@ -268,7 +269,8 @@ public class AppFragment extends Fragment {
                 dataLayout.setVisibility(View.VISIBLE);
             }
 
-            updateUI(v);
+            if(getActivity() != null)
+                updateUI(v);
         }
     };
 

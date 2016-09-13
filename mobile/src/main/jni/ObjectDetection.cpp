@@ -6,19 +6,21 @@
 #include "opencv2/objdetect/objdetect.hpp"
 #include "opencv2/highgui/highgui.hpp"
 #include "opencv2/imgproc/imgproc.hpp"
+#include "IPM.h"
 
 #define  LOG_TAG    "Object_Detection_Native"
 #define  LOGI(...)  __android_log_print(ANDROID_LOG_INFO,LOG_TAG,__VA_ARGS__)
 #define  LOGE(...)  __android_log_print(ANDROID_LOG_ERROR,LOG_TAG,__VA_ARGS__)
 
+using namespace cv;
+using namespace std;
+
 extern "C" {
     JNIEXPORT jintArray Java_mnefzger_de_sensorplatform_Processors_ImageProcessor_nAsmFindFace(JNIEnv *env, jobject obj, jlong address, jlong returnadress);
     JNIEXPORT jintArray Java_mnefzger_de_sensorplatform_Processors_ImageProcessor_nAsmFindCars(JNIEnv *env, jobject obj, jlong address, jlong returnadress);
     JNIEXPORT jint Java_mnefzger_de_sensorplatform_Processors_ImageProcessor_nInitCascades(JNIEnv *env, jobject obj);
+    cv::Mat getIPMImage( const Mat& _inputImg );
 }
-
-using namespace cv;
-using namespace std;
 
 CascadeClassifier faceCascadeHaar;
 CascadeClassifier faceCascadeLBP;
@@ -120,6 +122,9 @@ JNIEXPORT jintArray Java_mnefzger_de_sensorplatform_Processors_ImageProcessor_nA
     Rect region_of_interest = Rect(30,40,260,190);
     Mat roi = gray_small(region_of_interest);
 
+    //Mat output = getIPMImage(roi);
+
+
     vector< Rect > cars;
     vehicleCascadeHaar.detectMultiScale( roi, cars, 1.06, 2, 0, Size(5, 5) );
 
@@ -139,7 +144,7 @@ JNIEXPORT jintArray Java_mnefzger_de_sensorplatform_Processors_ImageProcessor_nA
 
         /*
         * uncomment this block to draw the distance on the images
-        *
+        */
         double sensor_width = 6.17; //mm
         double f = 4.67; //mm
         int img_width = 320; //pixel
@@ -150,7 +155,7 @@ JNIEXPORT jintArray Java_mnefzger_de_sensorplatform_Processors_ImageProcessor_nA
         std::stringstream s;
         s << distance_to_car;
         putText(gray_small, s.str(), Point(cars[i].x, cars[i].y+1.3*cars[i].height), FONT_HERSHEY_SIMPLEX, 0.3, Scalar(255,255,255), 1);
-        */
+
     }
 
     Mat bgr(gray_small.rows, gray_small.cols, CV_8UC3);
@@ -163,9 +168,33 @@ JNIEXPORT jintArray Java_mnefzger_de_sensorplatform_Processors_ImageProcessor_nA
     mat->create(yuv.rows, yuv.cols, CV_8UC1);
     memcpy(mat->data, yuv.data, mat->rows * mat->cols );
 
-
     return result;
 }
 
+cv::Mat getIPMImage(const Mat& _inputImg) {
+    Mat output;
+
+    int width = 320;
+    int height = 240;
+
+    // The 4-points at the input image
+    vector<Point2f> origPoints;
+   	origPoints.push_back( Point2f(0, height) );
+   	origPoints.push_back( Point2f(width, height) );
+   	origPoints.push_back( Point2f(width/2+30, 120) );
+   	origPoints.push_back( Point2f(width/2-30, 120) );
+
+    // The 4-points correspondences in the destination image
+   	vector<Point2f> dstPoints;
+   	dstPoints.push_back( Point2f(0, height) );
+   	dstPoints.push_back( Point2f(width, height) );
+   	dstPoints.push_back( Point2f(width, 0) );
+   	dstPoints.push_back( Point2f(0, 0) );
+
+   	IPM ipm( Size(width, height), Size(width, height), origPoints, dstPoints );
+   	ipm.applyHomography( _inputImg, output );
+
+   	return output;
+}
 
 

@@ -23,6 +23,7 @@ import android.support.v4.app.ActivityCompat;
 import android.util.Log;
 import android.util.SparseArray;
 
+import org.opencv.core.Core;
 import org.opencv.core.CvType;
 import org.opencv.core.Mat;
 import org.opencv.core.Size;
@@ -370,7 +371,7 @@ public class ImageModule implements IEventCallback{
                 mBackgroundHandler.post(new Runnable() {
                     @Override
                     public void run() {
-                        imgProc.processImageBack(bytes, w, h);
+                       // imgProc.processImageBack(bytes, w, h);
                     }
                 });
                 /*byte[] processedImg = imgProc.processImageBack(bytes.clone(), w, h);
@@ -495,6 +496,8 @@ public class ImageModule implements IEventCallback{
                             Imgproc.cvtColor(imgMat, gray, Imgproc.COLOR_YUV2GRAY_I420);
                             Mat rgbMat = new Mat(h,w,CvType.CV_8UC3);
                             Imgproc.cvtColor(gray, rgbMat, Imgproc.COLOR_GRAY2RGB);
+
+                            Core.flip(rgbMat, rgbMat, -1);
 
                             videoWriter.write(rgbMat);
                             rgbMat.release();

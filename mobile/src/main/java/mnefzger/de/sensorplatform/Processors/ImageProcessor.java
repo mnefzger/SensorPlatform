@@ -21,7 +21,7 @@ import mnefzger.de.sensorplatform.Core.ImageModule;
 /**
  * This class includes all image analysis functions for
  * a. face detection
- * b. car detection and following distance calculation (TODO)
+ * b. car detection and following distance calculation
  */
 
 public class ImageProcessor{
@@ -116,7 +116,7 @@ public class ImageProcessor{
         int[] cars = nAsmFindCars(adress1, adress2);
         Log.d("CAR_DETECTION_FRAME", System.currentTimeMillis()-time + "");
 
-        if(cars.length > 0) {
+        if(cars != null && cars.length > 0) {
             Log.d("CAR_DETECTION", "Detected " +  cars.length/4 + " cars");
             callback.onEventDetected(new EventVector(true, System.currentTimeMillis(), "Cars detected", cars.length/4));
 
@@ -136,6 +136,10 @@ public class ImageProcessor{
         return cars;
     }
 
+    /**
+     * Calculates the following distance based on the car's pixel width
+     * The hardcoded values are for a Google Nexus 6P, replace if another phone is used
+     */
     private void calculateDist(int pixel_width) {
         double sensor_width = 6.17; //mm
         double f = 4.67; //mm

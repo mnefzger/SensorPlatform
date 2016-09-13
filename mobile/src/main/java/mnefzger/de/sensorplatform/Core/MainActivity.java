@@ -141,8 +141,8 @@ public class MainActivity extends AppCompatActivity {
         startService(startIntent);
         started = true;
 
-        sPS.startWaitBehaviour();
-        //sPS.subscribe();
+        //sPS.startWaitBehaviour();
+        sPS.subscribe();
     }
 
     private void doUnbindService() {

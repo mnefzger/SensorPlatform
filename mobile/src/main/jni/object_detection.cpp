@@ -117,8 +117,11 @@ JNIEXPORT jintArray Java_mnefzger_de_sensorplatform_Processors_ImageProcessor_nA
     Mat gray_small(240, 320, gray.depth());
     resize(gray, gray_small, size);
 
+    Rect region_of_interest = Rect(30,40,260,190);
+    Mat roi = gray_small(region_of_interest);
+
     vector< Rect > cars;
-    vehicleCascadeHaar.detectMultiScale( gray_small, cars, 1.06, 2, 0, Size(5, 5) );
+    vehicleCascadeHaar.detectMultiScale( roi, cars, 1.06, 2, 0, Size(5, 5) );
 
     result = env->NewIntArray(4 * cars.size());
 
@@ -132,7 +135,7 @@ JNIEXPORT jintArray Java_mnefzger_de_sensorplatform_Processors_ImageProcessor_nA
 
 		env->SetIntArrayRegion(result, i*4, 4, tmp_array);
 
-        rectangle(gray_small, cars[i], CV_RGB(255, 255, 255), 1);
+        rectangle(roi, cars[i], CV_RGB(255, 255, 255), 1);
 
         /*
         * uncomment this block to draw the distance on the images

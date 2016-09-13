@@ -200,13 +200,17 @@ public class SensorPlatformService extends Service implements IDataCallback, ITr
         }
     }
 
+    long lastSave = System.currentTimeMillis();
     @Override
     public void onEventData(EventVector ev) {
         if(Preferences.videoSavingActivated(setting_prefs) && !ev.isDebug()) {
-            // Check if a video is currently being saved...
-            if(!im.isSaving()) {
+            long now = System.currentTimeMillis();
+
+            // Check if a video is currently being saved or the last save was less than 1 second ago
+            if(!im.isSaving() && (now - lastSave) > 1000) {
                 im.saveVideoAfterEvent(ev);
                 ev.setVideoName("Video-" + ev.getTimestamp() + ".avi");
+                lastSave = now;
             }
         }
 

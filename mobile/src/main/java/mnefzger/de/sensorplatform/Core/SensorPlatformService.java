@@ -193,7 +193,7 @@ public class SensorPlatformService extends Service implements IDataCallback, ITr
 
         Intent raw = new Intent("mnefzger.de.sensorplatform.RawData");
         raw.putExtra("RawData", new Gson().toJson(dv));
-        sendBroadcast(raw);
+        LocalBroadcastManager.getInstance(getApplicationContext()).sendBroadcast(raw);
 
         if(ActiveSubscriptions.rawLoggingActive()) {
             lm.writeRawToCSV(dv);
@@ -216,7 +216,7 @@ public class SensorPlatformService extends Service implements IDataCallback, ITr
 
         Intent event = new Intent("mnefzger.de.sensorplatform.EventData");
         event.putExtra("EventData", new Gson().toJson(ev));
-        sendBroadcast(event);
+        LocalBroadcastManager.getInstance(getApplicationContext()).sendBroadcast(event);
 
     }
 

@@ -31,7 +31,9 @@ public class DataVector {
     /**
      * vehicle location in lat, lon
      */
-    public Location location;
+    //public Location location;
+    public double lat;
+    public double lon;
     /**
      * vehicle speed in km/h
      */
@@ -80,8 +82,10 @@ public class DataVector {
         this.rotMatrix = matrix;
     }
 
-    public void setLocation(Location l) {
-        this.location = l;
+    public void setLocation(double lat, double lon) {
+        //this.location = l;
+        this.lat = lat;
+        this.lon = lon;
     }
 
     public void setSpeed(double s) {
@@ -116,8 +120,8 @@ public class DataVector {
     }
 
     public String toCSVString() {
-        double lat = (location == null) ? 0 : location.getLatitude();
-        double lon = (location == null) ? 0 : location.getLongitude();
+        //double lat = (location == null) ? 0 : location.getLatitude();
+        //double lon = (location == null) ? 0 : location.getLongitude();
         return timestamp + ";" + dateTime + ";" + accX + ";" + accY + ";" + accZ + ";" +
                 rotX + ";" + rotY + ";" + rotZ + ";" + light + ";" +
                 lat + ";" + lon + ";" + speed + ";" + obdSpeed + ";" + rpm + ";" + fuel + ";" + heartRate + ";" + weather;

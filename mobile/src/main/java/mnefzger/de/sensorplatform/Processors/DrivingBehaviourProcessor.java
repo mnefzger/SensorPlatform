@@ -168,10 +168,10 @@ public class DrivingBehaviourProcessor extends EventProcessor implements IOSMRes
     private void checkForSpeeding(DataVector last) {
         long now = System.currentTimeMillis();
         // without location, there is nothing to process
-        if( last.location != null && !(last.location.getLatitude() == 0 && last.location.getLongitude() == 0) ) {
+        if( !(last.lat == 0 && last.lon == 0) ) {
             // query every OSM_REQUEST_RATE seconds
             if( now-lastRequest > OSM_REQUEST_RATE ) {
-                qAdapter.startSearchForRoad(last.location);
+                qAdapter.startSearchForRoad(currentVector.lat, currentVector.lon);
                 lastRequest = now;
             }
         }
@@ -190,8 +190,8 @@ public class DrivingBehaviourProcessor extends EventProcessor implements IOSMRes
     private void checkForSpeedingInstant(DataVector last) {
         long now = System.currentTimeMillis();
 
-        if( last.location != null ) {
-            qAdapter.startSearchForRoad(last.location);
+        if( last.lat != 0 && last.lon != 0 ) {
+            qAdapter.startSearchForRoad(currentVector.lat, currentVector.lon);
             lastRequest = now;
         }
     }
@@ -209,7 +209,7 @@ public class DrivingBehaviourProcessor extends EventProcessor implements IOSMRes
         OSMRespone.Element road = getCurrentRoad(response);
         if(road != null) {
             lastRecognizedRoad = road;
-            qAdapter.startSearchForSpeedLimit(currentVector.location);
+            qAdapter.startSearchForSpeedLimit(currentVector.lat, currentVector.lon);
             callback.onEventDetected(new EventVector(true, System.currentTimeMillis(), "ROAD: You are on " + lastRecognizedRoad.tags.name, 0));
         } else {
             lastRecognizedRoad = null;
@@ -330,7 +330,7 @@ public class DrivingBehaviourProcessor extends EventProcessor implements IOSMRes
         OSMRespone.Element near_node2 = closest[1];
 
         // now, we calculate the distance between our position and the line between the two nearest nodes
-        distance = MathFunctions.calculateDistanceToLine(near_node1.lat, near_node1.lon, near_node2.lat, near_node2.lon, currentVector.location.getLatitude(), currentVector.location.getLongitude());
+        distance = MathFunctions.calculateDistanceToLine(near_node1.lat, near_node1.lon, near_node2.lat, near_node2.lon, currentVector.lat, currentVector.lon);
         Log.d("DISTANCE", "Distance to " + element.tags.name +":" + distance);
 
         return distance;
@@ -359,7 +359,7 @@ public class DrivingBehaviourProcessor extends EventProcessor implements IOSMRes
                 }
             }
 
-            double temp_dist = MathFunctions.calculateDistance(el.lat, el.lon, currentVector.location.getLatitude(), currentVector.location.getLongitude());
+            double temp_dist = MathFunctions.calculateDistance(el.lat, el.lon, currentVector.lat, currentVector.lon);
 
             if(temp_dist < min_dist2) {
                 if(temp_dist < min_dist1) {
@@ -400,18 +400,18 @@ public class DrivingBehaviourProcessor extends EventProcessor implements IOSMRes
         OSMRespone.Element near_node1 = closest[0];
         OSMRespone.Element near_node2 = closest[1];
 
-        Log.d("CLOSE", near_node1.lat + "," + near_node1.lon + "; " + near_node2.lat + "," + near_node2.lon);
-        Log.d("CLOSE", currentVector.location.getLatitude() + "," + currentVector.location.getLongitude() + "; " + previousVector.location.getLatitude() + "," + previousVector.location.getLongitude());
+        //Log.d("CLOSE", near_node1.lat + "," + near_node1.lon + "; " + near_node2.lat + "," + near_node2.lon);
+        //Log.d("CLOSE", currentVector.location.getLatitude() + "," + currentVector.location.getLongitude() + "; " + previousVector.location.getLatitude() + "," + previousVector.location.getLongitude());
 
         double[] delta_nodes = {(near_node1.lat - near_node2.lat), (near_node1.lon - near_node2.lon)};
 
-        double[] delta_pos = {( previousVector.location.getLatitude() - currentVector.location.getLatitude()),
-                               (previousVector.location.getLongitude() - currentVector.location.getLongitude())};
+        double[] delta_pos = {( previousVector.lat - currentVector.lat),
+                               (previousVector.lon - currentVector.lon)};
 
         double cos = MathFunctions.cosVectors(delta_nodes, delta_pos);
         double angle = Math.acos(cos) * (180/Math.PI);
 
-        Log.d("ANGLE", delta_nodes[0]+","+delta_nodes[1]+ "; " + delta_pos[0]+","+delta_pos[1] + "; " + angle);
+        //Log.d("ANGLE", delta_nodes[0]+","+delta_nodes[1]+ "; " + delta_pos[0]+","+delta_pos[1] + "; " + angle);
 
         if(angle <= 90) {
             return DIRECTION.FORWARD;
@@ -425,7 +425,7 @@ public class DrivingBehaviourProcessor extends EventProcessor implements IOSMRes
     /**
      * Monstrosity of a method
      * There is probably a smarter way to do it
-     * Returns the closest SpeedSign that lies ahead
+     * Returns the closest SpeedSign in the direction of driving
      */
 
     private OSMRespone.Element[] findRelevantSpeedSign(SparseArray<OSMRespone.Element> speedLimits) {
@@ -440,8 +440,8 @@ public class DrivingBehaviourProcessor extends EventProcessor implements IOSMRes
             }
         }
 
-        double lat = currentVector.location.getLatitude();
-        double lon = currentVector.location.getLongitude();
+        double lat = currentVector.lat;
+        double lon = currentVector.lon;
 
         double minDist = 10000;
         int index = 0;

@@ -9,6 +9,7 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.support.v4.content.LocalBroadcastManager;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -83,11 +84,11 @@ public class AppFragment extends Fragment {
     private void registerReceivers() {
         IntentFilter f = new IntentFilter("mnefzger.de.sensorplatform.RawData");
         rawRegistered = true;
-        getActivity().registerReceiver(rawReceiver, f);
+        LocalBroadcastManager.getInstance(getActivity()).registerReceiver(rawReceiver, f);
 
         IntentFilter f2 = new IntentFilter("mnefzger.de.sensorplatform.EventData");
         eventRegistered = true;
-        getActivity().registerReceiver(eventReceiver, f2);
+        LocalBroadcastManager.getInstance(getActivity()).registerReceiver(eventReceiver, f2);
     }
 
     @Override
@@ -195,14 +196,14 @@ public class AppFragment extends Fragment {
 
                 light.setText("Light: " + df.format(v.light) + " lumen");
 
-                if(v.location == null && ActiveSubscriptions.usingGPS()) {
+                if(v.lat == 0 && ActiveSubscriptions.usingGPS()) {
                     lat.setText("Lat: Acquiring position…");
                     lon.setText("Lon: Acquiring position…");
                     speed.setText("Speed: Acquiring position…");
                 }
-                if(v.location != null && ActiveSubscriptions.usingGPS()) {
-                    lat.setText("Lat: " + df.format( v.location.getLatitude() ));
-                    lon.setText("Lon: " + df.format( v.location.getLongitude() ));
+                if(v.lat != 0 && ActiveSubscriptions.usingGPS()) {
+                    lat.setText("Lat: " + df.format( v.lat ));
+                    lon.setText("Lon: " + df.format( v.lon ));
                     speed.setText("Speed: " + df.format(v.speed) + " km/h");
                 }
 
@@ -249,7 +250,7 @@ public class AppFragment extends Fragment {
                 waitingText.setVisibility(View.INVISIBLE);
                 dataLayout.setVisibility(View.VISIBLE);
             }
-            
+
             updateUI(v);
         }
     };
@@ -278,7 +279,7 @@ public class AppFragment extends Fragment {
 
         if(rawRegistered) {
             try {
-                getActivity().unregisterReceiver(rawReceiver);
+                LocalBroadcastManager.getInstance(getActivity()).unregisterReceiver(rawReceiver);
                 rawRegistered = false;
             } catch (IllegalArgumentException e) {
                 Log.e("APP FRAGMENT", e.toString());
@@ -288,7 +289,7 @@ public class AppFragment extends Fragment {
 
         if(eventRegistered) {
             try {
-                getActivity().unregisterReceiver(eventReceiver);
+                LocalBroadcastManager.getInstance(getActivity()).unregisterReceiver(eventReceiver);
                 eventRegistered = false;
             } catch (IllegalArgumentException e) {
                 Log.e("APP FRAGMENT", e.toString());

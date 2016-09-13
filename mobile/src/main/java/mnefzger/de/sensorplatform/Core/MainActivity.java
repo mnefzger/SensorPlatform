@@ -227,31 +227,11 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-
     public void goToAppFragment() {
         this.appFragment = new AppFragment();
         changeFragment(this.appFragment, true, true);
 
         this.setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_REVERSE_LANDSCAPE);
-    }
-
-    private Fragment getCurrentFragment() {
-        FragmentManager fragmentManager = getSupportFragmentManager();
-        int stackCount = fragmentManager.getBackStackEntryCount();
-        if( fragmentManager.getFragments() != null ) return fragmentManager.getFragments().get( stackCount > 0 ? stackCount-1 : stackCount );
-        else return null;
-    }
-
-    private Fragment findFragmentInStack(String name) {
-        String frag;
-        for(int i=1; i<getSupportFragmentManager().getBackStackEntryCount(); i++) {
-            frag = getSupportFragmentManager().getBackStackEntryAt(getSupportFragmentManager().getBackStackEntryCount() - i).getName();
-            Log.d("FRAGMENT", frag);
-            if( frag.equals(name) ) {
-                return getSupportFragmentManager().findFragmentByTag(frag);
-            }
-        }
-        return null;
     }
 
     public void goToNewStudyFragment() {

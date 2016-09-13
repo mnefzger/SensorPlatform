@@ -13,6 +13,7 @@ import com.android.volley.toolbox.Volley;
 import com.google.gson.Gson;
 
 import mnefzger.de.sensorplatform.Utilities.OSMRespone;
+import mnefzger.de.sensorplatform.Utilities.VolleyQueue;
 import mnefzger.de.sensorplatform.Utilities.WeatherResponse;
 
 /**
@@ -25,7 +26,8 @@ public class WeatherProvider extends DataProvider{
     private final String BASE_URL = "https://query.yahooapis.com/v1/public/yql?q=select%20*%20from%20weather.forecast%20where%20woeid%20in%20(SELECT%20woeid%20FROM%20geo.places%20WHERE%20text%3D%22(LATITUDE%2CLONGITUDE)%22)&format=json&env=store%3A%2F%2Fdatatables.org%2Falltableswithkeys";
     private boolean running = false;
 
-    private Location current = null;
+    private Double currentLat = null;
+    private Double currentLon = null;
 
     private boolean first = true;
 
@@ -51,10 +53,11 @@ public class WeatherProvider extends DataProvider{
         running = false;
     }
 
-    public void updateLocation(Location loc) {
-        this.current = loc;
+    public void updateLocation(double lat, double lon) {
+        this.currentLat = lat;
+        this.currentLon = lon;
         if(first){
-            queryWeather();
+            //queryWeather();
             first = false;
         }
     }
@@ -64,8 +67,9 @@ public class WeatherProvider extends DataProvider{
                 new java.util.TimerTask() {
                     @Override
                     public void run() {
-                        if(current != null)
+                        if(currentLat != null) {
                             queryWeather();
+                        }
 
                         if(running)
                            getWeatherPeriodically();
@@ -77,10 +81,9 @@ public class WeatherProvider extends DataProvider{
 
     private void queryWeather() {
         Log.d("WEATHER", "Queried Weather");
-        RequestQueue queue = Volley.newRequestQueue(context);
 
-        String url = BASE_URL.replace("LATITUDE", current.getLatitude() + "");
-        url = url.replace("LONGITUDE", current.getLongitude() + "");
+        String url = BASE_URL.replace("LATITUDE", currentLat + "");
+        url = url.replace("LONGITUDE", currentLon + "");
         Log.d("VOLLEY", url);
 
         // Request a string response from the provided URL.
@@ -88,8 +91,10 @@ public class WeatherProvider extends DataProvider{
                 new Response.Listener<String>() {
                     @Override
                     public void onResponse(String response) {
+                        Log.d("WEATHER", "Trying to parse..." + response);
                         Gson gson = new Gson();
                         WeatherResponse weatherResponse = gson.fromJson(response, WeatherResponse.class);
+                        Log.d("WEATHER", "Successfully parsed weather :((( ");
                         processResponse(weatherResponse);
                     }
                 }, new Response.ErrorListener() {
@@ -99,7 +104,7 @@ public class WeatherProvider extends DataProvider{
             }
         });
 
-        queue.add(stringRequest);
+        VolleyQueue.getInstance(context).add(stringRequest);
     }
 
     private void processResponse(WeatherResponse res) {

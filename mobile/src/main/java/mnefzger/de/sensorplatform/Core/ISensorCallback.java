@@ -9,7 +9,7 @@ public interface ISensorCallback {
     // we need float to store the rotation matrix
     void onRotationData(float[][] values);
 
-    void onLocationData(Location location, double speed);
+    void onLocationData(double lat, double lon, double speed);
 
     void onOBD2Data(double[] values);
 

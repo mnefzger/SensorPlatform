@@ -9,10 +9,15 @@ import android.location.Location;
 import android.support.v4.app.ActivityCompat;
 import android.util.Log;
 
+import com.android.volley.Cache;
+import com.android.volley.Network;
 import com.android.volley.Request;
 import com.android.volley.RequestQueue;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
+import com.android.volley.toolbox.BasicNetwork;
+import com.android.volley.toolbox.DiskBasedCache;
+import com.android.volley.toolbox.HurlStack;
 import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
 import com.google.gson.Gson;
@@ -22,26 +27,28 @@ public class OSMQueryAdapter {
     Context context;
     IOSMResponse callback;
 
+
     public OSMQueryAdapter(IOSMResponse caller, Context context) {
         this.context = context;
         this.callback = caller;
+
     }
 
-    public void startSearchForRoad(Location location) {
+    public void startSearchForRoad(double lat, double lon) {
         int permission = ActivityCompat.checkSelfPermission(context, Manifest.permission.ACCESS_FINE_LOCATION);
         if(permission == PackageManager.PERMISSION_GRANTED) {
-            double lat_w = location.getLatitude() - 0.001;
-            double lon_s = location.getLongitude() - 0.001;
-            double lat_e = location.getLatitude() + 0.001;
-            double lon_n = location.getLongitude() + 0.001;
+            double lat_w = lat - 0.001;
+            double lon_s = lon - 0.001;
+            double lat_e = lat + 0.001;
+            double lon_n = lon + 0.001;
 
             //search(generateSearchStringBounding(lat_w, lon_s, lat_e, lon_n));
-            search(generateSearchStringRadius(15, location.getLatitude(), location.getLongitude()), "Road");
+            search(generateSearchStringRadius(15, lat, lon), "Road");
         }
     }
 
-    public void startSearchForSpeedLimit(Location location) {
-        search(generateSearchStringSpeed(300, location.getLatitude(), location.getLongitude()), "Speed");
+    public void startSearchForSpeedLimit(double lat, double lon) {
+        search(generateSearchStringSpeed(300, lat, lon), "Speed");
     }
 
     private String generateSearchStringBounding(double lat_w, double lon_s, double lat_e, double lon_n) {
@@ -77,7 +84,6 @@ public class OSMQueryAdapter {
     }
 
     private void search(String url, String m) {
-        RequestQueue queue = Volley.newRequestQueue(context);
         final String mode = m;
 
         Log.d("VOLLEY", url);
@@ -87,12 +93,14 @@ public class OSMQueryAdapter {
                 new Response.Listener<String>() {
                     @Override
                     public void onResponse(String response) {
+                        String temp = response;
+
                         // variable names can not have colons
-                        response = response.replace("maxspeed:forward", "maxspeed_forward");
-                        response = response.replace("maxspeed:backward", "maxspeed_backward");
+                        temp = temp.replace("maxspeed:forward", "maxspeed_forward");
+                        temp = temp.replace("maxspeed:backward", "maxspeed_backward");
 
                         Gson gson = new Gson();
-                        OSMRespone osmR = gson.fromJson(response, OSMRespone.class);
+                        OSMRespone osmR = gson.fromJson(temp, OSMRespone.class);
                         if(mode == "Road") callback.onOSMRoadResponseReceived(osmR);
                         if(mode == "Speed") callback.onOSMSpeedResponseReceived(osmR);
                     }
@@ -103,8 +111,8 @@ public class OSMQueryAdapter {
             }
         });
 
-        // Add the request to the RequestQueue
-        queue.add(stringRequest);
+        // Add the request to the VolleyQueue
+        VolleyQueue.getInstance(context).add(stringRequest);
     }
 
 

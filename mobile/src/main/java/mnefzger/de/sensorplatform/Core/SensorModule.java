@@ -214,19 +214,18 @@ public class SensorModule implements ISensorCallback, IEventCallback{
         }
     }
 
-    double lon = 153.015858;
-    double lat = -27.447945;
+    double lon = 152.97542002;
+    double lat = -26.98606427;
     private void aggregateData(final int ms) {
         DataVector last = current;
 
-/*
-        Location mock = new Location("mock");
+        /*Location mock = new Location("mock");
         mock.setLongitude(lon);
         mock.setLatitude(lat);
         last.setLocation(mock);
         lon -= 0.00001;
         lat += 0.00001;
-*/
+        weather.updateLocation(mock);*/
 
         current = new DataVector();
 
@@ -239,7 +238,7 @@ public class SensorModule implements ISensorCallback, IEventCallback{
             current.setAcc(0,0,0);
             current.setRotMatrix(last.rotMatrix);
             current.setLight(last.light);
-            current.setLocation(null);
+            current.setLocation(last.lat, last.lon);
             current.setSpeed(0);
             current.setOBDSpeed(last.obdSpeed);
             current.setRPM(last.rpm);
@@ -308,11 +307,12 @@ public class SensorModule implements ISensorCallback, IEventCallback{
     }
 
     @Override
-    public void onLocationData(Location location, double speed) {
-        current.setLocation(location);
+    public void onLocationData(double lat, double lon, double speed) {
+        current.setLocation(lat, lon);
         current.setSpeed(speed);
         // the WeatherProvider needs the most recent location for queries
-        weather.updateLocation(location);
+        if(weather != null)
+            weather.updateLocation(lat, lon);
     }
 
     @Override

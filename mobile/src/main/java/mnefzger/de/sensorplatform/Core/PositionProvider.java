@@ -58,8 +58,14 @@ public class PositionProvider extends DataProvider implements LocationListener{
 
     @Override
     public void onLocationChanged(Location location) {
-        double speed = 0;
-        double currentTime = System.currentTimeMillis();
+        double speed = calculateSpeed(location);
+
+        callback.onLocationData(location.getLatitude(), location.getLongitude(), speed);
+    }
+
+    private double calculateSpeed(Location location) {
+        long currentTime = System.currentTimeMillis();
+        double speed = -1;
 
         if(lastLocation != null) {
             double distance = MathFunctions.calculateDistance(location.getLatitude(), location.getLongitude(), lastLocation.getLatitude(), lastLocation.getLongitude());
@@ -76,13 +82,13 @@ public class PositionProvider extends DataProvider implements LocationListener{
                 lastSpeedValues.set(lastSpeedValues.size()-1, speed);
             }
 
-
             if(lastSpeedValues.size() > 5) lastSpeedValues.remove(0);
         }
+
         lastLocation = location;
         lastTimestamp = currentTime;
 
-        callback.onLocationData(location, speed);
+        return speed;
     }
 
     @Override

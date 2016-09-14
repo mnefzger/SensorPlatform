@@ -21,6 +21,7 @@ import mnefzger.de.sensorplatform.External.OBD2Connection;
 import mnefzger.de.sensorplatform.R;
 import mnefzger.de.sensorplatform.UI.AppFragment;
 import mnefzger.de.sensorplatform.UI.OBDSetupFragment;
+import mnefzger.de.sensorplatform.UI.SecondPhoneSetupFragment;
 import mnefzger.de.sensorplatform.UI.SensorSetupFragment;
 import mnefzger.de.sensorplatform.UI.SettingsFragment;
 import mnefzger.de.sensorplatform.UI.SetupFirstFragment;
@@ -43,6 +44,7 @@ public class MainActivity extends AppCompatActivity {
     SetupFirstFragment setupFragment;
     SensorSetupFragment sensorsFragment;
     OBDSetupFragment obdFragment;
+    SecondPhoneSetupFragment phoneFragment;
     SettingsFragment settings;
     AppFragment appFragment;
 
@@ -250,6 +252,12 @@ public class MainActivity extends AppCompatActivity {
     public void goToOBDSetupFragment() {
         obdFragment = new OBDSetupFragment();
         changeFragment(obdFragment, true, true);
+        this.setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_UNSPECIFIED);
+    }
+
+    public void goToPhoneSetupFragment() {
+        phoneFragment = new SecondPhoneSetupFragment();
+        changeFragment(phoneFragment, true, true);
         this.setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_UNSPECIFIED);
     }
 

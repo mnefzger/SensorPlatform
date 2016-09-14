@@ -22,11 +22,15 @@ public class UserPhoneBluetoothServer {
 
     private BroadcastReceiver mReceiver;
 
+    private Context c;
+
+    private AcceptThread acceptThread;
+
     public UserPhoneBluetoothServer(Context c) {
-        setupServer(c);
+        this.c = c;
     }
 
-    private void setupServer(Context c) {
+    public void setupServer() {
         bAdapter = BluetoothAdapter.getDefaultAdapter();
         if(!bAdapter.isEnabled())
             bAdapter.enable();
@@ -40,8 +44,13 @@ public class UserPhoneBluetoothServer {
         filter_screen.addAction(BluetoothDevice.ACTION_ACL_DISCONNECTED);
         c.registerReceiver(mReceiver,filter_screen);
 
-        AcceptThread acceptThread = new AcceptThread();
+        acceptThread = new AcceptThread();
         acceptThread.start();
+    }
+
+    public void cancel() {
+        acceptThread.cancel();
+        c.unregisterReceiver(mReceiver);
     }
 
     class ConnectionStatusReceiver extends BroadcastReceiver {
@@ -89,6 +98,7 @@ public class UserPhoneBluetoothServer {
                     // This is a blocking call and will only return on a
                     // successful connection or an exception
                     socket = mmServerSocket.accept();
+                    c.sendBroadcast(new Intent("PHONE_FOUND"));
                 } catch (IOException e) {
                     Log.e("Bluetooth", "accept() failed", e);
                     break;
@@ -109,6 +119,7 @@ public class UserPhoneBluetoothServer {
 
         public void manageConnections(final BluetoothSocket socket) {
             Log.d("INCOMING CONNECTION", socket.getRemoteDevice().getName());
+            c.sendBroadcast(new Intent("PHONE_CONNECTED"));
             BluetoothListener listener = new BluetoothListener();
             listener.listen(socket, handler);
         }

@@ -110,7 +110,7 @@ public class OBDSetupFragment extends Fragment {
         @Override
         public void onClick(View v) {
             MainActivity app = (MainActivity) getActivity();
-            app.goToSettingsFragment();
+            app.goToPhoneSetupFragment();
         }
     };
 

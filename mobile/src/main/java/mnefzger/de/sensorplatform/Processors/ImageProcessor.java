@@ -98,10 +98,10 @@ public class ImageProcessor{
         faceProcRunning = true;
         double time = System.currentTimeMillis();
         int[] faces = nAsmFindFace(adress1, adress2);
-        Log.d("FACE_DETECTION_FRAME", System.currentTimeMillis()-time + "");
+        //Log.d("FACE_DETECTION_FRAME", System.currentTimeMillis()-time + "");
 
         if(faces.length == 4) {
-            Log.d("FACE_DETECTION", "Detected at (" + faces[0] + "," + faces[1]+")");
+            //Log.d("FACE_DETECTION", "Detected at (" + faces[0] + "," + faces[1]+")");
             callback.onEventDetected(new EventVector(true, System.currentTimeMillis(), "Face detected", 0));
         } else {
             callback.onEventDetected(new EventVector(true, System.currentTimeMillis(), "No Face detected", 0));
@@ -114,10 +114,10 @@ public class ImageProcessor{
     private int[] findCarsInImage(long adress1, long adress2) {
         double time = System.currentTimeMillis();
         int[] cars = nAsmFindCars(adress1, adress2);
-        Log.d("CAR_DETECTION_FRAME", System.currentTimeMillis()-time + "");
+        //Log.d("CAR_DETECTION_FRAME", System.currentTimeMillis()-time + "");
 
         if(cars != null && cars.length > 0) {
-            Log.d("CAR_DETECTION", "Detected " +  cars.length/4 + " cars");
+            //Log.d("CAR_DETECTION", "Detected " +  cars.length/4 + " cars");
             callback.onEventDetected(new EventVector(true, System.currentTimeMillis(), "Cars detected", cars.length/4));
 
             int max = 0;

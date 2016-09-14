@@ -6,6 +6,7 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.os.Handler;
 import android.util.Log;
 
 import java.io.IOException;
@@ -17,7 +18,7 @@ import java.io.IOException;
 public class OBD2Connector {
 
     public interface IConnectionEstablished {
-        public void onConnectionEstablished();
+        void onConnectionEstablished();
     }
 
     private Context app;
@@ -26,6 +27,8 @@ public class OBD2Connector {
 
     private boolean receiverRegistered = false;
     private BluetoothAdapter btAdapter;
+
+    private boolean found = false;
 
     BroadcastReceiver mReceiver = new BroadcastReceiver() {
         public void onReceive(Context context, Intent intent) {
@@ -40,6 +43,7 @@ public class OBD2Connector {
                 if(device != null) {
                     if(device.getName() != null && device.getName().equals("OBDII")) {
                         app.sendBroadcast(new Intent("OBD_FOUND"));
+                        found = true;
 
                         OBD2Connection.obd2Device = device;
                         app.unregisterReceiver(mReceiver);
@@ -72,6 +76,23 @@ public class OBD2Connector {
 
         Log.d(TAG, "Start discovery...");
         btAdapter.startDiscovery();
+
+        startTimeout(12000);
+    }
+
+    private void startTimeout(int milliseconds) {
+        Handler h = new Handler();
+        h.postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                if(!found) {
+                    app.sendBroadcast(new Intent("OBD_NOT_FOUND"));
+                    app.unregisterReceiver(mReceiver);
+                    receiverRegistered = false;
+                    btAdapter.cancelDiscovery();
+                }
+            }
+        }, milliseconds);
     }
 
     public void unregisterReceiver() {

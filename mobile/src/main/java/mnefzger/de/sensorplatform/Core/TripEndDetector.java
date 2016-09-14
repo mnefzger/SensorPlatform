@@ -33,7 +33,7 @@ public class TripEndDetector {
             checkInOBD(dv);
 
         boolean location_active = Preferences.locationActivated(sensor_prefs);
-        if(location_active)
+        if(location_active && dv.lat != 0 && dv.lon != 0)
             checkInSpeed(dv);
 
     }

@@ -322,11 +322,12 @@ public class ImageModule implements IEventCallback{
                 });
                 //byte[] processedImg = imgProc.processImage(bytes, img.getWidth(), img.getHeight());
                 //yuvimage = new YuvImage(processedImg, ImageFormat.NV21, img.getWidth(), img.getHeight(), null);
+                //mBackgroundHandler.post( new ImageSaver(yuvimage, "front") );
                 lastFrontProc = now;
             }
 
             /**
-             * Store the received image (either processed or raw) and write it to file
+             * Store the received image (either processed or raw)
              */
             if(now - lastFront >= (1000/(1+FRONT_MAX_FPS)) ) {
                 double latestFPS = 1000 / (now - lastFront);
@@ -336,8 +337,6 @@ public class ImageModule implements IEventCallback{
                 frontImagesCV.append(frontIt, bytes);
                 frontIt++;
                 lastFront = now;
-
-                //mBackgroundHandler.post( new ImageSaver(yuvimage, "front") );
             }
 
             /**
@@ -371,7 +370,7 @@ public class ImageModule implements IEventCallback{
                 mBackgroundHandler.post(new Runnable() {
                     @Override
                     public void run() {
-                       // imgProc.processImageBack(bytes, w, h);
+                        imgProc.processImageBack(bytes, w, h);
                     }
                 });
                 /*byte[] processedImg = imgProc.processImageBack(bytes.clone(), w, h);
@@ -381,7 +380,7 @@ public class ImageModule implements IEventCallback{
             }
 
             /**
-             * Store the received image (either processed or raw) and write it to file
+             * Store the received image (either processed or raw)
              */
             if(now - lastBack >= (1000/(1+BACK_MAX_FPS)) ) {
                 double latestFPS = 1000 / (now - lastBack);
@@ -497,7 +496,8 @@ public class ImageModule implements IEventCallback{
                             Mat rgbMat = new Mat(h,w,CvType.CV_8UC3);
                             Imgproc.cvtColor(gray, rgbMat, Imgproc.COLOR_GRAY2RGB);
 
-                            Core.flip(rgbMat, rgbMat, -1);
+                            if(mode=="back")
+                                Core.flip(rgbMat, rgbMat, -1);
 
                             videoWriter.write(rgbMat);
                             rgbMat.release();

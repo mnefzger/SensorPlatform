@@ -90,6 +90,7 @@ public class OBDSetupFragment extends Fragment {
                 filter.addAction("OBD_FOUND");
                 filter.addAction("OBD_CONNECTED");
                 filter.addAction("OBD_SETUP_COMPLETE");
+                filter.addAction("OBD_NOT_FOUND");
                 app.registerReceiver(mReceiver, filter);
                 receiverRegistered = true;
             } else {
@@ -97,6 +98,7 @@ public class OBDSetupFragment extends Fragment {
                 editor.apply();
                 obd_setup_details.setVisibility(View.INVISIBLE);
                 hint.setVisibility(View.VISIBLE);
+                resetText();
 
                 if(receiverRegistered)
                     app.unregisterReceiver(mReceiver);
@@ -127,8 +129,21 @@ public class OBDSetupFragment extends Fragment {
         readyComplete();
     }
 
+    public void notFound() {
+        searching.setText("Seems like there is no OBD-II adapter in the car, are you sure it is plugged in and running?\nTo try again, deactivate this setting and activate it again.");
+    }
+
+
+
     public void readyComplete() {
         ready.setText("Ready.");
+    }
+
+    private void resetText() {
+        searching.setText("Looking for nearby OBD-II …");
+        connecting.setText("");
+        setup.setText("");
+        ready.setText("");
     }
 
     BroadcastReceiver mReceiver = new BroadcastReceiver() {
@@ -146,6 +161,8 @@ public class OBDSetupFragment extends Fragment {
                 // we are finished here, unregister receiver
                 MainActivity app = (MainActivity) getActivity();
                 app.unregisterReceiver(mReceiver);
+            } else if(action.equals("OBD_NOT_FOUND")) {
+                notFound();
             }
         }
     };

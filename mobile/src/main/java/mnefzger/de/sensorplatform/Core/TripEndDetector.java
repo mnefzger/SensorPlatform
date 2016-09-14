@@ -2,9 +2,6 @@ package mnefzger.de.sensorplatform.Core;
 
 import android.content.Context;
 import android.content.SharedPreferences;
-import android.os.SystemClock;
-
-import java.util.List;
 
 import mnefzger.de.sensorplatform.R;
 

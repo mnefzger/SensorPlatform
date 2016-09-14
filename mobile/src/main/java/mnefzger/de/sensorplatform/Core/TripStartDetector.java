@@ -11,6 +11,7 @@ import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
 import android.os.Bundle;
+import android.os.Looper;
 import android.support.v4.content.ContextCompat;
 import android.util.Log;
 
@@ -43,7 +44,7 @@ public class TripStartDetector implements LocationListener {
         int permission = ContextCompat.checkSelfPermission(context, Manifest.permission.ACCESS_FINE_LOCATION);
         if(permission == PackageManager.PERMISSION_GRANTED) {
             locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, LOCATION_REFRESH_TIME,
-                    LOCATION_REFRESH_DISTANCE, this);
+                    LOCATION_REFRESH_DISTANCE, this, Looper.getMainLooper());
         }
 
         mSensorManager = (SensorManager) context.getSystemService(Context.SENSOR_SERVICE);

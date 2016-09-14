@@ -1,9 +1,5 @@
 package mnefzger.de.sensorplatform.Core;
 
-import android.location.Location;
-import android.os.Parcel;
-import android.os.Parcelable;
-
 import org.threeten.bp.Instant;
 import org.threeten.bp.LocalDateTime;
 import org.threeten.bp.ZoneId;

@@ -1,8 +1,6 @@
 package mnefzger.de.sensorplatform.Core;
 
 
-import android.location.Location;
-
 public interface ISensorCallback {
     void onAccelerometerData(double[] values);
 

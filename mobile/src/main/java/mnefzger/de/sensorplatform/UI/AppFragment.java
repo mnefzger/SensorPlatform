@@ -1,8 +1,6 @@
 package mnefzger.de.sensorplatform.UI;
 
 
-import android.app.Activity;
-import android.bluetooth.BluetoothDevice;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
@@ -26,9 +24,8 @@ import mnefzger.de.sensorplatform.Core.ActiveSubscriptions;
 import mnefzger.de.sensorplatform.Core.DataVector;
 import mnefzger.de.sensorplatform.Core.EventVector;
 import mnefzger.de.sensorplatform.Core.MainActivity;
-import mnefzger.de.sensorplatform.External.OBD2Connection;
-import mnefzger.de.sensorplatform.R;
 import mnefzger.de.sensorplatform.Core.SensorPlatformService;
+import mnefzger.de.sensorplatform.R;
 
 
 public class AppFragment extends Fragment {
@@ -79,7 +76,6 @@ public class AppFragment extends Fragment {
         setRetainInstance(true);
 
     }
-
 
     private void registerReceivers() {
         IntentFilter f = new IntentFilter("mnefzger.de.sensorplatform.RawData");
@@ -229,9 +225,9 @@ public class AppFragment extends Fragment {
                     face.setText("Face detected: YES");
                 else if (v.getEventDescription().equals("No Face detected"))
                     face.setText("Face detected: NO");
-                else if (v.getEventDescription().equals("Trip Start Detected")) {
-                    waitingText.setVisibility(View.INVISIBLE);
-                    dataLayout.setVisibility(View.VISIBLE);
+                else if (v.getEventDescription().equals("Trip End detected")) {
+                    waitingText.setVisibility(View.VISIBLE);
+                    dataLayout.setVisibility(View.INVISIBLE);
                 } else
                     event.setText("Last event: " + v.getEventDescription() + ", " + df.format(v.getValue()) );
             }

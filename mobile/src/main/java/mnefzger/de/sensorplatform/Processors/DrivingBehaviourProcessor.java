@@ -12,9 +12,10 @@ import java.util.List;
 
 import mnefzger.de.sensorplatform.Core.DataVector;
 import mnefzger.de.sensorplatform.Core.EventVector;
+import mnefzger.de.sensorplatform.Core.ITripDetectionCallback;
 import mnefzger.de.sensorplatform.Core.Preferences;
-import mnefzger.de.sensorplatform.R;
 import mnefzger.de.sensorplatform.Core.SensorModule;
+import mnefzger.de.sensorplatform.R;
 import mnefzger.de.sensorplatform.Utilities.IOSMResponse;
 import mnefzger.de.sensorplatform.Utilities.MathFunctions;
 import mnefzger.de.sensorplatform.Utilities.OSMQueryAdapter;
@@ -42,13 +43,12 @@ public class DrivingBehaviourProcessor extends EventProcessor implements IOSMRes
     private int OSM_REQUEST_RATE;
 
 
-
     public DrivingBehaviourProcessor(SensorModule m, Context a) {
         super(m);
         qAdapter = new OSMQueryAdapter(this, a);
 
         setting_prefs = a.getSharedPreferences(a.getString(R.string.settings_preferences_key), Context.MODE_PRIVATE);
-        sensor_prefs = a.getSharedPreferences(a.getString(R.string.settings_preferences_key), Context.MODE_PRIVATE);
+        sensor_prefs = a.getSharedPreferences(a.getString(R.string.sensor_preferences_key), Context.MODE_PRIVATE);
 
         ACC_THRESHOLD = Preferences.getAccelerometerThreshold(setting_prefs);
         TURN_THRESHOLD = Preferences.getTurnThreshold(setting_prefs);
@@ -69,6 +69,7 @@ public class DrivingBehaviourProcessor extends EventProcessor implements IOSMRes
             checkForHardAcc(getLastDataItems(3));
             checkForSharpTurn(getLastDataItems(6));
             checkForSpeeding(currentVector);
+
         }
 
     }

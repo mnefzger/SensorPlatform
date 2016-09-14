@@ -10,7 +10,6 @@ import com.google.android.gms.wearable.MessageApi;
 import com.google.android.gms.wearable.Node;
 import com.google.android.gms.wearable.Wearable;
 
-
 import java.util.List;
 
 import mnefzger.de.sensorplatform.Core.DataProvider;

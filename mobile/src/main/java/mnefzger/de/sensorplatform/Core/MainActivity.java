@@ -1,10 +1,9 @@
 package mnefzger.de.sensorplatform.Core;
 
-import android.app.*;
+import android.app.ActivityManager;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
-import android.content.IntentFilter;
 import android.content.ServiceConnection;
 import android.content.SharedPreferences;
 import android.content.pm.ActivityInfo;
@@ -141,8 +140,8 @@ public class MainActivity extends AppCompatActivity {
         startService(startIntent);
         started = true;
 
-        //sPS.startWaitBehaviour();
-        sPS.subscribe();
+        sPS.startWaitBehaviour();
+        //sPS.subscribe();
     }
 
     private void doUnbindService() {

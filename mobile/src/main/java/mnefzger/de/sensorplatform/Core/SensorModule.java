@@ -3,7 +3,6 @@ package mnefzger.de.sensorplatform.Core;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.hardware.Sensor;
-import android.location.Location;
 import android.util.Log;
 
 import java.util.ArrayList;

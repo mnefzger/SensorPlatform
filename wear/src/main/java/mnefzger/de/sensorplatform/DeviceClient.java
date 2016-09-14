@@ -1,7 +1,6 @@
 package mnefzger.de.sensorplatform;
 
 import android.content.Context;
-import android.util.Log;
 import android.util.SparseLongArray;
 
 import com.google.android.gms.common.ConnectionResult;

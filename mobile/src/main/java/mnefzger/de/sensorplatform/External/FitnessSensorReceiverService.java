@@ -1,7 +1,6 @@
 package mnefzger.de.sensorplatform.External;
 
 
-import android.content.Intent;
 import android.net.Uri;
 import android.util.Log;
 
@@ -13,8 +12,6 @@ import com.google.android.gms.wearable.DataMapItem;
 import com.google.android.gms.wearable.MessageEvent;
 import com.google.android.gms.wearable.Node;
 import com.google.android.gms.wearable.WearableListenerService;
-
-import java.util.Arrays;
 
 
 public class FitnessSensorReceiverService extends WearableListenerService {

@@ -37,6 +37,7 @@ public class SensorPlatformService extends Service implements IDataCallback, ITr
     private ImageModule im;
     private UserPhoneBluetoothServer server;
     private TripStartDetector tsDetector;
+    private TripEndDetector teDetector;
 
     private final IBinder mBinder = new LocalBinder();
 
@@ -73,6 +74,8 @@ public class SensorPlatformService extends Service implements IDataCallback, ITr
         this.im = new ImageModule(this, getApplication());
         //this.server = new UserPhoneBluetoothServer(getApplication());
 
+        this.teDetector = new TripEndDetector(this, getApplication());
+
     }
 
     public void startWaitBehaviour() {
@@ -83,8 +86,16 @@ public class SensorPlatformService extends Service implements IDataCallback, ITr
     @Override
     public void onTripStart() {
         tsDetector.cancel();
-        this.onEventData(new EventVector(true, System.currentTimeMillis(), "Trip Start Detected", 0));
+        this.onEventData(new EventVector(true, System.currentTimeMillis(), "Trip Start detected", 0));
         subscribe();
+    }
+
+    @Override
+    public void onTripEnd() {
+        this.onEventData(new EventVector(true, System.currentTimeMillis(), "Trip End detected", 0));
+        pauseDataCollection();
+        ActiveSubscriptions.removeAll();
+        startWaitBehaviour();
     }
 
 
@@ -190,6 +201,7 @@ public class SensorPlatformService extends Service implements IDataCallback, ITr
 
     @Override
     public void onRawData(DataVector dv) {
+        teDetector.checkForTripEnd(dv);
 
         Intent raw = new Intent("mnefzger.de.sensorplatform.RawData");
         raw.putExtra("RawData", new Gson().toJson(dv));

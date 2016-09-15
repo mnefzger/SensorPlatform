@@ -1,6 +1,7 @@
 package mnefzger.de.sensorplatform.Processors;
 
 import android.content.Context;
+import android.os.SystemClock;
 import android.util.Log;
 
 import org.opencv.core.CvType;
@@ -87,10 +88,8 @@ public class ImageProcessor{
     }
 
     private void detectFace(Mat imgMat, Mat output) {
-        if(!faceProcRunning) {
-            // the native code writes the processing results to the output adress
-            int[] faces = findFaceInImage(imgMat.getNativeObjAddr(), output.getNativeObjAddr());
-        }
+        // the native code writes the processing results to the output adress
+        int[] faces = findFaceInImage(imgMat.getNativeObjAddr(), output.getNativeObjAddr());
     }
 
     private void detectCars(Mat imgMat, Mat output) {
@@ -98,20 +97,22 @@ public class ImageProcessor{
         int[] cars = findCarsInImage(imgMat.getNativeObjAddr(), output.getNativeObjAddr());
     }
 
-
+    long lastFaceDetect = System.currentTimeMillis();
     private int[] findFaceInImage(long adress1, long adress2) {
-        faceProcRunning = true;
         double time = System.currentTimeMillis();
         int[] faces = nAsmFindFace(adress1, adress2);
         //Log.d("FACE_DETECTION_FRAME", System.currentTimeMillis()-time + "");
 
         if(faces.length == 4) {
-            //Log.d("FACE_DETECTION", "Detected at (" + faces[0] + "," + faces[1]+")");
             callback.onEventDetected(new EventVector(true, System.currentTimeMillis(), "Face detected", 0));
+            lastFaceDetect = System.currentTimeMillis();
         } else {
             callback.onEventDetected(new EventVector(true, System.currentTimeMillis(), "No Face detected", 0));
+
+            long distractionTime = System.currentTimeMillis()-lastFaceDetect;
+            if(distractionTime > 3000)
+                callback.onEventDetected(new EventVector(false, System.currentTimeMillis(), "Driver is distracted", distractionTime));
         }
-        faceProcRunning = false;
 
         return faces;
     }

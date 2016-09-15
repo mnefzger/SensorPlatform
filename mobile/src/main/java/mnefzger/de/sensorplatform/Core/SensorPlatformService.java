@@ -114,6 +114,7 @@ public class SensorPlatformService extends Service implements IDataCallback, ITr
 
         if(Preferences.rawLoggingActivated(setting_prefs) || Preferences.eventLoggingActivated(setting_prefs) ) {
             lm.createNewFileSet();
+            sm.setStudyParameters();
         }
 
         /**
@@ -203,12 +204,13 @@ public class SensorPlatformService extends Service implements IDataCallback, ITr
     @Override
     public void onRawData(DataVector dv) {
         teDetector.checkForTripEnd(dv);
+
         // the time-to-collision calculation needs info about the current speed
         if(Preferences.backCameraActivated(sensor_prefs) &&
                 Preferences.backImagesProcessingActivated(setting_prefs))
             im.updateSpeed(dv.speed, dv.obdSpeed);
 
-        Intent raw = new Intent("mnefzger.  de.sensorplatform.RawData");
+        Intent raw = new Intent("mnefzger.de.sensorplatform.RawData");
         raw.putExtra("RawData", new Gson().toJson(dv));
         LocalBroadcastManager.getInstance(getApplicationContext()).sendBroadcast(raw);
 

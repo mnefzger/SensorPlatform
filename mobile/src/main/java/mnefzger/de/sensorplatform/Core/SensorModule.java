@@ -79,16 +79,26 @@ public class SensorModule implements ISensorCallback, IEventCallback{
      */
     private final int BUFFERSIZE = 100;
     /**
-     * int identifier for GPS Sensor
+     * int identifiers for 'non-Android sensors'
      */
     private final int GPS_IDENTIFIER = 100;
     private final int WEATHER_IDENTIFIER = 101;
     private final int OBD_IDENTIFIER = 102;
 
+    // copy of the study parameters
+    public String study_id;
+    public String study_name;
+    public String participant_id;
+    public int participant_age;
+    public String participant_gender;
+
+    private Context app;
+
 
     public SensorModule(IDataCallback callback, Context app) {
         setting_prefs = app.getSharedPreferences(app.getString(R.string.settings_preferences_key), Context.MODE_PRIVATE);
         this.callback = callback;
+        this.app = app;
 
         activeProviders = new ArrayList<>();
 
@@ -234,6 +244,7 @@ public class SensorModule implements ISensorCallback, IEventCallback{
          */
         if(last != null) {
             dataBuffer.add(last);
+            current.setStudyParams(study_id, study_name, participant_id, participant_age, participant_gender);
             current.setAcc(0,0,0);
             current.setRotMatrix(last.rotMatrix);
             current.setLight(last.light);
@@ -375,5 +386,14 @@ public class SensorModule implements ISensorCallback, IEventCallback{
             default:
                 return -1;
         }
+    }
+
+    public void setStudyParameters() {
+        SharedPreferences studyPrefs = app.getSharedPreferences(app.getString(R.string.study_preferences_key), Context.MODE_PRIVATE);
+        study_id = studyPrefs.getString("study_ID", "");
+        study_name = studyPrefs.getString("study_name", "");
+        participant_id = studyPrefs.getString("p_ID", "");
+        participant_age = studyPrefs.getInt("p_age", -1);
+        participant_gender = studyPrefs.getBoolean("p_gender", true) ? "male" : "female";
     }
 }

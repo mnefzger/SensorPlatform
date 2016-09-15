@@ -1,10 +1,21 @@
 package mnefzger.de.sensorplatform.Core;
 
+import android.content.Context;
+import android.content.SharedPreferences;
+
 import org.threeten.bp.Instant;
 import org.threeten.bp.LocalDateTime;
 import org.threeten.bp.ZoneId;
 
+import mnefzger.de.sensorplatform.R;
+
 public class DataVector {
+    public String study_id;
+    public String study_name;
+    public String participant_id;
+    public int participant_age;
+    public String participant_gender;
+
     public long timestamp;
     public String dateTime;
     /**
@@ -56,6 +67,14 @@ public class DataVector {
     public void setDateTime() {
         Instant now = Instant.now();
         this.dateTime = LocalDateTime.ofInstant(now, ZoneId.systemDefault()).toString();
+    }
+
+    public void setStudyParams(String s_id, String s_name, String p_id, int p_age, String p_gender) {
+        this.study_id = s_id;
+        this.study_name = s_name;
+        this.participant_id = p_id;
+        this.participant_age = p_age;
+        this.participant_gender = p_gender;
     }
 
     public void setAcc(double x, double y, double z) {
@@ -116,9 +135,8 @@ public class DataVector {
     }
 
     public String toCSVString() {
-        //double lat = (location == null) ? 0 : location.getLatitude();
-        //double lon = (location == null) ? 0 : location.getLongitude();
-        return timestamp + ";" + dateTime + ";" + accX + ";" + accY + ";" + accZ + ";" +
+        return study_id + ";" + study_name + ";" + participant_id + ";" + participant_age + ";" + participant_gender + ";" +
+                timestamp + ";" + dateTime + ";" + accX + ";" + accY + ";" + accZ + ";" +
                 rotX + ";" + rotY + ";" + rotZ + ";" + light + ";" +
                 lat + ";" + lon + ";" + speed + ";" + obdSpeed + ";" + rpm + ";" + fuel + ";" + heartRate + ";" + weather;
     }

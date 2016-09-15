@@ -24,13 +24,13 @@ public class SetupFirstFragment extends Fragment {
     private TextInputEditText study_ID;
     private TextInputEditText participant_ID;
     private TextInputEditText participant_age;
-    private RadioButton female;
     private RadioButton male;
 
     String s_name;
     String s_id;
     String p_id;
     int p_age;
+    boolean p_gender; // true = male, false = female
 
     public SetupFirstFragment() {
         // Required empty public constructor
@@ -59,6 +59,7 @@ public class SetupFirstFragment extends Fragment {
         participant_ID = (TextInputEditText) v.findViewById(R.id.participant_id);
         input_age = (TextInputLayout) v.findViewById(R.id.input_layout_age);
         participant_age = (TextInputEditText) v.findViewById(R.id.participant_age);
+        male = (RadioButton) v.findViewById(R.id.male_button);
 
         setup_next = (FrameLayout) v.findViewById(R.id.next_button);
         setup_next.setOnClickListener(nextStepButtonListener);
@@ -118,6 +119,8 @@ public class SetupFirstFragment extends Fragment {
             input_age.setErrorEnabled(false);
         }
 
+        p_gender = male.isChecked();
+
         return true;
     }
 
@@ -129,6 +132,7 @@ public class SetupFirstFragment extends Fragment {
         editor.putString("study_ID", s_id);
         editor.putString("p_ID", p_id);
         editor.putInt("p_age", p_age);
+        editor.putBoolean("p_gender", p_gender);
 
         editor.commit();
     }

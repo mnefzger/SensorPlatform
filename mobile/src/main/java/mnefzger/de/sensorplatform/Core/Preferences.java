@@ -445,5 +445,4 @@ public class Preferences {
         return value;
     }
 
-
 }

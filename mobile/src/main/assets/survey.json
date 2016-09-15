@@ -1,0 +1,16 @@
+{
+  "questions": [
+    {
+      "q":"I enjoyed this trip.",
+      "type":"lickert"
+    },
+    {
+      "q":"I felt relaxed while driving.",
+      "type":"lickert"
+    },
+    {
+      "q":"I sometimes drive just for fun.",
+      "type":"lickert"
+    }
+  ]
+}

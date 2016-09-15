@@ -216,6 +216,9 @@ public class AppFragment extends Fragment {
     public void updateUI(EventVector vector) {
         final EventVector v = vector;
 
+        /*MainActivity app = (MainActivity)getActivity();
+        app.goToSurveyFragment();*/
+
         getActivity().runOnUiThread(new Runnable() {
             @Override
             public void run() {
@@ -228,6 +231,8 @@ public class AppFragment extends Fragment {
                 else if (v.getEventDescription().equals("Trip End detected")) {
                     waitingText.setVisibility(View.VISIBLE);
                     dataLayout.setVisibility(View.INVISIBLE);
+                    MainActivity app = (MainActivity)getActivity();
+                    app.goToSurveyFragment();
                 } else
                     event.setText("Last event: " + v.getEventDescription() + ", " + df.format(v.getValue()) );
             }

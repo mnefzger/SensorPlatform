@@ -26,6 +26,7 @@ import mnefzger.de.sensorplatform.UI.SensorSetupFragment;
 import mnefzger.de.sensorplatform.UI.SettingsFragment;
 import mnefzger.de.sensorplatform.UI.SetupFirstFragment;
 import mnefzger.de.sensorplatform.UI.StartFragment;
+import mnefzger.de.sensorplatform.UI.SurveyFragment;
 import mnefzger.de.sensorplatform.Utilities.PermissionManager;
 
 
@@ -47,6 +48,7 @@ public class MainActivity extends AppCompatActivity {
     SecondPhoneSetupFragment phoneFragment;
     SettingsFragment settings;
     AppFragment appFragment;
+    SurveyFragment surveyFragment;
 
     SensorPlatformService sPS;
     public static boolean mBound = false;
@@ -269,6 +271,12 @@ public class MainActivity extends AppCompatActivity {
         this.setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_UNSPECIFIED);
     }
 
+    public void goToSurveyFragment() {
+        surveyFragment = new SurveyFragment();
+        changeFragment(surveyFragment, true, true);
+        this.setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_REVERSE_LANDSCAPE);
+    }
+
     MainActivity getActivity() {
         return this;
     }
@@ -318,6 +326,9 @@ public class MainActivity extends AppCompatActivity {
 
             } else {
                 Log.w("FRAGMENT", "Already instatiated, popped back: " + backStateName);
+                FragmentTransaction transaction = manager.beginTransaction();
+                transaction.show(frag).commit();
+
             }
         } catch (IllegalStateException exception) {
             Log.w("FRAGMENT", "Unable to commit fragment, could be activity has been killed in background. " + exception.toString());

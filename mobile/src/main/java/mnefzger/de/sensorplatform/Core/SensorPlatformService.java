@@ -9,6 +9,7 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Binder;
 import android.os.IBinder;
+import android.preference.PreferenceCategory;
 import android.support.v4.app.NotificationCompat;
 import android.support.v4.content.LocalBroadcastManager;
 import android.util.Log;
@@ -202,8 +203,12 @@ public class SensorPlatformService extends Service implements IDataCallback, ITr
     @Override
     public void onRawData(DataVector dv) {
         teDetector.checkForTripEnd(dv);
+        // the time-to-collision calculation needs info about the current speed
+        if(Preferences.backCameraActivated(sensor_prefs) &&
+                Preferences.backImagesProcessingActivated(setting_prefs))
+            im.updateSpeed(dv.speed, dv.obdSpeed);
 
-        Intent raw = new Intent("mnefzger.de.sensorplatform.RawData");
+        Intent raw = new Intent("mnefzger.  de.sensorplatform.RawData");
         raw.putExtra("RawData", new Gson().toJson(dv));
         LocalBroadcastManager.getInstance(getApplicationContext()).sendBroadcast(raw);
 
@@ -218,8 +223,8 @@ public class SensorPlatformService extends Service implements IDataCallback, ITr
         if(Preferences.videoSavingActivated(setting_prefs) && !ev.isDebug()) {
             long now = System.currentTimeMillis();
 
-            // Check if a video is currently being saved or the last save was less than 1 second ago
-            if(!im.isSaving() && (now - lastSave) > 1000) {
+            // Check if a video is currently being saved or the last save was less than 4 second ago
+            if(!im.isSaving() && (now - lastSave) > 4000) {
                 im.saveVideoAfterEvent(ev);
                 ev.setVideoName("Video-" + ev.getTimestamp() + ".avi");
                 lastSave = now;

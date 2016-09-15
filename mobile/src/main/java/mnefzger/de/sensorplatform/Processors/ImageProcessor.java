@@ -28,6 +28,7 @@ public class ImageProcessor{
     private IEventCallback callback;
 
     private boolean faceProcRunning = false;
+    private double currentSpeed;
 
     static{
         System.loadLibrary("opencv_java3");
@@ -45,6 +46,10 @@ public class ImageProcessor{
         writeCascadeToFileSystem(c, "lbpcascade_frontalface.xml");
         writeCascadeToFileSystem(c, "haarcascade_vehicles.xml");
         nInitCascades();
+    }
+
+    public void setCurrentSpeed(double currentSpeed) {
+        this.currentSpeed = currentSpeed;
     }
 
     public byte[] processImageFront(byte[] image, int width, int height) {
@@ -149,10 +154,19 @@ public class ImageProcessor{
         double distance_to_car = (f * real_width * img_width) / (pixel_width * sensor_width); //mm
         distance_to_car /= 1000; //m
 
-       // Log.d("CAR_DETECTION_DISTANCE", distance_to_car + "m");
-        callback.onEventDetected(new EventVector(true, System.currentTimeMillis(), "Distance to front car", distance_to_car));
+        if(currentSpeed > 10) {
+            // Time to collision
+            double TTC = distance_to_car / (currentSpeed/3.6);
 
-        if(distance_to_car < 8) callback.onEventDetected(new EventVector(false, System.currentTimeMillis(), "Tailgating", distance_to_car));
+            callback.onEventDetected(new EventVector(true, System.currentTimeMillis(), "TTC", TTC));
+
+            if(TTC < 2) callback.onEventDetected(new EventVector(false, System.currentTimeMillis(), "Tailgating", TTC));
+        } else {
+            callback.onEventDetected(new EventVector(true, System.currentTimeMillis(), "Distance to front car", distance_to_car));
+
+            if(distance_to_car < 7) callback.onEventDetected(new EventVector(false, System.currentTimeMillis(), "Tailgating", distance_to_car));
+        }
+
     }
 
 
@@ -192,5 +206,4 @@ public class ImageProcessor{
             br.close();
         }
     }
-
 }

@@ -19,6 +19,7 @@ import android.media.Image;
 import android.media.ImageReader;
 import android.os.Handler;
 import android.os.HandlerThread;
+import android.preference.PreferenceCategory;
 import android.support.v4.app.ActivityCompat;
 import android.util.Log;
 import android.util.SparseArray;
@@ -434,6 +435,13 @@ public class ImageModule implements IEventCallback{
         bitmapFatoryOptions.inPreferredConfig = Bitmap.Config.RGB_565;
         Bitmap bmp = BitmapFactory.decodeByteArray(jdata, 0, jdata.length, bitmapFatoryOptions);
         return bmp;
+    }
+
+    public void updateSpeed(double speed, double obdSpeed) {
+        if(Preferences.OBDActivated(sensor_prefs))
+            imgProc.setCurrentSpeed(obdSpeed);
+        else
+            imgProc.setCurrentSpeed(speed);
     }
 
     private static class VideoSaver {

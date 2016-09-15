@@ -2,6 +2,7 @@ package mnefzger.de.sensorplatform.UI;
 
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -17,6 +18,7 @@ import java.io.InputStream;
 
 import mnefzger.de.sensorplatform.Core.MainActivity;
 import mnefzger.de.sensorplatform.Core.SurveyModel;
+import mnefzger.de.sensorplatform.Logger.LoggingModule;
 import mnefzger.de.sensorplatform.R;
 
 public class SurveyFragment extends Fragment {
@@ -29,6 +31,8 @@ public class SurveyFragment extends Fragment {
 
     private RadioButton stronglyDisagree, disagree, undecided, agree, stronglyAgree;
     private RadioGroup group;
+
+    private String answers = "";
 
     public SurveyFragment() {
 
@@ -51,45 +55,53 @@ public class SurveyFragment extends Fragment {
 
         group = (RadioGroup) v.findViewById(R.id.lickertGroup);
 
-      /*  group.addView(stronglyDisagree);
-        group.addView(disagree);
-        group.addView(undecided);
-        group.addView(agree);
-        group.addView(stronglyAgree);*/
-
-        /*stronglyDisagree.setOnClickListener(button_listener);
-        disagree.setOnClickListener(button_listener);
-        undecided.setOnClickListener(button_listener);
-        agree.setOnClickListener(button_listener);
-        stronglyAgree.setOnClickListener(button_listener);*/
-
         loadSurvey();
         showQuestion(currentQuestion);
 
         return v;
     }
 
-    View.OnClickListener button_listener = new View.OnClickListener() {
-        @Override
-        public void onClick(View view) {
-            RadioButton btn = (RadioButton) view;
-            boolean current = btn.isChecked();
-            resetButtons();
-            btn.setChecked(current);
-        }
-    };
-
     View.OnClickListener next_listener = new View.OnClickListener() {
         @Override
         public void onClick(View view) {
-            if(++currentQuestion < survey.questions.size())
+            answers += getCheckedLickertButton() + ";";
+
+
+            if(++currentQuestion < survey.questions.size()) {
+                Log.d("NEXT QUESTION", getCheckedLickertButton());
+                Log.d("ANSWERS", "--> " + answers);
                 showQuestion(currentQuestion);
-            else {
+
+            } else {
+                // write to file
+                LoggingModule lm = LoggingModule.getInstance();
+                lm.writeSurveyToFile(answers, survey.questions.size());
+
+                // reset answer string
+                answers = "";
+
+                // go back to main data collection screen
                 MainActivity app = (MainActivity) getActivity();
                 app.goToAppFragment();
+
             }
         }
     };
+
+    private String getCheckedLickertButton() {
+        if(stronglyAgree.isChecked())
+            return "Strongly Agree";
+        if(agree.isChecked())
+            return "Agree";
+        if(undecided.isChecked())
+            return "Undecided";
+        if(disagree.isChecked())
+            return "Disagree";
+        if(stronglyDisagree.isChecked())
+            return "Strongly Disagree";
+
+        return "invalid";
+    }
 
     private void loadSurvey() {
         String surveyJson = loadJSONFromAsset("survey.json");

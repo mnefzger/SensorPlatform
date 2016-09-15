@@ -70,7 +70,7 @@ public class SensorPlatformService extends Service implements IDataCallback, ITr
         sensor_prefs = getApplicationContext().getSharedPreferences(getApplicationContext().getString(R.string.sensor_preferences_key), Context.MODE_PRIVATE);
 
         this.sm = new SensorModule(this, getApplication());
-        this.lm = new LoggingModule();
+        this.lm = LoggingModule.getInstance();
 
         this.im = new ImageModule(this, getApplication());
         this.server = new UserPhoneBluetoothServer(getApplication());
@@ -104,6 +104,8 @@ public class SensorPlatformService extends Service implements IDataCallback, ITr
         /**
          * Logging
          */
+        lm.generateNewLoggingID();
+
         if(Preferences.rawLoggingActivated(setting_prefs)) {
             logRawData(true);
         }
@@ -113,7 +115,7 @@ public class SensorPlatformService extends Service implements IDataCallback, ITr
         }
 
         if(Preferences.rawLoggingActivated(setting_prefs) || Preferences.eventLoggingActivated(setting_prefs) ) {
-            lm.createNewFileSet();
+            lm.createNewTripFileSet();
             sm.setStudyParameters();
         }
 

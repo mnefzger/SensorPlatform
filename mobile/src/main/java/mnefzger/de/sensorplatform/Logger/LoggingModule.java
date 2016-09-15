@@ -1,6 +1,7 @@
 package mnefzger.de.sensorplatform.Logger;
 
 import android.os.Environment;
+import android.util.Log;
 
 import com.opencsv.CSVWriter;
 
@@ -22,22 +23,36 @@ public class LoggingModule {
 
     String fileNameRaw = "RawData_";
     String fileNameEvent = "EventData_";
+    String fileNameSurvey = "SurveyAnswers";
 
     File rawFile;
     File eventFile;
+    File surveyFile;
 
     long tripID;
 
-    public LoggingModule() {
+    static LoggingModule instance;
+
+    public static LoggingModule getInstance() {
+        if(instance == null) {
+            instance = new LoggingModule();
+        }
+
+        return instance;
+    }
+
+    private LoggingModule() {
         File folder = new File(filePath);
         if (!folder.exists()) {
             folder.mkdir();
         }
+    }
 
+    public void generateNewLoggingID() {
         tripID = System.currentTimeMillis();
     }
 
-    public void createNewFileSet() {
+    public void createNewTripFileSet() {
         createNewRawFile(fileNameRaw + tripID + ".csv");
         createNewEventFile(fileNameEvent + tripID + ".csv");
     }
@@ -68,6 +83,18 @@ public class LoggingModule {
         }
     }
 
+    private void createNewSurveyFile(String name) {
+        surveyFile = new File(filePath + File.separator + name);
+
+        if(!surveyFile.exists()) {
+            try {
+                surveyFile.createNewFile();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+    }
+
     public void writeRawToCSV(DataVector v) {
         String[] line = { tripID + ";" + v.toCSVString() };
 
@@ -80,6 +107,15 @@ public class LoggingModule {
         write(eventFile, line);
     }
 
+    public void writeSurveyToFile(String answers, int items) {
+        //createHeadersSurvey(items);
+        createNewSurveyFile(fileNameSurvey + ".csv");
+
+        String[] line = { tripID + ";" + answers };
+
+        write(surveyFile, line);
+    }
+
     private void createHeadersRaw() {
         String[] line = { "tripID;s_id;s_name;p_id;p_age;p_gender;timestamp;dateTime;accelerationX;accelerationY;accelerationZ;rotationX;rotationY;rotationZ;light;latitude;longitude;gps_speed;obd_speed;obd_rpm;obd_fuel;heart_rate" };
 
@@ -88,6 +124,17 @@ public class LoggingModule {
 
     private void createHeadersEvent() {
         String[] line = { "tripID;timestamp;description;value" };
+
+        write(eventFile, line);
+    }
+
+    public void createHeadersSurvey(int noOfQuestions) {
+        String[] line = new String[noOfQuestions+1];
+        line[0] = "tripID;";
+
+        for(int i=0; i<noOfQuestions; i++) {
+            line[i+1] = "q"+(i+1)+";";
+        }
 
         write(eventFile, line);
     }

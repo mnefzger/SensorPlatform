@@ -34,7 +34,9 @@
         <FrameLayout
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:padding="25dp">
+            android:paddingLeft="25dp"
+            android:paddingRight="25dp"
+            android:paddingTop="10dp">
 
             <LinearLayout
                 android:orientation="horizontal"
@@ -69,7 +71,7 @@
                 android:layout_height="wrap_content"
                 android:text="Hint: A connected user phone will allow you to monitor incoming notifications as well as screen on and touch events."
                 android:id="@+id/phone_hint"
-                android:layout_marginTop="75dp"
+                android:layout_marginTop="60dp"
                 android:textSize="19sp"
                 android:textColor="@color/colorAccent" />
 
@@ -79,7 +81,15 @@
                 android:layout_height="match_parent"
                 android:layout_marginTop="50dp"
                 android:id="@+id/phone_setup_details"
-                android:visibility="invisible">
+                android:visibility="visible">
+
+                <LinearLayout
+                    android:orientation="horizontal"
+                    android:layout_width="match_parent"
+                    android:layout_height="1dp"
+                    android:layout_marginTop="0dp"
+                    android:layout_marginBottom="10dp"
+                    android:background="#80ffffff"></LinearLayout>
 
 
                 <LinearLayout
@@ -100,7 +110,7 @@
                     android:orientation="horizontal"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginTop="35dp"
+                    android:layout_marginTop="20dp"
                     android:layout_marginBottom="10dp"
                     android:layout_marginLeft="25dp" >
 
@@ -117,7 +127,7 @@
                     android:orientation="horizontal"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginTop="15dp"
+                    android:layout_marginTop="10dp"
                     android:layout_marginBottom="10dp"
                     android:layout_marginStart="25dp">
 
@@ -134,7 +144,7 @@
                     android:orientation="horizontal"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginTop="15dp"
+                    android:layout_marginTop="10dp"
                     android:layout_marginBottom="15dp"
                     android:layout_marginStart="25dp">
 

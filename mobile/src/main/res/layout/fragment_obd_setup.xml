@@ -35,7 +35,9 @@
         <FrameLayout
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:padding="25dp">
+            android:paddingTop="10dp"
+            android:paddingLeft="25dp"
+            android:paddingRight="25dp">
 
             <LinearLayout
                 android:orientation="horizontal"
@@ -70,7 +72,7 @@
                 android:layout_height="wrap_content"
                 android:text="Hint: A connected OBD-II adapter will add data on accurate speed, fuel consumption and engine speed."
                 android:id="@+id/obd_hint"
-                android:layout_marginTop="75dp"
+                android:layout_marginTop="60dp"
                 android:textSize="19sp"
                 android:textColor="@color/colorAccent"/>
 
@@ -86,7 +88,7 @@
                     android:orientation="horizontal"
                     android:layout_width="match_parent"
                     android:layout_height="1dp"
-                    android:layout_marginTop="15dp"
+                    android:layout_marginTop="0dp"
                     android:layout_marginBottom="10dp"
                     android:background="#80ffffff"></LinearLayout>
 
@@ -109,7 +111,7 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="35dp"
-                    android:layout_marginBottom="10dp"
+                    android:layout_marginBottom="5dp"
                     android:layout_marginLeft="25dp" >
 
                     <TextView
@@ -125,8 +127,8 @@
                     android:orientation="horizontal"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginTop="15dp"
-                    android:layout_marginBottom="10dp"
+                    android:layout_marginTop="10dp"
+                    android:layout_marginBottom="5dp"
                     android:layout_marginLeft="25dp">
 
                     <TextView
@@ -142,8 +144,8 @@
                     android:orientation="horizontal"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginTop="15dp"
-                    android:layout_marginBottom="15dp"
+                    android:layout_marginTop="10dp"
+                    android:layout_marginBottom="5dp"
                     android:layout_marginLeft="25dp">
 
                     <TextView
@@ -159,8 +161,8 @@
                     android:orientation="horizontal"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginTop="15dp"
-                    android:layout_marginBottom="15dp"
+                    android:layout_marginTop="10dp"
+                    android:layout_marginBottom="10dp"
                     android:layout_marginLeft="25dp">
 
                     <TextView

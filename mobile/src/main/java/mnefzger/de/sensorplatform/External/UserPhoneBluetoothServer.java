@@ -95,10 +95,10 @@ public class UserPhoneBluetoothServer {
             // Listen to the server socket if we're not connected
             while (true) {
                 try {
+                    c.sendBroadcast(new Intent("PHONE_FOUND"));
                     // This is a blocking call and will only return on a
                     // successful connection or an exception
                     socket = mmServerSocket.accept();
-                    c.sendBroadcast(new Intent("PHONE_FOUND"));
                 } catch (IOException e) {
                     Log.e("Bluetooth", "accept() failed", e);
                     break;

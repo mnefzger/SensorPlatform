@@ -44,9 +44,10 @@ dependencies {
     compile files('libs/jcodec-0.1.5.jar')
     compile group: 'com.google.code.gson', name: 'gson', version: '2.4'
     wearApp project(':wear')
-    compile 'com.android.support:appcompat-v7:24.1.1'
-    compile 'com.android.support:support-v4:24.1.1'
-    compile 'com.android.support:design:24.1.1'
+    compile 'com.android.support:appcompat-v7:24.2.1'
+    compile 'com.takisoft.fix:preference-v7:24.2.0.0'
+    compile 'com.android.support:support-v4:24.2.1'
+    compile 'com.android.support:design:24.2.1'
     compile 'com.google.android.gms:play-services-wearable:9.4.0'
     compile 'com.android.volley:volley:1.0.0'
     compile 'com.github.pires:obd-java-api:1.0-RC16'

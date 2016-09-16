@@ -225,7 +225,11 @@ public class DrivingBehaviourProcessor extends EventProcessor implements IOSMRes
 
             }
             // more advanced speed limit search based on traffic signs
+            // ATTENTION: EXPERIMENTAL FEATURE
             qAdapter.startSearchForSpeedLimitSign(currentVector.lat, currentVector.lon);
+
+            // Uncomment this if you don't want to use the traffic sign feature
+            //detectOverspeeding();
 
         } else {
             // somehow, we could not extract the current road
@@ -274,6 +278,11 @@ public class DrivingBehaviourProcessor extends EventProcessor implements IOSMRes
         }
 
 
+        detectOverspeeding();
+
+    }
+
+    private void detectOverspeeding() {
         double currentSpeed, previousSpeed;
         if(Preferences.OBDActivated(sensor_prefs) && currentVector.obdSpeed != 0) {
             currentSpeed = currentVector.obdSpeed;
@@ -284,14 +293,12 @@ public class DrivingBehaviourProcessor extends EventProcessor implements IOSMRes
             previousSpeed = previousVector.speed;
         }
 
-
+        // Fire a event if the last two speed readings were above the speed limit
         if(currentSpeedLimit > 0 && currentSpeed > currentSpeedLimit && previousSpeed > currentSpeedLimit)
             callback.onEventDetected(new EventVector(false, System.currentTimeMillis(), "Speeding", currentSpeed, currentSpeedLimit));
         else if(currentSpeed > 110)
             callback.onEventDetected(new EventVector(false, System.currentTimeMillis(), "Speeding above 110km/h", currentSpeed));
-
     }
-
 
     /**
      * Returns the best estimate for the current road

@@ -36,11 +36,6 @@ public class SetupFirstFragment extends Fragment {
         // Required empty public constructor
     }
 
-    public static SetupFirstFragment newInstance(String param1, String param2) {
-        SetupFirstFragment fragment = new SetupFirstFragment();
-        return fragment;
-    }
-
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);

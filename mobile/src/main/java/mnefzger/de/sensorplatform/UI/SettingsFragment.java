@@ -4,6 +4,7 @@ package mnefzger.de.sensorplatform.UI;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.os.Bundle;
+
 import android.preference.CheckBoxPreference;
 import android.preference.PreferenceFragment;
 import android.util.Log;
@@ -62,7 +63,6 @@ public class SettingsFragment extends PreferenceFragment
 
 
     public void startApplication() {
-
         ((MainActivity) getActivity()).startMeasuring();
     }
 

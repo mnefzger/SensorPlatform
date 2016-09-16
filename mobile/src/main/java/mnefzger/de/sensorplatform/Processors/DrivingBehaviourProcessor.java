@@ -201,20 +201,36 @@ public class DrivingBehaviourProcessor extends EventProcessor implements IOSMRes
     public void onOSMRoadResponseReceived(OSMRespone response) {
         if(response == null) {
             lastRecognizedRoad = null;
-            callback.onEventDetected(new EventVector(true, System.currentTimeMillis(), "ROAD: No road detected", 0));
+            callback.onEventDetected(new EventVector(true, System.currentTimeMillis(), "ROAD: No road detected, empty response.", 0));
             return;
         }
 
         lastResponse = response;
 
         OSMRespone.Element road = getCurrentRoad(response);
+
         if(road != null) {
+            // we successfully extracted the current road
             lastRecognizedRoad = road;
-            qAdapter.startSearchForSpeedLimit(currentVector.lat, currentVector.lon);
-            callback.onEventDetected(new EventVector(true, System.currentTimeMillis(), "ROAD: You are on " + lastRecognizedRoad.tags.name, 0));
+
+            OSMRespone.TagContainer tags = lastRecognizedRoad.tags;
+            if(tags != null) {
+
+                if(tags.maxspeed != null) {
+                    currentSpeedLimit = Integer.parseInt(tags.maxspeed);
+                    callback.onEventDetected(new EventVector(true, System.currentTimeMillis(), "ROAD: You are on " + tags.name + ", Speed Limit: " + currentSpeedLimit, 0));
+                } else {
+                    callback.onEventDetected(new EventVector(true, System.currentTimeMillis(), "ROAD: You are on " + tags.name, 0));
+                }
+
+            }
+            // more advanced speed limit search based on traffic signs
+            qAdapter.startSearchForSpeedLimitSign(currentVector.lat, currentVector.lon);
+
         } else {
+            // somehow, we could not extract the current road
             lastRecognizedRoad = null;
-            callback.onEventDetected(new EventVector(true, System.currentTimeMillis(), "ROAD: No road detected", 0));
+            callback.onEventDetected(new EventVector(true, System.currentTimeMillis(), "ROAD: No road detected, getCurrentRoad() failed", 0));
         }
 
     }
@@ -249,15 +265,11 @@ public class DrivingBehaviourProcessor extends EventProcessor implements IOSMRes
 
         if(passedSpeedSign != null) {
             if(nextSpeedSign != null)
-                callback.onEventDetected(new EventVector(true, System.currentTimeMillis(), "ROAD: You are on " + lastRecognizedRoad.tags.name + ", Current SpeedLimit: " + passedSpeedSign.tags.maxspeed + ", upcoming: " + nextSpeedSign.tags.maxspeed, 0));
-            else
-                callback.onEventDetected(new EventVector(true, System.currentTimeMillis(), "ROAD: You are on " + lastRecognizedRoad.tags.name + ", Current SpeedLimit: " + passedSpeedSign, 0));
+                callback.onEventDetected(new EventVector(true, System.currentTimeMillis(), "ROAD: You are on " + lastRecognizedRoad.tags.name + ", Speed Sign Limit: " + passedSpeedSign.tags.maxspeed + ", upcoming: " + nextSpeedSign.tags.maxspeed, 0));
             currentSpeedLimit = Integer.parseInt(passedSpeedSign.tags.maxspeed);
         } else if(lastRecognizedRoad.tags.maxspeed != null) {
             if(nextSpeedSign != null)
-                callback.onEventDetected(new EventVector(true, System.currentTimeMillis(), "ROAD: You are on " + lastRecognizedRoad.tags.name + ", Current SpeedLimit: " + lastRecognizedRoad.tags.maxspeed + ", upcoming: " + nextSpeedSign.tags.maxspeed, 0));
-            else
-                callback.onEventDetected(new EventVector(true, System.currentTimeMillis(), "ROAD: You are on " + lastRecognizedRoad.tags.name + ", Current SpeedLimit: " + lastRecognizedRoad.tags.maxspeed, 0));
+                callback.onEventDetected(new EventVector(true, System.currentTimeMillis(), "ROAD: You are on " + lastRecognizedRoad.tags.name + ", Speed Limit: " + lastRecognizedRoad.tags.maxspeed + ", upcoming: " + nextSpeedSign.tags.maxspeed, 0));
             currentSpeedLimit = Integer.parseInt(lastRecognizedRoad.tags.maxspeed);
         }
 

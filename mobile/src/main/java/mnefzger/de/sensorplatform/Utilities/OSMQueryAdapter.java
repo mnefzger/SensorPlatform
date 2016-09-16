@@ -38,15 +38,15 @@ public class OSMQueryAdapter {
         }
     }
 
-    public void startSearchForSpeedLimit(double lat, double lon) {
+    public void startSearchForSpeedLimitSign(double lat, double lon) {
         search(generateSearchStringSpeed(300, lat, lon), "Speed");
     }
 
     private String generateSearchStringBounding(double lat_w, double lon_s, double lat_e, double lon_n) {
         String url ="http://overpass-api.de/api/interpreter?data=[out:json][timeout:5];";
         url += "(way";
-        url += "[\"highway\"~\"^primary|secondary|tertiary|residential|service\"]";
-        url += "[\"name\"]";
+        url += "[\"highway\"~\"^motorway|motorway_link|primary|primary_link|secondary|tertiary|residential|service\"]";
+        //url += "[\"name\"]";
         url += "("+ lat_w +"," + lon_s + "," + lat_e + "," + lon_n + ");";
         url += " <;);out body;";
 
@@ -56,8 +56,8 @@ public class OSMQueryAdapter {
     private String generateSearchStringRadius(double rad, double lat, double lon) {
         String url ="http://overpass-api.de/api/interpreter?data=[out:json][timeout:15];";
         url += "(way";
-        url += "[\"highway\"~\"^primary|secondary|tertiary|residential|service\"]";
-        url += "[\"name\"]";
+        url += "[\"highway\"~\"^motorway|motorway_link|primary|primary_link|secondary|tertiary|residential|service\"]";
+        //url += "[\"name\"]";
         url += "(around:"+ rad +"," + lat + "," + lon + ");";
         url += ">;);out body;";
 

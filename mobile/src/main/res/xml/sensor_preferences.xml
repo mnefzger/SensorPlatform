@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android"
     android:key="@string/sensor_preferences_key">
-    <PreferenceCategory android:title="Internal Sensors">
+    <PreferenceCategory android:title="Internal Sensors" android:key="sensors">
         <CheckBoxPreference
             android:key="accelerometer_raw"
             android:title="Accelerometer Raw Data"

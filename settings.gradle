@@ -1,2 +1,2 @@
-include ':mobile', ':wear'
+include ':mobile', ':wear', ':mobile_user'
 include ':openCVLibrary310'

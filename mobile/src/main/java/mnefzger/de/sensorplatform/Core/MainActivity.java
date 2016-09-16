@@ -249,7 +249,6 @@ public class MainActivity extends AppCompatActivity {
         transaction.setCustomAnimations(R.animator.slide_in_right_animator, R.animator.slide_out_left_animator);
         transaction.addToBackStack(sensorsFragment.getClass().getName());
         transaction.replace(R.id.fragment_container, sensorsFragment).commit();
-        //changeFragment(sensorsFragment, true, true);
         this.setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_UNSPECIFIED);
     }
 
@@ -271,7 +270,6 @@ public class MainActivity extends AppCompatActivity {
         transaction.setCustomAnimations(R.animator.slide_in_right_animator, R.animator.slide_out_left_animator);
         transaction.addToBackStack(settings.getClass().getName());
         transaction.replace(R.id.fragment_container, settings).commit();
-        //changeFragment(settings, true, true);
         this.setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_UNSPECIFIED);
     }
 

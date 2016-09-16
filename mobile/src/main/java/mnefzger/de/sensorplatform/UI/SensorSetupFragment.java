@@ -3,6 +3,7 @@ package mnefzger.de.sensorplatform.UI;
 import android.os.Bundle;
 
 import android.preference.Preference;
+import android.preference.PreferenceCategory;
 import android.preference.PreferenceFragment;
 import android.preference.PreferenceScreen;
 import android.view.LayoutInflater;
@@ -40,10 +41,11 @@ public class SensorSetupFragment extends PreferenceFragment implements View.OnCl
         fl.setOnClickListener(this);
 
         // do not show obd option since obd comes in the next step of setup, but is still in the same preference file
-        /*Preference obd = findPreference("obd_raw");
+        Preference obd = findPreference("obd_raw");
         hiddenOBD = obd;
-        PreferenceScreen screen = getPreferenceScreen();
-        screen.removePreference(obd);*/
+        PreferenceCategory sensors = (PreferenceCategory) findPreference("sensors");
+        sensors.removePreference(obd);
+
 
         return v;
     }

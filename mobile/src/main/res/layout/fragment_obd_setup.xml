@@ -115,12 +115,19 @@
                     android:layout_marginLeft="25dp" >
 
                     <TextView
-                        android:layout_width="match_parent"
+                        android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="Looking for nearby OBD-II … "
                         android:id="@+id/searchingOBDText"
                         android:textSize="19sp"
                         android:textColor="@color/colorAccent" />
+
+                    <ImageView
+                        android:layout_width="20dp"
+                        android:layout_height="20dp"
+                        android:id="@+id/done_search"
+                        android:src="@drawable/done"
+                        android:visibility="invisible"/>
                 </LinearLayout>
 
                 <LinearLayout
@@ -138,6 +145,13 @@
                         android:id="@+id/connectingOBDText"
                         android:textSize="19sp"
                         android:textColor="@color/colorAccent"/>
+
+                    <ImageView
+                        android:layout_width="20dp"
+                        android:layout_height="20dp"
+                        android:id="@+id/done_connect"
+                        android:src="@drawable/done"
+                        android:visibility="invisible" />
                 </LinearLayout>
 
                 <LinearLayout
@@ -155,6 +169,13 @@
                         android:id="@+id/setupOBDText"
                         android:textSize="19sp"
                         android:textColor="@color/colorAccent"/>
+
+                    <ImageView
+                        android:layout_width="20dp"
+                        android:layout_height="20dp"
+                        android:id="@+id/done_setup"
+                        android:src="@drawable/done"
+                        android:visibility="invisible" />
                 </LinearLayout>
 
                 <LinearLayout
@@ -172,6 +193,13 @@
                         android:id="@+id/readyOBDText"
                         android:textSize="19sp"
                         android:textColor="@color/colorAccent"/>
+
+                    <ImageView
+                        android:layout_width="20dp"
+                        android:layout_height="20dp"
+                        android:id="@+id/done_ready"
+                        android:src="@drawable/done"
+                        android:visibility="invisible" />
                 </LinearLayout>
 
                 <!--

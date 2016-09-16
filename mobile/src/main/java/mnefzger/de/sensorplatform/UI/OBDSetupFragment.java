@@ -14,6 +14,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.FrameLayout;
+import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
@@ -34,6 +35,8 @@ public class OBDSetupFragment extends Fragment {
     TextView connecting;
     TextView setup;
     TextView ready;
+
+    ImageView done_searching, done_connect, done_setup, done_ready;
 
     FrameLayout setup_next;
 
@@ -58,6 +61,11 @@ public class OBDSetupFragment extends Fragment {
         connecting = (TextView) v.findViewById(R.id.connectingOBDText);
         setup = (TextView) v.findViewById(R.id.setupOBDText);
         ready = (TextView) v.findViewById(R.id.readyOBDText);
+
+        done_searching = (ImageView) v.findViewById(R.id.done_search);
+        done_connect = (ImageView) v.findViewById(R.id.done_connect);
+        done_setup = (ImageView) v.findViewById(R.id.done_setup);
+        done_ready = (ImageView) v.findViewById(R.id.done_ready);
 
         obdActive.setOnClickListener(listener);
 
@@ -115,17 +123,17 @@ public class OBDSetupFragment extends Fragment {
     };
 
     public void searchComplete() {
-        searching.setText("Looking for nearby OBD-II … Done.");
+        done_searching.setVisibility(View.VISIBLE);
         connecting.setText("Connecting to OBD-II …");
     }
 
     public void connectionComplete() {
-        connecting.setText("Connecting to OBD-II … Done.");
+        done_connect.setVisibility(View.VISIBLE);
         setup.setText("Setting up …");
     }
 
     public void setupComplete() {
-        setup.setText("Setting up … Done.");
+        done_setup.setVisibility(View.VISIBLE);
         readyComplete();
     }
 
@@ -133,10 +141,9 @@ public class OBDSetupFragment extends Fragment {
         searching.setText("Seems like there is no OBD-II adapter in the car, are you sure it is plugged in and running?\nTo try again, deactivate this setting and activate it again.");
     }
 
-
-
     public void readyComplete() {
         ready.setText("Ready.");
+        done_ready.setVisibility(View.VISIBLE);
     }
 
     private void resetText() {

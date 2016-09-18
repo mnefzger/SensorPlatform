@@ -132,7 +132,7 @@ public class ImageProcessor{
                 if(pixel_width > max)
                     max = pixel_width;
             }
-            calculateDist(max);
+            detectTailgating( calculateDist(max) );
 
 
         } else {
@@ -146,7 +146,7 @@ public class ImageProcessor{
      * Calculates the following distance based on the car's pixel width
      * The hardcoded values are for a Google Nexus 6P, replace if another phone is used
      */
-    private void calculateDist(int pixel_width) {
+    private double calculateDist(int pixel_width) {
         double sensor_width = 6.17; //mm
         double f = 4.67; //mm
         int img_width = 320; //pixel
@@ -155,19 +155,30 @@ public class ImageProcessor{
         double distance_to_car = (f * real_width * img_width) / (pixel_width * sensor_width); //mm
         distance_to_car /= 1000; //m
 
-        if(currentSpeed > 10) {
-            // Time to collision
-            double TTC = distance_to_car / (currentSpeed/3.6);
+        return distance_to_car;
+    }
 
+    private void detectTailgating(double distance) {
+        if(currentSpeed > 0) {
+            // Time to collision
+            double TTC = distance / (currentSpeed / 3.6);
+
+            if(currentSpeed >= 15 && currentSpeed <= 50) {
+                if (TTC < 1)
+                    callback.onEventDetected(new EventVector(false, System.currentTimeMillis(), "Tailgating, TTC", TTC));
+                return;
+            } else if(currentSpeed > 50) {
+                if (TTC < 2)
+                    callback.onEventDetected(new EventVector(false, System.currentTimeMillis(), "Tailgating, TTC", TTC));
+                return;
+            }
             callback.onEventDetected(new EventVector(true, System.currentTimeMillis(), "TTC", TTC));
 
-            if(TTC < 2) callback.onEventDetected(new EventVector(false, System.currentTimeMillis(), "Tailgating", TTC));
         } else {
-            callback.onEventDetected(new EventVector(true, System.currentTimeMillis(), "Distance to front car", distance_to_car));
+            callback.onEventDetected(new EventVector(true, System.currentTimeMillis(), "Distance to front car", distance));
 
-            if(distance_to_car < 7) callback.onEventDetected(new EventVector(false, System.currentTimeMillis(), "Tailgating", distance_to_car));
+            if(distance < 6) callback.onEventDetected(new EventVector(false, System.currentTimeMillis(), "Tailgating", distance));
         }
-
     }
 
 

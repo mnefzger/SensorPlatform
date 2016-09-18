@@ -249,7 +249,7 @@ public class SensorModule implements ISensorCallback, IEventCallback{
             current.setRotMatrix(last.rotMatrix);
             current.setLight(last.light);
             current.setLocation(last.lat, last.lon);
-            current.setSpeed(0);
+            current.setSpeed(last.speed);
             current.setOBDSpeed(last.obdSpeed);
             current.setRPM(last.rpm);
             current.setHeartRate(last.heartRate);

@@ -22,6 +22,12 @@
                 android:title="Log Event Data"
                 android:summary="Writes all events to a csv file"
                 android:defaultValue="false"/>
+
+            <CheckBoxPreference
+                android:key="survey_active"
+                android:title="Show survey after trip"
+                android:summary="Shows a questionnaire to the driver after a trip ends."
+                android:defaultValue="false"/>
         </PreferenceCategory>
 
     <PreferenceCategory android:title="Image Processing">

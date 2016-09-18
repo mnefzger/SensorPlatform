@@ -5,7 +5,9 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.support.v4.app.Fragment;
 import android.support.v4.content.LocalBroadcastManager;
 import android.util.Log;
@@ -24,6 +26,7 @@ import mnefzger.de.sensorplatform.Core.ActiveSubscriptions;
 import mnefzger.de.sensorplatform.Core.DataVector;
 import mnefzger.de.sensorplatform.Core.EventVector;
 import mnefzger.de.sensorplatform.Core.MainActivity;
+import mnefzger.de.sensorplatform.Core.Preferences;
 import mnefzger.de.sensorplatform.Core.SensorPlatformService;
 import mnefzger.de.sensorplatform.R;
 
@@ -228,12 +231,7 @@ public class AppFragment extends Fragment {
                     face.setText("Face detected: YES");
                 else if (v.getEventDescription().equals("No Face detected"))
                     face.setText("Face detected: NO");
-                else if (v.getEventDescription().equals("Trip End detected")) {
-                    waitingText.setVisibility(View.VISIBLE);
-                    dataLayout.setVisibility(View.INVISIBLE);
-                    MainActivity app = (MainActivity)getActivity();
-                    app.goToSurveyFragment();
-                } else
+                else
                     event.setText("Last event: " + v.getEventDescription() + ", " + df.format(v.getValue()) );
             }
         });
@@ -270,10 +268,24 @@ public class AppFragment extends Fragment {
                 dataLayout.setVisibility(View.VISIBLE);
             }
 
+            if(v.getEventDescription().equals("Trip End detected"))
+                handleTripEndUI();
+
             if(getActivity() != null)
                 updateUI(v);
         }
     };
+
+    private void handleTripEndUI() {
+        waitingText.setVisibility(View.VISIBLE);
+        dataLayout.setVisibility(View.INVISIBLE);
+
+        SharedPreferences setting_prefs = getActivity().getSharedPreferences(getString(R.string.settings_preferences_key), Context.MODE_PRIVATE);
+        if(Preferences.surveyActivated(setting_prefs)) {
+            MainActivity app = (MainActivity)getActivity();
+            app.goToSurveyFragment();
+        }
+    }
 
 
     @Override

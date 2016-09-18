@@ -70,6 +70,8 @@ public class Preferences {
 
     public static final String LOGGING_EVENT = "logging_event";
 
+    public static final String SURVEY = "survey_active";
+
 
 
     private static Context context = null;
@@ -441,6 +443,12 @@ public class Preferences {
 
     public static boolean eventLoggingActivated(SharedPreferences prefs) {
         boolean value = prefs.getBoolean(LOGGING_EVENT, false);
+
+        return value;
+    }
+
+    public static boolean surveyActivated(SharedPreferences prefs) {
+        boolean value = prefs.getBoolean(SURVEY, false);
 
         return value;
     }

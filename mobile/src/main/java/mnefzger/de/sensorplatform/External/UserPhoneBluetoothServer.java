@@ -58,7 +58,7 @@ public class UserPhoneBluetoothServer {
         public void onReceive(Context context, Intent intent) {
             final BluetoothDevice device = intent.getParcelableExtra( BluetoothDevice.EXTRA_DEVICE );
             Log.d("Bluetooth", intent.getAction());
-            if (intent.getAction().equals(device.ACTION_ACL_DISCONNECTED)) {
+            if (intent.getAction().equals(BluetoothDevice.ACTION_ACL_DISCONNECTED)) {
                 Log.d("Bluetooth", "Disconnect detected, start new accept thread.");
                 AcceptThread acceptThread = new AcceptThread();
                 acceptThread.start();

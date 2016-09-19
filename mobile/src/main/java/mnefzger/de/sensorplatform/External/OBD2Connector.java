@@ -41,22 +41,20 @@ public class OBD2Connector {
 
                 Log.d(TAG, device.getName() + "");
 
-                if(device != null) {
-                    if(device.getName() != null && device.getName().equals("OBDII")) {
-                        app.sendBroadcast(new Intent("OBD_FOUND"));
-                        found = true;
+                if(device.getName() != null && device.getName().equals("OBDII")) {
+                    app.sendBroadcast(new Intent("OBD_FOUND"));
+                    found = true;
 
-                        OBD2Connection.obd2Device = device;
-                        app.unregisterReceiver(mReceiver);
-                        receiverRegistered = false;
-                        btAdapter.cancelDiscovery();
-                        new Thread(new Runnable() {
+                    OBD2Connection.obd2Device = device;
+                    app.unregisterReceiver(mReceiver);
+                    receiverRegistered = false;
+                    btAdapter.cancelDiscovery();
+                    new Thread(new Runnable() {
                             @Override
                             public void run() {
                                 connectToOBD2Device();
                             }
-                        }).start();
-                    }
+                    }).start();
                 }
             }
         }

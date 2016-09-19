@@ -21,7 +21,6 @@ import java.util.TimerTask;
 
 import mnefzger.de.sensorplatform.Core.DataProvider;
 import mnefzger.de.sensorplatform.Core.ISensorCallback;
-import mnefzger.de.sensorplatform.Core.MainActivity;
 import mnefzger.de.sensorplatform.Core.Preferences;
 import mnefzger.de.sensorplatform.R;
 
@@ -53,7 +52,7 @@ public class OBD2Provider extends DataProvider implements OBD2Connector.IConnect
 
     public void connect() {
         Log.d("OBD", Preferences.OBDActivated(sensor_prefs) +","+ OBD2Connection.connected);
-        if(Preferences.OBDActivated(sensor_prefs) && OBD2Connection.connected == false) {
+        if(Preferences.OBDActivated(sensor_prefs) && !OBD2Connection.connected) {
             reset();
         } else {
             app.sendBroadcast(new Intent("OBD_FOUND"));

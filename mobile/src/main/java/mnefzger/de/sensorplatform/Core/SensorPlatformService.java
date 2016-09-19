@@ -9,7 +9,6 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Binder;
 import android.os.IBinder;
-import android.preference.PreferenceCategory;
 import android.support.v4.app.NotificationCompat;
 import android.support.v4.content.LocalBroadcastManager;
 import android.util.Log;
@@ -364,9 +363,7 @@ public class SensorPlatformService extends Service implements IDataCallback, ITr
 
         PendingIntent p = PendingIntent.getService(this, 0, stopIntent, PendingIntent.FLAG_CANCEL_CURRENT);
 
-        NotificationCompat.Action stop = new NotificationCompat.Action.Builder(R.drawable.data_collection, "Stop", p).build();
-
-        return stop;
+        return new NotificationCompat.Action.Builder(R.drawable.data_collection, "Stop", p).build();
     }
 
     private NotificationCompat.Action getPauseAction() {
@@ -375,9 +372,7 @@ public class SensorPlatformService extends Service implements IDataCallback, ITr
 
         PendingIntent p = PendingIntent.getService(this, 0, pauseIntent, PendingIntent.FLAG_CANCEL_CURRENT);
 
-        NotificationCompat.Action pause = new NotificationCompat.Action.Builder(R.drawable.data_collection, "Pause", p).build();
-
-        return pause;
+        return new NotificationCompat.Action.Builder(R.drawable.data_collection, "Pause", p).build();
     }
 
     private NotificationCompat.Action getResumeAction() {
@@ -386,9 +381,7 @@ public class SensorPlatformService extends Service implements IDataCallback, ITr
 
         PendingIntent p = PendingIntent.getService(this, 0, resumeIntent, PendingIntent.FLAG_CANCEL_CURRENT);
 
-        NotificationCompat.Action resume = new NotificationCompat.Action.Builder(R.drawable.data_collection, "Resume", p).build();
-
-        return resume;
+        return new NotificationCompat.Action.Builder(R.drawable.data_collection, "Resume", p).build();
     }
 
 }

@@ -1,13 +1,8 @@
 package mnefzger.de.sensorplatform.Core;
 
-import android.content.Context;
-import android.content.SharedPreferences;
-
 import org.threeten.bp.Instant;
 import org.threeten.bp.LocalDateTime;
 import org.threeten.bp.ZoneId;
-
-import mnefzger.de.sensorplatform.R;
 
 public class DataVector {
     public String study_id;

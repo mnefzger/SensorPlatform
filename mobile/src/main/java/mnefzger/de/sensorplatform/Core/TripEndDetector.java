@@ -38,7 +38,6 @@ public class TripEndDetector {
     private void checkInOBD(DataVector dv) {
         if(dv.rpm == 0) {
             //callback.onTripEnd();
-            return;
         }
     }
 

@@ -1,7 +1,6 @@
 package mnefzger.de.sensorplatform.Processors;
 
 import android.content.Context;
-import android.os.SystemClock;
 import android.util.Log;
 
 import org.opencv.core.CvType;

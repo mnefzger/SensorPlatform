@@ -1,7 +1,6 @@
 package mnefzger.de.sensorplatform.Logger;
 
 import android.os.Environment;
-import android.util.Log;
 
 import com.opencsv.CSVWriter;
 

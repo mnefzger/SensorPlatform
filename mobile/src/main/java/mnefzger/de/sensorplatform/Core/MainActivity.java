@@ -112,7 +112,7 @@ public class MainActivity extends AppCompatActivity {
         sensor_prefs.edit().clear();
         if(sensor_prefs.getAll().isEmpty()) {
             PreferenceManager.setDefaultValues(this, getString(R.string.sensor_preferences_key), Context.MODE_PRIVATE,  R.xml.sensor_preferences, true);
-            sensor_prefs.edit().commit();
+            sensor_prefs.edit().apply();
         } else {
             PreferenceManager.setDefaultValues(this, getString(R.string.sensor_preferences_key), Context.MODE_PRIVATE,  R.xml.sensor_preferences, false);
         }
@@ -121,7 +121,7 @@ public class MainActivity extends AppCompatActivity {
         setting_prefs.edit().clear();
         if(setting_prefs.getAll().isEmpty()) {
             PreferenceManager.setDefaultValues(this, getString(R.string.settings_preferences_key), Context.MODE_PRIVATE,  R.xml.settings_preferences, true);
-            setting_prefs.edit().commit();
+            setting_prefs.edit().apply();
         } else {
             PreferenceManager.setDefaultValues(this, getString(R.string.settings_preferences_key), Context.MODE_PRIVATE,  R.xml.settings_preferences, false);
         }
@@ -130,7 +130,7 @@ public class MainActivity extends AppCompatActivity {
         study_prefs.edit().clear();
         if(study_prefs.getAll().isEmpty()) {
             PreferenceManager.setDefaultValues(this, getString(R.string.study_preferences_key), Context.MODE_PRIVATE,  R.xml.study_preferences, true);
-            study_prefs.edit().commit();
+            study_prefs.edit().apply();
         } else {
             PreferenceManager.setDefaultValues(this, getString(R.string.study_preferences_key), Context.MODE_PRIVATE,  R.xml.study_preferences, false);
         }
@@ -164,7 +164,6 @@ public class MainActivity extends AppCompatActivity {
             SensorPlatformService.LocalBinder binder = (SensorPlatformService.LocalBinder) service;
             sPS = binder.getService();
             mBound = true;
-            Log.d("SERVICE", "is bound: " + mBound);
         }
 
         @Override
@@ -222,7 +221,7 @@ public class MainActivity extends AppCompatActivity {
     public void onDestroy() {
         super.onDestroy();
 
-        if(checkIfServiceRunning() && !started && !sPS.serviceRunning) {
+        if(checkIfServiceRunning() && !started && !SensorPlatformService.serviceRunning) {
             Intent intent = new Intent(this, SensorPlatformService.class);
             intent.setAction("SERVICE_STOP");
             stopService(intent);
@@ -321,7 +320,6 @@ public class MainActivity extends AppCompatActivity {
 
                 if (saveInBackstack) {
                     transaction.addToBackStack(backStateName);
-                } else {
                 }
 
                 transaction.commit();

@@ -19,7 +19,6 @@ import android.media.Image;
 import android.media.ImageReader;
 import android.os.Handler;
 import android.os.HandlerThread;
-import android.preference.PreferenceCategory;
 import android.support.v4.app.ActivityCompat;
 import android.util.Log;
 import android.util.SparseArray;
@@ -36,7 +35,7 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.nio.ByteBuffer;
-import java.util.Arrays;
+import java.util.Collections;
 
 import mnefzger.de.sensorplatform.Processors.ImageProcessor;
 import mnefzger.de.sensorplatform.R;
@@ -153,12 +152,12 @@ public class ImageModule implements IEventCallback{
         try {
             int permission = ActivityCompat.checkSelfPermission(context, Manifest.permission.CAMERA);
             if(permission == PackageManager.PERMISSION_GRANTED) {
-                if(id == "0") {
+                if(id.equals("0")) {
                     imageReader_back = ImageReader.newInstance(RES_H, RES_W, ImageFormat.YUV_420_888, 15);
                     imageReader_back.setOnImageAvailableListener(onBackImageAvailableListener, mBackgroundHandler);
                     cameraManager.openCamera(id, backCameraStateCallback, null );
                 }
-                if(id == "1") {
+                if(id.equals("1")) {
                     imageReader_front = ImageReader.newInstance(RES_H, RES_W, ImageFormat.YUV_420_888, 15);
                     imageReader_front.setOnImageAvailableListener(onFrontImageAvailableListener, mBackgroundHandler);
                     cameraManager.openCamera(id, frontCameraStateCallback, null );
@@ -174,11 +173,11 @@ public class ImageModule implements IEventCallback{
     private CameraDevice.StateCallback backCameraStateCallback = new CameraDevice.StateCallback() {
         @Override
         public void onOpened(CameraDevice camera) {
-            Log.i(TAG, camera.getId().toString());
+            Log.i(TAG, camera.getId());
             ImageModule.this.camera_back = camera;
             try {
-                if(camera.getId() == "0") {
-                    ImageModule.this.camera_back.createCaptureSession(Arrays.asList(imageReader_back.getSurface()), backSessionStateCallback, null);
+                if(camera.getId().equals("0")) {
+                    ImageModule.this.camera_back.createCaptureSession(Collections.singletonList(imageReader_back.getSurface()), backSessionStateCallback, null);
                 }
             } catch (CameraAccessException e){
                 Log.e(TAG, e.getMessage());
@@ -197,11 +196,11 @@ public class ImageModule implements IEventCallback{
     private CameraDevice.StateCallback frontCameraStateCallback = new CameraDevice.StateCallback() {
         @Override
         public void onOpened(CameraDevice camera) {
-            Log.i(TAG, camera.getId().toString());
+            Log.i(TAG, camera.getId());
             ImageModule.this.camera_front = camera;
             try {
-                if(camera.getId() == "1") {
-                    ImageModule.this.camera_front.createCaptureSession(Arrays.asList(imageReader_front.getSurface()), frontSessionStateCallback, null);
+                if(camera.getId().equals("1") ) {
+                    ImageModule.this.camera_front.createCaptureSession(Collections.singletonList(imageReader_front.getSurface()), frontSessionStateCallback, null);
                 }
             } catch (CameraAccessException e){
                 Log.e(TAG, e.getMessage());
@@ -344,7 +343,7 @@ public class ImageModule implements IEventCallback{
             /**
              * Only store the last ten seconds in the image buffer
              */
-            if(frontImagesCV.size() > (10*FRONT_MAX_FPS) ) {
+            if(frontImagesCV.size() > (VIDEO_DURATION * FRONT_MAX_FPS) ) {
                 int key = frontImagesCV.keyAt(0);
                 frontImagesCV.remove(key);
             }
@@ -399,7 +398,7 @@ public class ImageModule implements IEventCallback{
             /**
              * Only store the last ten seconds in the image buffer
              */
-            if(backImagesCV.size() > (10*BACK_MAX_FPS) ) {
+            if(backImagesCV.size() > (VIDEO_DURATION * BACK_MAX_FPS) ) {
                 int key = backImagesCV.keyAt(0);
                 backImagesCV.remove(key);
             }
@@ -467,8 +466,8 @@ public class ImageModule implements IEventCallback{
 
             fileName = "Video-" + timestamp + ".avi";
 
-            if(mode == "front" && frontSaving == true) return;
-            if(mode == "back" && backSaving == true) return;
+            if(mode.equals("front") && frontSaving ) return;
+            if(mode.equals("back") && backSaving ) return;
 
             File folder = new File(filePath);
             if (!folder.exists()) {
@@ -492,8 +491,8 @@ public class ImageModule implements IEventCallback{
             ThreadPool.post(new Runnable() {
                 public void run() {
                     try {
-                        if(mode == "front") frontSaving = true;
-                        if(mode == "back") backSaving = true;
+                        if(mode.equals("front")) frontSaving = true;
+                        if(mode.equals("back")) backSaving = true;
                         videoWriter.open(filePath + File.separator + fileName, VideoWriter.fourcc('M','J','P','G'), FPS, new Size(w,h));
                         Log.d("VIDEO", "Trying to save..." + images.size() + " frames, FPS " + FPS + ", path: " + filePath + File.separator + fileName + ", "+w+"x"+h);
                         double start = System.currentTimeMillis();
@@ -506,7 +505,7 @@ public class ImageModule implements IEventCallback{
                             Mat rgbMat = new Mat(h,w,CvType.CV_8UC3);
                             Imgproc.cvtColor(gray, rgbMat, Imgproc.COLOR_GRAY2RGB);
 
-                            if(mode=="back")
+                            if(mode.equals("back"))
                                 Core.flip(rgbMat, rgbMat, -1);
 
                             videoWriter.write(rgbMat);
@@ -519,8 +518,8 @@ public class ImageModule implements IEventCallback{
 
                         double delta = (System.currentTimeMillis() - start)/1000;
                         Log.d("VIDEO", "Saving finished in " + delta + "s!" );
-                        if(mode == "front") frontSaving = false;
-                        if(mode == "back") backSaving = false;
+                        if(mode.equals("front")) frontSaving = false;
+                        if(mode.equals("back")) backSaving = false;
 
                     } catch (Exception e) {
                         e.printStackTrace();

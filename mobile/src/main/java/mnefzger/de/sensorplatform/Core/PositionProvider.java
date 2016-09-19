@@ -18,7 +18,6 @@ import mnefzger.de.sensorplatform.R;
 import mnefzger.de.sensorplatform.Utilities.MathFunctions;
 
 public class PositionProvider extends DataProvider implements LocationListener{
-    private SharedPreferences setting_prefs;
     private LocationManager locationManager;
     private Context context;
     private ISensorCallback callback;
@@ -32,7 +31,7 @@ public class PositionProvider extends DataProvider implements LocationListener{
     public PositionProvider(Context app, ISensorCallback m) {
         context = app;
         callback = m;
-        setting_prefs = app.getSharedPreferences(app.getString(R.string.settings_preferences_key), Context.MODE_PRIVATE);
+        SharedPreferences setting_prefs = app.getSharedPreferences(app.getString(R.string.settings_preferences_key), Context.MODE_PRIVATE);
 
         LOCATION_REFRESH_TIME = Preferences.getGPSRequestRate(setting_prefs);
     }

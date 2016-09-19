@@ -12,7 +12,6 @@ import java.util.List;
 
 import mnefzger.de.sensorplatform.Core.DataVector;
 import mnefzger.de.sensorplatform.Core.EventVector;
-import mnefzger.de.sensorplatform.Core.ITripDetectionCallback;
 import mnefzger.de.sensorplatform.Core.Preferences;
 import mnefzger.de.sensorplatform.Core.SensorModule;
 import mnefzger.de.sensorplatform.R;

@@ -128,13 +128,13 @@ public class ImageModule implements IEventCallback{
         ThreadPool.finish();
 
         if(camera_front != null) {
-            camera_front.close();
             imageReader_front.close();
+            camera_front.close();
         }
 
         if(camera_back != null) {
-            camera_back.close();
             imageReader_back.close();
+            camera_back.close();
         }
 
     }
@@ -315,6 +315,7 @@ public class ImageModule implements IEventCallback{
              * Decide if frame is to be processed or not
              */
             if(Preferences.frontImagesProcessingActivated(setting_prefs) && now - lastFrontProc >= (1000 / FRONT_PROCESSING_FPS) ) {
+                if(mBackgroundThread == null) return;
                 mBackgroundHandler.post(new Runnable() {
                     @Override
                     public void run() {
@@ -368,16 +369,17 @@ public class ImageModule implements IEventCallback{
              * Decide if frame is to be processed or not
              */
             if(Preferences.backImagesProcessingActivated(setting_prefs) && now - lastBackProc >= (1000 / BACK_PROCESSING_FPS) ) {
+                if(mBackgroundThread == null) return;
                 mBackgroundHandler.post(new Runnable() {
                     @Override
                     public void run() {
                         imgProc.processImageBack(bytes, w, h);
                     }
                 });
-                byte[] processedImg = imgProc.processImageBack(bytes.clone(), w, h);
-                //yuvimage = new YuvImage(processedImg, ImageFormat.NV21, 320, 240, null);
-                //mBackgroundHandler.post( new ImageSaver(yuvimage, "back") );
-                //lastBackProc = now;
+                /*byte[] processedImg = imgProc.processImageBack(bytes.clone(), w, h);
+                  yuvimage = new YuvImage(processedImg, ImageFormat.NV21, 320, 240, null);
+                  mBackgroundHandler.post( new ImageSaver(yuvimage, "back") );*/
+                  lastBackProc = now;
             }
 
             /**

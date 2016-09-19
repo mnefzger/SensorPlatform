@@ -7,6 +7,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.os.Handler;
+import android.os.Looper;
 import android.util.Log;
 
 import java.io.IOException;
@@ -81,13 +82,17 @@ public class OBD2Connector {
     }
 
     private void startTimeout(int milliseconds) {
-        Handler h = new Handler();
+        Handler h = new Handler(Looper.getMainLooper());
         h.postDelayed(new Runnable() {
             @Override
             public void run() {
                 if(!found) {
                     app.sendBroadcast(new Intent("OBD_NOT_FOUND"));
-                    app.unregisterReceiver(mReceiver);
+                    try{
+                        app.unregisterReceiver(mReceiver);
+                    } catch (Exception e) {
+                        Log.e("OBD RECEIVER", e.toString());
+                    }
                     receiverRegistered = false;
                     btAdapter.cancelDiscovery();
                 }

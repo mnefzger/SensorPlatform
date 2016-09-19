@@ -1,8 +1,10 @@
 package mnefzger.de.sensorplatform.External;
 
 import android.bluetooth.BluetoothSocket;
+import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.content.SharedPreferences;
 import android.util.Log;
 
@@ -19,6 +21,7 @@ import java.util.TimerTask;
 
 import mnefzger.de.sensorplatform.Core.DataProvider;
 import mnefzger.de.sensorplatform.Core.ISensorCallback;
+import mnefzger.de.sensorplatform.Core.MainActivity;
 import mnefzger.de.sensorplatform.Core.Preferences;
 import mnefzger.de.sensorplatform.R;
 
@@ -33,6 +36,8 @@ public class OBD2Provider extends DataProvider implements OBD2Connector.IConnect
     private boolean setupRunning = false;
     private boolean collecting = false;
     private Context app;
+
+    private boolean tryingToReconnect = false;
 
     private final String TAG = "OBD_BLUETOOTH";
 
@@ -68,6 +73,13 @@ public class OBD2Provider extends DataProvider implements OBD2Connector.IConnect
     // Is called in case of IOException with broken pipe
     public void reset() {
         Log.d(TAG, "reset");
+        IntentFilter f = new IntentFilter();
+        f.addAction("OBD_CONNECTED");
+        f.addAction("OBD_NOT_FOUND");
+        app.registerReceiver(mReceiver,f);
+
+        tryingToReconnect = true;
+
         OBD2Connection.sock = null;
         OBD2Connection.connected = false;
         setupComplete = false;
@@ -120,6 +132,9 @@ public class OBD2Provider extends DataProvider implements OBD2Connector.IConnect
                             }
                         }
                     }).start();
+
+                } else if(!tryingToReconnect) {
+                    reset();
                 }
 
                 if(collecting)
@@ -165,7 +180,8 @@ public class OBD2Provider extends DataProvider implements OBD2Connector.IConnect
                 cmd.run(s.getInputStream(), s.getOutputStream());
             } catch (IOException io) {
                 if(io.getMessage().contains("Broken pipe")) {
-                    reset();
+                    if(!tryingToReconnect)
+                        reset();
                 }
             } catch(Exception e) {
                 e.printStackTrace();
@@ -175,13 +191,11 @@ public class OBD2Provider extends DataProvider implements OBD2Connector.IConnect
 
     public void mRun(String cmd, InputStream in, OutputStream out) throws IOException,
             InterruptedException {
-
         Log.d("CMD", cmd);
         out.write((cmd + "\r").getBytes());
         out.flush();
-        Thread.sleep(100);
+        Thread.sleep(50);
         String raw = readRawData(in);
-        //Log.d("RAW", raw);
     }
 
     protected String readRawData(InputStream in) throws IOException {
@@ -220,6 +234,19 @@ public class OBD2Provider extends DataProvider implements OBD2Connector.IConnect
 
         return rawData;
     }
+
+    BroadcastReceiver mReceiver = new BroadcastReceiver() {
+        public void onReceive(Context context, Intent intent) {
+            String action = intent.getAction();
+
+            if(action.equals("OBD_CONNECTED") || action.equals("OBD_NOT_FOUND") ) {
+                tryingToReconnect = false;
+                app.unregisterReceiver(mReceiver);
+
+            }
+        }
+
+    };
 
 
 }

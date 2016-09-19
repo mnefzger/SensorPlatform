@@ -54,7 +54,7 @@
             android:key="video_resolution"
             android:persistent="true"
             android:title="Video Resolution" />
-        />
+
         <EditTextPreference
             android:key="front_max_fps"
             android:title="Front camera max. FPS"

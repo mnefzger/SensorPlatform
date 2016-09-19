@@ -119,11 +119,10 @@ JNIEXPORT jintArray Java_mnefzger_de_sensorplatform_Processors_ImageProcessor_nA
     Mat gray_small(240, 320, gray.depth());
     resize(gray, gray_small, size);
 
-    Rect region_of_interest = Rect(30,40,260,190);
+    Rect region_of_interest = Rect(90,90,150,150);
     Mat roi = gray_small(region_of_interest);
 
     //Mat output = getIPMImage(roi);
-
 
     vector< Rect > cars;
     vehicleCascadeHaar.detectMultiScale( roi, cars, 1.06, 2, 0, Size(5, 5) );
@@ -147,7 +146,7 @@ JNIEXPORT jintArray Java_mnefzger_de_sensorplatform_Processors_ImageProcessor_nA
         */
         double sensor_width = 6.17; //mm
         double f = 4.67; //mm
-        int img_width = 320; //pixel
+        int img_width = 640; //pixel
         int real_width = 1847; //mm
 
         double distance_to_car = (f * real_width * img_width) / (cars[i].width * sensor_width); //mm
@@ -163,6 +162,8 @@ JNIEXPORT jintArray Java_mnefzger_de_sensorplatform_Processors_ImageProcessor_nA
 
     Mat yuv;
     cvtColor(bgr, yuv, COLOR_BGR2YUV_I420);
+
+    rectangle(yuv, region_of_interest, CV_RGB(255, 255, 255), 1);
 
     Mat* mat = (Mat*) returnadress;
     mat->create(yuv.rows, yuv.cols, CV_8UC1);

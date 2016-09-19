@@ -26,6 +26,7 @@ import mnefzger.de.sensorplatform.R;
  * A simple {@link Fragment} subclass.
  */
 public class OBDSetupFragment extends Fragment {
+    SharedPreferences sensor_prefs;
 
     AppCompatCheckBox obdActive;
     TextView hint;
@@ -53,6 +54,8 @@ public class OBDSetupFragment extends Fragment {
 
         View v = inflater.inflate(R.layout.fragment_obd_setup, container, false);
 
+        sensor_prefs = getActivity().getSharedPreferences(getString(R.string.sensor_preferences_key), Context.MODE_PRIVATE);
+
         obdActive = (AppCompatCheckBox) v.findViewById(R.id.obd_checkbox);
         hint = (TextView) v.findViewById(R.id.obd_hint);
         obd_setup_details = (LinearLayout) v.findViewById(R.id.obd_setup_details);
@@ -69,6 +72,13 @@ public class OBDSetupFragment extends Fragment {
 
         obdActive.setOnClickListener(listener);
 
+        if(Preferences.OBDActivated(sensor_prefs))
+            obdActive.setChecked(true);
+        else
+            obdActive.setChecked(false);
+
+        obdActive.callOnClick();
+
 
         setup_next = (FrameLayout) v.findViewById(R.id.next_button);
         setup_next.setOnClickListener(nextStepButtonListener);
@@ -81,7 +91,6 @@ public class OBDSetupFragment extends Fragment {
         public void onClick(View view) {
             boolean checked = obdActive.isChecked();
             MainActivity app = (MainActivity) getActivity();
-            SharedPreferences sensor_prefs = getActivity().getSharedPreferences(getString(R.string.sensor_preferences_key), Context.MODE_PRIVATE);
             SharedPreferences.Editor editor = sensor_prefs.edit();
 
             if(checked) {
@@ -90,10 +99,6 @@ public class OBDSetupFragment extends Fragment {
                 hint.setVisibility(View.INVISIBLE);
                 obd_setup_details.setVisibility(View.VISIBLE);
 
-                Log.d("OBD setup", Preferences.OBDActivated(sensor_prefs) +", "+sensor_prefs.getBoolean("obd_raw", false));
-
-                app.getService().initiateOBDConnection();
-
                 IntentFilter filter = new IntentFilter();
                 filter.addAction("OBD_FOUND");
                 filter.addAction("OBD_CONNECTED");
@@ -101,6 +106,8 @@ public class OBDSetupFragment extends Fragment {
                 filter.addAction("OBD_NOT_FOUND");
                 app.registerReceiver(mReceiver, filter);
                 receiverRegistered = true;
+
+                app.getService().initiateOBDConnection();
             } else {
                 editor.putBoolean("obd_raw", false);
                 editor.apply();
@@ -108,8 +115,11 @@ public class OBDSetupFragment extends Fragment {
                 hint.setVisibility(View.VISIBLE);
                 resetText();
 
-                if(receiverRegistered)
+                if(receiverRegistered) {
                     app.unregisterReceiver(mReceiver);
+                    receiverRegistered = false;
+                }
+
             }
         }
     };
@@ -168,6 +178,7 @@ public class OBDSetupFragment extends Fragment {
                 // we are finished here, unregister receiver
                 MainActivity app = (MainActivity) getActivity();
                 app.unregisterReceiver(mReceiver);
+                receiverRegistered = false;
             } else if(action.equals("OBD_NOT_FOUND")) {
                 notFound();
             }

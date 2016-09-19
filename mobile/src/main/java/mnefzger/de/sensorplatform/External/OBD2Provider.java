@@ -55,6 +55,10 @@ public class OBD2Provider extends DataProvider implements OBD2Connector.IConnect
         Log.d("OBD", Preferences.OBDActivated(sensor_prefs) +","+ OBD2Connection.connected);
         if(Preferences.OBDActivated(sensor_prefs) && OBD2Connection.connected == false) {
             reset();
+        } else {
+            app.sendBroadcast(new Intent("OBD_FOUND"));
+            app.sendBroadcast(new Intent("OBD_CONNECTED"));
+            app.sendBroadcast(new Intent("OBD_SETUP_COMPLETE"));
         }
     }
 

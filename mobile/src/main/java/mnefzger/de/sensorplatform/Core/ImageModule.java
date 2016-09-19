@@ -374,10 +374,10 @@ public class ImageModule implements IEventCallback{
                         imgProc.processImageBack(bytes, w, h);
                     }
                 });
-                /*byte[] processedImg = imgProc.processImageBack(bytes.clone(), w, h);
-                yuvimage = new YuvImage(processedImg, ImageFormat.NV21, 320, 240, null);
-                mBackgroundHandler.post( new ImageSaver(yuvimage, "back") );*/
-                lastBackProc = now;
+                byte[] processedImg = imgProc.processImageBack(bytes.clone(), w, h);
+                //yuvimage = new YuvImage(processedImg, ImageFormat.NV21, 320, 240, null);
+                //mBackgroundHandler.post( new ImageSaver(yuvimage, "back") );
+                //lastBackProc = now;
             }
 
             /**

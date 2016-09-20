@@ -24,6 +24,8 @@ import android.widget.LinearLayout;
 import java.io.IOException;
 import java.io.OutputStream;
 
+import mnefzger.de.sensorplatformshared.InteractionEvents;
+
 
 public class PhoneInteractionService extends Service implements View.OnTouchListener {
     NotificationReceiver nReceiver;

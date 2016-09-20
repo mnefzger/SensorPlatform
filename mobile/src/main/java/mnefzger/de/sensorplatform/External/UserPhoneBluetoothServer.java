@@ -10,7 +10,6 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.os.Handler;
 import android.os.Message;
-import android.os.SystemClock;
 import android.util.Log;
 
 import java.io.IOException;
@@ -18,8 +17,7 @@ import java.util.UUID;
 
 import mnefzger.de.sensorplatform.Core.EventVector;
 import mnefzger.de.sensorplatform.Core.IEventCallback;
-import mnefzger.de.sensorplatform.Core.ISensorCallback;
-import mnefzger.de.sensorplatform.InteractionEvents;
+import mnefzger.de.sensorplatformshared.InteractionEvents;
 
 public class UserPhoneBluetoothServer {
 

@@ -1,8 +1,5 @@
-package mnefzger.de.sensorplatform;
+package mnefzger.de.sensorplatformshared;
 
-/**
- * Created by matthias on 05/09/16.
- */
 public class InteractionEvents {
     public static final String TOUCH = "INTERACTION_TOUCH";
 

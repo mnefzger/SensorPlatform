@@ -137,8 +137,6 @@ public class Preferences {
         return value;
     }
 
-
-
     public static int getRawDataDelay(SharedPreferences prefs) {
         String valueString = prefs.getString(FREQUENCY_RAWDATA, "500");
 

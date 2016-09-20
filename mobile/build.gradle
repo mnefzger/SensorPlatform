@@ -52,4 +52,5 @@ dependencies {
     compile 'com.android.volley:volley:1.0.0'
     compile 'com.github.pires:obd-java-api:1.0-RC16'
     compile 'com.jakewharton.threetenabp:threetenabp:1.0.3'
+    compile project(path: ':shared')
 }

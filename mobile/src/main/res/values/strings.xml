@@ -3,4 +3,7 @@
     <string name="sensor_preferences_key">sensor_preferences</string>
     <string name="settings_preferences_key">settings_preferences</string>
     <string name="study_preferences_key">study_preferences</string>
+
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
 </resources>

@@ -1,6 +1,7 @@
 package mnefzger.de.sensorplatform.UI;
 
 
+import android.app.Activity;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.os.Bundle;
@@ -44,7 +45,7 @@ public class SettingsFragment extends PreferenceFragment
 
         SharedPreferences sensor_prefs = getActivity().getSharedPreferences(getActivity().getString(R.string.sensor_preferences_key), Context.MODE_PRIVATE);
 
-        if(sensor_prefs.getBoolean("front_active", true) == false && sensor_prefs.getBoolean("back_active", true) == false ) {
+        if(!sensor_prefs.getBoolean("front_active", true) && !sensor_prefs.getBoolean("back_active", true) ) {
             CheckBoxPreference box = (CheckBoxPreference) findPreference("image_saving");
             box.setChecked(false);
             box.setEnabled(false);
@@ -68,7 +69,9 @@ public class SettingsFragment extends PreferenceFragment
 
     @Override
     public void onClick(View v) {
-        startApplication();
+        //startApplication();
+        MainActivity main = (MainActivity)getActivity();
+        main.goToCameraPreviewFragment();
     }
 
     @Override
@@ -88,7 +91,7 @@ public class SettingsFragment extends PreferenceFragment
             boolean obd = sharedPreferences.getBoolean("obd_raw", false);
             SharedPreferences.Editor editor = sharedPreferences.edit();
             editor.putBoolean("obd_raw", obd);
-            editor.commit();
+            editor.apply();
         }
     }
 }

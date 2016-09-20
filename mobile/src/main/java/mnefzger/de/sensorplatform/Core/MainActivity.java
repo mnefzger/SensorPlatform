@@ -20,6 +20,7 @@ import android.util.Log;
 import mnefzger.de.sensorplatform.External.OBD2Connection;
 import mnefzger.de.sensorplatform.R;
 import mnefzger.de.sensorplatform.UI.AppFragment;
+import mnefzger.de.sensorplatform.UI.CameraPreviewFragment;
 import mnefzger.de.sensorplatform.UI.OBDSetupFragment;
 import mnefzger.de.sensorplatform.UI.SecondPhoneSetupFragment;
 import mnefzger.de.sensorplatform.UI.SensorSetupFragment;
@@ -49,6 +50,7 @@ public class MainActivity extends AppCompatActivity {
     SettingsFragment settings;
     AppFragment appFragment;
     SurveyFragment surveyFragment;
+    CameraPreviewFragment cameraFragment;
 
     SensorPlatformService sPS;
     public static boolean mBound = false;
@@ -88,7 +90,6 @@ public class MainActivity extends AppCompatActivity {
             }
 
         } else {
-
             // if the data collection was already started, set reference to the UI fragment that shows live data
             started = savedInstanceState.getBoolean("started");
 
@@ -221,7 +222,7 @@ public class MainActivity extends AppCompatActivity {
     public void onDestroy() {
         super.onDestroy();
 
-        if(checkIfServiceRunning() && !started && !SensorPlatformService.serviceRunning) {
+        if(false && checkIfServiceRunning() && !started && !SensorPlatformService.serviceRunning) {
             Intent intent = new Intent(this, SensorPlatformService.class);
             intent.setAction("SERVICE_STOP");
             stopService(intent);
@@ -272,10 +273,27 @@ public class MainActivity extends AppCompatActivity {
         this.setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_UNSPECIFIED);
     }
 
+    public void goToCameraPreviewFragment() {
+        cameraFragment = new CameraPreviewFragment();
+        changeFragment(cameraFragment, true, true);
+        this.setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_REVERSE_LANDSCAPE);
+
+        Handler h = new Handler();
+        h.postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                //cameraFragment.start();
+            }
+        }, 2000);
+    }
+
+
     public void goToSurveyFragment() {
         surveyFragment = new SurveyFragment();
         changeFragment(surveyFragment, true, true);
         this.setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_REVERSE_LANDSCAPE);
+
+
     }
 
     MainActivity getActivity() {

@@ -10,10 +10,16 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.os.Handler;
 import android.os.Message;
+import android.os.SystemClock;
 import android.util.Log;
 
 import java.io.IOException;
 import java.util.UUID;
+
+import mnefzger.de.sensorplatform.Core.EventVector;
+import mnefzger.de.sensorplatform.Core.IEventCallback;
+import mnefzger.de.sensorplatform.Core.ISensorCallback;
+import mnefzger.de.sensorplatform.InteractionEvents;
 
 public class UserPhoneBluetoothServer {
 
@@ -26,7 +32,10 @@ public class UserPhoneBluetoothServer {
 
     private AcceptThread acceptThread;
 
-    public UserPhoneBluetoothServer(Context c) {
+    private IEventCallback callback;
+
+    public UserPhoneBluetoothServer(IEventCallback callback, Context c) {
+        this.callback = callback;
         this.c = c;
     }
 
@@ -136,6 +145,23 @@ public class UserPhoneBluetoothServer {
 
         public void processMessage(String m){
             Log.d("BLUETOOTH_SERVER", "Received: " +  m);
+            String description = "";
+            switch (m) {
+                case InteractionEvents.TOUCH:
+                    description = m;
+                    break;
+                case InteractionEvents.NOTIFICATION:
+                    description = m;
+                    break;
+                case InteractionEvents.SCREEN_ON:
+                    description = m;
+                    break;
+                default:
+                    break;
+            }
+
+            if(!description.equals(""))
+                callback.onEventDetected(new EventVector(false, System.currentTimeMillis(), description, 1));
         }
 
         public void cancel() {

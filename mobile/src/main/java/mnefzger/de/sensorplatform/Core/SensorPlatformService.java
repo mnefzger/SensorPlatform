@@ -72,7 +72,7 @@ public class SensorPlatformService extends Service implements IDataCallback, ITr
         this.lm = LoggingModule.getInstance();
 
         this.im = new ImageModule(this, getApplication());
-        this.server = new UserPhoneBluetoothServer(getApplication());
+        this.server = new UserPhoneBluetoothServer(sm, getApplication());
 
         this.teDetector = new TripEndDetector(this, getApplication());
 

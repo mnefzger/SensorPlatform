@@ -27,13 +27,7 @@ public class Preferences {
 
     public static final String BACK_CAMERA = "back_active";
 
-    public static final String FRONT_PROCESSING = "image_front_processing";
-
-    public static final String BACK_PROCESSING = "image_back_processing";
-
-    public static final String VIDEO_SAVING = "image_saving";
-
-    public static final String VIDEO_RESOLUTION = "video_resolution";
+    public static final String WEATHER = "weather_active";
 
 
     public static final String FREQUENCY_RAWDATA = "frequency_rawData";
@@ -56,6 +50,14 @@ public class Preferences {
 
     public static final String OBD_REQUEST_RATE = "obdRequest_frequency";
 
+
+    public static final String FRONT_PROCESSING = "image_front_processing";
+
+    public static final String BACK_PROCESSING = "image_back_processing";
+
+    public static final String VIDEO_SAVING = "image_saving";
+
+    public static final String VIDEO_RESOLUTION = "video_resolution";
 
     public static final String FRONT_CAMERA_FPS = "front_max_fps";
 
@@ -129,23 +131,13 @@ public class Preferences {
         return value;
     }
 
-    public static boolean frontImagesProcessingActivated(SharedPreferences prefs) {
-        boolean value = prefs.getBoolean(FRONT_PROCESSING, true);
+    public static boolean weatherActivated(SharedPreferences prefs) {
+        boolean value = prefs.getBoolean(WEATHER, true);
 
         return value;
     }
 
-    public static boolean backImagesProcessingActivated(SharedPreferences prefs) {
-        boolean value = prefs.getBoolean(BACK_PROCESSING, true);
 
-        return value;
-    }
-
-    public static boolean videoSavingActivated(SharedPreferences prefs) {
-        boolean value = prefs.getBoolean(VIDEO_SAVING, true);
-
-        return value;
-    }
 
     public static int getRawDataDelay(SharedPreferences prefs) {
         String valueString = prefs.getString(FREQUENCY_RAWDATA, "500");
@@ -301,7 +293,7 @@ public class Preferences {
     }
 
     /**
-     * Location
+     * LOCATION
      */
     public static int getOSMRequestRate(SharedPreferences prefs) {
         String valueString = prefs.getString(OSM_REQUEST_RATE, "5000");
@@ -343,6 +335,25 @@ public class Preferences {
     /**
      *  CAMERA
      */
+    public static boolean frontImagesProcessingActivated(SharedPreferences prefs) {
+        boolean value = prefs.getBoolean(FRONT_PROCESSING, true);
+
+        return value;
+    }
+
+
+    public static boolean backImagesProcessingActivated(SharedPreferences prefs) {
+        boolean value = prefs.getBoolean(BACK_PROCESSING, true);
+
+        return value;
+    }
+
+    public static boolean videoSavingActivated(SharedPreferences prefs) {
+        boolean value = prefs.getBoolean(VIDEO_SAVING, true);
+
+        return value;
+    }
+
     public static int getFrontFPS(SharedPreferences prefs) {
         String valueString = prefs.getString(FRONT_CAMERA_FPS, "15");
 
@@ -434,6 +445,10 @@ public class Preferences {
 
         return value;
     }
+
+    /**
+     * LOGGING AND SURVEY
+     */
 
     public static boolean rawLoggingActivated(SharedPreferences prefs) {
         boolean value = prefs.getBoolean(LOGGING_RAW, false);

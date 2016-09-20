@@ -25,12 +25,17 @@
         <CheckBoxPreference
             android:key="front_active"
             android:title="Front camera"
-            android:summary="Activate video capture with the front camera"
+            android:summary="Activates video capture with the front camera"
             android:defaultValue="true"/>
         <CheckBoxPreference
             android:key="back_active"
             android:title="Back camera"
-            android:summary="Activate video capture with the back camera"
+            android:summary="Activates video capture with the back camera"
+            android:defaultValue="true"/>
+        <CheckBoxPreference
+            android:key="weather_active"
+            android:title="Weather Conditions"
+            android:summary="Activates updates on the current weather conditions. Requires internet connection."
             android:defaultValue="true"/>
     </PreferenceCategory>
 

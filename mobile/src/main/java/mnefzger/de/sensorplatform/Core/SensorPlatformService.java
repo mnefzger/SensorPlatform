@@ -98,7 +98,6 @@ public class SensorPlatformService extends Service implements IDataCallback, ITr
         startWaitBehaviour();
     }
 
-
     public void subscribe() {
         /**
          * Logging
@@ -152,8 +151,10 @@ public class SensorPlatformService extends Service implements IDataCallback, ITr
             subscribeTo(DataType.HEART_RATE);
         }
 
-        //TODO
-        subscribeTo(DataType.WEATHER);
+        if(Preferences.weatherActivated(sensor_prefs)) {
+            subscribeTo(DataType.WEATHER);
+        }
+
     }
 
     public boolean subscribeTo(DataType type) {

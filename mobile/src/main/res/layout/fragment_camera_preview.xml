@@ -100,8 +100,9 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="Front Camera"
-                android:id="@+id/button"
-                android:layout_gravity="center" />
+                android:id="@+id/switchButton"
+                android:layout_gravity="center"
+                android:background="@drawable/start_button" />
         </FrameLayout>
 
     </FrameLayout>

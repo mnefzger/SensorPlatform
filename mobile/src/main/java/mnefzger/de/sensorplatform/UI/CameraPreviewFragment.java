@@ -37,6 +37,7 @@ import android.view.Surface;
 import android.view.TextureView;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.FrameLayout;
 import android.widget.Toast;
 
@@ -89,7 +90,7 @@ public class CameraPreviewFragment extends Fragment {
 
         @Override
         public void onSurfaceTextureAvailable(SurfaceTexture texture, int width, int height) {
-            openCamera(mTextureView.getWidth(), mTextureView.getHeight());
+            openCamera("0", mTextureView.getWidth(), mTextureView.getHeight());
         }
 
         @Override
@@ -112,7 +113,7 @@ public class CameraPreviewFragment extends Fragment {
     /**
      * ID of the current {@link CameraDevice}.
      */
-    private String mCameraId;
+    private String mCameraId = "0";
 
     /**
      * An {@link AutoFitTextureView} for camera preview.
@@ -316,7 +317,6 @@ public class CameraPreviewFragment extends Fragment {
 
     @Override
     public void onViewCreated(final View view, Bundle savedInstanceState) {
-        Log.d("CAMERA", "onViewCreated");
         mTextureView = (AutoFitTextureView) view.findViewById(R.id.texture);
         mTextureView.setSurfaceTextureListener(mSurfaceTextureListener);
 
@@ -331,6 +331,24 @@ public class CameraPreviewFragment extends Fragment {
                 preview.setVisibility(View.VISIBLE);
             }
         });
+
+        final Button switchButton = (Button) view.findViewById(R.id.switchButton);
+        switchButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                if(mCameraId.equals("0"))
+                    mCameraId = "1";
+                else
+                    mCameraId = "0";
+
+                mCameraDevice.close();
+                openCamera(mCameraId, mTextureView.getWidth(), mTextureView.getHeight());
+
+                String newButtonText = mCameraId.equals("0") ? "Front Camera" : "Back Camera";
+                switchButton.setText(newButtonText);
+            }
+        });
+
     }
 
     @Override
@@ -458,7 +476,6 @@ public class CameraPreviewFragment extends Fragment {
                             mPreviewSize.getHeight(), mPreviewSize.getWidth());
                 }
 
-                mCameraId = cameraId;
                 return;
             }
         } catch (CameraAccessException e) {
@@ -471,7 +488,7 @@ public class CameraPreviewFragment extends Fragment {
     /**
      * Opens the camera
      */
-    private void openCamera(int width, int height) {
+    private void openCamera(String id, int width, int height) {
         if (ContextCompat.checkSelfPermission(getActivity(), Manifest.permission.CAMERA)
                 != PackageManager.PERMISSION_GRANTED) {
             return;
@@ -481,7 +498,7 @@ public class CameraPreviewFragment extends Fragment {
         Activity activity = getActivity();
         CameraManager manager = (CameraManager) activity.getSystemService(Context.CAMERA_SERVICE);
         try {
-            manager.openCamera(mCameraId, mStateCallback, mBackgroundHandler);
+            manager.openCamera(id, mStateCallback, mBackgroundHandler);
         } catch (CameraAccessException e) {
             e.printStackTrace();
         }

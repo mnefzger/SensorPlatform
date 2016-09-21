@@ -22,6 +22,10 @@ public class ActiveSubscriptions {
         }
     }
 
+    public static boolean isEmpty() {
+        return activeSubscriptions.isEmpty();
+    }
+
     public static void removeAll() {
         activeSubscriptions.clear();
     }

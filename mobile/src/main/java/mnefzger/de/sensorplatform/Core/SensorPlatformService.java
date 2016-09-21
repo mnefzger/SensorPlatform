@@ -90,8 +90,15 @@ public class SensorPlatformService extends Service implements IDataCallback, ITr
         tsDetector.cancel();
         teDetector.reset();
         this.onEventData(new EventVector(true, System.currentTimeMillis(), "Trip Start detected", 0));
-        prepareTripLogging();
-        restartDataCollection();
+
+        if(ActiveSubscriptions.isEmpty())
+            subscribe();
+        else {
+            prepareTripLogging();
+            restartDataCollection();
+        }
+
+
         waiting = false;
     }
 

@@ -39,17 +39,17 @@ public class DataVector {
     /**
      * vehicle speed in km/h
      */
-    public double speed;
+    public Double speed = null;
 
     public String weather;
 
-    public double obdSpeed;
+    public Double obdSpeed = null;
 
-    public double rpm;
+    public Double rpm = null;
 
-    public double fuel;
+    public Double fuel = null;
 
-    public double heartRate;
+    public Double heartRate = null;
 
     public DataVector() {
         setDateTime();
@@ -98,7 +98,7 @@ public class DataVector {
         this.lon = lon;
     }
 
-    public void setSpeed(double s) {
+    public void setSpeed(Double s) {
         this.speed = s;
     }
 
@@ -106,19 +106,19 @@ public class DataVector {
         this.weather = weather;
     }
 
-    public void setOBDSpeed(double s) {
+    public void setOBDSpeed(Double s) {
         this.obdSpeed = s;
     }
 
-    public void setRPM(double r) {
+    public void setRPM(Double r) {
         this.rpm = r;
     }
 
-    public void setFuel(double f) {
+    public void setFuel(Double f) {
         this.fuel = f;
     }
 
-    public void setHeartRate(double heartRate) {
+    public void setHeartRate(Double heartRate) {
         this.heartRate = heartRate;
     }
 

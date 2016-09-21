@@ -4,6 +4,8 @@ import android.content.Context;
 import android.content.SharedPreferences;
 import android.util.Log;
 
+import mnefzger.de.sensorplatform.External.OBD2Connection;
+import mnefzger.de.sensorplatform.External.OBD2Connector;
 import mnefzger.de.sensorplatform.R;
 
 
@@ -30,7 +32,7 @@ public class TripEndDetector {
             return;
 
         boolean obd_active = Preferences.OBDActivated(sensor_prefs);
-        if(obd_active)
+        if(obd_active && OBD2Connection.sock.isConnected())
             checkInOBD(dv);
 
         boolean location_active = Preferences.locationActivated(sensor_prefs);

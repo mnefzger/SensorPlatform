@@ -42,6 +42,7 @@ public class SensorPlatformService extends Service implements IDataCallback, ITr
     private final IBinder mBinder = new LocalBinder();
 
     public static boolean serviceRunning = false;
+    private boolean waiting;
 
     /**
      * Class used for the client Binder.  Because we know this service always
@@ -81,6 +82,7 @@ public class SensorPlatformService extends Service implements IDataCallback, ITr
     public void startWaitBehaviour() {
         tsDetector = new TripStartDetector(getApplication(), this);
         serviceRunning = true;
+        waiting = true;
     }
 
     @Override
@@ -88,16 +90,15 @@ public class SensorPlatformService extends Service implements IDataCallback, ITr
         tsDetector.cancel();
         teDetector.reset();
         this.onEventData(new EventVector(true, System.currentTimeMillis(), "Trip Start detected", 0));
-        //subscribe();
         prepareTripLogging();
         restartDataCollection();
+        waiting = false;
     }
 
     @Override
     public void onTripEnd() {
         this.onEventData(new EventVector(true, System.currentTimeMillis(), "Trip End detected", 0));
         pauseDataCollection();
-        //ActiveSubscriptions.removeAll();
         startWaitBehaviour();
     }
 
@@ -212,6 +213,10 @@ public class SensorPlatformService extends Service implements IDataCallback, ITr
 
     @Override
     public void onRawData(DataVector dv) {
+        // ignore any incoming data if we are in waiting behaviour
+        if(waiting)
+            return;
+
         teDetector.checkForTripEnd(dv);
 
         // the time-to-collision calculation needs info about the current speed
@@ -231,6 +236,10 @@ public class SensorPlatformService extends Service implements IDataCallback, ITr
     long lastSave = System.currentTimeMillis();
     @Override
     public void onEventData(EventVector ev) {
+        // ignore incoming events (e.g. from user phone interactions) while we are not driving
+        if(waiting)
+            return;
+
         if(Preferences.videoSavingActivated(setting_prefs) && !ev.isDebug()) {
             long now = System.currentTimeMillis();
 

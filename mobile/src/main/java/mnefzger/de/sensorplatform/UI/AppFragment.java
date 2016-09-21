@@ -209,7 +209,7 @@ public class AppFragment extends Fragment {
                 obdSpeed.setText("OBD Speed: " + v.obdSpeed + " km/h");
                 obdFuel.setText("OBD Fuel: " + v.fuel + " l/100km");
 
-                heart.setText("Heart Rate: " + v.heartRate + "bpm");
+                heart.setText("Heart Rate: " + v.heartRate + " bpm");
             }
         });
 

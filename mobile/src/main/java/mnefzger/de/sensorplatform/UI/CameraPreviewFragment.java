@@ -141,7 +141,6 @@ public class CameraPreviewFragment extends Fragment {
         @Override
         public void onOpened(@NonNull CameraDevice cameraDevice) {
             // This method is called when the camera is opened.  We start camera preview here.
-            Log.d("CAMERA", "onOpened");
             mCameraDevice = cameraDevice;
             createCameraPreviewSession();
         }
@@ -370,6 +369,7 @@ public class CameraPreviewFragment extends Fragment {
         previewComplete.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+                closeCamera();
                 ((MainActivity) getActivity()).startMeasuring();
             }
         });
@@ -394,7 +394,6 @@ public class CameraPreviewFragment extends Fragment {
 
     public void start(){
         if (mCameraDevice != null) {
-
             createCameraPreviewSession();
         }
     }

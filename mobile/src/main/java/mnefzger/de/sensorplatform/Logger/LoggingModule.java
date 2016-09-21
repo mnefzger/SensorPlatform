@@ -1,6 +1,7 @@
 package mnefzger.de.sensorplatform.Logger;
 
 import android.os.Environment;
+import android.util.Log;
 
 import com.opencsv.CSVWriter;
 
@@ -49,6 +50,7 @@ public class LoggingModule {
 
     public void generateNewLoggingID() {
         tripID = System.currentTimeMillis();
+        Log.d("LOGGING", "New Trip ID " +tripID);
     }
 
     public void createNewTripFileSet() {

@@ -28,7 +28,7 @@ public class ImageProcessor{
     private IEventCallback callback;
 
     private boolean faceProcRunning = false;
-    private double currentSpeed;
+    private Double currentSpeed;
 
     static{
         System.loadLibrary("opencv_java3");
@@ -48,7 +48,7 @@ public class ImageProcessor{
         nInitCascades();
     }
 
-    public void setCurrentSpeed(double currentSpeed) {
+    public void setCurrentSpeed(Double currentSpeed) {
         this.currentSpeed = currentSpeed;
     }
 
@@ -158,7 +158,7 @@ public class ImageProcessor{
     }
 
     private void detectTailgating(double distance) {
-        if(currentSpeed > 0) {
+        if(currentSpeed != null && currentSpeed > 0) {
             // Time to collision
             double TTC = distance / (currentSpeed / 3.6);
 

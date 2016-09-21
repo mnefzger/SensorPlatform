@@ -32,7 +32,7 @@ public class TripEndDetector {
             return;
 
         boolean obd_active = Preferences.OBDActivated(sensor_prefs);
-        if(obd_active && OBD2Connection.sock.isConnected())
+        if(obd_active && OBD2Connection.sock != null && OBD2Connection.sock.isConnected())
             checkInOBD(dv);
 
         boolean location_active = Preferences.locationActivated(sensor_prefs);

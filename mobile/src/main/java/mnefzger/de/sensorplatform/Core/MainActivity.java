@@ -222,6 +222,7 @@ public class MainActivity extends AppCompatActivity {
     public void onDestroy() {
         super.onDestroy();
 
+        //TODO
         if(false && checkIfServiceRunning() && !started && !SensorPlatformService.serviceRunning) {
             Intent intent = new Intent(this, SensorPlatformService.class);
             intent.setAction("SERVICE_STOP");
@@ -277,14 +278,6 @@ public class MainActivity extends AppCompatActivity {
         cameraFragment = new CameraPreviewFragment();
         changeFragment(cameraFragment, true, true);
         this.setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_REVERSE_LANDSCAPE);
-
-        Handler h = new Handler();
-        h.postDelayed(new Runnable() {
-            @Override
-            public void run() {
-                //cameraFragment.start();
-            }
-        }, 2000);
     }
 
 

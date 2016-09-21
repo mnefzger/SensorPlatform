@@ -107,11 +107,13 @@ public class ImageModule implements IEventCallback{
     private void setPrefs() {
         FRONT_MAX_FPS = Preferences.getFrontFPS(setting_prefs);
         FRONT_PROCESSING_FPS = Preferences.getFrontProcessingFPS(setting_prefs);
-        FRONT_AVG_FPS = FRONT_MAX_FPS;
+        //FRONT_AVG_FPS = FRONT_MAX_FPS;
+        FRONT_AVG_FPS = 30;
 
         BACK_MAX_FPS = Preferences.getBackFPS(setting_prefs);
         BACK_PROCESSING_FPS = Preferences.getBackProcessingFPS(setting_prefs);
-        BACK_AVG_FPS = BACK_MAX_FPS;
+        //BACK_AVG_FPS = BACK_MAX_FPS;
+        BACK_AVG_FPS = 30;
     }
 
     public void startCapture() {
@@ -301,14 +303,14 @@ public class ImageModule implements IEventCallback{
     private double lastFrontProc = System.currentTimeMillis();
     private int frontIt = 0;
     private void handleImageFront(Image i) {
+        double now = System.currentTimeMillis();
+
         if(i != null) {
             final byte[] bytes = getBytes(i);
             final int w = i.getWidth();
             final int h = i.getHeight();
             i.close();
             //YuvImage yuvimage;
-
-            double now = System.currentTimeMillis();
 
             /**
              * Decide if frame is to be processed or not
@@ -327,18 +329,14 @@ public class ImageModule implements IEventCallback{
                 lastFrontProc = now;
             }
 
-            /**
-             * Store the received image (either processed or raw)
-             */
-            if(now - lastFront >= (1000/(1+FRONT_MAX_FPS)) ) {
-                double latestFPS = 1000 / (now - lastFront);
-                FRONT_AVG_FPS = 0.995*FRONT_AVG_FPS + 0.005*latestFPS;
-                //Log.d("FPS front", FRONT_AVG_FPS+", " +latestFPS);
+            double latestFPS = 1000 / (now - lastFront);
+            //FRONT_AVG_FPS = 0.995*FRONT_AVG_FPS + 0.005*latestFPS;
+            if(latestFPS > 5 && latestFPS < 40)
+                FRONT_AVG_FPS = (FRONT_AVG_FPS + latestFPS)/2.0;
 
-                frontImagesCV.append(frontIt, bytes);
-                frontIt++;
-                lastFront = now;
-            }
+            frontImagesCV.append(frontIt, bytes);
+            frontIt++;
+            lastFront = now;
 
             /**
              * Only store the last ten seconds in the image buffer
@@ -355,14 +353,14 @@ public class ImageModule implements IEventCallback{
     private double lastBackProc = System.currentTimeMillis();
     private int backIt = 0;
     private void handleImageBack(Image i) {
+        double now = System.currentTimeMillis();
+
         if(i != null) {
             final byte[] bytes = getBytes(i);
             final int w = i.getWidth();
             final int h = i.getHeight();
             i.close();
             //YuvImage yuvimage = new YuvImage(bytes, ImageFormat.NV21, w, h, null);
-
-            double now = System.currentTimeMillis();
 
             /**
              * Decide if frame is to be processed or not
@@ -381,18 +379,20 @@ public class ImageModule implements IEventCallback{
                   lastBackProc = now;
             }
 
-            /**
-             * Store the received image (either processed or raw)
-             */
-            if(now - lastBack >= (1000/(1+BACK_MAX_FPS)) ) {
+            //if(now - lastBack >= (1000/(1+BACK_MAX_FPS)) ) {
                 double latestFPS = 1000 / (now - lastBack);
-                BACK_AVG_FPS = 0.995*BACK_AVG_FPS + 0.005*latestFPS;
-                //Log.d("FPS back", BACK_AVG_FPS+", " +latestFPS);
+                //BACK_AVG_FPS = 0.995*BACK_AVG_FPS + 0.005*latestFPS;
+
+                // filter out extreme values
+                if(latestFPS > 5 && latestFPS < 40)
+                    BACK_AVG_FPS = (BACK_AVG_FPS + latestFPS)/2.0;
+
+                Log.d("FPS back", BACK_AVG_FPS+", " +latestFPS);
 
                 backImagesCV.put(backIt, bytes);
                 backIt++;
                 lastBack = now;
-            }
+            //}
 
 
             /**
@@ -438,7 +438,7 @@ public class ImageModule implements IEventCallback{
         return bmp;
     }
 
-    public void updateSpeed(double speed, double obdSpeed) {
+    public void updateSpeed(Double speed, Double obdSpeed) {
         if(Preferences.OBDActivated(sensor_prefs))
             imgProc.setCurrentSpeed(obdSpeed);
         else

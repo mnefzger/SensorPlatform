@@ -124,6 +124,7 @@ public class SecondPhoneSetupFragment extends Fragment {
                 connectionComplete();
                 MainActivity app = (MainActivity) getActivity();
                 app.unregisterReceiver(mReceiver);
+                receiverRegistered = false;
 
             } else if(action.equals("PHONE_NOT_FOUND")) {
                 //notFound();

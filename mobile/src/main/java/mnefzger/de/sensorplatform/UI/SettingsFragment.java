@@ -15,13 +15,14 @@ import android.widget.FrameLayout;
 import android.widget.TextView;
 
 import mnefzger.de.sensorplatform.Core.MainActivity;
+import mnefzger.de.sensorplatform.Core.Preferences;
 import mnefzger.de.sensorplatform.R;
 
 
 public class SettingsFragment extends PreferenceFragment
         implements View.OnClickListener, SharedPreferences.OnSharedPreferenceChangeListener {
 
-    TextView topbar;
+    SharedPreferences sensor_prefs;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -43,7 +44,7 @@ public class SettingsFragment extends PreferenceFragment
         SharedPreferences setting_prefs = getActivity().getSharedPreferences(getActivity().getString(R.string.settings_preferences_key), Context.MODE_PRIVATE);
         setting_prefs.registerOnSharedPreferenceChangeListener(this);
 
-        SharedPreferences sensor_prefs = getActivity().getSharedPreferences(getActivity().getString(R.string.sensor_preferences_key), Context.MODE_PRIVATE);
+        sensor_prefs = getActivity().getSharedPreferences(getActivity().getString(R.string.sensor_preferences_key), Context.MODE_PRIVATE);
 
         if(!sensor_prefs.getBoolean("front_active", true) && !sensor_prefs.getBoolean("back_active", true) ) {
             CheckBoxPreference box = (CheckBoxPreference) findPreference("image_saving");
@@ -51,11 +52,6 @@ public class SettingsFragment extends PreferenceFragment
             box.setEnabled(false);
             box.setSelectable(false);
         }
-
-        /*topbar = (TextView) v.findViewById(R.id.settings_topbar_text);
-        SharedPreferences studyPrefs = getActivity().getSharedPreferences(getString(R.string.study_preferences_key), Context.MODE_PRIVATE);
-        String studyName = studyPrefs.getString("study_name", "");
-        topbar.setText("New Study: " + studyName);*/
 
         return v;
     }
@@ -69,9 +65,10 @@ public class SettingsFragment extends PreferenceFragment
 
     @Override
     public void onClick(View v) {
-        //startApplication();
-        MainActivity main = (MainActivity)getActivity();
-        main.goToCameraPreviewFragment();
+        if(Preferences.frontCameraActivated(sensor_prefs) || Preferences.backCameraActivated(sensor_prefs))
+            ((MainActivity)getActivity()).goToCameraPreviewFragment();
+        else
+            startApplication();
     }
 
     @Override

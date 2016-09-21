@@ -11,7 +11,6 @@ import android.graphics.Matrix;
 import android.graphics.Point;
 import android.graphics.RectF;
 import android.graphics.SurfaceTexture;
-import android.hardware.SensorManager;
 import android.hardware.camera2.CameraAccessException;
 import android.hardware.camera2.CameraCaptureSession;
 import android.hardware.camera2.CameraCharacteristics;
@@ -32,13 +31,13 @@ import android.util.Log;
 import android.util.Size;
 import android.util.SparseIntArray;
 import android.view.LayoutInflater;
-import android.view.OrientationEventListener;
 import android.view.Surface;
 import android.view.TextureView;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.FrameLayout;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import java.util.ArrayList;
@@ -46,9 +45,8 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
-import java.util.concurrent.Semaphore;
-import java.util.concurrent.TimeUnit;
 
+import mnefzger.de.sensorplatform.Core.MainActivity;
 import mnefzger.de.sensorplatform.R;
 import mnefzger.de.sensorplatform.Utilities.AutoFitTextureView;
 
@@ -315,10 +313,17 @@ public class CameraPreviewFragment extends Fragment {
         return inflater.inflate(R.layout.fragment_camera_preview, container, false);
     }
 
+    private FrameLayout previewComplete;
+    private TextView hintFront, hintBack;
+
     @Override
     public void onViewCreated(final View view, Bundle savedInstanceState) {
         mTextureView = (AutoFitTextureView) view.findViewById(R.id.texture);
         mTextureView.setSurfaceTextureListener(mSurfaceTextureListener);
+
+        hintBack = (TextView) view.findViewById(R.id.hintBack);
+        hintFront = (TextView) view.findViewById(R.id.hintFront);
+        previewComplete = (FrameLayout) view.findViewById(R.id.previewCompleteButton);
 
         final FrameLayout first = (FrameLayout) view.findViewById(R.id.cameraSetupFirst);
         final FrameLayout preview = (FrameLayout) view.findViewById(R.id.cameraSetupPreview);
@@ -344,8 +349,28 @@ public class CameraPreviewFragment extends Fragment {
                 mCameraDevice.close();
                 openCamera(mCameraId, mTextureView.getWidth(), mTextureView.getHeight());
 
-                String newButtonText = mCameraId.equals("0") ? "Front Camera" : "Back Camera";
-                switchButton.setText(newButtonText);
+                previewComplete.setVisibility(View.VISIBLE);
+
+                switch (mCameraId) {
+                    case "0":
+                        switchButton.setText("Front Camera");
+                        hintBack.setVisibility(View.VISIBLE);
+                        hintFront.setVisibility(View.GONE);
+                        break;
+                    case "1":
+                        switchButton.setText("Back Camera");
+                        hintBack.setVisibility(View.GONE);
+                        hintFront.setVisibility(View.VISIBLE);
+                        break;
+                }
+
+            }
+        });
+
+        previewComplete.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                ((MainActivity) getActivity()).startMeasuring();
             }
         });
 

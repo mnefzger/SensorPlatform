@@ -2,6 +2,7 @@ package mnefzger.de.sensorplatform.Core;
 
 import android.content.Context;
 import android.content.SharedPreferences;
+import android.util.Log;
 
 import mnefzger.de.sensorplatform.R;
 
@@ -12,6 +13,7 @@ public class TripEndDetector {
 
     private boolean counting = false;
     private Long firstStop = null;
+    private int count = 0;
 
     private ITripDetectionCallback callback;
 
@@ -24,6 +26,8 @@ public class TripEndDetector {
 
 
     public void checkForTripEnd(DataVector dv) {
+        if(++count < 10)
+            return;
 
         boolean obd_active = Preferences.OBDActivated(sensor_prefs);
         if(obd_active)
@@ -37,8 +41,15 @@ public class TripEndDetector {
 
     private void checkInOBD(DataVector dv) {
         if(dv.rpm == 0) {
-            //callback.onTripEnd();
+            Log.d("TRIP END","Trip end in OBD");
+            callback.onTripEnd();
         }
+    }
+
+    public void reset() {
+        counting = false;
+        firstStop = null;
+        count = 0;
     }
 
     private void checkInSpeed(DataVector dv) {
@@ -50,12 +61,12 @@ public class TripEndDetector {
                 long duration = dv.timestamp - firstStop;
 
                 if(duration > 30000) {
+                    Log.d("TRIP END","Trip end in Speed");
                     callback.onTripEnd();
                 }
             }
         } else {
-            counting = false;
-            firstStop = null;
+            reset();
         }
     }
 }

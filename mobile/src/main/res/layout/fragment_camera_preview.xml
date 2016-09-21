@@ -8,7 +8,8 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:background="@color/colorPrimary"
-        android:id="@+id/cameraSetupFirst">
+        android:id="@+id/cameraSetupFirst"
+        android:visibility="visible">
 
         <TextView
             android:layout_width="wrap_content"
@@ -70,23 +71,41 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent">
 
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Please align the horizon with the blue line."
-                android:id="@+id/textView5"
-                android:textSize="19sp"
-                android:textColor="#fff"
-                android:layout_marginLeft="25dp"
-                android:layout_marginTop="10dp" />
-
             <LinearLayout
                 android:orientation="vertical"
                 android:layout_width="match_parent"
                 android:layout_height="4dp"
                 android:layout_gravity="center_vertical"
                 android:background="@color/colorAccent"
-                android:baselineAligned="true"></LinearLayout>
+                android:baselineAligned="true"
+                android:layout_marginTop="-2dp"></LinearLayout>
+
+            <FrameLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:paddingLeft="25dp"
+                android:paddingTop="10dp"
+                android:paddingBottom="10dp"
+                android:background="#500272a6">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Please align the horizon with the blue line."
+                    android:id="@+id/hintBack"
+                    android:textSize="19sp"
+                    android:textColor="#fff" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Please make sure that the driver&apos;s face is centered\nand clearly visible."
+                    android:id="@+id/hintFront"
+                    android:textSize="19sp"
+                    android:textColor="#fff"
+                    android:singleLine="false"
+                    android:visibility="gone" />
+            </FrameLayout>
 
         </FrameLayout>
 
@@ -94,7 +113,7 @@
             android:layout_width="175dp"
             android:layout_height="match_parent"
             android:layout_gravity="right|top"
-            android:background="@color/colorPrimaryDark">
+            android:background="@color/colorPrimary">
 
             <Button
                 android:layout_width="wrap_content"
@@ -103,6 +122,38 @@
                 android:id="@+id/switchButton"
                 android:layout_gravity="center"
                 android:background="@drawable/start_button" />
+            <FrameLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent">
+
+                <FrameLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="60dp"
+                    android:layout_gravity="bottom"
+                    android:background="@color/colorPrimaryDark"
+                    android:id="@+id/previewCompleteButton"
+                    android:visibility="gone">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="32dp"
+                        android:textSize="22dp"
+                        android:textStyle="bold"
+                        android:text="Start"
+                        android:id="@+id/textView4"
+                        android:layout_gravity="center_vertical|right"
+                        android:layout_marginRight="60dp"
+                        android:textColor="#fff"/>
+
+                    <ImageView
+                        android:layout_width="24dp"
+                        android:layout_height="32dp"
+                        android:id="@+id/imageView3"
+                        android:src="@drawable/arrow"
+                        android:layout_gravity="center_vertical|right"
+                        android:layout_marginRight="25dp" />
+                </FrameLayout>
+            </FrameLayout>
         </FrameLayout>
 
     </FrameLayout>

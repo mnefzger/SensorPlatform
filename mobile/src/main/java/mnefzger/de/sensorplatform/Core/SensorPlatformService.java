@@ -86,22 +86,22 @@ public class SensorPlatformService extends Service implements IDataCallback, ITr
     @Override
     public void onTripStart() {
         tsDetector.cancel();
+        teDetector.reset();
         this.onEventData(new EventVector(true, System.currentTimeMillis(), "Trip Start detected", 0));
-        subscribe();
+        //subscribe();
+        prepareTripLogging();
+        restartDataCollection();
     }
 
     @Override
     public void onTripEnd() {
         this.onEventData(new EventVector(true, System.currentTimeMillis(), "Trip End detected", 0));
         pauseDataCollection();
-        ActiveSubscriptions.removeAll();
+        //ActiveSubscriptions.removeAll();
         startWaitBehaviour();
     }
 
-    public void subscribe() {
-        /**
-         * Logging
-         */
+    private void prepareTripLogging() {
         lm.generateNewLoggingID();
 
         if(Preferences.rawLoggingActivated(setting_prefs)) {
@@ -116,6 +116,13 @@ public class SensorPlatformService extends Service implements IDataCallback, ITr
             lm.createNewTripFileSet();
             sm.setStudyParameters();
         }
+    }
+
+    public void subscribe() {
+        /**
+         * Logging
+         */
+        prepareTripLogging();
 
         /**
          * Data Collection

@@ -17,6 +17,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.View;
 import android.widget.AdapterView;
+import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.TextView;
 
@@ -27,6 +28,7 @@ public class MainActivity extends AppCompatActivity {
     private ListView deviceList;
     private DeviceListAdapter listAdapter;
     private TextView successText;
+    private LinearLayout successLayout, setupLayout;
 
     private static final String TAG = "USER_PHONE_MAIN";
 
@@ -40,6 +42,9 @@ public class MainActivity extends AppCompatActivity {
         listAdapter = new DeviceListAdapter(this);
         deviceList.setAdapter(listAdapter);
         successText = (TextView) findViewById(R.id.successText);
+
+        successLayout = (LinearLayout) findViewById(R.id.successLayout);
+        setupLayout = (LinearLayout) findViewById(R.id.setupLayout);
 
         deviceList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
@@ -109,9 +114,9 @@ public class MainActivity extends AppCompatActivity {
 
             runOnUiThread(new Runnable() {
                 public void run() {
-                    deviceList.setVisibility(View.INVISIBLE);
+                    setupLayout.setVisibility(View.INVISIBLE);
                     successText.setText("Connected to: " + BluetoothConnection.device.getName() + ".");
-                    successText.setVisibility(View.VISIBLE);
+                    successLayout.setVisibility(View.VISIBLE);
                 }
             });
 

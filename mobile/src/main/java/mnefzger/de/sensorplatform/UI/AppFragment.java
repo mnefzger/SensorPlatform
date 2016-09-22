@@ -149,7 +149,7 @@ public class AppFragment extends Fragment {
             MainActivity app = (MainActivity) getActivity();
             app.started = false;
             app.mBound = false;
-            app.goToStartFragment(25);
+            app.goToStartFragment(25, false);
 
         }
     };

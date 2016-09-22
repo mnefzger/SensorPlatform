@@ -50,7 +50,7 @@ public class SensorSetupFragment extends PreferenceFragment implements View.OnCl
     @Override
     public void onClick(View v) {
         MainActivity app = (MainActivity) getActivity();
-        app.goToOBDSetupFragment();
+        app.goToOBDSetupFragment(true);
     }
 
 }

@@ -52,7 +52,7 @@ public class StartFragment extends Fragment {
         @Override
         public void onClick(View v) {
             MainActivity app = (MainActivity) getActivity();
-            app.goToNewStudyFragment();
+            app.goToNewStudyFragment(true);
         }
     };
 

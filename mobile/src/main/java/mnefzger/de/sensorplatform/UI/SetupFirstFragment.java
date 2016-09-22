@@ -74,7 +74,7 @@ public class SetupFirstFragment extends Fragment {
             if(valid) {
                 writePreferences();
                 MainActivity app = (MainActivity) getActivity();
-                app.goToSensorSetupFragment();
+                app.goToSensorSetupFragment(true);
             }
         }
     };

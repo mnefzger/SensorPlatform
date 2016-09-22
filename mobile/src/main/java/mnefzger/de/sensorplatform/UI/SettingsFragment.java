@@ -90,7 +90,7 @@ public class SettingsFragment extends PreferenceFragment
     @Override
     public void onClick(View v) {
         if(Preferences.frontCameraActivated(sensor_prefs) || Preferences.backCameraActivated(sensor_prefs))
-            ((MainActivity)getActivity()).goToCameraPreviewFragment();
+            ((MainActivity)getActivity()).goToCameraPreviewFragment(true);
         else
             startApplication();
     }
@@ -98,8 +98,8 @@ public class SettingsFragment extends PreferenceFragment
     @Override
     public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key) {
         if(key.equals("front_active") || key.equals("back_active")) {
-            if(sharedPreferences.getBoolean("front_active", true) == false &&
-                    sharedPreferences.getBoolean("back_active", true) == false ) {
+            if(!sharedPreferences.getBoolean("front_active", true) &&
+                    !sharedPreferences.getBoolean("back_active", true)) {
                 findPreference("image_saving").setEnabled(false);
                 CheckBoxPreference box = (CheckBoxPreference) findPreference("image_saving");
                 box.setChecked(false);

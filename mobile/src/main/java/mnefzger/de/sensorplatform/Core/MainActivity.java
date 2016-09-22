@@ -56,6 +56,9 @@ public class MainActivity extends AppCompatActivity {
     public static boolean mBound = false;
     public static boolean started = false;
 
+    private boolean inAppFragment, inSensorFragment, inSettingsFragment,
+                    inOBDFragment, inCameraFragment = false;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -75,7 +78,7 @@ public class MainActivity extends AppCompatActivity {
                 bindService(intent, mConnection, Context.BIND_AUTO_CREATE);
                 startService(intent);
 
-                goToStartFragment(0);
+                goToStartFragment(0, true);
 
             } else {
                 started = true;
@@ -231,62 +234,97 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
+    @Override
+    public void onBackPressed() {
+        if(inAppFragment) {
+            goToStartFragment(0, false);
+            return;
+        } else if(inSensorFragment) {
+            goToNewStudyFragment(false);
+            return;
+        } else if(inSettingsFragment) {
+            goToPhoneSetupFragment(false);
+            return;
+        } else if(inOBDFragment) {
+            goToSensorSetupFragment(false);
+            return;
+        } else if(inCameraFragment) {
+            goToSettingsFragment(false);
+            return;
+        }
+        super.onBackPressed();
+    }
+
+
     public void goToAppFragment() {
         this.appFragment = new AppFragment();
-        changeFragment(this.appFragment, true, true);
+        changeFragment(this.appFragment, true, true, true);
 
         this.setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_REVERSE_LANDSCAPE);
+        inAppFragment = true;
     }
 
-    public void goToNewStudyFragment() {
+    public void goToNewStudyFragment(boolean forward) {
         setupFragment = new SetupFirstFragment();
-        changeFragment(setupFragment, true, true);
+        changeFragment(setupFragment, true, true, forward);
         this.setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_UNSPECIFIED);
     }
 
-    public void goToSensorSetupFragment() {
+    public void goToSensorSetupFragment(boolean forward) {
         sensorsFragment = new SensorSetupFragment();
         android.app.FragmentTransaction transaction = getFragmentManager().beginTransaction();
-        transaction.setCustomAnimations(R.animator.slide_in_right_animator, R.animator.slide_out_left_animator);
+        if(forward)
+            transaction.setCustomAnimations(R.animator.slide_in_right_animator, R.animator.slide_out_left_animator);
+        else
+            transaction.setCustomAnimations(R.animator.slide_out_left_animator, R.animator.slide_in_right_animator);
         transaction.addToBackStack(sensorsFragment.getClass().getName());
         transaction.replace(R.id.fragment_container, sensorsFragment).commit();
+
         this.setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_UNSPECIFIED);
+        inSensorFragment = true;
     }
 
-    public void goToOBDSetupFragment() {
+    public void goToOBDSetupFragment(boolean forward) {
         obdFragment = new OBDSetupFragment();
-        changeFragment(obdFragment, true, true);
+        changeFragment(obdFragment, true, true, forward);
         this.setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_UNSPECIFIED);
+
+        inOBDFragment = true;
     }
 
-    public void goToPhoneSetupFragment() {
+    public void goToPhoneSetupFragment(boolean forward) {
         phoneFragment = new SecondPhoneSetupFragment();
-        changeFragment(phoneFragment, true, true);
+        changeFragment(phoneFragment, true, true, forward);
         this.setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_UNSPECIFIED);
     }
 
-    public void goToSettingsFragment() {
+    public void goToSettingsFragment(boolean forward) {
         settings = new SettingsFragment();
         android.app.FragmentTransaction transaction = getFragmentManager().beginTransaction();
-        transaction.setCustomAnimations(R.animator.slide_in_right_animator, R.animator.slide_out_left_animator);
+        if(forward)
+            transaction.setCustomAnimations(R.animator.slide_in_right_animator, R.animator.slide_out_left_animator);
+        else
+            transaction.setCustomAnimations(R.animator.slide_out_left_animator, R.animator.slide_in_right_animator);
         transaction.addToBackStack(settings.getClass().getName());
         transaction.replace(R.id.fragment_container, settings).commit();
         this.setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_UNSPECIFIED);
+
+        inSettingsFragment = true;
     }
 
-    public void goToCameraPreviewFragment() {
+    public void goToCameraPreviewFragment(boolean forward) {
         cameraFragment = new CameraPreviewFragment();
-        changeFragment(cameraFragment, true, true);
+        changeFragment(cameraFragment, true, true, forward);
         this.setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_REVERSE_LANDSCAPE);
+
+        inCameraFragment = true;
     }
 
 
     public void goToSurveyFragment() {
         surveyFragment = new SurveyFragment();
-        changeFragment(surveyFragment, true, true);
+        changeFragment(surveyFragment, true, true, true);
         this.setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_REVERSE_LANDSCAPE);
-
-
     }
 
     MainActivity getActivity() {
@@ -296,14 +334,14 @@ public class MainActivity extends AppCompatActivity {
     /**
      * Changing to the StartFragment allows for a short delay to allow the service to shut down completely
      */
-    public void goToStartFragment(int ms) {
+    public void goToStartFragment(int ms, final boolean forward) {
         startFragment = new StartFragment();
 
         Handler wait = new Handler();
         wait.postDelayed(new Runnable() {
             @Override
             public void run() {
-                changeFragment(startFragment, true, true);
+                changeFragment(startFragment, true, true, forward);
                 MainActivity that = getActivity();
                 that.setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_UNSPECIFIED);
             }
@@ -311,7 +349,14 @@ public class MainActivity extends AppCompatActivity {
 
     }
 
-    private void changeFragment(Fragment frag, boolean saveInBackstack, boolean animate) {
+    private void changeFragment(Fragment frag, boolean saveInBackstack, boolean animate, boolean forward) {
+        // reset any fragment booleans
+        inAppFragment = false;
+        inSensorFragment = false;
+        inOBDFragment = false;
+        inSettingsFragment = false;
+        inCameraFragment = false;
+
         String backStateName = ((Object) frag).getClass().getName();
 
         try {
@@ -324,7 +369,10 @@ public class MainActivity extends AppCompatActivity {
                 FragmentTransaction transaction = manager.beginTransaction();
 
                 if (animate) {
-                    transaction.setCustomAnimations(R.anim.slide_in_right, R.anim.slide_out_left);
+                    if(forward)
+                        transaction.setCustomAnimations(R.anim.slide_in_right, R.anim.slide_out_left);
+                    else
+                        transaction.setCustomAnimations(R.anim.slide_out_left, R.anim.slide_in_right);
                 }
 
                 transaction.replace(R.id.fragment_container, frag, backStateName);
@@ -336,9 +384,11 @@ public class MainActivity extends AppCompatActivity {
                 transaction.commit();
 
             } else {
-                Log.w("FRAGMENT", "Already instatiated, popped back: " + backStateName);
-                FragmentTransaction transaction = manager.beginTransaction();
-                transaction.show(frag).commit();
+                Log.w("FRAGMENT", "Already instantiated, popped back: " + backStateName);
+                Fragment toShow = manager.findFragmentByTag(backStateName);
+                //FragmentTransaction transaction = manager.beginTransaction();
+                //transaction.show(toShow).commit();
+                toShow.getView().bringToFront();
 
             }
         } catch (IllegalStateException exception) {

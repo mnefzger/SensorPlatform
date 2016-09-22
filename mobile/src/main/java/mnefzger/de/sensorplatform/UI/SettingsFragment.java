@@ -67,9 +67,6 @@ public class SettingsFragment extends PreferenceFragment
             front_proc.setEnabled(false);
             front_proc.setSelectable(false);
 
-            EditTextPreference front_max = (EditTextPreference) findPreference("front_max_fps");
-            front_max.setEnabled(false);
-
         }
 
         if(!Preferences.backCameraActivated(sensor_prefs) ) {
@@ -77,9 +74,6 @@ public class SettingsFragment extends PreferenceFragment
             back_proc.setChecked(false);
             back_proc.setEnabled(false);
             back_proc.setSelectable(false);
-
-            EditTextPreference back_max = (EditTextPreference) findPreference("back_max_fps");
-            back_max.setEnabled(false);
 
         }
 

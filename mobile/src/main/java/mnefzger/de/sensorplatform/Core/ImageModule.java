@@ -68,11 +68,9 @@ public class ImageModule implements IEventCallback{
     private SparseArray<byte[]> frontImagesCV = new SparseArray<>();
     private SparseArray<byte[]> backImagesCV = new SparseArray<>();
 
-    private int FRONT_MAX_FPS;
     private double FRONT_AVG_FPS;
     private int FRONT_PROCESSING_FPS;
 
-    private int BACK_MAX_FPS;
     private double BACK_AVG_FPS;
     private int BACK_PROCESSING_FPS;
 
@@ -105,14 +103,10 @@ public class ImageModule implements IEventCallback{
     }
 
     private void setPrefs() {
-        FRONT_MAX_FPS = Preferences.getFrontFPS(setting_prefs);
         FRONT_PROCESSING_FPS = Preferences.getFrontProcessingFPS(setting_prefs);
-        //FRONT_AVG_FPS = FRONT_MAX_FPS;
         FRONT_AVG_FPS = 30;
 
-        BACK_MAX_FPS = Preferences.getBackFPS(setting_prefs);
         BACK_PROCESSING_FPS = Preferences.getBackProcessingFPS(setting_prefs);
-        //BACK_AVG_FPS = BACK_MAX_FPS;
         BACK_AVG_FPS = 30;
     }
 
@@ -339,9 +333,9 @@ public class ImageModule implements IEventCallback{
             lastFront = now;
 
             /**
-             * Only store the last ten seconds in the image buffer
+             * Only store the last ten seconds in the image buffer, 30FPS
              */
-            if(frontImagesCV.size() > (VIDEO_DURATION * FRONT_MAX_FPS) ) {
+            if(frontImagesCV.size() > (VIDEO_DURATION * 30) ) {
                 int key = frontImagesCV.keyAt(0);
                 frontImagesCV.remove(key);
             }
@@ -360,7 +354,7 @@ public class ImageModule implements IEventCallback{
             final int w = i.getWidth();
             final int h = i.getHeight();
             i.close();
-            //YuvImage yuvimage = new YuvImage(bytes, ImageFormat.NV21, w, h, null);
+            YuvImage yuvimage = new YuvImage(bytes, ImageFormat.NV21, w, h, null);
 
             /**
              * Decide if frame is to be processed or not
@@ -373,32 +367,29 @@ public class ImageModule implements IEventCallback{
                         imgProc.processImageBack(bytes, w, h);
                     }
                 });
-                /*byte[] processedImg = imgProc.processImageBack(bytes.clone(), w, h);
+                byte[] processedImg = imgProc.processImageBack(bytes.clone(), w, h);
                   yuvimage = new YuvImage(processedImg, ImageFormat.NV21, 320, 240, null);
-                  mBackgroundHandler.post( new ImageSaver(yuvimage, "back") );*/
+                  mBackgroundHandler.post( new ImageSaver(yuvimage, "back") );
                   lastBackProc = now;
             }
 
-            //if(now - lastBack >= (1000/(1+BACK_MAX_FPS)) ) {
-                double latestFPS = 1000 / (now - lastBack);
-                //BACK_AVG_FPS = 0.995*BACK_AVG_FPS + 0.005*latestFPS;
+            double latestFPS = 1000 / (now - lastBack);
 
-                // filter out extreme values
-                if(latestFPS > 5 && latestFPS < 40)
-                    BACK_AVG_FPS = (BACK_AVG_FPS + latestFPS)/2.0;
+            // filter out extreme values
+            if(latestFPS > 5 && latestFPS < 40)
+                BACK_AVG_FPS = (BACK_AVG_FPS + latestFPS)/2.0;
 
-                Log.d("FPS back", BACK_AVG_FPS+", " +latestFPS);
+            //Log.d("FPS back", BACK_AVG_FPS+", " +latestFPS);
 
-                backImagesCV.put(backIt, bytes);
-                backIt++;
-                lastBack = now;
-            //}
+            backImagesCV.put(backIt, bytes);
+            backIt++;
+            lastBack = now;
 
 
             /**
-             * Only store the last ten seconds in the image buffer
+             * Only store the last ten seconds in the image buffer, 30 FPS
              */
-            if(backImagesCV.size() > (VIDEO_DURATION * BACK_MAX_FPS) ) {
+            if(backImagesCV.size() > (VIDEO_DURATION * 30) ) {
                 int key = backImagesCV.keyAt(0);
                 backImagesCV.remove(key);
             }
@@ -425,17 +416,6 @@ public class ImageModule implements IEventCallback{
         buffer2.get(bytes, buffer0_size, buffer2_size);
 
         return bytes;
-    }
-
-    public static Bitmap getBitmapImageFromYUV(YuvImage img, int width, int height) {
-        ByteArrayOutputStream baos = new ByteArrayOutputStream();
-        img.compressToJpeg(new Rect(0, 0, width, height), 80, baos);
-
-        byte[] jdata = baos.toByteArray();
-        BitmapFactory.Options bitmapFatoryOptions = new BitmapFactory.Options();
-        bitmapFatoryOptions.inPreferredConfig = Bitmap.Config.RGB_565;
-        Bitmap bmp = BitmapFactory.decodeByteArray(jdata, 0, jdata.length, bitmapFatoryOptions);
-        return bmp;
     }
 
     public void updateSpeed(Double speed, Double obdSpeed) {

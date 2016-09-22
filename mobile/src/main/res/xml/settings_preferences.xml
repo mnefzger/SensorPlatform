@@ -31,16 +31,7 @@
         </PreferenceCategory>
 
     <PreferenceCategory android:title="Image Processing">
-        <CheckBoxPreference
-            android:key="image_front_processing"
-            android:title="Front Camera Processing"
-            android:summary="Activates image processing of front camera images"
-            android:defaultValue="true"/>
-        <CheckBoxPreference
-            android:key="image_back_processing"
-            android:title="Back Camera Processing"
-            android:summary="Activates image processing of back camera images"
-            android:defaultValue="true"/>
+
         <CheckBoxPreference
             android:key="image_saving"
             android:title="Video Saving"
@@ -55,12 +46,17 @@
             android:persistent="true"
             android:title="Video Resolution" />
 
-        <EditTextPreference
-            android:key="front_max_fps"
-            android:title="Front camera max. FPS"
-            android:summary="This value represents the maximum frames per second"
-            android:defaultValue="@integer/front_max_fps"
-            />
+        <CheckBoxPreference
+            android:key="image_front_processing"
+            android:title="Front Camera Processing"
+            android:summary="Enables driver distraction detection"
+            android:defaultValue="true"/>
+        <CheckBoxPreference
+            android:key="image_back_processing"
+            android:title="Back Camera Processing"
+            android:summary="Enables tailgating detection"
+            android:defaultValue="true"/>
+
         <EditTextPreference
             android:key="front_processing_fps"
             android:title="Front camera processing FPS"
@@ -68,11 +64,6 @@
             android:defaultValue="@integer/front_processing_fps"
             android:dependency="image_front_processing"/>
 
-        <EditTextPreference
-            android:key="back_max_fps"
-            android:title="Back camera max. FPS"
-            android:summary="This value represents the maximum frames per second"
-            android:defaultValue="@integer/back_max_fps" />
         <EditTextPreference
             android:key="back_processing_fps"
             android:title="Back camera processing FPS"

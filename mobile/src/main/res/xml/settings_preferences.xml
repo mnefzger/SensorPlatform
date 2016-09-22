@@ -47,7 +47,7 @@
             android:summary="Stores videos of critical driving events"
             android:defaultValue="true"/>
         <ListPreference
-            android:summary="The video resolution"
+            android:summary="The video resolution of saved video files"
             android:defaultValue="@integer/rotation_delay_default"
             android:entries="@array/resolution_readable"
             android:entryValues="@array/resolution_values"

@@ -37,6 +37,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.FrameLayout;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -314,6 +315,7 @@ public class CameraPreviewFragment extends Fragment {
 
     private FrameLayout previewComplete;
     private TextView hintFront, hintBack;
+    private LinearLayout horizon;
 
     @Override
     public void onViewCreated(final View view, Bundle savedInstanceState) {
@@ -323,6 +325,7 @@ public class CameraPreviewFragment extends Fragment {
         hintBack = (TextView) view.findViewById(R.id.hintBack);
         hintFront = (TextView) view.findViewById(R.id.hintFront);
         previewComplete = (FrameLayout) view.findViewById(R.id.previewCompleteButton);
+        horizon = (LinearLayout) view.findViewById(R.id.horizon);
 
         final FrameLayout first = (FrameLayout) view.findViewById(R.id.cameraSetupFirst);
         final FrameLayout preview = (FrameLayout) view.findViewById(R.id.cameraSetupPreview);
@@ -355,11 +358,13 @@ public class CameraPreviewFragment extends Fragment {
                         switchButton.setText("Front Camera");
                         hintBack.setVisibility(View.VISIBLE);
                         hintFront.setVisibility(View.GONE);
+                        horizon.setVisibility(View.VISIBLE);
                         break;
                     case "1":
                         switchButton.setText("Back Camera");
                         hintBack.setVisibility(View.GONE);
                         hintFront.setVisibility(View.VISIBLE);
+                        horizon.setVisibility(View.GONE);
                         break;
                 }
 

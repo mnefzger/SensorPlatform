@@ -6,6 +6,8 @@ import android.content.Context;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.preference.CheckBoxPreference;
+import android.preference.EditTextPreference;
+import android.preference.ListPreference;
 import android.preference.PreferenceFragment;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -13,6 +15,8 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.FrameLayout;
 import android.widget.TextView;
+
+import java.util.List;
 
 import mnefzger.de.sensorplatform.Core.MainActivity;
 import mnefzger.de.sensorplatform.Core.Preferences;
@@ -46,11 +50,37 @@ public class SettingsFragment extends PreferenceFragment
 
         sensor_prefs = getActivity().getSharedPreferences(getActivity().getString(R.string.sensor_preferences_key), Context.MODE_PRIVATE);
 
-        if(!sensor_prefs.getBoolean("front_active", true) && !sensor_prefs.getBoolean("back_active", true) ) {
-            CheckBoxPreference box = (CheckBoxPreference) findPreference("image_saving");
-            box.setChecked(false);
-            box.setEnabled(false);
-            box.setSelectable(false);
+        if(!Preferences.frontCameraActivated(sensor_prefs) && !Preferences.backCameraActivated(sensor_prefs) ) {
+            CheckBoxPreference saving = (CheckBoxPreference) findPreference("image_saving");
+            saving.setChecked(false);
+            saving.setEnabled(false);
+            saving.setSelectable(false);
+
+            ListPreference res = (ListPreference) findPreference("video_resolution");
+            res.setEnabled(false);
+
+        }
+
+        if(!Preferences.frontCameraActivated(sensor_prefs)) {
+            CheckBoxPreference front_proc = (CheckBoxPreference) findPreference("image_front_processing");
+            front_proc.setChecked(false);
+            front_proc.setEnabled(false);
+            front_proc.setSelectable(false);
+
+            EditTextPreference front_max = (EditTextPreference) findPreference("front_max_fps");
+            front_max.setEnabled(false);
+
+        }
+
+        if(!Preferences.backCameraActivated(sensor_prefs) ) {
+            CheckBoxPreference back_proc = (CheckBoxPreference) findPreference("image_back_processing");
+            back_proc.setChecked(false);
+            back_proc.setEnabled(false);
+            back_proc.setSelectable(false);
+
+            EditTextPreference back_max = (EditTextPreference) findPreference("back_max_fps");
+            back_max.setEnabled(false);
+
         }
 
         return v;

@@ -27,7 +27,6 @@ import mnefzger.de.sensorplatform.Core.ImageModule;
 public class ImageProcessor{
     private IEventCallback callback;
 
-    private boolean faceProcRunning = false;
     private Double currentSpeed;
 
     static{
@@ -45,6 +44,7 @@ public class ImageProcessor{
         callback = im;
         writeCascadeToFileSystem(c, "lbpcascade_frontalface.xml");
         writeCascadeToFileSystem(c, "haarcascade_vehicles.xml");
+        //writeCascadeToFileSystem(c, "haarcascade_vehicles_alt.xml");
         nInitCascades();
     }
 

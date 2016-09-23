@@ -146,6 +146,7 @@ public class PermissionManager {
             Manifest.permission.CAMERA,
             Manifest.permission.ACCESS_FINE_LOCATION,
             Manifest.permission.ACCESS_COARSE_LOCATION,
+            Manifest.permission.NFC
     };
 
     private static void verifyAllPermissions(Context context) {

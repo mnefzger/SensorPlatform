@@ -1,15 +1,21 @@
 package mnefzger.de.sensorplatform.Core;
 
+import android.app.Activity;
 import android.app.ActivityManager;
+import android.app.PendingIntent;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.content.ServiceConnection;
 import android.content.SharedPreferences;
 import android.content.pm.ActivityInfo;
+import android.nfc.NdefMessage;
+import android.nfc.NfcAdapter;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.IBinder;
+import android.os.Parcelable;
 import android.preference.PreferenceManager;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
@@ -57,7 +63,9 @@ public class MainActivity extends AppCompatActivity {
     public static boolean started = false;
 
     private boolean inAppFragment, inSensorFragment, inSettingsFragment,
-                    inOBDFragment, inCameraFragment = false;
+                    inOBDFragment, inCameraFragment, inPhoneFragment = false;
+    private boolean studySetupComplete = false;
+    private boolean setupStarted = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -72,7 +80,7 @@ public class MainActivity extends AppCompatActivity {
             Log.d("CREATE", "New activity");
 
             // bind and start service running in the background
-            if(!checkIfServiceRunning()) {
+            if(!checkIfServiceRunning() || (!studySetupComplete && setupStarted) ) {
                 Log.d("CREATE", "Service not running, go to start");
                 Intent intent = new Intent(this, SensorPlatformService.class);
                 bindService(intent, mConnection, Context.BIND_AUTO_CREATE);
@@ -80,7 +88,7 @@ public class MainActivity extends AppCompatActivity {
 
                 goToStartFragment(0, true);
 
-            } else {
+            } else if(studySetupComplete || !setupStarted){
                 started = true;
 
                 Log.d("CREATE", "Service running, binding it and changing fragment");
@@ -200,6 +208,12 @@ public class MainActivity extends AppCompatActivity {
     @Override
     public void onResume() {
         super.onResume();
+        
+        /**
+         * It's important, that the activity is in the foreground (resumed). Otherwise
+         * an IllegalStateException is thrown.
+         */
+        setupForegroundDispatch(this, NfcAdapter.getDefaultAdapter(this));
 
         Intent intent = new Intent(this, SensorPlatformService.class);
         bindService(intent, mConnection, Context.BIND_AUTO_CREATE);
@@ -225,8 +239,7 @@ public class MainActivity extends AppCompatActivity {
     public void onDestroy() {
         super.onDestroy();
 
-        //TODO
-        if(false && checkIfServiceRunning() && !started && !SensorPlatformService.serviceRunning) {
+        if(!studySetupComplete && checkIfServiceRunning() && !started && !SensorPlatformService.serviceRunning) {
             Intent intent = new Intent(this, SensorPlatformService.class);
             intent.setAction("SERVICE_STOP");
             stopService(intent);
@@ -248,6 +261,9 @@ public class MainActivity extends AppCompatActivity {
         } else if(inOBDFragment) {
             goToSensorSetupFragment(false);
             return;
+        } else if (inPhoneFragment) {
+            goToOBDSetupFragment(false);
+            return;
         } else if(inCameraFragment) {
             goToSettingsFragment(false);
             return;
@@ -262,12 +278,14 @@ public class MainActivity extends AppCompatActivity {
 
         this.setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_REVERSE_LANDSCAPE);
         inAppFragment = true;
+        studySetupComplete = true;
     }
 
     public void goToNewStudyFragment(boolean forward) {
         setupFragment = new SetupFirstFragment();
         changeFragment(setupFragment, true, true, forward);
         this.setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_UNSPECIFIED);
+        setupStarted = true;
     }
 
     public void goToSensorSetupFragment(boolean forward) {
@@ -276,7 +294,7 @@ public class MainActivity extends AppCompatActivity {
         if(forward)
             transaction.setCustomAnimations(R.animator.slide_in_right_animator, R.animator.slide_out_left_animator);
         else
-            transaction.setCustomAnimations(R.animator.slide_out_left_animator, R.animator.slide_in_right_animator);
+            transaction.setCustomAnimations(R.animator.slide_in_left_animator, R.animator.slide_out_right_animator);
         transaction.addToBackStack(sensorsFragment.getClass().getName());
         transaction.replace(R.id.fragment_container, sensorsFragment).commit();
 
@@ -296,6 +314,8 @@ public class MainActivity extends AppCompatActivity {
         phoneFragment = new SecondPhoneSetupFragment();
         changeFragment(phoneFragment, true, true, forward);
         this.setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_UNSPECIFIED);
+
+        inPhoneFragment = true;
     }
 
     public void goToSettingsFragment(boolean forward) {
@@ -304,7 +324,7 @@ public class MainActivity extends AppCompatActivity {
         if(forward)
             transaction.setCustomAnimations(R.animator.slide_in_right_animator, R.animator.slide_out_left_animator);
         else
-            transaction.setCustomAnimations(R.animator.slide_out_left_animator, R.animator.slide_in_right_animator);
+            transaction.setCustomAnimations(R.animator.slide_in_left_animator, R.animator.slide_out_right_animator);
         transaction.addToBackStack(settings.getClass().getName());
         transaction.replace(R.id.fragment_container, settings).commit();
         this.setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_UNSPECIFIED);
@@ -354,6 +374,7 @@ public class MainActivity extends AppCompatActivity {
         inAppFragment = false;
         inSensorFragment = false;
         inOBDFragment = false;
+        inPhoneFragment = false;
         inSettingsFragment = false;
         inCameraFragment = false;
 
@@ -372,7 +393,7 @@ public class MainActivity extends AppCompatActivity {
                     if(forward)
                         transaction.setCustomAnimations(R.anim.slide_in_right, R.anim.slide_out_left);
                     else
-                        transaction.setCustomAnimations(R.anim.slide_out_left, R.anim.slide_in_right);
+                        transaction.setCustomAnimations(R.anim.slide_in_left, R.anim.slide_out_right);
                 }
 
                 transaction.replace(R.id.fragment_container, frag, backStateName);
@@ -386,14 +407,41 @@ public class MainActivity extends AppCompatActivity {
             } else {
                 Log.w("FRAGMENT", "Already instantiated, popped back: " + backStateName);
                 Fragment toShow = manager.findFragmentByTag(backStateName);
-                //FragmentTransaction transaction = manager.beginTransaction();
-                //transaction.show(toShow).commit();
-                toShow.getView().bringToFront();
+                /*FragmentTransaction transaction = manager.beginTransaction();
+                if(forward)
+                    transaction.setCustomAnimations(R.anim.slide_in_right, R.anim.slide_out_left);
+                else
+                    transaction.setCustomAnimations(R.anim.slide_in_left, R.anim.slide_out_right);
+                transaction.show(toShow).commit();*/
+                if(toShow.getView() != null)
+                    toShow.getView().bringToFront();
 
             }
         } catch (IllegalStateException exception) {
             Log.w("FRAGMENT", "Unable to commit fragment, could be activity has been killed in background. " + exception.toString());
         }
+    }
+
+    public static void setupForegroundDispatch(final Activity activity, NfcAdapter adapter) {
+        final Intent intent = new Intent(activity.getApplicationContext(), activity.getClass());
+        intent.setFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP);
+
+        final PendingIntent pendingIntent = PendingIntent.getActivity(activity.getApplicationContext(), 0, intent, 0);
+
+        IntentFilter[] filters = new IntentFilter[1];
+        String[][] techList = new String[][]{};
+
+        // Notice that this is the same filter as in our manifest.
+        filters[0] = new IntentFilter();
+        filters[0].addAction(NfcAdapter.ACTION_NDEF_DISCOVERED);
+        filters[0].addCategory(Intent.CATEGORY_DEFAULT);
+        try {
+            filters[0].addDataType("text/plain");
+        } catch (IntentFilter.MalformedMimeTypeException e) {
+            throw new RuntimeException("Check your mime type.");
+        }
+
+        adapter.enableForegroundDispatch(activity, pendingIntent, filters, techList);
     }
 
 

@@ -12,6 +12,7 @@ import android.widget.FrameLayout;
 import android.widget.RadioButton;
 import android.widget.RadioGroup;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.google.gson.Gson;
 
@@ -61,7 +62,6 @@ public class SurveyFragment extends Fragment {
 
         loadSurvey();
         showQuestion(currentQuestion);
-        //getActivity().getWindow().clearFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
 
         return v;
     }
@@ -69,8 +69,13 @@ public class SurveyFragment extends Fragment {
     View.OnClickListener next_listener = new View.OnClickListener() {
         @Override
         public void onClick(View view) {
-            answers += getCheckedLickertButton() + ";";
+            String answer = getCheckedLickertButton();
+            if(answer.equals("invalid")) {
+                handleEmpty();
+                return;
+            }
 
+            answers += answer + ";";
 
             if(++currentQuestion < survey.questions.size()) {
                 Log.d("NEXT QUESTION", getCheckedLickertButton());
@@ -87,12 +92,17 @@ public class SurveyFragment extends Fragment {
 
                 // go back to main data collection screen
                 MainActivity app = (MainActivity) getActivity();
-                app.goToAppFragment();
+                app.getWindow().clearFlags(WindowManager.LayoutParams.FLAG_SHOW_WHEN_LOCKED);
                 app.setIntent(new Intent("mnefzger.de.sensorplatform"));
-                getActivity().getWindow().clearFlags(WindowManager.LayoutParams.FLAG_SHOW_WHEN_LOCKED);
+                app.goToAppFragment();
+
             }
         }
     };
+
+    private void handleEmpty() {
+        Toast.makeText(getActivity(), "Please select an answer.", Toast.LENGTH_SHORT).show();
+    }
 
     private String getCheckedLickertButton() {
         if(stronglyAgree.isChecked())

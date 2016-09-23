@@ -31,6 +31,9 @@ public class TripEndDetector {
         if(++count < 10)
             return;
 
+        if(count == 10)
+            callback.onTripEnd();
+
         boolean obd_active = Preferences.OBDActivated(sensor_prefs);
         if(obd_active && OBD2Connection.sock != null && OBD2Connection.sock.isConnected())
             checkInOBD(dv);

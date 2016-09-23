@@ -1,11 +1,13 @@
 package mnefzger.de.sensorplatform.UI;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.WindowManager;
 import android.widget.FrameLayout;
 import android.widget.RadioButton;
 import android.widget.RadioGroup;
@@ -42,6 +44,8 @@ public class SurveyFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
 
+        getActivity().getWindow().addFlags(WindowManager.LayoutParams.FLAG_SHOW_WHEN_LOCKED);
+        getActivity().getWindow().addFlags(WindowManager.LayoutParams.FLAG_TURN_SCREEN_ON);
         View v = inflater.inflate(R.layout.fragment_survey, container, false);
         question = (TextView) v.findViewById(R.id.question);
         next = (FrameLayout) v.findViewById(R.id.next_question_button);
@@ -57,6 +61,7 @@ public class SurveyFragment extends Fragment {
 
         loadSurvey();
         showQuestion(currentQuestion);
+        //getActivity().getWindow().clearFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
 
         return v;
     }
@@ -83,7 +88,8 @@ public class SurveyFragment extends Fragment {
                 // go back to main data collection screen
                 MainActivity app = (MainActivity) getActivity();
                 app.goToAppFragment();
-
+                app.setIntent(new Intent("mnefzger.de.sensorplatform"));
+                getActivity().getWindow().clearFlags(WindowManager.LayoutParams.FLAG_SHOW_WHEN_LOCKED);
             }
         }
     };

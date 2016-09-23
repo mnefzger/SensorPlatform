@@ -22,6 +22,7 @@ import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
+import android.view.WindowManager;
 
 import mnefzger.de.sensorplatform.External.OBD2Connection;
 import mnefzger.de.sensorplatform.R;
@@ -201,14 +202,28 @@ public class MainActivity extends AppCompatActivity {
     @Override
     public void onSaveInstanceState(Bundle savedInstanceState) {
         super.onSaveInstanceState(savedInstanceState);
-        Log.d("SAVE", "saving state...");
         savedInstanceState.putBoolean("started", started);
+    }
+
+    @Override
+    public void onNewIntent(Intent intent) {
+        super.onNewIntent(intent);
+        setIntent(intent);
+        Log.d("OnNewIntent", intent.getAction());
+    }
+
+    private void handleSurveyIntent() {
+        Intent intent = getIntent();
+        if(intent.getAction().equals("mnefzger.de.sensorplatform.survey")) {
+            Log.d("INTENT", "Going to survey");
+            goToSurveyFragment();
+        }
     }
 
     @Override
     public void onResume() {
         super.onResume();
-        
+
         /**
          * It's important, that the activity is in the foreground (resumed). Otherwise
          * an IllegalStateException is thrown.
@@ -218,6 +233,8 @@ public class MainActivity extends AppCompatActivity {
         Intent intent = new Intent(this, SensorPlatformService.class);
         bindService(intent, mConnection, Context.BIND_AUTO_CREATE);
         startService(intent);
+
+        handleSurveyIntent();
     }
 
     @Override

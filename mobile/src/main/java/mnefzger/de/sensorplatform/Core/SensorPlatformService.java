@@ -98,13 +98,18 @@ public class SensorPlatformService extends Service implements IDataCallback, ITr
             restartDataCollection();
         }
 
-
         waiting = false;
     }
 
     @Override
     public void onTripEnd() {
         this.onEventData(new EventVector(true, System.currentTimeMillis(), "Trip End detected", 0));
+
+        Intent i = new Intent("mnefzger.de.sensorplatform.survey");
+        i.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+        i.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+        startActivity(i);
+
         pauseDataCollection();
         startWaitBehaviour();
     }

@@ -2,43 +2,43 @@
 <PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android"
     android:key="@string/settings_preferences_key">
 
-        <PreferenceCategory android:title="General">
-            <ListPreference
-                android:summary="The onRawData() and event detection sampling rate in milliseconds"
-                android:defaultValue="@integer/rawData_delay_default"
-                android:entries="@array/rawData_readable"
-                android:entryValues="@array/rawData_values"
-                android:key="frequency_rawData"
-                android:persistent="true"
-                android:title="Raw data sampling rate" />
+    <PreferenceCategory android:title="General">
+        <ListPreference
+            android:summary="The raw data and event detection sampling rate"
+            android:defaultValue="@integer/rawData_delay_default"
+            android:entries="@array/rawData_readable"
+            android:entryValues="@array/rawData_values"
+            android:key="frequency_rawData"
+            android:persistent="true"
+            android:title="Raw data sampling rate" />
 
-            <CheckBoxPreference
-                android:key="logging_raw"
-                android:title="Log Raw Data"
-                android:summary="Writes all raw data values to a csv file"
-                android:defaultValue="false"/>
-            <CheckBoxPreference
-                android:key="logging_event"
-                android:title="Log Event Data"
-                android:summary="Writes all events to a csv file"
-                android:defaultValue="false"/>
+        <CheckBoxPreference
+            android:key="logging_raw"
+            android:title="Log Raw Data"
+            android:summary="Write all raw data values to a csv file"
+            android:defaultValue="false"/>
+        <CheckBoxPreference
+            android:key="logging_event"
+            android:title="Log Event Data"
+            android:summary="Write all events to a csv file"
+            android:defaultValue="false"/>
 
-            <CheckBoxPreference
-                android:key="survey_active"
-                android:title="Show survey after trip"
-                android:summary="Shows a questionnaire to the driver after a trip ends."
-                android:defaultValue="false"/>
-        </PreferenceCategory>
+        <CheckBoxPreference
+            android:key="survey_active"
+            android:title="Show survey after trip"
+            android:summary="Shows a questionnaire to the driver after a trip ends."
+            android:defaultValue="false"/>
+    </PreferenceCategory>
 
     <PreferenceCategory android:title="Image Processing">
 
         <CheckBoxPreference
             android:key="image_saving"
             android:title="Video Saving"
-            android:summary="Stores videos of critical driving events"
+            android:summary="Save videos of critical driving events"
             android:defaultValue="true"/>
         <ListPreference
-            android:summary="The video resolution of saved video files"
+            android:summary="Video resolution of saved video files"
             android:defaultValue="@integer/rotation_delay_default"
             android:entries="@array/resolution_readable"
             android:entryValues="@array/resolution_values"
@@ -49,94 +49,94 @@
         <CheckBoxPreference
             android:key="image_front_processing"
             android:title="Front Camera Processing"
-            android:summary="Enables driver distraction detection"
+            android:summary="Enable driver distraction detection"
             android:defaultValue="true"/>
         <CheckBoxPreference
             android:key="image_back_processing"
             android:title="Back Camera Processing"
-            android:summary="Enables tailgating detection"
+            android:summary="Enable tailgating detection"
             android:defaultValue="true"/>
 
         <EditTextPreference
             android:key="front_processing_fps"
             android:title="Front camera processing FPS"
-            android:summary="This value represents the processed frames per second for the front camera"
+            android:summary="Processed frames per second for the front camera"
             android:defaultValue="@integer/front_processing_fps"
             android:dependency="image_front_processing"/>
 
         <EditTextPreference
             android:key="back_processing_fps"
             android:title="Back camera processing FPS"
-            android:summary="This value represents the processed frames per second for the back camera"
+            android:summary="Processed frames per second for the back camera"
             android:defaultValue="@integer/back_processing_fps"
             android:dependency="image_back_processing"/>
     </PreferenceCategory>
 
-        <PreferenceCategory android:title="OBD2 Adapter">
+    <PreferenceCategory android:title="OBD2 Adapter">
 
-            <ListPreference
-                android:summary="The request rate for OBD2 updates"
-                android:defaultValue="@integer/obdRequest_delay_default"
-                android:entries="@array/obd_readable"
-                android:entryValues="@array/obd_values"
-                android:key="obdRequest_frequency"
-                android:persistent="true"
-                android:title="OBD2 request frequency"/>
-        </PreferenceCategory>
+        <ListPreference
+            android:summary="The request rate for OBD2 updates"
+            android:defaultValue="@integer/obdRequest_delay_default"
+            android:entries="@array/obd_readable"
+            android:entryValues="@array/obd_values"
+            android:key="obdRequest_frequency"
+            android:persistent="true"
+            android:title="OBD2 request frequency"/>
+    </PreferenceCategory>
 
-        <PreferenceCategory android:title="Acceleration and Braking">
-            <ListPreference
-                android:summary="The accelerometer sensor delay in microseconds"
-                android:defaultValue="@integer/accelerometer_delay_default"
-                android:entries="@array/frequency_readable"
-                android:entryValues="@array/frequency_values"
-                android:key="frequency_accelerometer"
-                android:persistent="true"
-                android:title="Acclerometer sampling rate" />
+    <PreferenceCategory android:title="Acceleration and Braking">
+        <ListPreference
+            android:summary="The accelerometer sensor delay in microseconds"
+            android:defaultValue="@integer/accelerometer_delay_default"
+            android:entries="@array/frequency_readable"
+            android:entryValues="@array/frequency_values"
+            android:key="frequency_accelerometer"
+            android:persistent="true"
+            android:title="Acclerometer sampling rate" />
 
-            <EditTextPreference
-                android:key="accelerometer_threshold"
-                android:title="Hard acceleration threshold"
-                android:summary="This represents the g-force value for hard acceleration and braking"
-                android:defaultValue="@string/acceleration_threshold_default" />
-        </PreferenceCategory>
+        <EditTextPreference
+            android:key="accelerometer_threshold"
+            android:title="Hard acceleration threshold"
+            android:summary="This represents the g-force value for hard acceleration and braking"
+            android:defaultValue="@string/acceleration_threshold_default" />
+    </PreferenceCategory>
 
 
-        <PreferenceCategory android:title="Rotation and Turns">
-            <ListPreference
-                android:summary="The rotation sensor delay in microseconds"
-                android:defaultValue="@integer/rotation_delay_default"
-                android:entries="@array/frequency_readable"
-                android:entryValues="@array/frequency_values"
-                android:key="frequency_rotation"
-                android:persistent="true"
-                android:title="Rotation sampling rate" />
+    <PreferenceCategory android:title="Rotation and Turns">
+        <ListPreference
+            android:summary="The rotation sensor delay in microseconds"
+            android:defaultValue="@integer/rotation_delay_default"
+            android:entries="@array/frequency_readable"
+            android:entryValues="@array/frequency_values"
+            android:key="frequency_rotation"
+            android:persistent="true"
+            android:title="Rotation sampling rate" />
 
-            <EditTextPreference
-                android:key="rotation_threshold_normal"
-                android:title="Normal turn threshold"
-                android:summary="This value is the threshold for a normal turn in rad/s"
-                android:defaultValue="@string/rotation_threshold_normal_default" />
+        <EditTextPreference
+            android:key="rotation_threshold_normal"
+            android:title="Normal turn threshold"
+            android:summary="This value is the threshold for a normal turn in rad/s"
+            android:defaultValue="@string/rotation_threshold_normal_default" />
 
-            <EditTextPreference
-                android:key="rotation_threshold_risky"
-                android:title="Sharp turn threshold"
-                android:summary="This value is the threshold for a sharp turn in rad/s"
-                android:defaultValue="@string/rotation_threshold_risky_default" />
-        </PreferenceCategory>
+        <EditTextPreference
+            android:key="rotation_threshold_risky"
+            android:title="Sharp turn threshold"
+            android:summary="This value is the threshold for a sharp turn in rad/s"
+            android:defaultValue="@string/rotation_threshold_risky_default" />
+    </PreferenceCategory>
 
-        <PreferenceCategory android:title="Location">
-            <EditTextPreference
-                android:key="osmRequest_frequency"
-                android:title="OSM query frequency"
-                android:summary="Time between two OSM requests in milliseconds"
-                android:defaultValue="@integer/osmRequest_delay_default" />
+    <PreferenceCategory android:title="Location">
+        <EditTextPreference
+            android:key="osmRequest_frequency"
+            android:title="OSM query frequency"
+            android:summary="Time between two OSM requests in milliseconds"
+            android:defaultValue="@integer/osmRequest_delay_default" />
 
-            <EditTextPreference
-                android:key="gpsRequest_frequency"
-                android:title="Location update frequency"
-                android:summary="Time between two location updateds requests in milliseconds"
-                android:defaultValue="@integer/gpsRequest_delay_default" />
-        </PreferenceCategory>
+        <EditTextPreference
+            android:key="gpsRequest_frequency"
+            android:title="Location update frequency"
+            android:summary="Time between two location updates requests in milliseconds"
+            android:defaultValue="@integer/gpsRequest_delay_default" />
+    </PreferenceCategory>
 
 </PreferenceScreen>

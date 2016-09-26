@@ -1,21 +1,21 @@
 <?xml version="1.0" encoding="utf-8"?>
 <PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android"
     android:key="@string/sensor_preferences_key">
-    <PreferenceCategory android:title="Internal Sensors" android:key="sensors">
+    <PreferenceCategory android:title="Internal Sensors" android:key="sensors" android:summary="Sensors integrated in the smartphone, requires no external device.">
         <CheckBoxPreference
             android:key="accelerometer_raw"
-            android:title="Accelerometer Raw Data"
-            android:summary="Activates raw data collection of vehicle acceleration"
+            android:title="Accelerometer Data"
+            android:summary="Activates data collection of vehicle acceleration. Event detection: hard acceleration and braking"
             android:defaultValue="true"/>
         <CheckBoxPreference
             android:key="location_raw"
-            android:title="Location Raw Data"
-            android:summary="Activates raw data collection of the vehicle location"
+            android:title="Location Data (GPS)"
+            android:summary="Activates data collection of the vehicle location. Event detection: speeding (requires internet connection)"
             android:defaultValue="true"/>
         <CheckBoxPreference
             android:key="rotation_raw"
-            android:title="Rotation Raw Data"
-            android:summary="Activates raw data collection of vehicle orientation"
+            android:title="Rotation Data"
+            android:summary="Activates data collection of vehicle orientation. Event detection: sharp turns"
             android:defaultValue="true"/>
         <CheckBoxPreference
             android:key="light_raw"
@@ -24,18 +24,18 @@
             android:defaultValue="true"/>
         <CheckBoxPreference
             android:key="front_active"
-            android:title="Front camera"
+            android:title="Front Camera"
             android:summary="Activates video capture with the front camera"
             android:defaultValue="true"/>
         <CheckBoxPreference
             android:key="back_active"
-            android:title="Back camera"
+            android:title="Back Camera"
             android:summary="Activates video capture with the back camera"
             android:defaultValue="true"/>
         <CheckBoxPreference
             android:key="weather_active"
             android:title="Weather Conditions"
-            android:summary="Activates updates on the current weather conditions. Requires internet connection."
+            android:summary="Activates updates on the current weather conditions. Requires internet connection"
             android:defaultValue="true"/>
     </PreferenceCategory>
 
@@ -44,13 +44,11 @@
             android:key="heartRate_raw"
             android:title="Heart Rate"
             android:summary="Activate a connected Android Wear device to collect heart rate"
-            android:defaultValue="false"
-            />
+            android:defaultValue="false"/>
         <CheckBoxPreference
             android:key="obd_raw"
             android:title="OBD Raw Data"
             android:summary="Activate OBD2 connection and vehicle data collection"
-            android:defaultValue="false"
-            />
+            android:defaultValue="false"/>
     </PreferenceCategory>
 </PreferenceScreen>

@@ -6,6 +6,10 @@ import android.content.Context;
 import android.content.pm.PackageManager;
 import android.support.v4.app.ActivityCompat;
 
+/**
+ * Bundles all permission request in one static function that can be called on startup.
+ * Alternatively, single permissions can be requested during runtime.
+ */
 public class PermissionManager {
 
     public static void verifyPermissions(Context c) {

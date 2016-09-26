@@ -29,7 +29,9 @@ import mnefzger.de.sensorplatform.Core.Preferences;
 import mnefzger.de.sensorplatform.Core.SensorPlatformService;
 import mnefzger.de.sensorplatform.R;
 
-
+/**
+ * This fragment shows the real-time raw and event data
+ */
 public class AppFragment extends Fragment {
 
     RelativeLayout dataLayout;
@@ -147,8 +149,8 @@ public class AppFragment extends Fragment {
             pauseButton.setEnabled(false);
 
             MainActivity app = (MainActivity) getActivity();
-            app.started = false;
-            app.mBound = false;
+            MainActivity.started = false;
+            MainActivity.mBound = false;
             app.goToStartFragment(25, false);
 
         }
@@ -188,9 +190,9 @@ public class AppFragment extends Fragment {
                 accY.setText("AccY: " + df.format(v.accY) );
                 accZ.setText("AccZ: " + df.format(v.accZ) );
 
-                rotX.setText("RotX: " + v.rotX);
-                rotY.setText("RotY: " + v.rotY);
-                rotZ.setText("RotZ: " + v.rotZ);
+                rotX.setText("RotX: " + v.rotX_rad);
+                rotY.setText("RotY: " + v.rotY_rad);
+                rotZ.setText("RotZ: " + v.rotZ_rad);
 
                 light.setText("Light: " + df.format(v.light) + " lumen");
 

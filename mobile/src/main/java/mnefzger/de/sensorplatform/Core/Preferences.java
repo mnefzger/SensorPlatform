@@ -192,18 +192,18 @@ public class Preferences {
     }
 
     public static double getAccelerometerThreshold(SharedPreferences prefs) {
-        String valueString = prefs.getString(ACCELEROMETER_THRESHOLD, "3.924");
+        String valueString = prefs.getString(ACCELEROMETER_THRESHOLD, "0.35");
 
         double value = Double.valueOf( context.getResources().getString(R.string.acceleration_threshold_default) );
 
         try {
-            value = Double.valueOf(valueString);
+            value = Double.valueOf(valueString) * 9.81; // convert to m/s^2
         } catch (Exception e) {
             e.printStackTrace();
         }
 
         if (value <= 0) {
-            value = Double.valueOf( context.getResources().getString(R.string.acceleration_threshold_default) );
+            value = Double.valueOf( context.getResources().getString(R.string.acceleration_threshold_default) ) * 9.81;
         }
 
         return value;

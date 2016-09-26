@@ -8,9 +8,13 @@ import mnefzger.de.sensorplatform.External.OBD2Connection;
 import mnefzger.de.sensorplatform.External.OBD2Connector;
 import mnefzger.de.sensorplatform.R;
 
-
+/**
+ * Analyzes Datavectors in real-time to detect a trip end.
+ * Trip end is detected ...
+ * A. ... if the OBD engine speed == 0
+ * B. ... if the vehicle speed < 1 for 30 seconds
+ */
 public class TripEndDetector {
-    private SharedPreferences setting_prefs;
     private SharedPreferences sensor_prefs;
 
     private boolean counting = false;
@@ -20,7 +24,6 @@ public class TripEndDetector {
     private ITripDetectionCallback callback;
 
     public TripEndDetector(ITripDetectionCallback callback, Context c) {
-        setting_prefs = c.getSharedPreferences(c.getString(R.string.settings_preferences_key), Context.MODE_PRIVATE);
         sensor_prefs = c.getSharedPreferences(c.getString(R.string.sensor_preferences_key), Context.MODE_PRIVATE);
 
         this.callback = callback;
@@ -30,9 +33,6 @@ public class TripEndDetector {
     public void checkForTripEnd(DataVector dv) {
         if(++count < 10)
             return;
-
-        if(count == 10)
-            callback.onTripEnd();
 
         boolean obd_active = Preferences.OBDActivated(sensor_prefs);
         if(obd_active && OBD2Connection.sock != null && OBD2Connection.sock.isConnected())

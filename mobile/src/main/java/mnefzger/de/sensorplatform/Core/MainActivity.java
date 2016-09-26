@@ -225,7 +225,7 @@ public class MainActivity extends AppCompatActivity {
         super.onResume();
 
         /**
-         * It's important, that the activity is in the foreground (resumed). Otherwise
+         * It's important that the activity is in the foreground (resumed). Otherwise
          * an IllegalStateException is thrown.
          */
         setupForegroundDispatch(this, NfcAdapter.getDefaultAdapter(this));

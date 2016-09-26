@@ -16,7 +16,7 @@ import mnefzger.de.sensorplatform.Processors.DrivingBehaviourProcessor;
 import mnefzger.de.sensorplatform.R;
 
 /**
- * This class is the central unit of data collection.
+ * This class is the central unit of data collection (except image data).
  * It knows all the Sensor Provider classes and collects raw data values in one DataVector.
  */
 
@@ -86,11 +86,11 @@ public class SensorModule implements ISensorCallback, IEventCallback{
     private final int OBD_IDENTIFIER = 102;
 
     // copy of the study parameters
-    public String study_id;
-    public String study_name;
-    public String participant_id;
-    public int participant_age;
-    public String participant_gender;
+    private String study_id;
+    private String study_name;
+    private String participant_id;
+    private int participant_age;
+    private String participant_gender;
 
     private Context app;
 
@@ -314,6 +314,7 @@ public class SensorModule implements ISensorCallback, IEventCallback{
     public void onRotationData(float[][] values) {
         current.setRot( values[0][0], values[0][1], values[0][2] );
         current.setRotMatrix( values[1] );
+        current.setRotRad(values[2][0], values[2][1], values[2][2]);
     }
 
     @Override

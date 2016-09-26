@@ -5,11 +5,11 @@ import org.threeten.bp.LocalDateTime;
 import org.threeten.bp.ZoneId;
 
 public class DataVector {
-    public String study_id;
-    public String study_name;
-    public String participant_id;
-    public int participant_age;
-    public String participant_gender;
+    private String study_id;
+    private String study_name;
+    private String participant_id;
+    private int participant_age;
+    private String participant_gender;
 
     public long timestamp;
     public String dateTime;
@@ -26,6 +26,9 @@ public class DataVector {
     public double rotY;
     public double rotZ;
     public float[] rotMatrix;
+    public double rotX_rad;
+    public double rotY_rad;
+    public double rotZ_rad;
     /**
      * Light level in cabin in lux
      */
@@ -83,13 +86,18 @@ public class DataVector {
         this.rotY = y;
         this.rotZ = z;
     }
+    public void setRotMatrix(float[] matrix) {
+        this.rotMatrix = matrix;
+    }
+
+    public void setRotRad(double x, double y, double z) {
+        this.rotX_rad = x;
+        this.rotY_rad = y;
+        this.rotZ_rad = z;
+    }
 
     public void setLight(double light) {
         this.light = light;
-    }
-
-    public void setRotMatrix(float[] matrix) {
-        this.rotMatrix = matrix;
     }
 
     public void setLocation(double lat, double lon) {
@@ -125,14 +133,14 @@ public class DataVector {
     @Override
     public String toString() {
         return "time: " + timestamp + ", date: " + dateTime + ", accX: " + accX + ", accY: " + accY + ", accZ: " + accZ +
-                ", rotX: " + rotX + ", rotY: " + rotY + ", rotZ: " + rotZ + ", light: " + light + ", speed: " + speed +
+                ", rotX: " + rotX_rad + ", rotY: " + rotY_rad + ", rotZ: " + rotZ_rad + ", light: " + light + ", speed: " + speed +
                 ", OBD speed: " + obdSpeed + ", rpm: " + rpm + ", fuel: " + fuel + ", heart rate: " + heartRate + ", weather: " + weather;
     }
 
     public String toCSVString() {
         return study_id + ";" + study_name + ";" + participant_id + ";" + participant_age + ";" + participant_gender + ";" +
                 timestamp + ";" + dateTime + ";" + accX + ";" + accY + ";" + accZ + ";" +
-                rotX + ";" + rotY + ";" + rotZ + ";" + light + ";" +
+                rotX_rad + ";" + rotY_rad + ";" + rotZ_rad + ";" + light + ";" +
                 lat + ";" + lon + ";" + speed + ";" + obdSpeed + ";" + rpm + ";" + fuel + ";" + heartRate + ";" + weather;
     }
 

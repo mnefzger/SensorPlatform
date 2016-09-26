@@ -162,11 +162,12 @@ public class ImageProcessor{
             // Time to collision
             double TTC = distance / (currentSpeed / 3.6);
 
-            if(currentSpeed >= 15 && currentSpeed <= 50) {
+            // tailgating detection starts at >25km/h
+            if(currentSpeed >= 25 && currentSpeed <= 60) { // urban
                 if (TTC < 1)
                     callback.onEventDetected(new EventVector(false, System.currentTimeMillis(), "Tailgating, TTC", TTC));
                 return;
-            } else if(currentSpeed > 50) {
+            } else if(currentSpeed > 60) { // highway
                 if (TTC < 2)
                     callback.onEventDetected(new EventVector(false, System.currentTimeMillis(), "Tailgating, TTC", TTC));
                 return;
@@ -176,7 +177,7 @@ public class ImageProcessor{
         } else {
             callback.onEventDetected(new EventVector(true, System.currentTimeMillis(), "Distance to front car", distance));
 
-            if(distance < 6) callback.onEventDetected(new EventVector(false, System.currentTimeMillis(), "Tailgating", distance));
+            //if(distance < 6) callback.onEventDetected(new EventVector(false, System.currentTimeMillis(), "Tailgating", distance));
         }
     }
 
@@ -197,6 +198,7 @@ public class ImageProcessor{
             File toFile = new File(toPath, filename);
             copyAssetFile(br, toFile);
         } catch (IOException e) {
+            e.printStackTrace();
         }
     }
 
@@ -211,10 +213,15 @@ public class ImageProcessor{
             }
         } finally {
             Log.d("CASCADES", "Writing finished");
-            if (bw != null) {
-                bw.close();
+            try{
+                if (bw != null) {
+                    bw.close();
+                }
+                br.close();
+            } catch (IOException e) {
+                e.printStackTrace();
             }
-            br.close();
+
         }
     }
 }

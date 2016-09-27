@@ -17,6 +17,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.View;
 import android.widget.AdapterView;
+import android.widget.FrameLayout;
 import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.TextView;
@@ -28,7 +29,8 @@ public class MainActivity extends AppCompatActivity {
     private ListView deviceList;
     private DeviceListAdapter listAdapter;
     private TextView successText;
-    private LinearLayout successLayout, setupLayout;
+    private LinearLayout successLayout, setupLayout, firstLayout;
+    private FrameLayout next;
 
     private static final String TAG = "USER_PHONE_MAIN";
 
@@ -43,8 +45,18 @@ public class MainActivity extends AppCompatActivity {
         deviceList.setAdapter(listAdapter);
         successText = (TextView) findViewById(R.id.successText);
 
+        firstLayout = (LinearLayout) findViewById(R.id.firstLayout);
         successLayout = (LinearLayout) findViewById(R.id.successLayout);
         setupLayout = (LinearLayout) findViewById(R.id.setupLayout);
+
+        next = (FrameLayout) findViewById(R.id.next_button);
+
+        next.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                requestNotifications();
+            }
+        });
 
         deviceList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
@@ -63,6 +75,9 @@ public class MainActivity extends AppCompatActivity {
 
         verifyPermissions(this);
 
+    }
+
+    private void requestNotifications() {
         if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.M && !Settings.canDrawOverlays(this)) {
             Intent overlay_p=new Intent("android.settings.ACTION_MANAGE_OVERLAY_PERMISSION");
             startActivityForResult(overlay_p,1337);
@@ -71,8 +86,6 @@ public class MainActivity extends AppCompatActivity {
             startActivityForResult(notifications_p, 1338);
             setup();
         }
-
-
     }
 
     @Override
@@ -83,12 +96,16 @@ public class MainActivity extends AppCompatActivity {
                 startActivityForResult(notifications_p, 1338);
             }
         } else if(requestCode == 1338) {
+            firstLayout.setVisibility(View.INVISIBLE);
+            setupLayout.setVisibility(View.VISIBLE);
+            next.setVisibility(View.INVISIBLE);
             setup();
         }
     }
 
     private void setup() {
         bAdapter = BluetoothAdapter.getDefaultAdapter();
+        bAdapter.enable();
         startDiscovery();
 
         Intent intent = new Intent(this, PhoneInteractionService.class);

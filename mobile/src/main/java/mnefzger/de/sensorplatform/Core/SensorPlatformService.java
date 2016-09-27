@@ -105,10 +105,12 @@ public class SensorPlatformService extends Service implements IDataCallback, ITr
     public void onTripEnd() {
         this.onEventData(new EventVector(true, System.currentTimeMillis(), "Trip End detected", 0));
 
-        Intent i = new Intent("mnefzger.de.sensorplatform.survey");
-        i.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-        i.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-        startActivity(i);
+        if(Preferences.surveyActivated(setting_prefs)) {
+            Intent i = new Intent("mnefzger.de.sensorplatform.survey");
+            i.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+            i.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+            startActivity(i);
+        }
 
         pauseDataCollection();
         startWaitBehaviour();
@@ -278,7 +280,7 @@ public class SensorPlatformService extends Service implements IDataCallback, ITr
     }
 
     public void initiatePhoneConnection() {
-        this.server.setupServer();
+        this.server.setupServer(getApplicationContext());
     }
 
     public void cancelPhoneConnection() {

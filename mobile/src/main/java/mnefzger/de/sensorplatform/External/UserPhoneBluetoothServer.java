@@ -37,13 +37,14 @@ public class UserPhoneBluetoothServer {
         this.c = c;
     }
 
-    public void setupServer() {
+    public void setupServer(Context c) {
         bAdapter = BluetoothAdapter.getDefaultAdapter();
         if(!bAdapter.isEnabled())
             bAdapter.enable();
 
         Intent discoverableIntent = new Intent(BluetoothAdapter.ACTION_REQUEST_DISCOVERABLE);
         discoverableIntent.putExtra(BluetoothAdapter.EXTRA_DISCOVERABLE_DURATION, 0); // 0 = always discoverable
+        discoverableIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
         c.startActivity(discoverableIntent);
 
         mReceiver = new ConnectionStatusReceiver();

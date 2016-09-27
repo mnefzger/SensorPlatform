@@ -73,6 +73,10 @@ public class DrivingBehaviourProcessor extends EventProcessor implements IOSMRes
 
     }
 
+    /**
+     * Calculates the exponential moving average of several Z acceleration values and matches against threshold
+     * @param lastData
+     */
     private void checkForHardAcc(List<DataVector> lastData) {
         List<Double> acc = new ArrayList<Double>();
         Iterator<DataVector> it = lastData.iterator();

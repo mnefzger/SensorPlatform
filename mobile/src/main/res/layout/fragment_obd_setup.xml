@@ -123,8 +123,8 @@
                         android:textColor="@color/colorAccent" />
 
                     <ImageView
-                        android:layout_width="20dp"
-                        android:layout_height="20dp"
+                        android:layout_width="18dp"
+                        android:layout_height="18dp"
                         android:id="@+id/done_search"
                         android:src="@drawable/done"
                         android:visibility="invisible"/>
@@ -147,8 +147,8 @@
                         android:textColor="@color/colorAccent"/>
 
                     <ImageView
-                        android:layout_width="20dp"
-                        android:layout_height="20dp"
+                        android:layout_width="18dp"
+                        android:layout_height="18dp"
                         android:id="@+id/done_connect"
                         android:src="@drawable/done"
                         android:visibility="invisible" />
@@ -171,8 +171,8 @@
                         android:textColor="@color/colorAccent"/>
 
                     <ImageView
-                        android:layout_width="20dp"
-                        android:layout_height="20dp"
+                        android:layout_width="18dp"
+                        android:layout_height="18dp"
                         android:id="@+id/done_setup"
                         android:src="@drawable/done"
                         android:visibility="invisible" />
@@ -195,8 +195,8 @@
                         android:textColor="@color/colorAccent"/>
 
                     <ImageView
-                        android:layout_width="20dp"
-                        android:layout_height="20dp"
+                        android:layout_width="18dp"
+                        android:layout_height="18dp"
                         android:id="@+id/done_ready"
                         android:src="@drawable/done"
                         android:visibility="invisible" />

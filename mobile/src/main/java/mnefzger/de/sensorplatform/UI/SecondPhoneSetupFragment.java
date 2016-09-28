@@ -13,6 +13,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.FrameLayout;
+import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
@@ -31,6 +32,8 @@ public class SecondPhoneSetupFragment extends Fragment {
     TextView waiting;
     TextView connecting;
     TextView ready;
+
+    ImageView done_wait, done_phone_connect;
 
     FrameLayout setup_next;
 
@@ -53,6 +56,9 @@ public class SecondPhoneSetupFragment extends Fragment {
         waiting = (TextView) v.findViewById(R.id.waitingPhoneText);
         connecting = (TextView) v.findViewById(R.id.connectingPhoneText);
         ready = (TextView) v.findViewById(R.id.readyPhoneText);
+
+        done_wait = (ImageView)v.findViewById(R.id.done_wait);
+        done_phone_connect = (ImageView) v.findViewById(R.id.done_phone_connect);
 
         phoneActive.setOnClickListener(listener);
 
@@ -104,12 +110,13 @@ public class SecondPhoneSetupFragment extends Fragment {
     };
 
     private void searchComplete() {
-        waiting.setText("Waiting for incoming connection … Done.");
+        done_wait.setVisibility(View.VISIBLE);
         connecting.setText("Trying to connect …");
     }
 
     private void connectionComplete() {
-        connecting.setText("Trying to connect … Done.");
+        done_phone_connect.setVisibility(View.VISIBLE);
+        connecting.setText("Trying to connect …");
         ready.setText("Ready.");
     }
 

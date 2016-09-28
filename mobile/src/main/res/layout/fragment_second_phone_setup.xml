@@ -115,12 +115,19 @@
                     android:layout_marginLeft="25dp" >
 
                     <TextView
-                        android:layout_width="match_parent"
+                        android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="Waiting for incoming connection … "
+                        android:text="Waiting for connection … "
                         android:id="@+id/waitingPhoneText"
                         android:textSize="19sp"
                         android:textColor="@color/colorAccent" />
+
+                    <ImageView
+                        android:layout_width="18dp"
+                        android:layout_height="18dp"
+                        android:id="@+id/done_wait"
+                        android:src="@drawable/done"
+                        android:visibility="invisible"/>
                 </LinearLayout>
 
                 <LinearLayout
@@ -138,6 +145,13 @@
                         android:id="@+id/connectingPhoneText"
                         android:textSize="19sp"
                         android:textColor="@color/colorAccent"/>
+
+                    <ImageView
+                        android:layout_width="18dp"
+                        android:layout_height="18dp"
+                        android:id="@+id/done_phone_connect"
+                        android:src="@drawable/done"
+                        android:visibility="invisible"/>
                 </LinearLayout>
 
                 <LinearLayout
@@ -155,6 +169,13 @@
                         android:id="@+id/readyPhoneText"
                         android:textSize="19sp"
                         android:textColor="@color/colorAccent"/>
+
+                    <ImageView
+                        android:layout_width="18dp"
+                        android:layout_height="18dp"
+                        android:id="@+id/done_phone"
+                        android:src="@drawable/done"
+                        android:visibility="invisible"/>
                 </LinearLayout>
 
 

@@ -152,7 +152,7 @@ public class OBDSetupFragment extends Fragment {
 
     public void readyComplete() {
         ready.setText("Ready.");
-        done_ready.setVisibility(View.VISIBLE);
+        //done_ready.setVisibility(View.VISIBLE);
     }
 
     private void resetText() {

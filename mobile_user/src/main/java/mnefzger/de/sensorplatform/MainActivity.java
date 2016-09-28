@@ -61,12 +61,13 @@ public class MainActivity extends AppCompatActivity {
         deviceList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
+                updateView(i);
                 final BluetoothDevice device = listAdapter.getItem(i);
                 new Thread(new Runnable() {
                     @Override
                     public void run() {
                         connectTo(device);
-                        //device.createBond();
+
                     }
                 }).start();
 
@@ -101,6 +102,18 @@ public class MainActivity extends AppCompatActivity {
             next.setVisibility(View.INVISIBLE);
             setup();
         }
+    }
+
+    public void updateView(int index){
+        ListView lView = (ListView) findViewById(R.id.deviceListView);
+                View v = lView.getChildAt(index -
+                lView.getFirstVisiblePosition());
+
+        if(v == null)
+            return;
+
+        TextView someText = (TextView) v.findViewById(R.id.deviceText);
+        someText.setText(someText.getText() + " -> Connecting …");
     }
 
     private void setup() {

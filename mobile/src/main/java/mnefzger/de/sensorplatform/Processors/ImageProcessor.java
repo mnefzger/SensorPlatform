@@ -177,7 +177,7 @@ public class ImageProcessor{
         } else {
             callback.onEventDetected(new EventVector(true, System.currentTimeMillis(), "Distance to front car", distance));
 
-            //if(distance < 6) callback.onEventDetected(new EventVector(false, System.currentTimeMillis(), "Tailgating", distance));
+            if(distance < 6) callback.onEventDetected(new EventVector(false, System.currentTimeMillis(), "Tailgating", distance));
         }
     }
 

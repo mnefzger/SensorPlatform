@@ -19,12 +19,15 @@ public class ThreadPool {
         if (mInstance == null) {
             mInstance = new ThreadPool();
         }
+        Log.d("THREADPOOL", "Added runnable: " + runnable.toString());
         mInstance.mThreadPoolExec.execute(runnable);
+
     }
 
     private ThreadPool() {
         int coreNum = Runtime.getRuntime().availableProcessors();
-        MAX_POOL_SIZE = coreNum * 2;
+        MAX_POOL_SIZE = coreNum * 4;
+        Log.d("THREADPOOL", "New pool: " + MAX_POOL_SIZE);
         mThreadPoolExec = new ThreadPoolExecutor(
                 coreNum,
                 MAX_POOL_SIZE,
@@ -37,12 +40,13 @@ public class ThreadPool {
                         Log.d("THREADPOOL", runnable.toString() + " was rejected");
                     }
                 });
-
-
     }
 
     public static void finish() {
-        if(mInstance != null)
+        if(mInstance != null) {
             mInstance.mThreadPoolExec.shutdown();
+            mInstance = null;
+        }
+        Log.d("THREADPOOL", "Stopped Pool");
     }
 }

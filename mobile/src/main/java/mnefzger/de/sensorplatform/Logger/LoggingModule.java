@@ -1,5 +1,7 @@
 package mnefzger.de.sensorplatform.Logger;
 
+import android.content.Context;
+import android.content.SharedPreferences;
 import android.os.Environment;
 import android.util.Log;
 
@@ -11,6 +13,7 @@ import java.io.IOException;
 
 import mnefzger.de.sensorplatform.Core.DataVector;
 import mnefzger.de.sensorplatform.Core.EventVector;
+import mnefzger.de.sensorplatform.R;
 
 /**
  * This class writes Raw Data and Event Data to csv files on the phone
@@ -29,7 +32,7 @@ public class LoggingModule {
     File eventFile;
     File surveyFile;
 
-    long tripID;
+    String tripID;
 
     static LoggingModule instance;
 
@@ -48,8 +51,8 @@ public class LoggingModule {
         }
     }
 
-    public void generateNewLoggingID() {
-        tripID = System.currentTimeMillis();
+    public void generateNewLoggingID(String participantID) {
+        tripID = System.currentTimeMillis() +"_"+ participantID;
         Log.d("LOGGING", "New Trip ID " +tripID);
     }
 
@@ -124,7 +127,7 @@ public class LoggingModule {
     }
 
     private void createHeadersEvent() {
-        String[] line = { "tripID;timestamp;description;value" };
+        String[] line = { "tripID;timestamp;description;value;extra;videoFront;videoBack" };
 
         write(eventFile, line);
     }

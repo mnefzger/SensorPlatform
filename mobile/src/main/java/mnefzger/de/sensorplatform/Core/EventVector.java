@@ -9,7 +9,8 @@ public class EventVector {
     private String eventDescription;
     private double value;
     private double extraValue;
-    private String videoName;
+    private String videoFront;
+    private String videoBack;
 
     public EventVector(boolean debug, long time, String event, double value) {
         this.debug = debug;
@@ -38,8 +39,10 @@ public class EventVector {
         this.value = value;
     }
 
-    public void setVideoName(String videoName) {
-        this.videoName = videoName;
+    public void setVideoNames(long timestamp) {
+
+        this.videoFront = "front-" + timestamp + ".avi";
+        this.videoBack = "back-" + timestamp + ".avi";
     }
 
     public void setExtraValue(double extraValue) {
@@ -66,16 +69,12 @@ public class EventVector {
         return extraValue;
     }
 
-    public String getVideoName() {
-        return videoName;
-    }
-
 
     public String toString() {
-        return "Timestamp: " + timestamp + " -> " + eventDescription + " @ " + value + ", extra: " + extraValue + ", video: " + videoName;
+        return "Timestamp: " + timestamp + " -> " + eventDescription + " @ " + value + ", extra: " + extraValue + ", video: " + videoFront + "," + videoBack;
     }
 
     public String toCSVString() {
-        return timestamp + ";" + eventDescription + ";" + value + ";" + extraValue + ";" + videoName;
+        return timestamp + ";" + eventDescription + ";" + value + ";" + extraValue + ";" + videoFront + ";" + videoBack;
     }
 }

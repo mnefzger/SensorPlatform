@@ -117,7 +117,8 @@ public class SensorPlatformService extends Service implements IDataCallback, ITr
     }
 
     private void prepareTripLogging() {
-        lm.generateNewLoggingID();
+        SharedPreferences studyPrefs = getApplication().getSharedPreferences(getApplication().getString(R.string.study_preferences_key), Context.MODE_PRIVATE);
+        lm.generateNewLoggingID(studyPrefs.getString("p_ID", "empty"));
 
         if(Preferences.rawLoggingActivated(setting_prefs)) {
             logRawData(true);
@@ -257,10 +258,10 @@ public class SensorPlatformService extends Service implements IDataCallback, ITr
         if(Preferences.videoSavingActivated(setting_prefs) && !ev.isDebug()) {
             long now = System.currentTimeMillis();
 
-            // Check if a video is currently being saved or the last save was less than 4 second ago
-            if(!im.isSaving() && (now - lastSave) > 4000) {
+            // Check if a video is currently being saved or the last save was less than 5 second ago
+            if(!im.isSaving() && (now - lastSave) > 5000) {
                 im.saveVideoAfterEvent(ev);
-                ev.setVideoName("Video-" + ev.getTimestamp() + ".avi");
+                ev.setVideoNames(ev.getTimestamp());
                 lastSave = now;
             }
         }

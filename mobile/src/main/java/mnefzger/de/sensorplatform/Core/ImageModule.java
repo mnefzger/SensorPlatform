@@ -354,7 +354,7 @@ public class ImageModule implements IEventCallback{
             final int w = i.getWidth();
             final int h = i.getHeight();
             i.close();
-            YuvImage yuvimage = new YuvImage(bytes, ImageFormat.NV21, w, h, null);
+            //YuvImage yuvimage = new YuvImage(bytes, ImageFormat.NV21, w, h, null);
 
             /**
              * Decide if frame is to be processed or not
@@ -367,9 +367,9 @@ public class ImageModule implements IEventCallback{
                         imgProc.processImageBack(bytes, w, h);
                     }
                 });
-                byte[] processedImg = imgProc.processImageBack(bytes.clone(), w, h);
+                /*byte[] processedImg = imgProc.processImageBack(bytes.clone(), w, h);
                   yuvimage = new YuvImage(processedImg, ImageFormat.NV21, 320, 240, null);
-                  mBackgroundHandler.post( new ImageSaver(yuvimage, "back") );
+                  mBackgroundHandler.post( new ImageSaver(yuvimage, "back") );*/
                   lastBackProc = now;
             }
 
@@ -444,7 +444,7 @@ public class ImageModule implements IEventCallback{
             this.h = height;
             this.mode = mode;
 
-            fileName = "Video-" + timestamp + ".avi";
+            fileName = mode + "-" + timestamp + ".avi";
 
             if(mode.equals("front") && frontSaving ) return;
             if(mode.equals("back") && backSaving ) return;

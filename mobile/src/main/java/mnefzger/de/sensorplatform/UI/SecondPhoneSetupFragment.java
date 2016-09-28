@@ -115,8 +115,9 @@ public class SecondPhoneSetupFragment extends Fragment {
     }
 
     private void connectionComplete() {
-        done_phone_connect.setVisibility(View.VISIBLE);
+        done_wait.setVisibility(View.VISIBLE);
         connecting.setText("Trying to connect …");
+        done_phone_connect.setVisibility(View.VISIBLE);
         ready.setText("Ready.");
     }
 

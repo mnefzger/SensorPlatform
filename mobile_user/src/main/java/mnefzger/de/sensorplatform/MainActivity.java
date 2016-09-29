@@ -121,8 +121,6 @@ public class MainActivity extends AppCompatActivity {
         bAdapter.enable();
         startDiscovery();
 
-        Intent intent = new Intent(this, PhoneInteractionService.class);
-        startService(intent);
     }
 
     private void startDiscovery() {
@@ -141,6 +139,10 @@ public class MainActivity extends AppCompatActivity {
             BluetoothConnection.connected = true;
             BluetoothConnection.device = device;
             Log.d(TAG, "Connected to: " + BluetoothConnection.device.getName() + "-> " + BluetoothConnection.socket.isConnected());
+
+            Intent intent = new Intent(this, PhoneInteractionService.class);
+            startService(intent);
+            registerReceiver(stopReceiver, new IntentFilter("mnefzger.de.sensorplatform.STOP"));
 
             runOnUiThread(new Runnable() {
                 public void run() {
@@ -177,6 +179,17 @@ public class MainActivity extends AppCompatActivity {
         }
     };
 
+    BroadcastReceiver stopReceiver = new BroadcastReceiver() {
+        public void onReceive(Context context, Intent intent) {
+            String action = intent.getAction();
+            if (action.equals("mnefzger.de.sensorplatform.STOP")) {
+                Intent i = new Intent(Intent.ACTION_MAIN);
+                i.addCategory(Intent.CATEGORY_HOME);
+                i.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                startActivity(i);
+            }
+        }
+    };
 
 
     private static final int REQUEST_LOCATION = 1;
@@ -207,6 +220,7 @@ public class MainActivity extends AppCompatActivity {
     @Override
     public void onDestroy() {
         unregisterReceiver(mReceiver);
+        unregisterReceiver(stopReceiver);
 
         super.onDestroy();
     }

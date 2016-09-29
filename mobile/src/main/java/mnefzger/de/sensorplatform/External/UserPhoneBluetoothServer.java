@@ -13,10 +13,12 @@ import android.os.Message;
 import android.util.Log;
 
 import java.io.IOException;
+import java.io.OutputStream;
 import java.util.UUID;
 
 import mnefzger.de.sensorplatform.Core.EventVector;
 import mnefzger.de.sensorplatform.Core.IEventCallback;
+import mnefzger.de.sensorplatformshared.BluetoothListener;
 import mnefzger.de.sensorplatformshared.InteractionEvents;
 
 public class UserPhoneBluetoothServer {
@@ -57,8 +59,18 @@ public class UserPhoneBluetoothServer {
     }
 
     public void cancel() {
-        acceptThread.cancel();
-        c.unregisterReceiver(mReceiver);
+        if(acceptThread != null)
+            acceptThread.cancel();
+        try {
+            c.unregisterReceiver(mReceiver);
+        } catch (IllegalArgumentException e) {
+            Log.e("Bluetooth", "Receiver already unregistered");
+        }
+    }
+
+    public void stop() {
+        cancel();
+        acceptThread.sendStop();
     }
 
     class ConnectionStatusReceiver extends BroadcastReceiver {
@@ -82,8 +94,9 @@ public class UserPhoneBluetoothServer {
     private class AcceptThread extends Thread {
         // The local server socket
         private final BluetoothServerSocket mmServerSocket;
+        private BluetoothSocket socket;
 
-        public AcceptThread() {
+        AcceptThread() {
             BluetoothServerSocket tmp = null;
             Log.d("Bluetooth", "Started Thread");
             // Create a new listening server socket
@@ -98,7 +111,7 @@ public class UserPhoneBluetoothServer {
         public void run() {
             setName("AcceptThread");
 
-            BluetoothSocket socket = null;
+            socket = null;
 
             // Listen to the server socket if we're not connected
             while (true) {
@@ -125,7 +138,7 @@ public class UserPhoneBluetoothServer {
 
         }
 
-        public void manageConnections(final BluetoothSocket socket) {
+        private void manageConnections(final BluetoothSocket socket) {
             Log.d("INCOMING CONNECTION", socket.getRemoteDevice().getName());
             c.sendBroadcast(new Intent("PHONE_CONNECTED"));
             BluetoothListener listener = new BluetoothListener();
@@ -142,7 +155,7 @@ public class UserPhoneBluetoothServer {
             }
         };
 
-        public void processMessage(String m){
+        private void processMessage(String m){
             Log.d("BLUETOOTH_SERVER", "Received: " +  m);
             String description = "";
             switch (m) {
@@ -163,13 +176,33 @@ public class UserPhoneBluetoothServer {
                 callback.onEventDetected(new EventVector(false, System.currentTimeMillis(), description, 1));
         }
 
-        public void cancel() {
+        private void cancel() {
             Log.d("Bluetooth", "cancel()" + this);
             try {
                 mmServerSocket.close();
             } catch (IOException e) {
                 Log.e("Bluetooth", "close() of server failed", e);
             }
+        }
+
+        private void sendStop() {
+            if(socket != null && socket.isConnected())
+                sendDataToPairedDevice("mnefzger.de.sensorplatform.STOP");
+            else
+                Log.d("BLUETOOTH SERVER", "No connection to user phone, cannot call stop");
+        }
+
+        public void sendDataToPairedDevice(String message){
+            byte[] toSend = message.getBytes();
+            try {
+                Log.d("OutStream? ", socket + "");
+                OutputStream mmOutStream = socket.getOutputStream();
+                mmOutStream.write(toSend);
+                Log.d("Sent to: ", socket.getRemoteDevice().getName() + ", " + message);
+            } catch (IOException e) {
+                Log.e("BluetoothSend", "Exception during write", e);
+            }
+
         }
     }
 }

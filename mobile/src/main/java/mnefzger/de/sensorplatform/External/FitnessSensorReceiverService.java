@@ -13,7 +13,9 @@ import com.google.android.gms.wearable.MessageEvent;
 import com.google.android.gms.wearable.Node;
 import com.google.android.gms.wearable.WearableListenerService;
 
-
+/**
+ * Receives data package from connected Android Wear device
+ */
 public class FitnessSensorReceiverService extends WearableListenerService {
     private static final String TAG = "SensorReceiverService";
 

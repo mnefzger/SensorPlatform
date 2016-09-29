@@ -11,7 +11,9 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.graphics.PixelFormat;
 import android.os.Build;
+import android.os.Handler;
 import android.os.IBinder;
+import android.os.Message;
 import android.provider.Settings;
 import android.support.annotation.Nullable;
 import android.util.Log;
@@ -24,6 +26,7 @@ import android.widget.LinearLayout;
 import java.io.IOException;
 import java.io.OutputStream;
 
+import mnefzger.de.sensorplatformshared.BluetoothListener;
 import mnefzger.de.sensorplatformshared.InteractionEvents;
 
 
@@ -71,7 +74,31 @@ public class PhoneInteractionService extends Service implements View.OnTouchList
 
         socket = BluetoothConnection.socket;
         Log.d(TAG, "Service created");
+
+        if(socket != null)
+            setupListener(socket);
     }
+
+    private void setupListener(BluetoothSocket socket) {
+        Log.d(TAG, "Setup Listener");
+        BluetoothListener listener = new BluetoothListener();
+        listener.listen(socket, handler);
+    }
+
+    private final Handler handler = new Handler() {
+        @Override
+        public void handleMessage(Message msg) {
+            byte[] readBuf = (byte[]) msg.obj;
+            // construct a string from the valid bytes in the buffer
+            String readMessage = new String(readBuf, 0, msg.arg1);
+            Log.d(TAG, readMessage);
+            if(readMessage.equals("mnefzger.de.sensorplatform.STOP")) {
+                Log.d(TAG, "Stop received, shut down");
+                sendBroadcast(new Intent(readMessage));
+                stopSelf();
+            }
+        }
+    };
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
@@ -150,15 +177,16 @@ public class PhoneInteractionService extends Service implements View.OnTouchList
     }
 
     public void sendDataToPairedDevice(String message){
-        if(socket == null && BluetoothConnection.socket != null) {
+        if( socket == null && BluetoothConnection.socket != null ) {
             Log.d("BluetoothSend", "First time assignment");
             socket = BluetoothConnection.socket;
             deviceAddress = socket.getRemoteDevice().getAddress();
-        }  else if(BluetoothConnection.connected == false && deviceAddress != null) {
+            setupListener(socket);
+        }  else if( !BluetoothConnection.connected && deviceAddress != null ) {
             Log.d("BluetoothSend", "Socket dead, reconnect.");
             reconnect();
             return;
-        }   else if(socket == null || BluetoothConnection.connected == false){
+        }   else if(socket == null || !BluetoothConnection.connected ){
             Log.d("BluetoothSend", "Socket still dead.");
             return;
         }
@@ -175,6 +203,8 @@ public class PhoneInteractionService extends Service implements View.OnTouchList
 
     }
 
+
+
     private void reconnect() {
         Log.d(TAG, "Trying to reconnect....");
         BluetoothAdapter bAdapter = BluetoothAdapter.getDefaultAdapter();
@@ -185,6 +215,7 @@ public class PhoneInteractionService extends Service implements View.OnTouchList
             BluetoothConnection.connected = true;
             BluetoothConnection.device = d;
             socket = BluetoothConnection.socket;
+            setupListener(socket);
         } catch (IOException e) {
             Log.d(TAG, "Could not reconnect. " + e);
         }

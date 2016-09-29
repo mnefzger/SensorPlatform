@@ -5,22 +5,30 @@ import org.threeten.bp.LocalDateTime;
 import org.threeten.bp.ZoneId;
 
 public class DataVector {
+    /**
+     * Study parameters
+     */
     private String study_id;
     private String study_name;
     private String participant_id;
     private int participant_age;
     private String participant_gender;
 
+    /**
+     * Data about time
+     */
     public long timestamp;
     public String dateTime;
+
     /**
      * Three axis acceleration
      */
     public double accX;
     public double accY;
     public double accZ;
+
     /**
-     * Three axis acceleration
+     * Three axis rotation in euler, matrix, rad/s
      */
     public double rotX;
     public double rotY;
@@ -29,16 +37,18 @@ public class DataVector {
     public double rotX_rad;
     public double rotY_rad;
     public double rotZ_rad;
+
     /**
      * Light level in cabin in lux
      */
     public double light;
+
     /**
      * vehicle location in lat, lon
      */
-    //public Location location;
     public double lat;
     public double lon;
+
     /**
      * vehicle speed in km/h
      */
@@ -46,13 +56,18 @@ public class DataVector {
 
     public String weather;
 
+    /**
+     * OBD data values
+     */
     public Double obdSpeed = null;
-
     public Double rpm = null;
-
     public Double fuel = null;
 
+    /**
+     * Heart rate coming from Android Wear device
+     */
     public Double heartRate = null;
+
 
     public DataVector() {
         setDateTime();
@@ -101,7 +116,6 @@ public class DataVector {
     }
 
     public void setLocation(double lat, double lon) {
-        //this.location = l;
         this.lat = lat;
         this.lon = lon;
     }

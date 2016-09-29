@@ -15,6 +15,9 @@ import java.util.List;
 import mnefzger.de.sensorplatform.Core.DataProvider;
 import mnefzger.de.sensorplatform.Core.ISensorCallback;
 
+/**
+ * Handles connection, start, stop of Android Wear device
+ */
 public class FitnessSensorManager extends DataProvider{
 
     private static FitnessSensorManager instance;

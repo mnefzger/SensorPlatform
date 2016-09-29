@@ -1,4 +1,4 @@
-package mnefzger.de.sensorplatform.External;
+package mnefzger.de.sensorplatformshared;
 
 import android.bluetooth.BluetoothSocket;
 import android.os.Handler;

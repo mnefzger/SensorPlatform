@@ -73,7 +73,10 @@ public class OBD2Provider extends DataProvider implements OBD2Connector.IConnect
         OBD2Connection.connected = false;
     }
 
-    // Is called in case of IOException with broken pipe
+    /*
+     * Sets up a new connection to the OBDII device.
+     * Is called for initial setup and in case of IOException with broken pipe
+     */
     public void reset() {
         Log.d(TAG, "reset");
         IntentFilter f = new IntentFilter();
@@ -94,6 +97,10 @@ public class OBD2Provider extends DataProvider implements OBD2Connector.IConnect
         setup();
     }
 
+    /**
+     * Runs the commands that set up the OBDII settings
+     * https://github.com/pires/obd-java-api
+     */
     private void setup() {
         setupRunning = true;
         try { Thread.sleep(1000); } catch (InterruptedException e) { e.printStackTrace(); }
@@ -108,6 +115,7 @@ public class OBD2Provider extends DataProvider implements OBD2Connector.IConnect
         runCommand(OBD2Connection.sock, "AT S0");
         runCommand(OBD2Connection.sock, "AT H0");
 
+        // try to run a command
         SpeedCommand cmd = new SpeedCommand();
         runCommand(OBD2Connection.sock, cmd);
 
@@ -124,7 +132,7 @@ public class OBD2Provider extends DataProvider implements OBD2Connector.IConnect
         new Timer().schedule(new TimerTask() {
             @Override
             public void run() {
-                if(OBD2Connection.sock != null && OBD2Connection.sock.isConnected()) {
+                if(OBD2Connection.sock != null && OBD2Connection.sock.isConnected()) {  // connection is established, run commands
                     new Thread(new Runnable() {
                         @Override
                         public void run() {
@@ -136,16 +144,21 @@ public class OBD2Provider extends DataProvider implements OBD2Connector.IConnect
                         }
                     }).start();
 
-                } else if(!tryingToReconnect) {
+                } else if(!tryingToReconnect) {     // connection is lost, try reconnecting...
                     reset();
                 }
 
+                // if data collection is still running, call again
                 if(collecting)
                     collectOBDData();
             }
         }, OBD_DELAY);
     }
 
+    /*
+     * Run the commands and report values back to callback.
+     * Speed, Engine Speed, Fuel consumption
+     */
     private void requestData() {
         SpeedCommand sp_cmd = new SpeedCommand();
         runCommand(OBD2Connection.sock, sp_cmd);

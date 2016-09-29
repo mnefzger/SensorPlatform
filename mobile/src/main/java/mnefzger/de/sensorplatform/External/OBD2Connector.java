@@ -76,7 +76,7 @@ public class OBD2Connector {
         Log.d(TAG, "Start discovery...");
         btAdapter.startDiscovery();
 
-        startTimeout(12000);
+        startTimeout(15000);
     }
 
     private void startTimeout(int milliseconds) {

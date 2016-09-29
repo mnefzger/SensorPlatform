@@ -294,6 +294,9 @@ public class SensorModule implements ISensorCallback, IEventCallback{
     public void initiateOBDSetup() {
         obd2.connect();
     }
+    public void cancelOBDSetup() {
+        obd2.stop();
+    }
 
     /**
      * This method is the accelerometer callback function.

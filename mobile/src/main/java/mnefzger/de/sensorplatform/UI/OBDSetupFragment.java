@@ -114,6 +114,8 @@ public class OBDSetupFragment extends Fragment {
                 hint.setVisibility(View.VISIBLE);
                 resetText();
 
+                app.getService().cancelOBDConnection();
+
                 if(receiverRegistered) {
                     app.unregisterReceiver(mReceiver);
                     receiverRegistered = false;
@@ -160,6 +162,10 @@ public class OBDSetupFragment extends Fragment {
         connecting.setText("");
         setup.setText("");
         ready.setText("");
+
+        done_searching.setVisibility(View.INVISIBLE);
+        done_connect.setVisibility(View.INVISIBLE);
+        done_setup.setVisibility(View.INVISIBLE);
     }
 
     BroadcastReceiver mReceiver = new BroadcastReceiver() {

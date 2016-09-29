@@ -71,6 +71,7 @@ public class OBD2Provider extends DataProvider implements OBD2Connector.IConnect
     public void stop() {
         collecting = false;
         OBD2Connection.connected = false;
+        setupComplete = false;
     }
 
     /*
@@ -103,7 +104,9 @@ public class OBD2Provider extends DataProvider implements OBD2Connector.IConnect
      */
     private void setup() {
         setupRunning = true;
-        try { Thread.sleep(1000); } catch (InterruptedException e) { e.printStackTrace(); }
+        // allow small wait for connection to be stable
+        try { Thread.sleep(500); } catch (InterruptedException e) { e.printStackTrace(); }
+
         /* Setup */
         runCommand(OBD2Connection.sock, "ATD");
         runCommand(OBD2Connection.sock, "ATZ");

@@ -279,6 +279,9 @@ public class SensorPlatformService extends Service implements IDataCallback, ITr
     public void initiateOBDConnection() {
         this.sm.initiateOBDSetup();
     }
+    public void cancelOBDConnection() {
+        this.sm.cancelOBDSetup();
+    }
 
     public void initiatePhoneConnection() {
         this.server.setupServer(getApplicationContext());

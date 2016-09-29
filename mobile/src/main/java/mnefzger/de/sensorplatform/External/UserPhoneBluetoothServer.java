@@ -69,8 +69,10 @@ public class UserPhoneBluetoothServer {
     }
 
     public void stop() {
-        cancel();
-        acceptThread.sendStop();
+        if(acceptThread != null) {
+            cancel();
+            acceptThread.sendStop();
+        }
     }
 
     class ConnectionStatusReceiver extends BroadcastReceiver {

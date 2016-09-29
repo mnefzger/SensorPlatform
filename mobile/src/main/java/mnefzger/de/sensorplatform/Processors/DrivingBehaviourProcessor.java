@@ -41,6 +41,7 @@ public class DrivingBehaviourProcessor extends EventProcessor implements IOSMRes
     private double TURN_THRESHOLD_SHARP;
     private int OSM_REQUEST_RATE;
 
+    private int rawDataDelay;
 
     public DrivingBehaviourProcessor(SensorModule m, Context a) {
         super(m);
@@ -54,6 +55,8 @@ public class DrivingBehaviourProcessor extends EventProcessor implements IOSMRes
         TURN_THRESHOLD_SHARP = Preferences.getSharpTurnThreshold(setting_prefs);
         OSM_REQUEST_RATE = Preferences.getOSMRequestRate(setting_prefs);
 
+        rawDataDelay = Preferences.getRawDataDelay(setting_prefs);
+
     }
 
     public void processData(List<DataVector> data) {
@@ -63,10 +66,13 @@ public class DrivingBehaviourProcessor extends EventProcessor implements IOSMRes
             currentVector = data.get(data.size()-1);
             previousVector = data.get(data.size()-2);
 
-            //checkForHardAcc(getLastData(3*rawDataDelay));
-            //checkForSharpTurn(getLastData(10*rawDataDelay));
-            checkForHardAcc(getLastDataItems(3));
-            checkForSharpTurn(getLastDataItems(6));
+            //
+            int no_of_items = 2000/rawDataDelay;
+            // minimum of 3 items
+            no_of_items = no_of_items >= 3 ? no_of_items : 3;
+
+            checkForHardAcc(getLastDataItems(no_of_items));
+            checkForSharpTurn(getLastDataItems(no_of_items));
             checkForSpeeding(currentVector);
 
         }
@@ -77,11 +83,12 @@ public class DrivingBehaviourProcessor extends EventProcessor implements IOSMRes
      * Calculates the exponential moving average of several Z acceleration values and matches against threshold
      * @param lastData
      */
+    long lastAccDetected = 0;
     private void checkForHardAcc(List<DataVector> lastData) {
         List<Double> acc = new ArrayList<Double>();
         Iterator<DataVector> it = lastData.iterator();
         double max = 0;
-        long time = data.get(0).timestamp;
+        long time = lastData.get(0).timestamp;
         while(it.hasNext()) {
             DataVector next = it.next();
             Double accelerationZ = next.accZ;
@@ -94,14 +101,21 @@ public class DrivingBehaviourProcessor extends EventProcessor implements IOSMRes
             }
         }
 
-        double avg = MathFunctions.getAccEMASingle(acc, 0.3);
+        double avg = MathFunctions.getAccEMASingle(acc, 2/(acc.size()+1) );
+        Log.d("ACCELERATION", "Value: " + avg);
+
+        // we already looked at this data or last detected was less than 500ms ago
+        if(time == lastAccDetected || (time-lastAccDetected) < 500)
+            return;
 
         if(avg > ACC_THRESHOLD) {
-            EventVector ev = new EventVector(false, time, "Hard brake", avg);
+            EventVector ev = new EventVector(false, time, "Hard brake", avg/9.81);
+            lastAccDetected = time;
             callback.onEventDetected(ev);
         }
         if(avg < -ACC_THRESHOLD) {
-            EventVector ev = new EventVector(false, time, "Hard acceleration", avg);
+            EventVector ev = new EventVector(false, time, "Hard acceleration", avg/9.81);
+            lastAccDetected = time;
             callback.onEventDetected(ev);
         }
     }
@@ -111,6 +125,8 @@ public class DrivingBehaviourProcessor extends EventProcessor implements IOSMRes
         double leftDelta = 0.0;
         double rightDelta = 0.0;
         float[] prevMatrix = null;
+
+        long time = lastData.get(0).timestamp;;
 
         Iterator<DataVector> it = lastData.iterator();
         while(it.hasNext()) {
@@ -128,23 +144,33 @@ public class DrivingBehaviourProcessor extends EventProcessor implements IOSMRes
                 // convert to radians
                 float[] rad = MathFunctions.calculateRadAngles(angleChange);
 
-                if(rad[2] < leftDelta) leftDelta = rad[2];
-                if(rad[2] > rightDelta) rightDelta = rad[2];
+                if(rad[2] < leftDelta)  {
+                    leftDelta = rad[2];
+                    time = v.timestamp;
+                }
+                if(rad[2] > rightDelta) {
+                    rightDelta = rad[2];
+                    time = v.timestamp;
+                }
 
                 prevMatrix = v.rotMatrix;
             }
 
         }
 
+        // we already looked at this data or last detected was less than 500ms ago
+        if(time == lastTurn || (time - lastTurn) < 500)
+            return;
+
         /**
          * Did the data include a sharp turn?
          */
         if(leftDelta <= -TURN_THRESHOLD_SHARP) {
-            EventVector ev = new EventVector(false, lastData.get(0).timestamp, "Sharp Left Turn", leftDelta);
+            EventVector ev = new EventVector(false, time, "Sharp Left Turn", leftDelta);
             callback.onEventDetected(ev);
         }
         if(rightDelta >= TURN_THRESHOLD_SHARP) {
-            EventVector ev = new EventVector(false, lastData.get(0).timestamp, "Sharp Right Turn", rightDelta);
+            EventVector ev = new EventVector(false, time, "Sharp Right Turn", rightDelta);
             callback.onEventDetected(ev);
         }
 
@@ -158,7 +184,7 @@ public class DrivingBehaviourProcessor extends EventProcessor implements IOSMRes
             checkForSpeedingInstant(currentVector);
         }
 
-        // if no turn occured in timeframe, reset variable
+        // if no turn occurred in timeframe, reset variable
         if(System.currentTimeMillis() - lastTurn > OSM_REQUEST_RATE) {
             turned = false;
         }

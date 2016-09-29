@@ -355,7 +355,8 @@ public class SensorPlatformService extends Service implements IDataCallback, ITr
         }
 
         im.stopCapture();
-        server.stop();
+        if(server != null)
+            server.stop();
 
         ActiveSubscriptions.removeAll();
 

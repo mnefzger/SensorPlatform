@@ -102,7 +102,6 @@ public class DrivingBehaviourProcessor extends EventProcessor implements IOSMRes
         }
 
         double avg = MathFunctions.getAccEMASingle(acc, 2/(acc.size()+1) );
-        Log.d("ACCELERATION", "Value: " + avg);
 
         // we already looked at this data or last detected was less than 500ms ago
         if(time == lastAccDetected || (time-lastAccDetected) < 500)
@@ -354,7 +353,7 @@ public class DrivingBehaviourProcessor extends EventProcessor implements IOSMRes
             for(int i=0; i<roads.size(); i++) {
                 double temp_dist = getDistanceToRoad(roads.valueAt(i));
                 // if there was no turn detected, we assume it is more likely that we are still on the same road
-                // to express this likelyhood, we multiply the distance to lastRecognizedRoad by 0.75
+                // to express this likelihood, we multiply the distance to lastRecognizedRoad by 0.75
                 if(lastRecognizedRoad == roads.valueAt(i)) {
                     if(!turned) {
                         temp_dist *= 0.75;

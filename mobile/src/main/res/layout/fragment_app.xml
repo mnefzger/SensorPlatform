@@ -85,7 +85,8 @@
             android:orientation="horizontal"
             android:layout_width="match_parent"
             android:layout_height="120dp"
-            android:id="@+id/linearLayout">
+            android:id="@+id/linearLayout"
+            android:weightSum="1">
 
             <LinearLayout
                 android:orientation="vertical"
@@ -95,14 +96,14 @@
                 android:layout_weight="0.5">
 
                 <TextView
-                    android:text="RotX:"
+                    android:text=""
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:id="@+id/rotXText"
                     android:layout_alignParentStart="true" />
 
                 <TextView
-                    android:text="RotY:"
+                    android:text=""
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:id="@+id/rotYText"
@@ -110,7 +111,7 @@
                     android:layout_alignParentStart="true" />
 
                 <TextView
-                    android:text="RotZ:"
+                    android:text=""
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:id="@+id/rotZText"
@@ -125,20 +126,20 @@
                 android:layout_weight="0.5">
 
                 <TextView
-                    android:text="AccX:"
+                    android:text=""
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:id="@+id/accXText" />
 
                 <TextView
-                    android:text="AccY:"
+                    android:text=""
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:id="@+id/accYText"
                     android:layout_marginTop="11dp" />
 
                 <TextView
-                    android:text="AccZ:"
+                    android:text=""
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:id="@+id/accZText"
@@ -160,27 +161,27 @@
                 android:layout_weight="0.5">
 
                 <TextView
-                    android:text="Lat:"
+                    android:text=""
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:id="@+id/latText"/>
 
                 <TextView
-                    android:text="Lon:"
+                    android:text=""
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:id="@+id/lonText"
                     android:layout_marginTop="10dp" />
 
                 <TextView
-                    android:text="Speed:"
+                    android:text=""
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:id="@+id/speedText"
                     android:layout_marginTop="10dp" />
 
                 <TextView
-                    android:text="Heart Rate:"
+                    android:text=""
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:id="@+id/heartText"
@@ -194,26 +195,26 @@
                 android:layout_height="wrap_content"
                 android:layout_weight="0.5">
                 <TextView
-                    android:text="Light:"
+                    android:text=""
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:id="@+id/lightText" />
                 <TextView
-                    android:text="OBD RPM:"
+                    android:text=""
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:id="@+id/obdSpeedText"
                     android:layout_marginTop="10dp" />
 
                 <TextView
-                    android:text="OBD Speed:"
+                    android:text=""
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:id="@+id/obdRPMText"
                     android:layout_marginTop="10dp" />
 
                 <TextView
-                    android:text="OBD Fuel:"
+                    android:text=""
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:id="@+id/obdFuelText"

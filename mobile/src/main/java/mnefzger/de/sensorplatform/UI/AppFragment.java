@@ -35,6 +35,7 @@ import mnefzger.de.sensorplatform.R;
  * This fragment shows the real-time raw and event data
  */
 public class AppFragment extends Fragment {
+    SharedPreferences sensor_prefs;
 
     RelativeLayout dataLayout;
     TextView waitingText;
@@ -83,7 +84,7 @@ public class AppFragment extends Fragment {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setRetainInstance(true);
-
+        sensor_prefs = getActivity().getSharedPreferences(getActivity().getString(R.string.sensor_preferences_key), Context.MODE_PRIVATE);
     }
 
     private void registerReceivers() {
@@ -212,15 +213,22 @@ public class AppFragment extends Fragment {
         getActivity().runOnUiThread(new Runnable() {
             @Override
             public void run() {
-                accX.setText("AccX: " + df.format(v.accX) );
-                accY.setText("AccY: " + df.format(v.accY) );
-                accZ.setText("AccZ: " + df.format(v.accZ) );
+                if(Preferences.accelerometerActivated(sensor_prefs)) {
+                    accX.setText("AccX: " + df.format(v.accX) );
+                    accY.setText("AccY: " + df.format(v.accY) );
+                    accZ.setText("AccZ: " + df.format(v.accZ) );
+                }
 
-                rotX.setText("RotX: " + df.format(v.rotX_rad));
-                rotY.setText("RotY: " + df.format(v.rotY_rad));
-                rotZ.setText("RotZ: " + df.format(v.rotZ_rad));
+                if(Preferences.rotationActivated(sensor_prefs)) {
+                    rotX.setText("RotX: " + df.format(v.rotX_rad));
+                    rotY.setText("RotY: " + df.format(v.rotY_rad));
+                    rotZ.setText("RotZ: " + df.format(v.rotZ_rad));
+                }
 
-                light.setText("Light: " + df.format(v.light) + " lumen");
+                if(Preferences.lightActivated(sensor_prefs)) {
+                    light.setText("Light: " + df.format(v.light) + " lumen");
+                }
+
 
                 if(v.lat == 0 && ActiveSubscriptions.usingGPS()) {
                     lat.setText("Lat: Acquiring position…");
@@ -233,11 +241,16 @@ public class AppFragment extends Fragment {
                     speed.setText("Speed: " + df.format(v.speed) + " km/h");
                 }
 
-                obdRPM.setText("OBD RPM: " + v.rpm);
-                obdSpeed.setText("OBD Speed: " + v.obdSpeed + " km/h");
-                obdFuel.setText("OBD Fuel: " + v.fuel + " l/100km");
+                if(Preferences.OBDActivated(sensor_prefs) ) {
+                    obdRPM.setText("OBD RPM: " + v.rpm);
+                    obdSpeed.setText("OBD Speed: " + v.obdSpeed + " km/h");
+                    obdFuel.setText("OBD Fuel: " + v.fuel + " l/100km");
+                }
 
-                heart.setText("Heart Rate: " + v.heartRate + " bpm");
+                if(Preferences.heartRateActivated(sensor_prefs)) {
+                    heart.setText("Heart Rate: " + v.heartRate + " bpm");
+                }
+
             }
         });
 

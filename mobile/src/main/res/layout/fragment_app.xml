@@ -1,4 +1,5 @@
 <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
@@ -89,61 +90,95 @@
             android:weightSum="1">
 
             <LinearLayout
-                android:orientation="vertical"
+                android:orientation="horizontal"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:weightSum="1"
                 android:layout_weight="0.5">
 
-                <TextView
-                    android:text=""
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:id="@+id/rotXText"
-                    android:layout_alignParentStart="true" />
+                <ImageView
+                    android:layout_width="32dp"
+                    android:layout_height="32dp"
+                    app:srcCompat="@drawable/rotation"
+                    android:id="@+id/imageView4"
+                    android:layout_weight="0.15"
+                    android:layout_gravity="center_vertical"
+                    android:layout_marginRight="10dp" />
 
-                <TextView
-                    android:text=""
-                    android:layout_width="wrap_content"
+                <LinearLayout
+                    android:orientation="vertical"
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:id="@+id/rotYText"
-                    android:layout_marginTop="10dp"
-                    android:layout_alignParentStart="true" />
+                    android:layout_weight="0.85">
 
-                <TextView
-                    android:text=""
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:id="@+id/rotZText"
-                    android:layout_marginTop="10dp"
-                    android:layout_weight="0.18" />
+                    <TextView
+                        android:text=""
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:id="@+id/rotXText"
+                        android:layout_alignParentStart="true" />
+
+                    <TextView
+                        android:text=""
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:id="@+id/rotYText"
+                        android:layout_marginTop="10dp"
+                        android:layout_alignParentStart="true" />
+
+                    <TextView
+                        android:text=""
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:id="@+id/rotZText"
+                        android:layout_marginTop="10dp"
+                        android:layout_weight="0.18" />
+                </LinearLayout>
+
             </LinearLayout>
 
             <LinearLayout
-                android:orientation="vertical"
+                android:orientation="horizontal"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_weight="0.5">
 
-                <TextView
-                    android:text=""
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:id="@+id/accXText" />
+                <ImageView
+                    android:layout_width="32dp"
+                    android:layout_height="32dp"
+                    app:srcCompat="@drawable/acceleration"
+                    android:id="@+id/imageView5"
+                    android:layout_weight="0.15"
+                    android:layout_gravity="center_vertical"
+                    android:layout_marginRight="10dp" />
 
-                <TextView
-                    android:text=""
-                    android:layout_width="wrap_content"
+                <LinearLayout
+                    android:orientation="vertical"
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:id="@+id/accYText"
-                    android:layout_marginTop="11dp" />
+                    android:layout_weight="0.85">
 
-                <TextView
-                    android:text=""
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:id="@+id/accZText"
-                    android:layout_marginTop="10dp" />
+                    <TextView
+                        android:text=""
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:id="@+id/accXText" />
+
+                    <TextView
+                        android:text=""
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:id="@+id/accYText"
+                        android:layout_marginTop="11dp" />
+
+                    <TextView
+                        android:text=""
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:id="@+id/accZText"
+                        android:layout_marginTop="10dp" />
+                </LinearLayout>
+
             </LinearLayout>
 
         </LinearLayout>
@@ -242,7 +277,7 @@
                     android:text=""
                     android:id="@+id/osmText"
                     android:layout_marginTop="25dp"
-                    android:textSize="20dp" />
+                    android:textSize="18sp" />
 
                 <TextView
                     android:layout_width="wrap_content"
@@ -250,7 +285,7 @@
                     android:textAppearance="?android:attr/textAppearanceLarge"
                     android:id="@+id/eventText"
                     android:layout_marginTop="10dp"
-                    android:textSize="20dp" />
+                    android:textSize="18sp" />
 
                 <TextView
                     android:layout_width="wrap_content"
@@ -258,7 +293,7 @@
                     android:textAppearance="?android:attr/textAppearanceLarge"
                     android:id="@+id/faceText"
                     android:layout_marginTop="10dp"
-                    android:textSize="20dp" />
+                    android:textSize="18sp" />
             </LinearLayout>
 
         </LinearLayout>

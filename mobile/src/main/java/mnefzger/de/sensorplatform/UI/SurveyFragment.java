@@ -34,6 +34,8 @@ public class SurveyFragment extends Fragment {
 
     private RadioButton stronglyDisagree, disagree, undecided, agree, stronglyAgree;
 
+    private RadioGroup group;
+
     private String answers = "";
 
     public SurveyFragment() {
@@ -56,6 +58,8 @@ public class SurveyFragment extends Fragment {
         undecided = (RadioButton) v.findViewById(R.id.undecided);
         agree = (RadioButton) v.findViewById(R.id.agree);
         stronglyAgree = (RadioButton) v.findViewById(R.id.stronglyAgree);
+
+        group = (RadioGroup)v.findViewById(R.id.lickertGroup);
 
         loadSurvey();
         showQuestion(currentQuestion);
@@ -127,11 +131,8 @@ public class SurveyFragment extends Fragment {
     }
 
     private void resetButtons() {
-        stronglyDisagree.setChecked(false);
-        disagree.setChecked(false);
-        undecided.setChecked(false);
-        agree.setChecked(false);
-        stronglyAgree.setChecked(false);
+        Log.d("SURVEY", "Reset");
+        group.clearCheck();
     }
 
     private String loadJSONFromAsset(String filename) {

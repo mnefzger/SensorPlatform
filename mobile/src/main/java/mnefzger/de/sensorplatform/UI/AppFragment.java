@@ -19,6 +19,8 @@ import android.widget.TextView;
 
 import com.google.gson.Gson;
 
+import org.w3c.dom.Text;
+
 import java.text.DecimalFormat;
 
 import mnefzger.de.sensorplatform.Core.ActiveSubscriptions;
@@ -36,6 +38,7 @@ public class AppFragment extends Fragment {
 
     RelativeLayout dataLayout;
     TextView waitingText;
+    TextView collectingText;
 
     TextView accX;
     TextView accY;
@@ -64,6 +67,8 @@ public class AppFragment extends Fragment {
     Button stopButton;
     Button pauseButton;
     Button resumeButton;
+
+    Button showData;
 
     DecimalFormat df = new DecimalFormat("#.####");
 
@@ -103,6 +108,7 @@ public class AppFragment extends Fragment {
 
         dataLayout = (RelativeLayout) v.findViewById(R.id.dataLayout);
         waitingText = (TextView) v.findViewById(R.id.waiting_text);
+        collectingText = (TextView) v.findViewById(R.id.collectingText);
 
         accX = (TextView) v.findViewById(R.id.accXText);
         accY = (TextView) v.findViewById(R.id.accYText);
@@ -130,10 +136,13 @@ public class AppFragment extends Fragment {
         stopButton = (Button) v.findViewById(R.id.stopButton);
         pauseButton = (Button) v.findViewById(R.id.pauseButton);
         resumeButton = (Button) v.findViewById(R.id.resumeButton);
+        showData = (Button) v.findViewById(R.id.toggleData);
 
         stopButton.setOnClickListener(stopListener);
         pauseButton.setOnClickListener(pauseListener);
         resumeButton.setOnClickListener(resumeListener);
+
+        showData.setOnClickListener(toggleDataListener);
 
         return v;
     }
@@ -180,6 +189,23 @@ public class AppFragment extends Fragment {
         }
     };
 
+    View.OnClickListener toggleDataListener = new View.OnClickListener() {
+        @Override
+        public void onClick(View v) {
+            if(dataLayout.getVisibility() == View.INVISIBLE) {
+                waitingText.setVisibility(View.INVISIBLE);
+                collectingText.setVisibility(View.INVISIBLE);
+                dataLayout.setVisibility(View.VISIBLE);
+                showData.setText("Hide Data");
+            } else {
+                waitingText.setVisibility(View.VISIBLE);
+                collectingText.setVisibility(View.INVISIBLE);
+                dataLayout.setVisibility(View.INVISIBLE);
+                showData.setText("Show Data");
+            }
+        }
+    };
+
     public void updateUI(DataVector vector) {
         final DataVector v = vector;
 
@@ -190,9 +216,9 @@ public class AppFragment extends Fragment {
                 accY.setText("AccY: " + df.format(v.accY) );
                 accZ.setText("AccZ: " + df.format(v.accZ) );
 
-                rotX.setText("RotX: " + v.rotX_rad);
-                rotY.setText("RotY: " + v.rotY_rad);
-                rotZ.setText("RotZ: " + v.rotZ_rad);
+                rotX.setText("RotX: " + df.format(v.rotX_rad));
+                rotY.setText("RotY: " + df.format(v.rotY_rad));
+                rotZ.setText("RotZ: " + df.format(v.rotZ_rad));
 
                 light.setText("Light: " + df.format(v.light) + " lumen");
 
@@ -246,10 +272,11 @@ public class AppFragment extends Fragment {
 
             Log.d("RawData @ App  ", v.toString());
 
-            if(dataLayout.getVisibility() == View.INVISIBLE) {
+            if(waitingText.getVisibility() == View.VISIBLE) {
                 waitingText.setVisibility(View.INVISIBLE);
-                dataLayout.setVisibility(View.VISIBLE);
+                collectingText.setVisibility((View.VISIBLE));
             }
+
 
             if(getActivity() != null)
                 updateUI(v);
@@ -264,10 +291,10 @@ public class AppFragment extends Fragment {
 
             Log.d("EventData @ App  ", v.toString());
 
-            if(dataLayout.getVisibility() == View.INVISIBLE) {
+            /*if(dataLayout.getVisibility() == View.INVISIBLE) {
                 waitingText.setVisibility(View.INVISIBLE);
                 dataLayout.setVisibility(View.VISIBLE);
-            }
+            }*/
 
             if(v.getEventDescription().equals("Trip End detected"))
                 handleTripEndUI();
@@ -279,6 +306,7 @@ public class AppFragment extends Fragment {
 
     private void handleTripEndUI() {
         waitingText.setVisibility(View.VISIBLE);
+        collectingText.setVisibility(View.INVISIBLE);
         dataLayout.setVisibility(View.INVISIBLE);
 
         SharedPreferences setting_prefs = getActivity().getSharedPreferences(getString(R.string.settings_preferences_key), Context.MODE_PRIVATE);

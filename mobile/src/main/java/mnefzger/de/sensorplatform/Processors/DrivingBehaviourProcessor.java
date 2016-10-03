@@ -69,7 +69,7 @@ public class DrivingBehaviourProcessor extends EventProcessor implements IOSMRes
             //
             int no_of_items = 2000/rawDataDelay;
             // minimum of 3 items
-            no_of_items = no_of_items >= 3 ? no_of_items : 3;
+            //no_of_items = no_of_items >= 3 ? no_of_items : 3;
 
             checkForHardAcc(getLastDataItems(no_of_items));
             checkForSharpTurn(getLastDataItems(no_of_items));
@@ -83,10 +83,11 @@ public class DrivingBehaviourProcessor extends EventProcessor implements IOSMRes
      * Calculates the exponential moving average of several Z acceleration values and matches against threshold
      * @param lastData
      */
-    long lastAccDetected = 0;
+    private long lastAccDetected = 0;
     private void checkForHardAcc(List<DataVector> lastData) {
         List<Double> acc = new ArrayList<Double>();
         Iterator<DataVector> it = lastData.iterator();
+        double max_abs = 0;
         double max = 0;
         long time = lastData.get(0).timestamp;
         while(it.hasNext()) {
@@ -95,24 +96,27 @@ public class DrivingBehaviourProcessor extends EventProcessor implements IOSMRes
             acc.add(accelerationZ);
 
             // find the timestamp of the peak value
-            if(Math.abs(accelerationZ) > max) {
-                max = Math.abs(accelerationZ);
+            if(Math.abs(accelerationZ) > max_abs) {
+                max_abs = Math.abs(accelerationZ);
                 time = next.timestamp;
+                max = accelerationZ;
             }
         }
 
-        double avg = MathFunctions.getAccEMASingle(acc, 2/(acc.size()+1) );
+        double avg = max;
+        //double avg = MathFunctions.getAccEMASingle(acc, 2/(acc.size()+1) );
+        //double avg = MathFunctions.getAccEMASingle(acc, 1);
 
-        // we already looked at this data or last detected was less than 500ms ago
-        if(time == lastAccDetected || (time-lastAccDetected) < 500)
+        // we already looked at this data or last detected was not long ago
+        if(time == lastAccDetected || (time-lastAccDetected) < (lastData.size()*rawDataDelay) )
             return;
 
         if(avg > ACC_THRESHOLD) {
             EventVector ev = new EventVector(false, time, "Hard brake", avg/9.81);
             lastAccDetected = time;
             callback.onEventDetected(ev);
-        }
-        if(avg < -ACC_THRESHOLD) {
+
+        } else if(avg < -ACC_THRESHOLD) {
             EventVector ev = new EventVector(false, time, "Hard acceleration", avg/9.81);
             lastAccDetected = time;
             callback.onEventDetected(ev);

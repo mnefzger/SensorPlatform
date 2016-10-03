@@ -59,16 +59,6 @@ JNIEXPORT jintArray Java_mnefzger_de_sensorplatform_Processors_ImageProcessor_nA
     Mat gray(image.rows, image.cols, image.depth());
     cvtColor(image, gray, COLOR_YUV2GRAY_I420);
 
-    /**
-    *   Rotating the image is only necessary certain device orientations
-    *
-    Point2f center( gray.rows/2, gray.cols/2 );
-    Mat rotationMatrix = getRotationMatrix2D(center, -180, 1);
-    Mat rotated;
-    warpAffine(gray, rotated, rotationMatrix, gray.size());
-    flip(gray, rotated, 0);
-    */
-
     vector< Rect > faces;
     //faceCascadeHaar.detectMultiScale(gray, faces, 1.1, 2, 0 | CV_HAAR_SCALE_IMAGE, Size(30, 30));
     faceCascadeLBP.detectMultiScale( gray, faces, 1.1, 2, 0, Size(30, 30) );
@@ -119,13 +109,28 @@ JNIEXPORT jintArray Java_mnefzger_de_sensorplatform_Processors_ImageProcessor_nA
     Mat gray_small(240, 320, gray.depth());
     resize(gray, gray_small, size);
 
-    Rect region_of_interest = Rect(90,90,150,150);
-    Mat roi = gray_small(region_of_interest);
+    //Rect region_of_interest = Rect(30,55,250,185);
+    //Mat roi = gray_small(region_of_interest);
+
+
+    Mat black(gray_small.rows, gray_small.cols, gray_small.type(), cv::Scalar::all(0));
+    Mat mask(gray_small.rows, gray_small.cols, CV_8UC1, cv::Scalar(0));
+
+    vector< vector<Point> >  co_ordinates;
+    co_ordinates.push_back(vector<Point>());
+    co_ordinates[0].push_back(Point(130,95));
+    co_ordinates[0].push_back(Point(190,95));
+    co_ordinates[0].push_back(Point(310,240));
+    co_ordinates[0].push_back(Point(0,240));
+    co_ordinates[0].push_back(Point(0,220));
+    drawContours( mask,co_ordinates,0, Scalar(255),CV_FILLED, 8 );
+    bitwise_not(mask,mask);
+    black.copyTo(gray_small,mask);
 
     //Mat output = getIPMImage(roi);
 
     vector< Rect > cars;
-    vehicleCascadeHaar.detectMultiScale( roi, cars, 1.06, 2, 0, Size(5, 5) );
+    vehicleCascadeHaar.detectMultiScale( gray_small, cars, 1.06, 2, 0, Size(3, 3) );
 
     result = env->NewIntArray(4 * cars.size());
 
@@ -139,14 +144,14 @@ JNIEXPORT jintArray Java_mnefzger_de_sensorplatform_Processors_ImageProcessor_nA
 
 		env->SetIntArrayRegion(result, i*4, 4, tmp_array);
 
-        rectangle(roi, cars[i], CV_RGB(255, 255, 255), 1);
+        rectangle(gray_small, cars[i], CV_RGB(255, 255, 255), 1);
 
         /*
         * uncomment this block to draw the distance on the images
         */
         double sensor_width = 6.17; //mm
         double f = 4.67; //mm
-        int img_width = 640; //pixel
+        int img_width = 320; //pixel
         int real_width = 1847; //mm
 
         double distance_to_car = (f * real_width * img_width) / (cars[i].width * sensor_width); //mm
@@ -163,7 +168,7 @@ JNIEXPORT jintArray Java_mnefzger_de_sensorplatform_Processors_ImageProcessor_nA
     Mat yuv;
     cvtColor(bgr, yuv, COLOR_BGR2YUV_I420);
 
-    rectangle(yuv, region_of_interest, CV_RGB(255, 255, 255), 1);
+    //rectangle(yuv, region_of_interest, CV_RGB(255, 255, 255), 1);
 
     Mat* mat = (Mat*) returnadress;
     mat->create(yuv.rows, yuv.cols, CV_8UC1);

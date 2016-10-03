@@ -259,9 +259,6 @@ public class AppFragment extends Fragment {
     public void updateUI(EventVector vector) {
         final EventVector v = vector;
 
-        /*MainActivity app = (MainActivity)getActivity();
-        app.goToSurveyFragment();*/
-
         getActivity().runOnUiThread(new Runnable() {
             @Override
             public void run() {

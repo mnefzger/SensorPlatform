@@ -254,10 +254,10 @@ public class DrivingBehaviourProcessor extends EventProcessor implements IOSMRes
             }
             // more advanced speed limit search based on traffic signs
             // ATTENTION: EXPERIMENTAL FEATURE
-            qAdapter.startSearchForSpeedLimitSign(currentVector.lat, currentVector.lon);
+            //qAdapter.startSearchForSpeedLimitSign(currentVector.lat, currentVector.lon);
 
             // Uncomment this if you don't want to use the traffic sign feature
-            //detectOverspeeding();
+            detectOverspeeding();
 
         } else {
             // somehow, we could not extract the current road

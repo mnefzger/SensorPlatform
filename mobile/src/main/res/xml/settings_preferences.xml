@@ -28,6 +28,14 @@
             android:title="Show survey after trip"
             android:summary="Shows a questionnaire to the driver after a trip ends."
             android:defaultValue="false"/>
+
+        <SwitchPreference
+            android:key="reverse_orientation"
+            android:title="Reverse phone orientation"
+            android:summary="Switches landscape orientation so that the camera is on the right"
+            android:defaultValue="false"
+            android:visibility="invisible"/>
+
     </PreferenceCategory>
 
     <PreferenceCategory android:title="Image Processing">
@@ -128,13 +136,13 @@
     <PreferenceCategory android:title="Location">
         <EditTextPreference
             android:key="osmRequest_frequency"
-            android:title="OSM query frequency"
-            android:summary="Time between two OSM requests in milliseconds"
+            android:title="OpenStreetMap query frequency"
+            android:summary="Time between two map requests in milliseconds"
             android:defaultValue="@integer/osmRequest_delay_default" />
 
         <EditTextPreference
             android:key="gpsRequest_frequency"
-            android:title="Location update frequency"
+            android:title="GPS location update frequency"
             android:summary="Time between two location updates requests in milliseconds"
             android:defaultValue="@integer/gpsRequest_delay_default" />
     </PreferenceCategory>

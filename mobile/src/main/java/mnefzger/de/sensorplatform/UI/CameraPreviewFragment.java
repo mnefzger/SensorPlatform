@@ -4,6 +4,8 @@ package mnefzger.de.sensorplatform.UI;
 import android.Manifest;
 import android.app.Activity;
 import android.content.Context;
+import android.content.SharedPreferences;
+import android.content.pm.ActivityInfo;
 import android.content.pm.PackageManager;
 import android.content.res.Configuration;
 import android.graphics.ImageFormat;
@@ -48,6 +50,7 @@ import java.util.Comparator;
 import java.util.List;
 
 import mnefzger.de.sensorplatform.Core.MainActivity;
+import mnefzger.de.sensorplatform.Core.Preferences;
 import mnefzger.de.sensorplatform.R;
 import mnefzger.de.sensorplatform.Utilities.AutoFitTextureView;
 
@@ -327,6 +330,7 @@ public class CameraPreviewFragment extends Fragment {
         previewComplete = (FrameLayout) view.findViewById(R.id.previewCompleteButton);
         horizon = (LinearLayout) view.findViewById(R.id.horizon);
 
+
         final FrameLayout first = (FrameLayout) view.findViewById(R.id.cameraSetupFirst);
         final FrameLayout preview = (FrameLayout) view.findViewById(R.id.cameraSetupPreview);
 
@@ -336,6 +340,26 @@ public class CameraPreviewFragment extends Fragment {
             public void onClick(View view) {
                 first.setVisibility(View.INVISIBLE);
                 preview.setVisibility(View.VISIBLE);
+            }
+        });
+
+        final SharedPreferences setting_prefs = getActivity().getSharedPreferences(getActivity().getString(R.string.settings_preferences_key), Context.MODE_PRIVATE);
+        Button switchOrientation = (Button) view.findViewById(R.id.orientationButton);
+        switchOrientation.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                boolean reversed = Preferences.isReverseOrientation(setting_prefs);
+                reversed = !reversed;
+
+                SharedPreferences.Editor editor = setting_prefs.edit();
+                editor.putBoolean("reverse_orientation", reversed);
+                editor.apply();
+
+
+                if(reversed)
+                    getActivity().setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_REVERSE_LANDSCAPE);
+                else
+                    getActivity().setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);
             }
         });
 

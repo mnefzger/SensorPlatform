@@ -295,7 +295,12 @@ public class MainActivity extends AppCompatActivity {
         this.appFragment = new AppFragment();
         changeFragment(this.appFragment, true, true, true);
 
-        this.setRequestedOrientation(Preferences.getOrientation(setting_prefs));
+        boolean reversed = Preferences.isReverseOrientation(setting_prefs);
+        if(reversed)
+            this.setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_REVERSE_LANDSCAPE);
+        else
+            this.setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);
+
         inAppFragment = true;
         studySetupComplete = true;
     }
@@ -354,7 +359,11 @@ public class MainActivity extends AppCompatActivity {
     public void goToCameraPreviewFragment(boolean forward) {
         cameraFragment = new CameraPreviewFragment();
         changeFragment(cameraFragment, true, true, forward);
-        this.setRequestedOrientation(Preferences.getOrientation(setting_prefs));
+        boolean reversed = Preferences.isReverseOrientation(setting_prefs);
+        if(reversed)
+            this.setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_REVERSE_LANDSCAPE);
+        else
+            this.setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);
 
         inCameraFragment = true;
     }
@@ -363,7 +372,11 @@ public class MainActivity extends AppCompatActivity {
     public void goToSurveyFragment() {
         surveyFragment = new SurveyFragment();
         changeFragment(surveyFragment, true, true, true);
-        this.setRequestedOrientation(Preferences.getOrientation(setting_prefs));
+        boolean reversed = Preferences.isReverseOrientation(setting_prefs);
+        if(reversed)
+            this.setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_REVERSE_LANDSCAPE);
+        else
+            this.setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);
     }
 
     MainActivity getActivity() {

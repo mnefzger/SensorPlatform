@@ -14,6 +14,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
@@ -41,10 +42,12 @@ public class AppFragment extends Fragment {
     TextView waitingText;
     TextView collectingText;
 
+    LinearLayout accelerometerInfo;
     TextView accX;
     TextView accY;
     TextView accZ;
 
+    LinearLayout rotationInfo;
     TextView rotX;
     TextView rotY;
     TextView rotZ;
@@ -111,10 +114,12 @@ public class AppFragment extends Fragment {
         waitingText = (TextView) v.findViewById(R.id.waiting_text);
         collectingText = (TextView) v.findViewById(R.id.collectingText);
 
+        accelerometerInfo = (LinearLayout) v.findViewById(R.id.accelerometerInfo);
         accX = (TextView) v.findViewById(R.id.accXText);
         accY = (TextView) v.findViewById(R.id.accYText);
         accZ = (TextView) v.findViewById(R.id.accZText);
 
+        rotationInfo = (LinearLayout) v.findViewById(R.id.rotationInfo);
         rotX = (TextView) v.findViewById(R.id.rotXText);
         rotY = (TextView) v.findViewById(R.id.rotYText);
         rotZ = (TextView) v.findViewById(R.id.rotZText);
@@ -162,7 +167,6 @@ public class AppFragment extends Fragment {
             MainActivity.started = false;
             MainActivity.mBound = false;
             app.goToStartFragment(25, false);
-
         }
     };
 
@@ -214,12 +218,14 @@ public class AppFragment extends Fragment {
             @Override
             public void run() {
                 if(Preferences.accelerometerActivated(sensor_prefs)) {
+                    accelerometerInfo.setVisibility(View.VISIBLE);
                     accX.setText("AccX: " + df.format(v.accX) );
                     accY.setText("AccY: " + df.format(v.accY) );
                     accZ.setText("AccZ: " + df.format(v.accZ) );
                 }
 
                 if(Preferences.rotationActivated(sensor_prefs)) {
+                    rotationInfo.setVisibility(View.VISIBLE);
                     rotX.setText("RotX: " + df.format(v.rotX_rad));
                     rotY.setText("RotY: " + df.format(v.rotY_rad));
                     rotZ.setText("RotZ: " + df.format(v.rotZ_rad));

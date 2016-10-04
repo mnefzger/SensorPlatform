@@ -78,7 +78,6 @@ public class OBDSetupFragment extends Fragment {
 
         obdActive.callOnClick();
 
-
         setup_next = (FrameLayout) v.findViewById(R.id.next_button);
         setup_next.setOnClickListener(nextStepButtonListener);
 
@@ -106,7 +105,8 @@ public class OBDSetupFragment extends Fragment {
                 app.registerReceiver(mReceiver, filter);
                 receiverRegistered = true;
 
-                app.getService().initiateOBDConnection();
+                if(app != null)
+                    app.getService().initiateOBDConnection();
             } else {
                 editor.putBoolean("obd_raw", false);
                 editor.apply();
@@ -114,7 +114,8 @@ public class OBDSetupFragment extends Fragment {
                 hint.setVisibility(View.VISIBLE);
                 resetText();
 
-                app.getService().cancelOBDConnection();
+                if(app!= null)
+                    app.getService().cancelOBDConnection();
 
                 if(receiverRegistered) {
                     app.unregisterReceiver(mReceiver);

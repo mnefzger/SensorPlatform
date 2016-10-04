@@ -87,6 +87,7 @@ public class ImageModule implements IEventCallback{
 
     static boolean backSaving = false;
     static boolean frontSaving = false;
+    static boolean reverseOrientation = false;
 
 
     public ImageModule(IDataCallback caller, Context app) {
@@ -108,6 +109,8 @@ public class ImageModule implements IEventCallback{
 
         BACK_PROCESSING_FPS = Preferences.getBackProcessingFPS(setting_prefs);
         BACK_AVG_FPS = 30;
+
+        reverseOrientation = Preferences.isReverseOrientation(setting_prefs);
     }
 
     public void startCapture() {
@@ -485,7 +488,9 @@ public class ImageModule implements IEventCallback{
                             Mat rgbMat = new Mat(h,w,CvType.CV_8UC3);
                             Imgproc.cvtColor(gray, rgbMat, Imgproc.COLOR_GRAY2RGB);
 
-                            if(mode.equals("back"))
+                            // rotate the image 180 degrees if phone orientation requires it
+                            if( (mode.equals("back") && reverseOrientation) ||
+                                    (mode.equals("front") && !reverseOrientation ) )
                                 Core.flip(rgbMat, rgbMat, -1);
 
                             videoWriter.write(rgbMat);

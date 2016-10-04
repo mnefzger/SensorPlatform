@@ -2,6 +2,7 @@ package mnefzger.de.sensorplatform.Core;
 
 import android.content.Context;
 import android.content.SharedPreferences;
+import android.content.pm.ActivityInfo;
 
 import mnefzger.de.sensorplatform.R;
 
@@ -69,6 +70,8 @@ public class Preferences {
     public static final String LOGGING_EVENT = "logging_event";
 
     public static final String SURVEY = "survey_active";
+
+    public static final String ORIENTATION = "reverse_orientation";
 
 
 
@@ -424,6 +427,23 @@ public class Preferences {
         boolean value = prefs.getBoolean(SURVEY, false);
 
         return value;
+    }
+
+    public static boolean isReverseOrientation(SharedPreferences prefs) {
+        Boolean reverse = prefs.getBoolean(ORIENTATION, false);
+
+        return reverse;
+    }
+
+    public static int getOrientation(SharedPreferences prefs) {
+        Boolean reverse = prefs.getBoolean(ORIENTATION, false);
+
+        if(reverse) {
+            return ActivityInfo.SCREEN_ORIENTATION_REVERSE_LANDSCAPE;
+        } else {
+            return ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE;
+        }
+
     }
 
 }

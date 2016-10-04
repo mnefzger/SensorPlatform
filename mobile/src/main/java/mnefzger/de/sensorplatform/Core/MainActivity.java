@@ -68,6 +68,8 @@ public class MainActivity extends AppCompatActivity {
     private boolean studySetupComplete = false;
     private boolean setupStarted = false;
 
+    SharedPreferences sensor_prefs, setting_prefs, study_prefs;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -121,7 +123,7 @@ public class MainActivity extends AppCompatActivity {
 
     // make sure the preference files are filled with the right values
     public void setupPreferences() {
-        SharedPreferences sensor_prefs = this.getSharedPreferences(getString(R.string.sensor_preferences_key), Context.MODE_PRIVATE);
+        sensor_prefs = this.getSharedPreferences(getString(R.string.sensor_preferences_key), Context.MODE_PRIVATE);
         sensor_prefs.edit().clear();
         if(sensor_prefs.getAll().isEmpty()) {
             PreferenceManager.setDefaultValues(this, getString(R.string.sensor_preferences_key), Context.MODE_PRIVATE,  R.xml.sensor_preferences, true);
@@ -130,7 +132,7 @@ public class MainActivity extends AppCompatActivity {
             PreferenceManager.setDefaultValues(this, getString(R.string.sensor_preferences_key), Context.MODE_PRIVATE,  R.xml.sensor_preferences, false);
         }
 
-        SharedPreferences setting_prefs = this.getSharedPreferences(getString(R.string.settings_preferences_key), Context.MODE_PRIVATE);
+        setting_prefs = this.getSharedPreferences(getString(R.string.settings_preferences_key), Context.MODE_PRIVATE);
         setting_prefs.edit().clear();
         if(setting_prefs.getAll().isEmpty()) {
             PreferenceManager.setDefaultValues(this, getString(R.string.settings_preferences_key), Context.MODE_PRIVATE,  R.xml.settings_preferences, true);
@@ -139,7 +141,7 @@ public class MainActivity extends AppCompatActivity {
             PreferenceManager.setDefaultValues(this, getString(R.string.settings_preferences_key), Context.MODE_PRIVATE,  R.xml.settings_preferences, false);
         }
 
-        SharedPreferences study_prefs = this.getSharedPreferences(getString(R.string.study_preferences_key), Context.MODE_PRIVATE);
+        study_prefs = this.getSharedPreferences(getString(R.string.study_preferences_key), Context.MODE_PRIVATE);
         study_prefs.edit().clear();
         if(study_prefs.getAll().isEmpty()) {
             PreferenceManager.setDefaultValues(this, getString(R.string.study_preferences_key), Context.MODE_PRIVATE,  R.xml.study_preferences, true);
@@ -293,7 +295,7 @@ public class MainActivity extends AppCompatActivity {
         this.appFragment = new AppFragment();
         changeFragment(this.appFragment, true, true, true);
 
-        this.setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_REVERSE_LANDSCAPE);
+        this.setRequestedOrientation(Preferences.getOrientation(setting_prefs));
         inAppFragment = true;
         studySetupComplete = true;
     }
@@ -352,7 +354,7 @@ public class MainActivity extends AppCompatActivity {
     public void goToCameraPreviewFragment(boolean forward) {
         cameraFragment = new CameraPreviewFragment();
         changeFragment(cameraFragment, true, true, forward);
-        this.setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_REVERSE_LANDSCAPE);
+        this.setRequestedOrientation(Preferences.getOrientation(setting_prefs));
 
         inCameraFragment = true;
     }
@@ -361,7 +363,7 @@ public class MainActivity extends AppCompatActivity {
     public void goToSurveyFragment() {
         surveyFragment = new SurveyFragment();
         changeFragment(surveyFragment, true, true, true);
-        this.setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_REVERSE_LANDSCAPE);
+        this.setRequestedOrientation(Preferences.getOrientation(setting_prefs));
     }
 
     MainActivity getActivity() {

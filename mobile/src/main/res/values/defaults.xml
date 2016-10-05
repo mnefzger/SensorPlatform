@@ -28,6 +28,11 @@
     <string name="rotation_threshold_risky_default" format="float" type="integer">0.6</string>
     <string name="rotation_threshold_dangerous_default" format="float" type="integer">0.7</string>
 
+    <!-- Threshold in seconds
+         Values based on http://www.qld.gov.au/transport/safety/rules/road/distances/index.html -->
+    <string name="following_distance_normal_default" format="float" type="integer">2</string>
+    <string name="following_distance_risky_default" format="float" type="integer">1.5</string>
+    <string name="following_distance_dangerous_default" format="float" type="integer">1</string>
 
 
     <integer name="front_max_fps">15</integer>

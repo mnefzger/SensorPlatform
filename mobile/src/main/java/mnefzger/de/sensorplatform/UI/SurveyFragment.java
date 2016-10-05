@@ -16,6 +16,8 @@ import android.widget.Toast;
 
 import com.google.gson.Gson;
 
+import java.io.BufferedReader;
+import java.io.FileReader;
 import java.io.IOException;
 import java.io.InputStream;
 
@@ -91,15 +93,19 @@ public class SurveyFragment extends Fragment {
                 // reset answer string
                 answers = "";
 
-                // go back to main data collection screen
-                MainActivity app = (MainActivity) getActivity();
-                app.getWindow().clearFlags(WindowManager.LayoutParams.FLAG_SHOW_WHEN_LOCKED);
-                app.setIntent(new Intent("mnefzger.de.sensorplatform"));
-                app.goToAppFragment();
+                leaveSurvey();
 
             }
         }
     };
+
+    private void leaveSurvey() {
+        // go back to main data collection screen
+        MainActivity app = (MainActivity) getActivity();
+        app.getWindow().clearFlags(WindowManager.LayoutParams.FLAG_SHOW_WHEN_LOCKED);
+        app.setIntent(new Intent("mnefzger.de.sensorplatform"));
+        app.goToAppFragment();
+    }
 
     private void handleEmpty() {
         Toast.makeText(getActivity(), "Please select an answer.", Toast.LENGTH_SHORT).show();
@@ -121,8 +127,12 @@ public class SurveyFragment extends Fragment {
     }
 
     private void loadSurvey() {
-        String surveyJson = loadJSONFromAsset("survey.json");
-        this.survey = new Gson().fromJson(surveyJson, SurveyModel.class);
+        String surveyJson = loadJSONFromFile("survey.json");
+        if(surveyJson != "")
+            this.survey = new Gson().fromJson(surveyJson, SurveyModel.class);
+        else
+            leaveSurvey();
+
     }
 
     private void showQuestion(int index) {
@@ -148,6 +158,43 @@ public class SurveyFragment extends Fragment {
             ex.printStackTrace();
             return null;
         }
+        return json;
+    }
+
+    private String loadJSONFromFile(String filename) {
+        String json = "";
+
+        String baseDir = android.os.Environment.getExternalStorageDirectory().getAbsolutePath();
+        String filePath = baseDir + "/SensorPlatform/";
+
+        BufferedReader buffered_reader=null;
+        try
+        {
+            buffered_reader = new BufferedReader(new FileReader(filePath+filename));
+            String line;
+
+            while ((line = buffered_reader.readLine()) != null)
+            {
+                json += line;
+            }
+        }
+        catch (IOException e)
+        {
+            e.printStackTrace();
+        }
+        finally
+        {
+            try
+            {
+                if (buffered_reader != null)
+                    buffered_reader.close();
+            }
+            catch (IOException ex)
+            {
+                ex.printStackTrace();
+            }
+        }
+
         return json;
     }
 }

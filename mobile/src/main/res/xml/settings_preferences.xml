@@ -69,12 +69,6 @@
             android:title="Front Camera Processing"
             android:summary="Enable driver distraction detection"
             android:defaultValue="true"/>
-        <CheckBoxPreference
-            android:key="image_back_processing"
-            android:title="Back Camera Processing"
-            android:summary="Enable tailgating detection"
-            android:defaultValue="true"/>
-
         <EditTextPreference
             android:key="front_processing_fps"
             android:title="Front camera processing FPS"
@@ -82,12 +76,43 @@
             android:defaultValue="@integer/front_processing_fps"
             android:dependency="image_front_processing"/>
 
+        <CheckBoxPreference
+            android:key="image_back_processing"
+            android:title="Back Camera Processing"
+            android:summary="Enable tailgating detection"
+            android:defaultValue="true"/>
         <EditTextPreference
             android:key="back_processing_fps"
             android:title="Back camera processing FPS"
             android:summary="Processed frames per second for the back camera"
             android:defaultValue="@integer/back_processing_fps"
             android:dependency="image_back_processing"/>
+        <mnefzger.de.sensorplatform.Utilities.SeekBarPreference
+            android:key="following_distance_normal"
+            android:title="Normal TTC"
+            android:summary="The time-to-collision for a normal following distance in seconds"
+            android:max="400"
+            app:stringDefault="@string/following_distance_normal_default"
+            android:defaultValue="@string/following_distance_normal_default"
+            android:text="seconds"/>
+        <mnefzger.de.sensorplatform.Utilities.SeekBarPreference
+            android:key="following_distance_risky"
+            android:title="Risky TTC"
+            android:summary="The time-to-collision for a risky following distance in seconds"
+            android:max="400"
+            app:stringDefault="@string/following_distance_risky_default"
+            android:defaultValue="@string/following_distance_risky_default"
+            android:text="seconds"/>
+        <mnefzger.de.sensorplatform.Utilities.SeekBarPreference
+            android:key="following_distance_dangerous"
+            android:title="Dangerous TTC"
+            android:summary="The time-to-collision for a dangerous following distance in seconds"
+            android:max="400"
+            app:stringDefault="@string/following_distance_dangerous_default"
+            android:defaultValue="@string/following_distance_dangerous_default"
+            android:text="seconds"/>
+
+
     </PreferenceCategory>
 
     <PreferenceCategory android:title="OBD2 Adapter">

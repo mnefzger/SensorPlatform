@@ -1,6 +1,7 @@
 package mnefzger.de.sensorplatform.Processors;
 
 import android.content.Context;
+import android.content.SharedPreferences;
 import android.util.Log;
 
 import org.opencv.core.CvType;
@@ -13,10 +14,13 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.util.logging.Level;
 
 import mnefzger.de.sensorplatform.Core.EventVector;
 import mnefzger.de.sensorplatform.Core.IEventCallback;
 import mnefzger.de.sensorplatform.Core.ImageModule;
+import mnefzger.de.sensorplatform.Core.Preferences;
+import mnefzger.de.sensorplatform.R;
 
 /**
  * This class includes all image analysis functions for
@@ -28,6 +32,10 @@ public class ImageProcessor{
     private IEventCallback callback;
 
     private Double currentSpeed;
+
+    private double TTC_NORMAL;
+    private double TTC_RISKY;
+    private double TTC_DANGEROUS;
 
     static{
         System.loadLibrary("opencv_java3");
@@ -46,6 +54,11 @@ public class ImageProcessor{
         writeCascadeToFileSystem(c, "haarcascade_vehicles.xml");
         //writeCascadeToFileSystem(c, "haarcascade_vehicles_alt.xml");
         nInitCascades();
+
+        SharedPreferences setting_prefs = c.getSharedPreferences(c.getString(R.string.settings_preferences_key), Context.MODE_PRIVATE);
+        TTC_NORMAL = Preferences.getNormalTTC(setting_prefs);
+        TTC_RISKY = Preferences.getRiskyTTC(setting_prefs);
+        TTC_DANGEROUS = Preferences.getDangerousTTC(setting_prefs);
     }
 
     public void setCurrentSpeed(Double currentSpeed) {
@@ -164,12 +177,29 @@ public class ImageProcessor{
 
             // tailgating detection starts at >25km/h
             if(currentSpeed >= 25 && currentSpeed <= 60) { // urban
-                if (TTC < 1)
-                    callback.onEventDetected(new EventVector(EventVector.LEVEL.DANGEROUS, System.currentTimeMillis(), "Tailgating, TTC", TTC));
+                EventVector.LEVEL l = null;
+                if (TTC < TTC_DANGEROUS/2)
+                    l = EventVector.LEVEL.DANGEROUS;
+                else if(TTC < TTC_RISKY/2)
+                    l = EventVector.LEVEL.RISKY;
+                else if(TTC < TTC_NORMAL/2)
+                    l = EventVector.LEVEL.NORMAL;
+
+                if(l != null)
+                    callback.onEventDetected(new EventVector(l, System.currentTimeMillis(), "Tailgating below 60km/h, TTC", TTC));
                 return;
+
             } else if(currentSpeed > 60) { // highway
-                if (TTC < 2)
-                    callback.onEventDetected(new EventVector(EventVector.LEVEL.DANGEROUS, System.currentTimeMillis(), "Tailgating, TTC", TTC));
+                EventVector.LEVEL l = null;
+                if (TTC < TTC_DANGEROUS)
+                    l = EventVector.LEVEL.DANGEROUS;
+                else if(TTC < TTC_RISKY)
+                    l = EventVector.LEVEL.RISKY;
+                else if(TTC < TTC_NORMAL)
+                    l = EventVector.LEVEL.NORMAL;
+
+                if(l != null)
+                    callback.onEventDetected(new EventVector(l, System.currentTimeMillis(), "Tailgating above 60km/h, TTC", TTC));
                 return;
             }
             callback.onEventDetected(new EventVector(EventVector.LEVEL.DEBUG, System.currentTimeMillis(), "TTC", TTC));
@@ -177,7 +207,8 @@ public class ImageProcessor{
         } else {
             callback.onEventDetected(new EventVector(EventVector.LEVEL.DEBUG, System.currentTimeMillis(), "Distance to front car", distance));
 
-            if(distance < 6) callback.onEventDetected(new EventVector(EventVector.LEVEL.DANGEROUS, System.currentTimeMillis(), "Tailgating", distance));
+            if(distance < 6)
+                callback.onEventDetected(new EventVector(EventVector.LEVEL.DEBUG, System.currentTimeMillis(), "Tailgating, Distance", distance));
         }
     }
 

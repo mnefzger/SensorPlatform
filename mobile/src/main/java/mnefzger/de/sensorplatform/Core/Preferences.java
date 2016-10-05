@@ -14,6 +14,8 @@ import mnefzger.de.sensorplatform.R;
  */
 
 public class Preferences {
+    public static final String FREQUENCY_RAWDATA = "frequency_rawData";
+
 
     public static final String ACCELEROMETER_RAW = "accelerometer_raw";
 
@@ -34,8 +36,6 @@ public class Preferences {
     public static final String WEATHER = "weather_active";
 
 
-    public static final String FREQUENCY_RAWDATA = "frequency_rawData";
-
     public static final String FREQUENCY_ACCELEROMETER = "frequency_accelerometer";
 
     public static final String ACCELEROMETER_THRESHOLD_NORMAL = "acceleration_threshold_normal";
@@ -44,6 +44,7 @@ public class Preferences {
 
     public static final String ACCELEROMETER_THRESHOLD_DANGEROUS = "accelerometer_threshold_dangerous";
 
+
     public static final String FREQUENCY_ROTATION = "frequency_rotation";
 
     public static final String TURN_THRESHOLD_NORMAL = "rotation_threshold_normal";
@@ -51,6 +52,7 @@ public class Preferences {
     public static final String TURN_THRESHOLD_RISKY = "rotation_threshold_risky";
 
     public static final String TURN_THRESHOLD_DANGEROUS = "rotation_threshold_dangerous";
+
 
     public static final String FREQUENCY_LIGHT = "frequency_light";
 
@@ -72,6 +74,12 @@ public class Preferences {
     public static final String FRONT_PROCESSING_FPS = "front_processing_fps";
 
     public static final String BACK_PROCESSING_FPS = "back_processing_fps";
+
+    public static final String TTC_NORMAL = "following_distance_normal";
+
+    public static final String TTC_RISKY = "following_distance_risky";
+
+    public static final String TTC_DANGEROUS = "following_distance_dangerous";
 
 
     public static final String LOGGING_RAW = "logging_raw";
@@ -281,7 +289,7 @@ public class Preferences {
         return value;
     }
 
-    public static double getTurnThreshold(SharedPreferences prefs) {
+    public static double getNormalTurnThreshold(SharedPreferences prefs) {
         String valueString = prefs.getString(TURN_THRESHOLD_NORMAL, "0.45");
 
         double value = Double.valueOf( context.getResources().getString(R.string.rotation_threshold_normal_default) );
@@ -471,6 +479,61 @@ public class Preferences {
 
         return value;
     }
+
+    public static double getNormalTTC(SharedPreferences prefs) {
+        String valueString = prefs.getString(TTC_NORMAL, "2.0");
+
+        double value = Double.valueOf( context.getResources().getString(R.string.following_distance_normal_default) );
+
+        try {
+            value = Double.valueOf(valueString);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        if (value <= 0) {
+            value = Double.valueOf( context.getResources().getString(R.string.following_distance_normal_default) );
+        }
+
+        return value;
+    }
+
+    public static double getRiskyTTC(SharedPreferences prefs) {
+        String valueString = prefs.getString(TTC_RISKY, "1.5");
+
+        double value = Double.valueOf( context.getResources().getString(R.string.following_distance_risky_default) );
+
+        try {
+            value = Double.valueOf(valueString);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        if (value <= 0) {
+            value = Double.valueOf( context.getResources().getString(R.string.following_distance_risky_default) );
+        }
+
+        return value;
+    }
+
+    public static double getDangerousTTC(SharedPreferences prefs) {
+        String valueString = prefs.getString(TTC_DANGEROUS, "1.0");
+
+        double value = Double.valueOf( context.getResources().getString(R.string.following_distance_dangerous_default) );
+
+        try {
+            value = Double.valueOf(valueString);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        if (value <= 0) {
+            value = Double.valueOf( context.getResources().getString(R.string.following_distance_dangerous_default) );
+        }
+
+        return value;
+    }
+
 
     /**
      * LOGGING AND SURVEY

@@ -52,9 +52,11 @@ public class DrivingBehaviourProcessor extends EventProcessor implements IOSMRes
         ACC_THRESHOLD_NORMAL = Preferences.getNormalAccelerometerThreshold(setting_prefs);
         ACC_THRESHOLD_RISKY = Preferences.getRiskyAccelerometerThreshold(setting_prefs);
         ACC_THRESHOLD_DANGEROUS= Preferences.getDangerousAccelerometerThreshold(setting_prefs);
-        TURN_THRESHOLD_NORMAL = Preferences.getTurnThreshold(setting_prefs);
-        TURN_THRESHOLD_RISKY = Preferences.getTurnThreshold(setting_prefs);
-        TURN_THRESHOLD_DANGEROUS = Preferences.getTurnThreshold(setting_prefs);
+
+        TURN_THRESHOLD_NORMAL = Preferences.getNormalTurnThreshold(setting_prefs);
+        TURN_THRESHOLD_RISKY = Preferences.getRiskyTurnThreshold(setting_prefs);
+        TURN_THRESHOLD_DANGEROUS = Preferences.getDangerousTurnThreshold(setting_prefs);
+
         OSM_REQUEST_RATE = Preferences.getOSMRequestRate(setting_prefs);
 
         rawDataDelay = Preferences.getRawDataDelay(setting_prefs);
@@ -68,7 +70,6 @@ public class DrivingBehaviourProcessor extends EventProcessor implements IOSMRes
             currentVector = data.get(data.size()-1);
             previousVector = data.get(data.size()-2);
 
-            //
             int no_of_items = 2000/rawDataDelay;
             // minimum of 3 items
             //no_of_items = no_of_items >= 3 ? no_of_items : 3;
@@ -190,22 +191,35 @@ public class DrivingBehaviourProcessor extends EventProcessor implements IOSMRes
 
         }
 
-        // we already looked at this data or last detected was less than 500ms ago
-        if(time == lastTurn || (time - lastTurn) < 500)
+        // we already looked at this data or last detected was not long ago
+        if(time == lastTurn || (time - lastTurn) < (lastData.size()*rawDataDelay))
             return;
 
         /**
-         * Did the data include a sharp turn?
+         * Did the data include a turn?
          */
-        //TODO
         if(leftDelta <= -TURN_THRESHOLD_DANGEROUS) {
             EventVector ev = new EventVector(EventVector.LEVEL.DANGEROUS, time, "Left Turn", leftDelta);
             callback.onEventDetected(ev);
+        } else if(leftDelta <= -TURN_THRESHOLD_RISKY) {
+            EventVector ev = new EventVector(EventVector.LEVEL.RISKY, time, "Left Turn", leftDelta);
+            callback.onEventDetected(ev);
+        } else if(leftDelta <= -TURN_THRESHOLD_NORMAL) {
+            EventVector ev = new EventVector(EventVector.LEVEL.NORMAL, time, "Left Turn", leftDelta);
+            callback.onEventDetected(ev);
         }
+
         if(rightDelta >= TURN_THRESHOLD_DANGEROUS) {
             EventVector ev = new EventVector(EventVector.LEVEL.DANGEROUS, time, "Right Turn", rightDelta);
             callback.onEventDetected(ev);
+        } else if(rightDelta >= TURN_THRESHOLD_RISKY) {
+            EventVector ev = new EventVector(EventVector.LEVEL.RISKY, time, "Right Turn", rightDelta);
+            callback.onEventDetected(ev);
+        } else if(rightDelta >= TURN_THRESHOLD_NORMAL) {
+            EventVector ev = new EventVector(EventVector.LEVEL.NORMAL, time, "Right Turn", rightDelta);
+            callback.onEventDetected(ev);
         }
+
 
         /**
          * Did the data include a any turn (safe OR sharp)?

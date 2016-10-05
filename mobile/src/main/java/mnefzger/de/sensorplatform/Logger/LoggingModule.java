@@ -127,7 +127,7 @@ public class LoggingModule {
     }
 
     private void createHeadersEvent() {
-        String[] line = { "tripID;timestamp;description;value;extra;videoFront;videoBack" };
+        String[] line = { "tripID;timestamp;level;description;value;extra;videoFront;videoBack" };
 
         write(eventFile, line);
     }

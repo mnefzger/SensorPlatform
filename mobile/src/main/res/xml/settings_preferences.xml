@@ -24,15 +24,14 @@
             android:summary="Write all events to a csv file"
             android:defaultValue="false"/>
 
-        <ListPreference
+        <MultiSelectListPreference
             android:summary="The log level specifies which events will be written to log"
-            android:defaultValue="2"
+            android:defaultValue="@array/log_level_default"
             android:entries="@array/log_level_readable"
             android:entryValues="@array/log_level_values"
             android:key="log_level"
             android:persistent="true"
-            android:title="Log Level"
-            android:dependency="logging_event"/>
+            android:title="Log Level" />
 
         <CheckBoxPreference
             android:key="survey_active"

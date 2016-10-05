@@ -114,16 +114,42 @@ public class DrivingBehaviourProcessor extends EventProcessor implements IOSMRes
             return;
 
         //TODO
-        if(avg > ACC_THRESHOLD_DANGEROUS) {
-            EventVector ev = new EventVector(EventVector.LEVEL.DANGEROUS, time, "Hard brake", avg/9.81);
-            lastAccDetected = time;
-            callback.onEventDetected(ev);
+        if(avg > 0) {
+            if(avg > ACC_THRESHOLD_DANGEROUS) {
+                EventVector ev = new EventVector(EventVector.LEVEL.DANGEROUS, time, "Brake", avg/9.81);
+                lastAccDetected = time;
+                callback.onEventDetected(ev);
 
-        } else if(avg < -ACC_THRESHOLD_DANGEROUS) {
-            EventVector ev = new EventVector(EventVector.LEVEL.DANGEROUS, time, "Hard acceleration", avg/9.81);
-            lastAccDetected = time;
-            callback.onEventDetected(ev);
+            } else if(avg > ACC_THRESHOLD_RISKY) {
+                EventVector ev = new EventVector(EventVector.LEVEL.RISKY, time, "Brake", avg/9.81);
+                lastAccDetected = time;
+                callback.onEventDetected(ev);
+
+            } else if(avg > ACC_THRESHOLD_NORMAL) {
+                EventVector ev = new EventVector(EventVector.LEVEL.NORMAL, time, "Brake", avg/9.81);
+                lastAccDetected = time;
+                callback.onEventDetected(ev);
+
+            }
+        } else {
+            if(avg < -ACC_THRESHOLD_DANGEROUS) {
+                EventVector ev = new EventVector(EventVector.LEVEL.DANGEROUS, time, "Acceleration", avg/9.81);
+                lastAccDetected = time;
+                callback.onEventDetected(ev);
+
+            } else if(avg < -ACC_THRESHOLD_RISKY) {
+                EventVector ev = new EventVector(EventVector.LEVEL.RISKY, time, "Acceleration", avg/9.81);
+                lastAccDetected = time;
+                callback.onEventDetected(ev);
+
+            } else if(avg < -ACC_THRESHOLD_NORMAL) {
+                EventVector ev = new EventVector(EventVector.LEVEL.NORMAL, time, "Acceleration", avg/9.81);
+                lastAccDetected = time;
+                callback.onEventDetected(ev);
+
+            }
         }
+
     }
 
     private long lastTurn = System.currentTimeMillis();
@@ -173,11 +199,11 @@ public class DrivingBehaviourProcessor extends EventProcessor implements IOSMRes
          */
         //TODO
         if(leftDelta <= -TURN_THRESHOLD_DANGEROUS) {
-            EventVector ev = new EventVector(EventVector.LEVEL.DANGEROUS, time, "Sharp Left Turn", leftDelta);
+            EventVector ev = new EventVector(EventVector.LEVEL.DANGEROUS, time, "Left Turn", leftDelta);
             callback.onEventDetected(ev);
         }
         if(rightDelta >= TURN_THRESHOLD_DANGEROUS) {
-            EventVector ev = new EventVector(EventVector.LEVEL.DANGEROUS, time, "Sharp Right Turn", rightDelta);
+            EventVector ev = new EventVector(EventVector.LEVEL.DANGEROUS, time, "Right Turn", rightDelta);
             callback.onEventDetected(ev);
         }
 

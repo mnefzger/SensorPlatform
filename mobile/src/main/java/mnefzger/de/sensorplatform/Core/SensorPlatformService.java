@@ -38,6 +38,7 @@ public class SensorPlatformService extends Service implements IDataCallback, ITr
     private UserPhoneBluetoothServer server;
     private TripStartDetector tsDetector;
     private TripEndDetector teDetector;
+    private int[] level_int;
 
     private final IBinder mBinder = new LocalBinder();
 
@@ -77,6 +78,7 @@ public class SensorPlatformService extends Service implements IDataCallback, ITr
 
         this.teDetector = new TripEndDetector(this, getApplication());
 
+        level_int = Preferences.getLogLevel(setting_prefs);
     }
 
     public void startWaitBehaviour() {
@@ -266,11 +268,8 @@ public class SensorPlatformService extends Service implements IDataCallback, ITr
             }
         }
 
-        int level_int = Preferences.getLogLevel(setting_prefs);
-        EventVector.LEVEL log_level = EventVector.LEVEL.values()[level_int];
-
         if(ActiveSubscriptions.eventLoggingActive() && !(ev.getLevel() == EventVector.LEVEL.DEBUG) &&
-                ev.isIncludedInLevel(log_level)) {
+                ev.isIncludedInLevel(level_int)) {
             lm.writeEventToCSV(ev);
         }
 

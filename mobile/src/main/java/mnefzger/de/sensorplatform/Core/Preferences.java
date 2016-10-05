@@ -3,6 +3,9 @@ package mnefzger.de.sensorplatform.Core;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.content.pm.ActivityInfo;
+import android.util.Log;
+
+import java.util.Set;
 
 import mnefzger.de.sensorplatform.R;
 
@@ -485,8 +488,21 @@ public class Preferences {
         return value;
     }
 
-    public static int getLogLevel(SharedPreferences prefs) {
-        int value = prefs.getInt(LOG_LEVEL, 1);
+    public static int[] getLogLevel(SharedPreferences prefs) {
+        Set<String> valueString = prefs.getStringSet(LOG_LEVEL, null);
+        String[] a = valueString.toArray(new String[] {});
+
+        int[] value = new int[a.length];
+
+        for(int i=0; i<a.length; i++) {
+            int parsed;
+            try {
+                parsed = Integer.valueOf(a[i]);
+                value[i] = parsed;
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
 
         return value;
     }

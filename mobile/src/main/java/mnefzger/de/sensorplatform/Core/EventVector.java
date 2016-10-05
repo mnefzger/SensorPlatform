@@ -55,6 +55,17 @@ public class EventVector {
         return level;
     }
 
+    public String getLevelString() {
+        if(this.level == LEVEL.NORMAL)
+            return "NORMAL";
+        if(this.level == LEVEL.RISKY)
+            return "RISKY";
+        if(this.level == LEVEL.DANGEROUS)
+            return "DANGEROUS";
+
+        return "-";
+    }
+
     public long getTimestamp() {
         return timestamp;
     }
@@ -77,20 +88,20 @@ public class EventVector {
     }
 
     public String toCSVString() {
-        return timestamp + ";" + eventDescription + ";" + value + ";" + extraValue + ";" + videoFront + ";" + videoBack;
+        String level = getLevelString();
+        return timestamp + ";" + level + ";" + eventDescription + ";" + value + ";" + extraValue + ";" + videoFront + ";" + videoBack;
     }
 
-    public boolean isIncludedInLevel(LEVEL l) {
-        if(level == LEVEL.DEBUG)
+    public boolean isIncludedInLevel(int[] int_levels) {
+        if(level == LEVEL.DEBUG || int_levels == null)
             return false;
 
-        if(l == LEVEL.NORMAL)
-            return true;
-        else if(l == LEVEL.RISKY && (level == LEVEL.RISKY || level == LEVEL.DANGEROUS) )
-            return true;
-        else if(l == LEVEL.DANGEROUS && level == LEVEL.DANGEROUS)
-            return true;
-        else
-            return false;
+        for(int i=0; i<int_levels.length; i++) {
+            LEVEL l = EventVector.LEVEL.values()[int_levels[i]];
+            if(level == l)
+                return true;
+        }
+
+        return false;
     }
 }

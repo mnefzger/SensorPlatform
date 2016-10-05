@@ -3,4 +3,8 @@
     <declare-styleable name="CompoundButton">
         <attr name="android:button" />
     </declare-styleable>
+
+    <declare-styleable name="SeekBarPreference">
+        <attr name="stringDefault" format="string"/>
+    </declare-styleable>
 </resources>

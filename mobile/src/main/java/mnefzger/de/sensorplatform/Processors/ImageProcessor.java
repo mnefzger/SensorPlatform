@@ -103,14 +103,14 @@ public class ImageProcessor{
         //Log.d("FACE_DETECTION_FRAME", System.currentTimeMillis()-time + "");
 
         if(faces.length == 4) {
-            callback.onEventDetected(new EventVector(true, System.currentTimeMillis(), "Face detected", 0));
+            callback.onEventDetected(new EventVector(EventVector.LEVEL.DEBUG, System.currentTimeMillis(), "Face detected", 0));
             lastFaceDetect = System.currentTimeMillis();
         } else {
-            callback.onEventDetected(new EventVector(true, System.currentTimeMillis(), "No Face detected", 0));
+            callback.onEventDetected(new EventVector(EventVector.LEVEL.DEBUG, System.currentTimeMillis(), "No Face detected", 0));
 
             long distractionTime = System.currentTimeMillis()-lastFaceDetect;
             if(distractionTime > 3000)
-                callback.onEventDetected(new EventVector(false, System.currentTimeMillis(), "Driver is distracted", distractionTime));
+                callback.onEventDetected(new EventVector(EventVector.LEVEL.DANGEROUS, System.currentTimeMillis(), "Driver is distracted", distractionTime));
         }
 
         return faces;
@@ -123,7 +123,7 @@ public class ImageProcessor{
 
         if(cars != null && cars.length > 0) {
             //Log.d("CAR_DETECTION", "Detected " +  cars.length/4 + " cars");
-            callback.onEventDetected(new EventVector(true, System.currentTimeMillis(), "Cars detected", cars.length/4));
+            callback.onEventDetected(new EventVector(EventVector.LEVEL.DEBUG, System.currentTimeMillis(), "Cars detected", cars.length/4));
 
             int max = 0;
             for(int c=0; c<cars.length; c+=4) {
@@ -135,7 +135,7 @@ public class ImageProcessor{
 
 
         } else {
-            callback.onEventDetected(new EventVector(true, System.currentTimeMillis(), "No Car detected", 0));
+            callback.onEventDetected(new EventVector(EventVector.LEVEL.DEBUG, System.currentTimeMillis(), "No Car detected", 0));
         }
 
         return cars;
@@ -165,19 +165,19 @@ public class ImageProcessor{
             // tailgating detection starts at >25km/h
             if(currentSpeed >= 25 && currentSpeed <= 60) { // urban
                 if (TTC < 1)
-                    callback.onEventDetected(new EventVector(false, System.currentTimeMillis(), "Tailgating, TTC", TTC));
+                    callback.onEventDetected(new EventVector(EventVector.LEVEL.DANGEROUS, System.currentTimeMillis(), "Tailgating, TTC", TTC));
                 return;
             } else if(currentSpeed > 60) { // highway
                 if (TTC < 2)
-                    callback.onEventDetected(new EventVector(false, System.currentTimeMillis(), "Tailgating, TTC", TTC));
+                    callback.onEventDetected(new EventVector(EventVector.LEVEL.DANGEROUS, System.currentTimeMillis(), "Tailgating, TTC", TTC));
                 return;
             }
-            callback.onEventDetected(new EventVector(true, System.currentTimeMillis(), "TTC", TTC));
+            callback.onEventDetected(new EventVector(EventVector.LEVEL.DEBUG, System.currentTimeMillis(), "TTC", TTC));
 
         } else {
-            callback.onEventDetected(new EventVector(true, System.currentTimeMillis(), "Distance to front car", distance));
+            callback.onEventDetected(new EventVector(EventVector.LEVEL.DEBUG, System.currentTimeMillis(), "Distance to front car", distance));
 
-            if(distance < 6) callback.onEventDetected(new EventVector(false, System.currentTimeMillis(), "Tailgating", distance));
+            if(distance < 6) callback.onEventDetected(new EventVector(EventVector.LEVEL.DANGEROUS, System.currentTimeMillis(), "Tailgating", distance));
         }
     }
 

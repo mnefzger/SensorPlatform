@@ -35,13 +35,19 @@ public class Preferences {
 
     public static final String FREQUENCY_ACCELEROMETER = "frequency_accelerometer";
 
-    public static final String ACCELEROMETER_THRESHOLD = "accelerometer_threshold";
+    public static final String ACCELEROMETER_THRESHOLD_NORMAL = "acceleration_threshold_normal";
+
+    public static final String ACCELEROMETER_THRESHOLD_RISKY = "accelerometer_threshold_risky";
+
+    public static final String ACCELEROMETER_THRESHOLD_DANGEROUS = "accelerometer_threshold_dangerous";
 
     public static final String FREQUENCY_ROTATION = "frequency_rotation";
 
     public static final String TURN_THRESHOLD_NORMAL = "rotation_threshold_normal";
 
-    public static final String TURN_THRESHOLD_SHARP = "rotation_threshold_risky";
+    public static final String TURN_THRESHOLD_RISKY = "rotation_threshold_risky";
+
+    public static final String TURN_THRESHOLD_DANGEROUS = "rotation_threshold_dangerous";
 
     public static final String FREQUENCY_LIGHT = "frequency_light";
 
@@ -68,6 +74,8 @@ public class Preferences {
     public static final String LOGGING_RAW = "logging_raw";
 
     public static final String LOGGING_EVENT = "logging_event";
+
+    public static final String LOG_LEVEL = "log_level";
 
     public static final String SURVEY = "survey_active";
 
@@ -194,10 +202,10 @@ public class Preferences {
         return value;
     }
 
-    public static double getAccelerometerThreshold(SharedPreferences prefs) {
-        String valueString = prefs.getString(ACCELEROMETER_THRESHOLD, "0.35");
+    public static double getNormalAccelerometerThreshold(SharedPreferences prefs) {
+        String valueString = prefs.getString(ACCELEROMETER_THRESHOLD_NORMAL, "0.2");
 
-        double value = Double.valueOf( context.getResources().getString(R.string.acceleration_threshold_default) );
+        double value = Double.valueOf( context.getResources().getString(R.string.acceleration_threshold_normal_default) );
 
         try {
             value = Double.valueOf(valueString) * 9.81; // convert to m/s^2
@@ -206,7 +214,43 @@ public class Preferences {
         }
 
         if (value <= 0) {
-            value = Double.valueOf( context.getResources().getString(R.string.acceleration_threshold_default) ) * 9.81;
+            value = Double.valueOf( context.getResources().getString(R.string.acceleration_threshold_normal_default) ) * 9.81;
+        }
+
+        return value;
+    }
+
+    public static double getRiskyAccelerometerThreshold(SharedPreferences prefs) {
+        String valueString = prefs.getString(ACCELEROMETER_THRESHOLD_RISKY, "0.3");
+
+        double value = Double.valueOf( context.getResources().getString(R.string.acceleration_threshold_risky_default) );
+
+        try {
+            value = Double.valueOf(valueString) * 9.81; // convert to m/s^2
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        if (value <= 0) {
+            value = Double.valueOf( context.getResources().getString(R.string.acceleration_threshold_risky_default) ) * 9.81;
+        }
+
+        return value;
+    }
+
+    public static double getDangerousAccelerometerThreshold(SharedPreferences prefs) {
+        String valueString = prefs.getString(ACCELEROMETER_THRESHOLD_DANGEROUS, "0.4");
+
+        double value = Double.valueOf( context.getResources().getString(R.string.acceleration_threshold_dangerous_default) );
+
+        try {
+            value = Double.valueOf(valueString) * 9.81; // convert to m/s^2
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        if (value <= 0) {
+            value = Double.valueOf( context.getResources().getString(R.string.rotation_threshold_dangerous_default) ) * 9.81;
         }
 
         return value;
@@ -235,7 +279,7 @@ public class Preferences {
     }
 
     public static double getTurnThreshold(SharedPreferences prefs) {
-        String valueString = prefs.getString(TURN_THRESHOLD_NORMAL, "0.3");
+        String valueString = prefs.getString(TURN_THRESHOLD_NORMAL, "0.45");
 
         double value = Double.valueOf( context.getResources().getString(R.string.rotation_threshold_normal_default) );
 
@@ -252,8 +296,8 @@ public class Preferences {
         return value;
     }
 
-    public static double getSharpTurnThreshold(SharedPreferences prefs) {
-        String valueString = prefs.getString(TURN_THRESHOLD_SHARP, "0.5");
+    public static double getRiskyTurnThreshold(SharedPreferences prefs) {
+        String valueString = prefs.getString(TURN_THRESHOLD_RISKY, "0.6");
 
         double value = Double.valueOf( context.getResources().getString(R.string.rotation_threshold_risky_default) );
 
@@ -265,6 +309,24 @@ public class Preferences {
 
         if (value <= 0) {
             value = Double.valueOf( context.getResources().getString(R.string.rotation_threshold_risky_default) );
+        }
+
+        return value;
+    }
+
+    public static double getDangerousTurnThreshold(SharedPreferences prefs) {
+        String valueString = prefs.getString(TURN_THRESHOLD_DANGEROUS, "0.7");
+
+        double value = Double.valueOf( context.getResources().getString(R.string.rotation_threshold_dangerous_default) );
+
+        try {
+            value = Double.valueOf(valueString);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        if (value <= 0) {
+            value = Double.valueOf( context.getResources().getString(R.string.rotation_threshold_dangerous_default) );
         }
 
         return value;
@@ -423,6 +485,12 @@ public class Preferences {
         return value;
     }
 
+    public static int getLogLevel(SharedPreferences prefs) {
+        int value = prefs.getInt(LOG_LEVEL, 1);
+
+        return value;
+    }
+
     public static boolean surveyActivated(SharedPreferences prefs) {
         boolean value = prefs.getBoolean(SURVEY, false);
 
@@ -435,15 +503,5 @@ public class Preferences {
         return reverse;
     }
 
-    public static int getOrientation(SharedPreferences prefs) {
-        Boolean reverse = prefs.getBoolean(ORIENTATION, false);
-
-        if(reverse) {
-            return ActivityInfo.SCREEN_ORIENTATION_REVERSE_LANDSCAPE;
-        } else {
-            return ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE;
-        }
-
-    }
 
 }

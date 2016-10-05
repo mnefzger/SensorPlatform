@@ -89,7 +89,7 @@ public class SensorPlatformService extends Service implements IDataCallback, ITr
     public void onTripStart() {
         tsDetector.cancel();
         teDetector.reset();
-        this.onEventData(new EventVector(true, System.currentTimeMillis(), "Trip Start detected", 0));
+        this.onEventData(new EventVector(EventVector.LEVEL.DEBUG, System.currentTimeMillis(), "Trip Start detected", 0));
 
         if(ActiveSubscriptions.isEmpty())
             subscribe();
@@ -103,7 +103,7 @@ public class SensorPlatformService extends Service implements IDataCallback, ITr
 
     @Override
     public void onTripEnd() {
-        this.onEventData(new EventVector(true, System.currentTimeMillis(), "Trip End detected", 0));
+        this.onEventData(new EventVector(EventVector.LEVEL.DEBUG, System.currentTimeMillis(), "Trip End detected", 0));
 
         if(Preferences.surveyActivated(setting_prefs)) {
             Intent i = new Intent("mnefzger.de.sensorplatform.survey");
@@ -255,7 +255,7 @@ public class SensorPlatformService extends Service implements IDataCallback, ITr
         if(waiting)
             return;
 
-        if(Preferences.videoSavingActivated(setting_prefs) && !ev.isDebug()) {
+        if(Preferences.videoSavingActivated(setting_prefs) && !(ev.getLevel() == EventVector.LEVEL.DEBUG) ) {
             long now = System.currentTimeMillis();
 
             // Check if a video is currently being saved or the last save was less than 5 second ago
@@ -266,7 +266,11 @@ public class SensorPlatformService extends Service implements IDataCallback, ITr
             }
         }
 
-        if(ActiveSubscriptions.eventLoggingActive() && !ev.isDebug()) {
+        int level_int = Preferences.getLogLevel(setting_prefs);
+        EventVector.LEVEL log_level = EventVector.LEVEL.values()[level_int];
+
+        if(ActiveSubscriptions.eventLoggingActive() && !(ev.getLevel() == EventVector.LEVEL.DEBUG) &&
+                ev.isIncludedInLevel(log_level)) {
             lm.writeEventToCSV(ev);
         }
 

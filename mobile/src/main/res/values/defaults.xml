@@ -18,13 +18,15 @@
 
     <!-- Threshold is the g-force value
          Value of 0.35g based on: DriveSafe (Bergasa, 2014), SeMiFOT (Victor et al., 2010) -->
-    <string name="acceleration_threshold_default" format="float" type="integer">0.35</string>
+    <string name="acceleration_threshold_normal_default" format="float" type="integer">0.2</string>
+    <string name="acceleration_threshold_risky_default" format="float" type="integer">0.3</string>
+    <string name="acceleration_threshold_dangerous_default" format="float" type="integer">0.4</string>
 
     <!-- Threshold in rad/s
          Value based on (Wang, 2013) -->
-    <string name="rotation_threshold_normal_default" format="float" type="integer">0.5</string>
-
-    <string name="rotation_threshold_risky_default" format="float" type="integer">0.7</string>
+    <string name="rotation_threshold_normal_default" format="float" type="integer">0.45</string>
+    <string name="rotation_threshold_risky_default" format="float" type="integer">0.6</string>
+    <string name="rotation_threshold_dangerous_default" format="float" type="integer">0.7</string>
 
 
 

@@ -36,9 +36,8 @@ public class DrivingBehaviourProcessor extends EventProcessor implements IOSMRes
     private enum DIRECTION {FORWARD, BACKWARD, UNDEFINED};
     private DIRECTION currentDirection = DIRECTION.UNDEFINED;
 
-    private double ACC_THRESHOLD;
-    private double TURN_THRESHOLD;
-    private double TURN_THRESHOLD_SHARP;
+    private double ACC_THRESHOLD_NORMAL, ACC_THRESHOLD_RISKY, ACC_THRESHOLD_DANGEROUS;
+    private double TURN_THRESHOLD_NORMAL, TURN_THRESHOLD_RISKY, TURN_THRESHOLD_DANGEROUS;
     private int OSM_REQUEST_RATE;
 
     private int rawDataDelay;
@@ -50,9 +49,12 @@ public class DrivingBehaviourProcessor extends EventProcessor implements IOSMRes
         setting_prefs = a.getSharedPreferences(a.getString(R.string.settings_preferences_key), Context.MODE_PRIVATE);
         sensor_prefs = a.getSharedPreferences(a.getString(R.string.sensor_preferences_key), Context.MODE_PRIVATE);
 
-        ACC_THRESHOLD = Preferences.getAccelerometerThreshold(setting_prefs);
-        TURN_THRESHOLD = Preferences.getTurnThreshold(setting_prefs);
-        TURN_THRESHOLD_SHARP = Preferences.getSharpTurnThreshold(setting_prefs);
+        ACC_THRESHOLD_NORMAL = Preferences.getNormalAccelerometerThreshold(setting_prefs);
+        ACC_THRESHOLD_RISKY = Preferences.getRiskyAccelerometerThreshold(setting_prefs);
+        ACC_THRESHOLD_DANGEROUS= Preferences.getDangerousAccelerometerThreshold(setting_prefs);
+        TURN_THRESHOLD_NORMAL = Preferences.getTurnThreshold(setting_prefs);
+        TURN_THRESHOLD_RISKY = Preferences.getTurnThreshold(setting_prefs);
+        TURN_THRESHOLD_DANGEROUS = Preferences.getTurnThreshold(setting_prefs);
         OSM_REQUEST_RATE = Preferences.getOSMRequestRate(setting_prefs);
 
         rawDataDelay = Preferences.getRawDataDelay(setting_prefs);
@@ -111,13 +113,14 @@ public class DrivingBehaviourProcessor extends EventProcessor implements IOSMRes
         if(time == lastAccDetected || (time-lastAccDetected) < (lastData.size()*rawDataDelay) )
             return;
 
-        if(avg > ACC_THRESHOLD) {
-            EventVector ev = new EventVector(false, time, "Hard brake", avg/9.81);
+        //TODO
+        if(avg > ACC_THRESHOLD_DANGEROUS) {
+            EventVector ev = new EventVector(EventVector.LEVEL.DANGEROUS, time, "Hard brake", avg/9.81);
             lastAccDetected = time;
             callback.onEventDetected(ev);
 
-        } else if(avg < -ACC_THRESHOLD) {
-            EventVector ev = new EventVector(false, time, "Hard acceleration", avg/9.81);
+        } else if(avg < -ACC_THRESHOLD_DANGEROUS) {
+            EventVector ev = new EventVector(EventVector.LEVEL.DANGEROUS, time, "Hard acceleration", avg/9.81);
             lastAccDetected = time;
             callback.onEventDetected(ev);
         }
@@ -168,12 +171,13 @@ public class DrivingBehaviourProcessor extends EventProcessor implements IOSMRes
         /**
          * Did the data include a sharp turn?
          */
-        if(leftDelta <= -TURN_THRESHOLD_SHARP) {
-            EventVector ev = new EventVector(false, time, "Sharp Left Turn", leftDelta);
+        //TODO
+        if(leftDelta <= -TURN_THRESHOLD_DANGEROUS) {
+            EventVector ev = new EventVector(EventVector.LEVEL.DANGEROUS, time, "Sharp Left Turn", leftDelta);
             callback.onEventDetected(ev);
         }
-        if(rightDelta >= TURN_THRESHOLD_SHARP) {
-            EventVector ev = new EventVector(false, time, "Sharp Right Turn", rightDelta);
+        if(rightDelta >= TURN_THRESHOLD_DANGEROUS) {
+            EventVector ev = new EventVector(EventVector.LEVEL.DANGEROUS, time, "Sharp Right Turn", rightDelta);
             callback.onEventDetected(ev);
         }
 
@@ -181,7 +185,7 @@ public class DrivingBehaviourProcessor extends EventProcessor implements IOSMRes
          * Did the data include a any turn (safe OR sharp)?
          * If so, request new information on road and speed limits
          */
-        if(leftDelta <= -TURN_THRESHOLD || rightDelta >= TURN_THRESHOLD) {
+        if(leftDelta <= -TURN_THRESHOLD_NORMAL || rightDelta >= TURN_THRESHOLD_NORMAL) {
             turned = true;
             lastTurn = System.currentTimeMillis();
             checkForSpeedingInstant(currentVector);
@@ -233,7 +237,7 @@ public class DrivingBehaviourProcessor extends EventProcessor implements IOSMRes
     public void onOSMRoadResponseReceived(OSMRespone response) {
         if(response == null) {
             lastRecognizedRoad = null;
-            callback.onEventDetected(new EventVector(true, System.currentTimeMillis(), "ROAD: No road detected, empty response.", 0));
+            callback.onEventDetected(new EventVector(EventVector.LEVEL.DEBUG, System.currentTimeMillis(), "ROAD: No road detected, empty response.", 0));
             return;
         }
 
@@ -250,9 +254,9 @@ public class DrivingBehaviourProcessor extends EventProcessor implements IOSMRes
 
                 if(tags.maxspeed != null) {
                     currentSpeedLimit = Integer.parseInt(tags.maxspeed);
-                    callback.onEventDetected(new EventVector(true, System.currentTimeMillis(), "ROAD: You are on " + tags.name + ", Speed Limit: " + currentSpeedLimit, 0));
+                    callback.onEventDetected(new EventVector(EventVector.LEVEL.DEBUG, System.currentTimeMillis(), "ROAD: You are on " + tags.name + ", Speed Limit: " + currentSpeedLimit, 0));
                 } else {
-                    callback.onEventDetected(new EventVector(true, System.currentTimeMillis(), "ROAD: You are on " + tags.name, 0));
+                    callback.onEventDetected(new EventVector(EventVector.LEVEL.DEBUG, System.currentTimeMillis(), "ROAD: You are on " + tags.name, 0));
                 }
 
             }
@@ -266,7 +270,7 @@ public class DrivingBehaviourProcessor extends EventProcessor implements IOSMRes
         } else {
             // somehow, we could not extract the current road
             lastRecognizedRoad = null;
-            callback.onEventDetected(new EventVector(true, System.currentTimeMillis(), "ROAD: No road detected, getCurrentRoad() failed", 0));
+            callback.onEventDetected(new EventVector(EventVector.LEVEL.DEBUG, System.currentTimeMillis(), "ROAD: No road detected, getCurrentRoad() failed", 0));
         }
 
     }
@@ -301,11 +305,11 @@ public class DrivingBehaviourProcessor extends EventProcessor implements IOSMRes
 
         if(passedSpeedSign != null) {
             if(nextSpeedSign != null)
-                callback.onEventDetected(new EventVector(true, System.currentTimeMillis(), "ROAD: You are on " + lastRecognizedRoad.tags.name + ", Speed Sign Limit: " + passedSpeedSign.tags.maxspeed + ", upcoming: " + nextSpeedSign.tags.maxspeed, 0));
+                callback.onEventDetected(new EventVector(EventVector.LEVEL.DEBUG, System.currentTimeMillis(), "ROAD: You are on " + lastRecognizedRoad.tags.name + ", Speed Sign Limit: " + passedSpeedSign.tags.maxspeed + ", upcoming: " + nextSpeedSign.tags.maxspeed, 0));
             currentSpeedLimit = Integer.parseInt(passedSpeedSign.tags.maxspeed);
         } else if(lastRecognizedRoad.tags.maxspeed != null) {
             if(nextSpeedSign != null)
-                callback.onEventDetected(new EventVector(true, System.currentTimeMillis(), "ROAD: You are on " + lastRecognizedRoad.tags.name + ", Speed Limit: " + lastRecognizedRoad.tags.maxspeed + ", upcoming: " + nextSpeedSign.tags.maxspeed, 0));
+                callback.onEventDetected(new EventVector(EventVector.LEVEL.DEBUG, System.currentTimeMillis(), "ROAD: You are on " + lastRecognizedRoad.tags.name + ", Speed Limit: " + lastRecognizedRoad.tags.maxspeed + ", upcoming: " + nextSpeedSign.tags.maxspeed, 0));
             currentSpeedLimit = Integer.parseInt(lastRecognizedRoad.tags.maxspeed);
         }
 
@@ -327,9 +331,9 @@ public class DrivingBehaviourProcessor extends EventProcessor implements IOSMRes
 
         // Fire a event if the last two speed readings were above the speed limit
         if(currentSpeedLimit > 0 && currentSpeed > currentSpeedLimit && previousSpeed > currentSpeedLimit)
-            callback.onEventDetected(new EventVector(false, System.currentTimeMillis(), "Speeding", currentSpeed, currentSpeedLimit));
+            callback.onEventDetected(new EventVector(EventVector.LEVEL.DANGEROUS, System.currentTimeMillis(), "Speeding", currentSpeed, currentSpeedLimit));
         else if(currentSpeed > 110)
-            callback.onEventDetected(new EventVector(false, System.currentTimeMillis(), "Speeding above 110km/h", currentSpeed));
+            callback.onEventDetected(new EventVector(EventVector.LEVEL.DANGEROUS, System.currentTimeMillis(), "Speeding above 110km/h", currentSpeed));
     }
 
     /**

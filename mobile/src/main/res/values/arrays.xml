@@ -28,6 +28,17 @@
         <item>20 Hz</item>
     </string-array>
 
+    <string-array name="log_level_values">
+        <item>1</item>
+        <item>2</item>
+        <item>3</item>
+    </string-array>
+    <string-array name="log_level_readable">
+        <item>Normal</item>
+        <item>Risky</item>
+        <item>Dangerous</item>
+    </string-array>
+
     <string-array name="resolution_values">
         <item>1024</item>
         <item>640</item>

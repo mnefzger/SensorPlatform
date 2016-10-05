@@ -3,7 +3,9 @@ package mnefzger.de.sensorplatform.Core;
 
 public class EventVector {
 
-    private boolean debug;
+    public enum LEVEL {DEBUG, NORMAL, RISKY, DANGEROUS};
+
+    private LEVEL level;
 
     private long timestamp;
     private String eventDescription;
@@ -12,15 +14,15 @@ public class EventVector {
     private String videoFront;
     private String videoBack;
 
-    public EventVector(boolean debug, long time, String event, double value) {
-        this.debug = debug;
+    public EventVector(LEVEL level, long time, String event, double value) {
+        this.level = level;
         this.timestamp = time;
         this.eventDescription = event;
         this.value = value;
     }
 
-    public EventVector(boolean debug, long time, String event, double value, double extra) {
-        this.debug = debug;
+    public EventVector(LEVEL level, long time, String event, double value, double extra) {
+        this.level = level;
         this.timestamp = time;
         this.eventDescription = event;
         this.value = value;
@@ -49,8 +51,8 @@ public class EventVector {
         this.extraValue = extraValue;
     }
 
-    public boolean isDebug() {
-        return this.debug;
+    public LEVEL getLevel() {
+        return level;
     }
 
     public long getTimestamp() {
@@ -76,5 +78,19 @@ public class EventVector {
 
     public String toCSVString() {
         return timestamp + ";" + eventDescription + ";" + value + ";" + extraValue + ";" + videoFront + ";" + videoBack;
+    }
+
+    public boolean isIncludedInLevel(LEVEL l) {
+        if(level == LEVEL.DEBUG)
+            return false;
+
+        if(l == LEVEL.NORMAL)
+            return true;
+        else if(l == LEVEL.RISKY && (level == LEVEL.RISKY || level == LEVEL.DANGEROUS) )
+            return true;
+        else if(l == LEVEL.DANGEROUS && level == LEVEL.DANGEROUS)
+            return true;
+        else
+            return false;
     }
 }

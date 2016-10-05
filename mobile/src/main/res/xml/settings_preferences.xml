@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:key="@string/settings_preferences_key">
 
     <PreferenceCategory android:title="General">
@@ -23,6 +24,16 @@
             android:summary="Write all events to a csv file"
             android:defaultValue="false"/>
 
+        <ListPreference
+            android:summary="The log level specifies which events will be written to log"
+            android:defaultValue="2"
+            android:entries="@array/log_level_readable"
+            android:entryValues="@array/log_level_values"
+            android:key="log_level"
+            android:persistent="true"
+            android:title="Log Level"
+            android:dependency="logging_event"/>
+
         <CheckBoxPreference
             android:key="survey_active"
             android:title="Show survey after trip"
@@ -34,7 +45,7 @@
             android:title="Reverse phone orientation"
             android:summary="Switches landscape orientation so that the camera is on the right"
             android:defaultValue="false"
-            android:visibility="invisible"/>
+            android:visibility="gone"/>
 
     </PreferenceCategory>
 
@@ -100,13 +111,32 @@
             android:entryValues="@array/frequency_values"
             android:key="frequency_accelerometer"
             android:persistent="true"
-            android:title="Acclerometer sampling rate" />
+            android:title="Accelerometer sampling rate"/>
 
-        <EditTextPreference
-            android:key="accelerometer_threshold"
-            android:title="Hard acceleration threshold"
-            android:summary="This represents the g-force value for hard acceleration and braking"
-            android:defaultValue="@string/acceleration_threshold_default" />
+        <mnefzger.de.sensorplatform.Utilities.SeekBarPreference
+            android:key="acceleration_threshold_normal"
+            android:title="Normal acceleration threshold"
+            android:summary="Threshold for a normal acceleration or brake in g-force"
+            android:max="100"
+            app:stringDefault="@string/acceleration_threshold_normal_default"
+            android:defaultValue="@string/acceleration_threshold_normal_default"
+            android:text="g"/>
+        <mnefzger.de.sensorplatform.Utilities.SeekBarPreference
+            android:key="acceleration_threshold_risky"
+            android:title="Risky acceleration threshold"
+            android:summary="Threshold for a risky acceleration or brake in g-force"
+            android:max="100"
+            app:stringDefault="@string/acceleration_threshold_risky_default"
+            android:defaultValue="@string/acceleration_threshold_risky_default"
+            android:text="g"/>
+        <mnefzger.de.sensorplatform.Utilities.SeekBarPreference
+            android:key="accelerometer_threshold_dangerous"
+            android:title="Dangerous acceleration threshold"
+            android:summary="Threshold for a dangerous acceleration or brake in g-force"
+            android:max="100"
+            app:stringDefault="@string/acceleration_threshold_dangerous_default"
+            android:defaultValue="@string/acceleration_threshold_dangerous_default"
+            android:text="g"/>
     </PreferenceCategory>
 
 
@@ -120,17 +150,32 @@
             android:persistent="true"
             android:title="Rotation sampling rate" />
 
-        <EditTextPreference
+        <mnefzger.de.sensorplatform.Utilities.SeekBarPreference
             android:key="rotation_threshold_normal"
             android:title="Normal turn threshold"
-            android:summary="This value is the threshold for a normal turn in rad/s"
-            android:defaultValue="@string/rotation_threshold_normal_default" />
+            android:summary="Threshold for a normal turn in rad/s"
+            android:max="100"
+            app:stringDefault="@string/rotation_threshold_normal_default"
+            android:defaultValue="@string/rotation_threshold_normal_default"
+            android:text="rad/s"/>
 
-        <EditTextPreference
+        <mnefzger.de.sensorplatform.Utilities.SeekBarPreference
             android:key="rotation_threshold_risky"
-            android:title="Sharp turn threshold"
-            android:summary="This value is the threshold for a sharp turn in rad/s"
-            android:defaultValue="@string/rotation_threshold_risky_default" />
+            android:title="Risky turn threshold"
+            android:summary="Threshold for a risky turn in rad/s"
+            android:max="100"
+            app:stringDefault="@string/rotation_threshold_risky_default"
+            android:defaultValue="@string/rotation_threshold_risky_default"
+            android:text="rad/s"/>
+
+        <mnefzger.de.sensorplatform.Utilities.SeekBarPreference
+            android:key="rotation_threshold_dangerous"
+            android:title="Dangerous turn threshold"
+            android:summary="Threshold for a dangerous turn in rad/s"
+            android:max="100"
+            app:stringDefault="@string/rotation_threshold_dangerous_default"
+            android:defaultValue="@string/rotation_threshold_dangerous_default"
+            android:text="rad/s"/>
     </PreferenceCategory>
 
     <PreferenceCategory android:title="Location">

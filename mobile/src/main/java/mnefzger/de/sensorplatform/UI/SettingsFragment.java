@@ -89,6 +89,8 @@ public class SettingsFragment extends PreferenceFragment
 
     @Override
     public void onClick(View v) {
+        Log.d("SETTINGS", "" + Preferences.getTurnThreshold(getActivity().getSharedPreferences(getActivity().getString(R.string.settings_preferences_key), Context.MODE_PRIVATE) ) );
+
         if(Preferences.frontCameraActivated(sensor_prefs) || Preferences.backCameraActivated(sensor_prefs))
             ((MainActivity)getActivity()).goToCameraPreviewFragment(true);
         else

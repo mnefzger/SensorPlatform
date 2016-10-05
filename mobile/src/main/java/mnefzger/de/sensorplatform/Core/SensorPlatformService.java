@@ -17,6 +17,7 @@ import com.google.gson.Gson;
 import com.jakewharton.threetenabp.AndroidThreeTen;
 
 import java.util.Iterator;
+import java.util.List;
 
 import mnefzger.de.sensorplatform.External.UserPhoneBluetoothServer;
 import mnefzger.de.sensorplatform.Logger.LoggingModule;
@@ -38,7 +39,7 @@ public class SensorPlatformService extends Service implements IDataCallback, ITr
     private UserPhoneBluetoothServer server;
     private TripStartDetector tsDetector;
     private TripEndDetector teDetector;
-    private int[] level_int;
+    private List<EventVector.LEVEL> levels;
 
     private final IBinder mBinder = new LocalBinder();
 
@@ -78,7 +79,9 @@ public class SensorPlatformService extends Service implements IDataCallback, ITr
 
         this.teDetector = new TripEndDetector(this, getApplication());
 
-        level_int = Preferences.getLogLevel(setting_prefs);
+        int[] level_int = Preferences.getLogLevel(setting_prefs);
+        levels = EventVector.convertToLevels(level_int);
+        levels.add(EventVector.LEVEL.DEBUG); // DEBUG should be included
     }
 
     public void startWaitBehaviour() {
@@ -257,25 +260,30 @@ public class SensorPlatformService extends Service implements IDataCallback, ITr
         if(waiting)
             return;
 
-        if(Preferences.videoSavingActivated(setting_prefs) && !(ev.getLevel() == EventVector.LEVEL.DEBUG) ) {
-            long now = System.currentTimeMillis();
+        // check if the log level is active
+        if( levels.contains(EventVector.LEVEL.ALL) || levels.contains(ev.getLevel()) ) {
+            // save a video of this event
+            if(Preferences.videoSavingActivated(setting_prefs) && !(ev.getLevel() == EventVector.LEVEL.DEBUG) ) {
+                long now = System.currentTimeMillis();
 
-            // Check if a video is currently being saved or the last save was less than 5 second ago
-            if(!im.isSaving() && (now - lastSave) > 5000) {
-                im.saveVideoAfterEvent(ev);
-                ev.setVideoNames(ev.getTimestamp());
-                lastSave = now;
+                // Check if a video is currently being saved or the last save was less than 5 second ago
+                if(!im.isSaving() && (now - lastSave) > 5000) {
+                    im.saveVideoAfterEvent(ev);
+                    ev.setVideoNames(ev.getTimestamp());
+                    lastSave = now;
+                }
             }
-        }
 
-        if(ActiveSubscriptions.eventLoggingActive() && !(ev.getLevel() == EventVector.LEVEL.DEBUG) &&
-                ev.isIncludedInLevel(level_int)) {
-            lm.writeEventToCSV(ev);
-        }
+            // write to log files
+            if( ActiveSubscriptions.eventLoggingActive() && !(ev.getLevel() == EventVector.LEVEL.DEBUG) ) {
+                lm.writeEventToCSV(ev);
+            }
 
-        Intent event = new Intent("mnefzger.de.sensorplatform.EventData");
-        event.putExtra("EventData", new Gson().toJson(ev));
-        LocalBroadcastManager.getInstance(getApplicationContext()).sendBroadcast(event);
+            // broadcast event data
+            Intent event = new Intent("mnefzger.de.sensorplatform.EventData");
+            event.putExtra("EventData", new Gson().toJson(ev));
+            LocalBroadcastManager.getInstance(getApplicationContext()).sendBroadcast(event);
+        }
 
     }
 

@@ -1,9 +1,12 @@
 package mnefzger.de.sensorplatform.Core;
 
 
+import java.util.ArrayList;
+import java.util.List;
+
 public class EventVector {
 
-    public enum LEVEL {DEBUG, NORMAL, RISKY, DANGEROUS};
+    public enum LEVEL {DEBUG, ALL, NORMAL, RISKY, DANGEROUS};
 
     private LEVEL level;
 
@@ -100,8 +103,21 @@ public class EventVector {
             LEVEL l = EventVector.LEVEL.values()[int_levels[i]];
             if(level == l)
                 return true;
+            if(l == LEVEL.ALL)
+                return true;
         }
 
         return false;
+    }
+
+    public static List<LEVEL> convertToLevels(int[] int_levels) {
+        List<LEVEL> levels = new ArrayList<>();
+
+        for(int i=0; i<int_levels.length; i++) {
+            LEVEL l = EventVector.LEVEL.values()[int_levels[i]];
+            levels.add(l);
+        }
+
+        return levels;
     }
 }

@@ -37,6 +37,9 @@ public class ImageProcessor{
     private double TTC_RISKY;
     private double TTC_DANGEROUS;
 
+    private boolean flip_back = false;
+    private boolean flip_front = false;
+
     static{
         System.loadLibrary("opencv_java3");
         System.loadLibrary("imgProc");
@@ -44,9 +47,9 @@ public class ImageProcessor{
 
     private native int nInitCascades();
 
-    private native int[] nAsmFindFace(long adress1, long adress2);
+    private native int[] nAsmFindFace(long adress1, long adress2, boolean flipped);
 
-    private native int[] nAsmFindCars(long adress1, long adress2);
+    private native int[] nAsmFindCars(long adress1, long adress2, boolean flipped);
 
     public ImageProcessor(ImageModule im, Context c) {
         callback = im;
@@ -59,6 +62,10 @@ public class ImageProcessor{
         TTC_NORMAL = Preferences.getNormalTTC(setting_prefs);
         TTC_RISKY = Preferences.getRiskyTTC(setting_prefs);
         TTC_DANGEROUS = Preferences.getDangerousTTC(setting_prefs);
+
+        boolean reversed = Preferences.isReverseOrientation(setting_prefs);
+        if(reversed) flip_back = true;
+        else flip_front = true;
     }
 
     public void setCurrentSpeed(Double currentSpeed) {
@@ -112,7 +119,7 @@ public class ImageProcessor{
     long lastFaceDetect = System.currentTimeMillis();
     private int[] findFaceInImage(long adress1, long adress2) {
         double time = System.currentTimeMillis();
-        int[] faces = nAsmFindFace(adress1, adress2);
+        int[] faces = nAsmFindFace(adress1, adress2, flip_front);
         //Log.d("FACE_DETECTION_FRAME", System.currentTimeMillis()-time + "");
 
         if(faces.length == 4) {
@@ -131,7 +138,7 @@ public class ImageProcessor{
 
     private int[] findCarsInImage(long adress1, long adress2) {
         double time = System.currentTimeMillis();
-        int[] cars = nAsmFindCars(adress1, adress2);
+        int[] cars = nAsmFindCars(adress1, adress2, flip_back);
         //Log.d("CAR_DETECTION_FRAME", System.currentTimeMillis()-time + "");
 
         if(cars != null && cars.length > 0) {
@@ -148,7 +155,7 @@ public class ImageProcessor{
 
 
         } else {
-            callback.onEventDetected(new EventVector(EventVector.LEVEL.DEBUG, System.currentTimeMillis(), "No Car detected", 0));
+            callback.onEventDetected(new EventVector(EventVector.LEVEL.DEBUG, System.currentTimeMillis(), "No Cars detected", 0));
         }
 
         return cars;

@@ -16,8 +16,8 @@ using namespace cv;
 using namespace std;
 
 extern "C" {
-    JNIEXPORT jintArray Java_mnefzger_de_sensorplatform_Processors_ImageProcessor_nAsmFindFace(JNIEnv *env, jobject obj, jlong address, jlong returnadress);
-    JNIEXPORT jintArray Java_mnefzger_de_sensorplatform_Processors_ImageProcessor_nAsmFindCars(JNIEnv *env, jobject obj, jlong address, jlong returnadress);
+    JNIEXPORT jintArray Java_mnefzger_de_sensorplatform_Processors_ImageProcessor_nAsmFindFace(JNIEnv *env, jobject obj, jlong address, jlong returnadress, jboolean flipped);
+    JNIEXPORT jintArray Java_mnefzger_de_sensorplatform_Processors_ImageProcessor_nAsmFindCars(JNIEnv *env, jobject obj, jlong address, jlong returnadress, jboolean flipped);
     JNIEXPORT jint Java_mnefzger_de_sensorplatform_Processors_ImageProcessor_nInitCascades(JNIEnv *env, jobject obj);
     cv::Mat getIPMImage( const Mat& _inputImg );
 }
@@ -44,7 +44,7 @@ JNIEXPORT jint Java_mnefzger_de_sensorplatform_Processors_ImageProcessor_nInitCa
 	return 1;
 }
 
-JNIEXPORT jintArray Java_mnefzger_de_sensorplatform_Processors_ImageProcessor_nAsmFindFace(JNIEnv *env, jobject obj, jlong address, jlong returnadress) {
+JNIEXPORT jintArray Java_mnefzger_de_sensorplatform_Processors_ImageProcessor_nAsmFindFace(JNIEnv *env, jobject obj, jlong address, jlong returnadress, jboolean flipped) {
 	jintArray result;
 	Mat image = *((Mat*) address);
 
@@ -58,6 +58,7 @@ JNIEXPORT jintArray Java_mnefzger_de_sensorplatform_Processors_ImageProcessor_nA
 
     Mat gray(image.rows, image.cols, image.depth());
     cvtColor(image, gray, COLOR_YUV2GRAY_I420);
+    if(flipped == true) flip(gray, gray, -1);
 
     vector< Rect > faces;
     //faceCascadeHaar.detectMultiScale(gray, faces, 1.1, 2, 0 | CV_HAAR_SCALE_IMAGE, Size(30, 30));
@@ -97,13 +98,13 @@ JNIEXPORT jintArray Java_mnefzger_de_sensorplatform_Processors_ImageProcessor_nA
     return result;
 }
 
-JNIEXPORT jintArray Java_mnefzger_de_sensorplatform_Processors_ImageProcessor_nAsmFindCars(JNIEnv *env, jobject obj, jlong address, jlong returnadress) {
+JNIEXPORT jintArray Java_mnefzger_de_sensorplatform_Processors_ImageProcessor_nAsmFindCars(JNIEnv *env, jobject obj, jlong address, jlong returnadress, jboolean flipped) {
 	jintArray result;
 	Mat image = *((Mat*) address);
 
     Mat gray(image.rows, image.cols, image.depth());
     cvtColor(image, gray, COLOR_YUV2GRAY_I420);
-    flip(gray, gray, -1);
+    if(flipped == true) flip(gray, gray, -1);
 
     Size size(320, 240);
     Mat gray_small(240, 320, gray.depth());

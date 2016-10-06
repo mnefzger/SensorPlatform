@@ -77,11 +77,12 @@ public class PositionProvider extends DataProvider implements LocationListener{
 
             lastSpeedValues.add(speed);
             if(lastSpeedValues.size() >= 3) {
-                speed = MathFunctions.getAccEMASingle(lastSpeedValues, 2/(lastSpeedValues.size()+1) );
+                speed = MathFunctions.getAccEMASingle(lastSpeedValues, 0.5 );
                 lastSpeedValues.set(lastSpeedValues.size()-1, speed);
             }
 
-            if(lastSpeedValues.size() > 3) lastSpeedValues.remove(0);
+            if(lastSpeedValues.size() > 3)
+                lastSpeedValues.remove(0);
         }
 
         lastLocation = location;

@@ -295,6 +295,12 @@
                     android:id="@+id/faceText"
                     android:layout_marginTop="10dp"
                     android:textSize="18sp" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:id="@+id/carText"
+                    android:textAppearance="?android:attr/textAppearanceLarge" />
             </LinearLayout>
 
         </LinearLayout>

@@ -198,27 +198,64 @@ public class DrivingBehaviourProcessor extends EventProcessor implements IOSMRes
         /**
          * Did the data include a turn?
          */
+        if(!Preferences.isReverseOrientation(setting_prefs)) {
+
+        }
+
+
+
         if(leftDelta <= -TURN_THRESHOLD_DANGEROUS) {
-            EventVector ev = new EventVector(EventVector.LEVEL.DANGEROUS, time, "Left Turn", leftDelta);
+            EventVector ev;
+            if(Preferences.isReverseOrientation(setting_prefs)) {
+                ev = new EventVector(EventVector.LEVEL.DANGEROUS, time, "Left Turn", leftDelta);
+            } else {
+                ev = new EventVector(EventVector.LEVEL.DANGEROUS, time, "Right Turn", leftDelta);
+            }
             callback.onEventDetected(ev);
         } else if(leftDelta <= -TURN_THRESHOLD_RISKY) {
-            EventVector ev = new EventVector(EventVector.LEVEL.RISKY, time, "Left Turn", leftDelta);
+            EventVector ev;
+            if(Preferences.isReverseOrientation(setting_prefs)) {
+                ev = new EventVector(EventVector.LEVEL.RISKY, time, "Left Turn", leftDelta);
+            } else {
+                ev = new EventVector(EventVector.LEVEL.RISKY, time, "Right Turn", leftDelta);
+            }
             callback.onEventDetected(ev);
         } else if(leftDelta <= -TURN_THRESHOLD_NORMAL) {
-            EventVector ev = new EventVector(EventVector.LEVEL.NORMAL, time, "Left Turn", leftDelta);
+            EventVector ev;
+            if(Preferences.isReverseOrientation(setting_prefs)) {
+                ev = new EventVector(EventVector.LEVEL.NORMAL, time, "Left Turn", leftDelta);
+            } else {
+                ev = new EventVector(EventVector.LEVEL.NORMAL, time, "Right Turn", leftDelta);
+            }
             callback.onEventDetected(ev);
         }
 
         if(rightDelta >= TURN_THRESHOLD_DANGEROUS) {
-            EventVector ev = new EventVector(EventVector.LEVEL.DANGEROUS, time, "Right Turn", rightDelta);
+            EventVector ev;
+            if(Preferences.isReverseOrientation(setting_prefs)) {
+                ev = new EventVector(EventVector.LEVEL.DANGEROUS, time, "Right Turn", rightDelta);
+            } else {
+                ev = new EventVector(EventVector.LEVEL.DANGEROUS, time, "Left Turn", rightDelta);
+            }
             callback.onEventDetected(ev);
         } else if(rightDelta >= TURN_THRESHOLD_RISKY) {
-            EventVector ev = new EventVector(EventVector.LEVEL.RISKY, time, "Right Turn", rightDelta);
+            EventVector ev;
+            if(Preferences.isReverseOrientation(setting_prefs)) {
+                ev = new EventVector(EventVector.LEVEL.RISKY, time, "Right Turn", rightDelta);
+            } else {
+                ev = new EventVector(EventVector.LEVEL.RISKY, time, "Left Turn", rightDelta);
+            }
             callback.onEventDetected(ev);
         } else if(rightDelta >= TURN_THRESHOLD_NORMAL) {
-            EventVector ev = new EventVector(EventVector.LEVEL.NORMAL, time, "Right Turn", rightDelta);
+            EventVector ev;
+            if(Preferences.isReverseOrientation(setting_prefs)) {
+                ev = new EventVector(EventVector.LEVEL.NORMAL, time, "Right Turn", rightDelta);
+            } else {
+                ev = new EventVector(EventVector.LEVEL.NORMAL, time, "Left Turn", rightDelta);
+            }
             callback.onEventDetected(ev);
         }
+
 
 
         /**

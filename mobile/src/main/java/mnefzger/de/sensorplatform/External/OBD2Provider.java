@@ -69,6 +69,17 @@ public class OBD2Provider extends DataProvider implements OBD2Connector.IConnect
 
     @Override
     public void stop() {
+        if(OBD2Connection.sock != null) {
+            try {
+                OBD2Connection.sock.getInputStream().close();
+                OBD2Connection.sock.getOutputStream().close();
+                OBD2Connection.sock.close();
+                OBD2Connection.sock = null;
+            }catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
+
         collecting = false;
         OBD2Connection.connected = false;
         setupComplete = false;
@@ -147,7 +158,7 @@ public class OBD2Provider extends DataProvider implements OBD2Connector.IConnect
                         }
                     }).start();
 
-                } else if(!tryingToReconnect) {     // connection is lost, try reconnecting...
+                } else if(collecting && !tryingToReconnect) {     // connection is lost, try reconnecting...
                     reset();
                 }
 
@@ -184,7 +195,7 @@ public class OBD2Provider extends DataProvider implements OBD2Connector.IConnect
     }
 
     public void runCommand(BluetoothSocket s, String cmd) {
-        if(OBD2Connection.obd2Device != null) {
+        if(OBD2Connection.obd2Device != null && s != null) {
             try{
                 mRun(cmd, s.getInputStream(), s.getOutputStream());
             } catch (Exception e) {

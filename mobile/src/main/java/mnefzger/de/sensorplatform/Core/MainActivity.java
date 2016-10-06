@@ -3,6 +3,7 @@ package mnefzger.de.sensorplatform.Core;
 import android.app.Activity;
 import android.app.ActivityManager;
 import android.app.PendingIntent;
+import android.app.Service;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
@@ -186,6 +187,10 @@ public class MainActivity extends AppCompatActivity {
             mBound = false;
         }
     };
+
+    public ServiceConnection getConnection() {
+        return mConnection;
+    }
 
     public SensorPlatformService getService() {
         return sPS;

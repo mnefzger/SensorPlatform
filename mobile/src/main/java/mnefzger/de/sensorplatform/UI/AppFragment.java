@@ -161,13 +161,21 @@ public class AppFragment extends Fragment {
             Intent stopIntent = new Intent(getActivity(), SensorPlatformService.class);
             stopIntent.setAction("SERVICE_STOP");
 
+            MainActivity app = (MainActivity) getActivity();
+            try {
+                app.unbindService(app.getConnection());
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
             getActivity().startService(stopIntent);
+
             resumeButton.setEnabled(false);
             pauseButton.setEnabled(false);
 
-            MainActivity app = (MainActivity) getActivity();
+
             MainActivity.started = false;
             MainActivity.mBound = false;
+
             app.goToStartFragment(25, false);
         }
     };

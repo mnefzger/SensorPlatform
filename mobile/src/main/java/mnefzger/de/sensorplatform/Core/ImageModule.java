@@ -126,13 +126,17 @@ public class ImageModule implements IEventCallback{
         ThreadPool.finish();
 
         if(camera_front != null) {
+            frontImagesCV.clear();
             imageReader_front.close();
             camera_front.close();
+            camera_front = null;
         }
 
         if(camera_back != null) {
+            backImagesCV.clear();
             imageReader_back.close();
             camera_back.close();
+            camera_back = null;
         }
 
     }

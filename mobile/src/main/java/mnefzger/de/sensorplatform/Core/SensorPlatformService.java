@@ -140,6 +140,8 @@ public class SensorPlatformService extends Service implements IDataCallback, ITr
     }
 
     public void subscribe() {
+        waiting = false;
+
         /**
          * Logging
          */
@@ -183,6 +185,7 @@ public class SensorPlatformService extends Service implements IDataCallback, ITr
             subscribeTo(DataType.WEATHER);
         }
 
+
     }
 
     public boolean subscribeTo(DataType type) {
@@ -192,11 +195,13 @@ public class SensorPlatformService extends Service implements IDataCallback, ITr
         Iterator<Subscription> it = ActiveSubscriptions.get().iterator();
         while(it.hasNext()) {
             if(it.next().getType() == type) {
+                Log.d("Subscribe To", "already there " + type);
                 return false;
             }
         }
 
         Subscription s = new Subscription(type);
+        Log.d("Subscribe To", "New: " + type);
 
         if(type == DataType.CAMERA_RAW) {
             im.startCapture();
@@ -367,6 +372,7 @@ public class SensorPlatformService extends Service implements IDataCallback, ITr
             Subscription sub = it.next();
             sm.stopSensing(sub.getType());
         }
+        sm.stopAll();
 
         im.stopCapture();
         if(server != null)
@@ -380,7 +386,6 @@ public class SensorPlatformService extends Service implements IDataCallback, ITr
         // remove notification
         NotificationManager nm = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
         nm.cancelAll();
-
     }
 
     public void pauseDataCollection() {
@@ -391,7 +396,6 @@ public class SensorPlatformService extends Service implements IDataCallback, ITr
         }
 
         im.stopCapture();
-
         sm.clearDataBuffer();
     }
 

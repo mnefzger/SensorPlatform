@@ -100,6 +100,10 @@ public class SensorModule implements ISensorCallback, IEventCallback{
         this.callback = callback;
         this.app = app;
 
+        refresh();
+    }
+
+    public void refresh() {
         activeProviders = new ArrayList<>();
 
         accelerometer = new AccelerometerProvider(app, this);
@@ -115,7 +119,6 @@ public class SensorModule implements ISensorCallback, IEventCallback{
         current = new DataVector();
         current.setTimestamp(System.currentTimeMillis());
         dataBuffer = new ArrayList<>();
-
     }
 
     public void startSensing(DataType type) {
@@ -131,6 +134,7 @@ public class SensorModule implements ISensorCallback, IEventCallback{
         if(t == Sensor.TYPE_ACCELEROMETER && !activeProviders.contains(accelerometer)) {
             accelerometer.start();
             activeProviders.add(accelerometer);
+            Log.d("START", "starting accelerometer");
         }
 
         if(t == Sensor.TYPE_ROTATION_VECTOR && !activeProviders.contains(orientation)) {
@@ -221,6 +225,11 @@ public class SensorModule implements ISensorCallback, IEventCallback{
         if(activeProviders.size() == 0) {
             sensing = false;
         }
+    }
+
+    public void stopAll() {
+        activeProviders.clear();
+        sensing = false;
     }
 
     double lon = 152.97542002;

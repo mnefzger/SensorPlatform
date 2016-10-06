@@ -70,7 +70,7 @@ public class DrivingBehaviourProcessor extends EventProcessor implements IOSMRes
             currentVector = data.get(data.size()-1);
             previousVector = data.get(data.size()-2);
 
-            int no_of_items = 2000/rawDataDelay;
+            int no_of_items = 3000/rawDataDelay;
             // minimum of 3 items
             //no_of_items = no_of_items >= 3 ? no_of_items : 3;
 
@@ -102,19 +102,18 @@ public class DrivingBehaviourProcessor extends EventProcessor implements IOSMRes
             if(Math.abs(accelerationZ) > max_abs) {
                 max_abs = Math.abs(accelerationZ);
                 time = next.timestamp;
-                max = accelerationZ;
+                //max = accelerationZ;
             }
         }
 
-        double avg = max;
-        //double avg = MathFunctions.getAccEMASingle(acc, 2/(acc.size()+1) );
+        //double avg = max;
+        double avg = MathFunctions.getAccEMASingle(acc, 2/(acc.size()+1) );
         //double avg = MathFunctions.getAccEMASingle(acc, 1);
 
         // we already looked at this data or last detected was not long ago
         if(time == lastAccDetected || (time-lastAccDetected) < (lastData.size()*rawDataDelay) )
             return;
 
-        //TODO
         if(avg > 0) {
             if(avg > ACC_THRESHOLD_DANGEROUS) {
                 EventVector ev = new EventVector(EventVector.LEVEL.DANGEROUS, time, "Brake", avg/9.81);
@@ -198,11 +197,6 @@ public class DrivingBehaviourProcessor extends EventProcessor implements IOSMRes
         /**
          * Did the data include a turn?
          */
-        if(!Preferences.isReverseOrientation(setting_prefs)) {
-
-        }
-
-
 
         if(leftDelta <= -TURN_THRESHOLD_DANGEROUS) {
             EventVector ev;

@@ -3,6 +3,7 @@ package mnefzger.de.sensorplatform.Core;
 import android.content.Context;
 import android.hardware.Sensor;
 import android.hardware.SensorEvent;
+import android.util.Log;
 
 import java.util.ArrayList;
 
@@ -14,7 +15,7 @@ public class AccelerometerProvider extends SensorProvider {
     private double[] gravity = new double[3];
     private double[] linear_acceleration = new double[3];
     private ArrayList<double[]> lastValues = new ArrayList<>();
-    private final int WINDOW = 5;
+    private final int WINDOW = 10;
 
     /**
      * for accelerometer-gravity low-pass filter
@@ -31,6 +32,8 @@ public class AccelerometerProvider extends SensorProvider {
     }
 
     public void start() {
+        Log.d("ACCELEROMETER", "Started");
+
         super.start();
         if (sensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER) != null){
             accSensor = sensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER);

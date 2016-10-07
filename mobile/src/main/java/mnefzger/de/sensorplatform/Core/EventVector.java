@@ -6,7 +6,7 @@ import java.util.List;
 
 public class EventVector {
 
-    public enum LEVEL {DEBUG, ALL, NORMAL, RISKY, DANGEROUS};
+    public enum LEVEL {DEBUG, ALL, LOW_RISK, MEDIUM_RISK, HIGH_RISK};
 
     private LEVEL level;
 
@@ -59,12 +59,12 @@ public class EventVector {
     }
 
     public String getLevelString() {
-        if(this.level == LEVEL.NORMAL)
-            return "NORMAL";
-        if(this.level == LEVEL.RISKY)
-            return "RISKY";
-        if(this.level == LEVEL.DANGEROUS)
-            return "DANGEROUS";
+        if(this.level == LEVEL.LOW_RISK)
+            return "LOW_RISK";
+        if(this.level == LEVEL.MEDIUM_RISK)
+            return "MEDIUM_RISK";
+        if(this.level == LEVEL.HIGH_RISK)
+            return "HIGH_RISK";
 
         return "-";
     }

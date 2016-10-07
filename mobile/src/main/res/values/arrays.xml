@@ -36,9 +36,9 @@
     </string-array>
     <string-array name="log_level_readable">
         <item>All</item>
-        <item>Normal</item>
-        <item>Risky</item>
-        <item>Dangerous</item>
+        <item>Low Risk</item>
+        <item>Medium Risk</item>
+        <item>High Risk</item>
     </string-array>
     <string-array name="log_level_default">
         <item>1</item>

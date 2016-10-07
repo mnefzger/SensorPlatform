@@ -14,7 +14,6 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.util.logging.Level;
 
 import mnefzger.de.sensorplatform.Core.EventVector;
 import mnefzger.de.sensorplatform.Core.IEventCallback;
@@ -130,7 +129,7 @@ public class ImageProcessor{
 
             long distractionTime = System.currentTimeMillis()-lastFaceDetect;
             if(distractionTime > 3000)
-                callback.onEventDetected(new EventVector(EventVector.LEVEL.DANGEROUS, System.currentTimeMillis(), "Driver is distracted", distractionTime));
+                callback.onEventDetected(new EventVector(EventVector.LEVEL.HIGH_RISK, System.currentTimeMillis(), "Driver is distracted", distractionTime));
         }
 
         return faces;
@@ -186,11 +185,11 @@ public class ImageProcessor{
             if(currentSpeed >= 25 && currentSpeed <= 60) { // urban
                 EventVector.LEVEL l = null;
                 if (TTC < TTC_DANGEROUS/2)
-                    l = EventVector.LEVEL.DANGEROUS;
+                    l = EventVector.LEVEL.HIGH_RISK;
                 else if(TTC < TTC_RISKY/2)
-                    l = EventVector.LEVEL.RISKY;
+                    l = EventVector.LEVEL.MEDIUM_RISK;
                 else if(TTC < TTC_NORMAL/2)
-                    l = EventVector.LEVEL.NORMAL;
+                    l = EventVector.LEVEL.LOW_RISK;
 
                 if(l != null)
                     callback.onEventDetected(new EventVector(l, System.currentTimeMillis(), "Tailgating below 60km/h, TTC", TTC));
@@ -199,11 +198,11 @@ public class ImageProcessor{
             } else if(currentSpeed > 60) { // highway
                 EventVector.LEVEL l = null;
                 if (TTC < TTC_DANGEROUS)
-                    l = EventVector.LEVEL.DANGEROUS;
+                    l = EventVector.LEVEL.HIGH_RISK;
                 else if(TTC < TTC_RISKY)
-                    l = EventVector.LEVEL.RISKY;
+                    l = EventVector.LEVEL.MEDIUM_RISK;
                 else if(TTC < TTC_NORMAL)
-                    l = EventVector.LEVEL.NORMAL;
+                    l = EventVector.LEVEL.LOW_RISK;
 
                 if(l != null)
                     callback.onEventDetected(new EventVector(l, System.currentTimeMillis(), "Tailgating above 60km/h, TTC", TTC));

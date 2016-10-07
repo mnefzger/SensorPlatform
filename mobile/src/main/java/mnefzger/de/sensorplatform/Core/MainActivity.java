@@ -371,6 +371,7 @@ public class MainActivity extends AppCompatActivity {
             this.setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);
 
         inCameraFragment = true;
+        studySetupComplete = true;
     }
 
 

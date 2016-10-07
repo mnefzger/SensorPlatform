@@ -47,7 +47,7 @@
             android:defaultValue="false"/>
         <CheckBoxPreference
             android:key="obd_raw"
-            android:title="OBD Raw Data"
+            android:title="OBD-II Data"
             android:summary="Activate OBD2 connection and vehicle data collection"
             android:defaultValue="false"/>
     </PreferenceCategory>

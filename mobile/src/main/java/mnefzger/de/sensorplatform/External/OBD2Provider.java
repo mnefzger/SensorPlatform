@@ -51,7 +51,6 @@ public class OBD2Provider extends DataProvider implements OBD2Connector.IConnect
     }
 
     public void connect() {
-        Log.d("OBD", Preferences.OBDActivated(sensor_prefs) +","+ OBD2Connection.connected);
         if(Preferences.OBDActivated(sensor_prefs) && !OBD2Connection.connected) {
             reset();
         } else {
@@ -159,6 +158,9 @@ public class OBD2Provider extends DataProvider implements OBD2Connector.IConnect
                     }).start();
 
                 } else if(collecting && !tryingToReconnect) {     // connection is lost, try reconnecting...
+                    double[] resp = {-1,-1,-1};
+                    callback.onOBD2Data(resp);
+                    Log.d("OBD", "Connection lost, reconnecting.");
                     reset();
                 }
 
@@ -206,13 +208,28 @@ public class OBD2Provider extends DataProvider implements OBD2Connector.IConnect
 
     public void runCommand(BluetoothSocket s, ObdCommand cmd) {
         if(OBD2Connection.obd2Device != null) {
-            try{
+            try {
                 cmd.run(s.getInputStream(), s.getOutputStream());
+
             } catch (IOException io) {
-                if(io.getMessage().contains("Broken pipe")) {
-                    if(!tryingToReconnect)
+                if (io.getMessage().contains("Broken pipe")) {
+                    if (!tryingToReconnect) {
+                        Log.d("OBD", "Broken pipe, reconnecting.");
+                        double[] resp = {-1,-1,-1};
+                        callback.onOBD2Data(resp);
                         reset();
+                    }
                 }
+
+            } catch (IndexOutOfBoundsException e) {
+                e.printStackTrace();
+                if (!tryingToReconnect) {
+                    Log.d("OBD", "Out of bounds, reconnecting.");
+                    double[] resp = {-1,-1,-1};
+                    callback.onOBD2Data(resp);
+                    reset();
+                }
+
             } catch(Exception e) {
                 e.printStackTrace();
             }
@@ -269,10 +286,14 @@ public class OBD2Provider extends DataProvider implements OBD2Connector.IConnect
         public void onReceive(Context context, Intent intent) {
             String action = intent.getAction();
 
-            if(action.equals("OBD_CONNECTED") || action.equals("OBD_NOT_FOUND") ) {
+            if(action.equals("OBD_CONNECTED") ) {
                 tryingToReconnect = false;
                 app.unregisterReceiver(mReceiver);
 
+            }
+
+            if(action.equals("OBD_NOT_FOUND") && !collecting) {
+                app.unregisterReceiver(mReceiver);
             }
         }
 

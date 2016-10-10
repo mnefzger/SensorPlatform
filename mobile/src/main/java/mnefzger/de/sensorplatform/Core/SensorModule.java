@@ -14,6 +14,7 @@ import mnefzger.de.sensorplatform.External.FitnessSensorManager;
 import mnefzger.de.sensorplatform.External.OBD2Provider;
 import mnefzger.de.sensorplatform.Processors.DrivingBehaviourProcessor;
 import mnefzger.de.sensorplatform.R;
+import mnefzger.de.sensorplatform.Utilities.MathFunctions;
 
 /**
  * This class is the central unit of data collection (except image data).
@@ -318,9 +319,13 @@ public class SensorModule implements ISensorCallback, IEventCallback{
         /**
          * Replace the current value only if the new value is more extreme.
          * This guarantees that the same value is stored independent of the <code>RawDataSampling</code> setting.
-         */
+         *
         if(Math.abs(dataValues[2]) > Math.abs(current.accZ))
             current.setAcc( dataValues[0], dataValues[1], dataValues[2] );
+         */
+
+        current.setAcc( dataValues[0], dataValues[1], dataValues[2] );
+
     }
 
     @Override

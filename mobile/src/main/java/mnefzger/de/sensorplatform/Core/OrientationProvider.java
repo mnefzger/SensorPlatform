@@ -4,6 +4,7 @@ import android.content.Context;
 import android.hardware.Sensor;
 import android.hardware.SensorEvent;
 import android.hardware.SensorManager;
+import android.os.Handler;
 import android.util.Log;
 
 import mnefzger.de.sensorplatform.Utilities.MathFunctions;
@@ -55,5 +56,9 @@ public class OrientationProvider extends SensorProvider {
 
         sensorCallback.onRotationData(result);
     }
+
+
+
+
 
 }

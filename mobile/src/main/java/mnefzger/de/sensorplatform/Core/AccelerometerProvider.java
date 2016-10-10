@@ -5,6 +5,8 @@ import android.hardware.Sensor;
 import android.hardware.SensorEvent;
 import android.util.Log;
 
+import org.opencv.core.Mat;
+
 import java.util.ArrayList;
 
 import mnefzger.de.sensorplatform.Utilities.MathFunctions;
@@ -15,7 +17,8 @@ public class AccelerometerProvider extends SensorProvider {
     private double[] gravity = new double[3];
     private double[] linear_acceleration = new double[3];
     private ArrayList<double[]> lastValues = new ArrayList<>();
-    private final int WINDOW = 10;
+    private double[] lastValue = {0,0,0};
+    private int WINDOW = 25;
 
     /**
      * for accelerometer-gravity low-pass filter
@@ -29,6 +32,7 @@ public class AccelerometerProvider extends SensorProvider {
 
     public AccelerometerProvider(Context a, SensorModule m) {
         super(a, m);
+        WINDOW = ( Preferences.getRawDataDelay(setting_prefs) / Preferences.getAccelerometerDelay(setting_prefs) );
     }
 
     public void start() {
@@ -85,11 +89,16 @@ public class AccelerometerProvider extends SensorProvider {
      * @param newest The most recent accelerometer reading
      */
     private void reportEMAValues(double[] newest) {
+        /*
         lastValues.add(newest);
         if(lastValues.size() > WINDOW) {
             lastValues.remove(0);
         }
         double[] emaValues = MathFunctions.getAccEMA(lastValues);
+        */
+
+        double[] emaValues = MathFunctions.getEMA(newest, lastValue, 0.25);
+        lastValue = emaValues;
 
         sensorCallback.onAccelerometerData(emaValues);
     }

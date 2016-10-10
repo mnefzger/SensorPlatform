@@ -37,6 +37,7 @@ public class OBD2Provider extends DataProvider implements OBD2Connector.IConnect
     private Context app;
 
     private boolean tryingToReconnect = false;
+    private int outOfBoundsCounter = 0;
 
     private final String TAG = "OBD_BLUETOOTH";
 
@@ -223,11 +224,14 @@ public class OBD2Provider extends DataProvider implements OBD2Connector.IConnect
 
             } catch (IndexOutOfBoundsException e) {
                 e.printStackTrace();
-                if (!tryingToReconnect) {
+                outOfBoundsCounter += 1;
+                if (!tryingToReconnect && outOfBoundsCounter >= 3) {
                     Log.d("OBD", "Out of bounds, reconnecting.");
                     double[] resp = {-1,-1,-1};
                     callback.onOBD2Data(resp);
+                    outOfBoundsCounter = 0;
                     reset();
+
                 }
 
             } catch(Exception e) {
@@ -289,11 +293,13 @@ public class OBD2Provider extends DataProvider implements OBD2Connector.IConnect
             if(action.equals("OBD_CONNECTED") ) {
                 tryingToReconnect = false;
                 app.unregisterReceiver(mReceiver);
-
             }
 
-            if(action.equals("OBD_NOT_FOUND") && !collecting) {
-                app.unregisterReceiver(mReceiver);
+            if(action.equals("OBD_NOT_FOUND")) {
+                if(!collecting)
+                    app.unregisterReceiver(mReceiver);
+                if(collecting)
+                    reset();
             }
         }
 

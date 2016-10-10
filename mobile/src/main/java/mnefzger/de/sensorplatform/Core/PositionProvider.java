@@ -9,6 +9,7 @@ import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
 import android.os.Bundle;
+import android.os.Handler;
 import android.support.v4.content.ContextCompat;
 
 import java.util.ArrayList;
@@ -60,6 +61,18 @@ public class PositionProvider extends DataProvider implements LocationListener{
         double speed = calculateSpeed(location);
 
         callback.onLocationData(location.getLatitude(), location.getLongitude(), speed);
+        startTimeout();
+    }
+
+    private void startTimeout() {
+        Handler h = new Handler();
+        h.postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                if(System.currentTimeMillis() - lastTimestamp > 10000)
+                    callback.onLocationData(0, 0, -1);
+            }
+        }, 10);
     }
 
     private double calculateSpeed(Location location) {
@@ -105,6 +118,7 @@ public class PositionProvider extends DataProvider implements LocationListener{
     public void onProviderDisabled(String provider) {
 
     }
+
 
 
 }

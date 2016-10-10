@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
 
-    <integer name="accelerometer_delay_default">60000</integer>
+    <integer name="accelerometer_delay_default">20000</integer>
 
-    <integer name="rotation_delay_default">60000</integer>
+    <integer name="rotation_delay_default">20000</integer>
 
     <integer name="light_delay_default">200000</integer>
 

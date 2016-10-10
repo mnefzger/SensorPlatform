@@ -58,7 +58,7 @@ public class TripEndDetector {
     }
 
     private void checkInSpeed(DataVector dv) {
-        if(dv.speed < 1) {
+        if(dv.speed < 1 && dv.speed >= 0) {
             if(!counting) {
                 firstStop = dv.timestamp;
                 counting = true;

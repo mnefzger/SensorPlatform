@@ -62,6 +62,16 @@ public class MathFunctions {
         return result;
     }
 
+    public static double[] getEMA(double[] current, double[] prev, double alpha) {
+        double[] result = new double[current.length];
+
+        for(int dim = 0; dim < current.length; dim++) {
+            result[dim] = alpha*current[dim] + (1-alpha)*prev[dim];
+        }
+
+        return result;
+    }
+
     /**
      * Returns the Euler representation of a quaternion rotation vector
      * @param values

@@ -1,6 +1,7 @@
 package mnefzger.de.sensorplatform;
 
 
+import android.app.ActivityManager;
 import android.app.Service;
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
@@ -23,11 +24,16 @@ import android.view.View;
 import android.view.WindowManager;
 import android.widget.LinearLayout;
 
+import com.google.gson.Gson;
+
 import java.io.IOException;
 import java.io.OutputStream;
+import java.util.List;
 
 import mnefzger.de.sensorplatformshared.BluetoothListener;
 import mnefzger.de.sensorplatformshared.InteractionEvents;
+import mnefzger.de.sensorplatformshared.InteractionObject;
+import mnefzger.de.sensorplatformshared.UStats;
 
 
 public class PhoneInteractionService extends Service implements View.OnTouchListener {
@@ -116,8 +122,18 @@ public class PhoneInteractionService extends Service implements View.OnTouchList
 
     @Override
     public boolean onTouch(View view, MotionEvent motionEvent) {
-        Log.d(TAG, "Touched!");
-        sendDataToPairedDevice(InteractionEvents.TOUCH);
+        String app = null;
+
+        if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.M ) {
+            app = UStats.getForegroundApp(getApplicationContext());
+        } else {
+            final ActivityManager activityManager = (ActivityManager) getSystemService(Context.ACTIVITY_SERVICE);
+            final List<ActivityManager.RunningTaskInfo> recentTasks = activityManager.getRunningTasks(Integer.MAX_VALUE);
+            app = recentTasks.get(0).baseActivity.toShortString();
+        }
+
+        Log.d(TAG, "Touched! " + app);
+        sendDataToPairedDevice(InteractionEvents.TOUCH, app);
         return false;
     }
 
@@ -146,7 +162,7 @@ public class PhoneInteractionService extends Service implements View.OnTouchList
             String temp = intent.getStringExtra("notification_event");
             Log.d(TAG, temp);
 
-            sendDataToPairedDevice(InteractionEvents.NOTIFICATION);
+            sendDataToPairedDevice(InteractionEvents.NOTIFICATION, null);
         }
     }
 
@@ -155,7 +171,7 @@ public class PhoneInteractionService extends Service implements View.OnTouchList
         public void onReceive(Context context, Intent intent) {
             if (intent.getAction().equals(Intent.ACTION_SCREEN_ON)) {
                 Log.d(TAG, Intent.ACTION_SCREEN_ON);
-                sendDataToPairedDevice(InteractionEvents.SCREEN_ON);
+                sendDataToPairedDevice(InteractionEvents.SCREEN_ON, null);
             }
         }
     }
@@ -176,7 +192,7 @@ public class PhoneInteractionService extends Service implements View.OnTouchList
         }
     }
 
-    public void sendDataToPairedDevice(String message){
+    public void sendDataToPairedDevice(String message, String extra){
         if( socket == null && BluetoothConnection.socket != null ) {
             Log.d("BluetoothSend", "First time assignment");
             socket = BluetoothConnection.socket;
@@ -191,7 +207,11 @@ public class PhoneInteractionService extends Service implements View.OnTouchList
             return;
         }
 
-        byte[] toSend = message.getBytes();
+        // TODO add extra
+        InteractionObject obj = new InteractionObject(message, extra);
+        String json = new Gson().toJson(obj);
+
+        byte[] toSend = json.getBytes();
         try {
             Log.d("OutStream? ", socket + "");
             OutputStream mmOutStream = socket.getOutputStream();
@@ -199,10 +219,11 @@ public class PhoneInteractionService extends Service implements View.OnTouchList
             Log.d("Sent to: ", socket.getRemoteDevice().getName() + ", " + message);
         } catch (IOException e) {
             Log.e("BluetoothSend", "Exception during write", e);
+            if(e.getMessage().contains("Broken pipe"))
+                reconnect();
         }
 
     }
-
 
 
     private void reconnect() {

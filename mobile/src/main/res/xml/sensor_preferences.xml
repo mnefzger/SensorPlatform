@@ -25,12 +25,12 @@
         <CheckBoxPreference
             android:key="front_active"
             android:title="Front Camera"
-            android:summary="Activates video capture with the front camera"
+            android:summary="Activates video capture with the phone's front camera"
             android:defaultValue="true"/>
         <CheckBoxPreference
             android:key="back_active"
             android:title="Back Camera"
-            android:summary="Activates video capture with the back camera"
+            android:summary="Activates video capture with the phone's back camera"
             android:defaultValue="true"/>
         <CheckBoxPreference
             android:key="weather_active"
@@ -43,7 +43,7 @@
         <CheckBoxPreference
             android:key="heartRate_raw"
             android:title="Heart Rate"
-            android:summary="Activate a connected Android Wear device to collect heart rate"
+            android:summary="Activate heart rate logging from a connected Android Wear watch."
             android:defaultValue="false"/>
         <CheckBoxPreference
             android:key="obd_raw"

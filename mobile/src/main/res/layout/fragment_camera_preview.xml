@@ -14,12 +14,15 @@
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Please mount the phone on the dashboard."
+            android:text="Please mount the phone on the dashboard.\nThe back camera must point at the road ahead, the front camera at the driver."
             android:id="@+id/textView6"
             android:textColor="#fff"
             android:textSize="22sp"
+            android:layout_marginTop="75dp"
             android:layout_gravity="center_horizontal"
-            android:layout_marginTop="75dp" />
+            android:gravity="center_horizontal"
+            android:layout_marginStart="40dp"
+            android:layout_marginEnd="40dp" />
 
         <Button
             android:text="Rotate 180°"

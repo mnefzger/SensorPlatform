@@ -36,8 +36,8 @@ public class DrivingBehaviourProcessor extends EventProcessor implements IOSMRes
     private enum DIRECTION {FORWARD, BACKWARD, UNDEFINED};
     private DIRECTION currentDirection = DIRECTION.UNDEFINED;
 
-    private double ACC_THRESHOLD_NORMAL, ACC_THRESHOLD_RISKY, ACC_THRESHOLD_DANGEROUS;
-    private double TURN_THRESHOLD_NORMAL, TURN_THRESHOLD_RISKY, TURN_THRESHOLD_DANGEROUS;
+    private double ACC_THRESHOLD_LOW, ACC_THRESHOLD_MEDIUM, ACC_THRESHOLD_HIGH;
+    private double TURN_THRESHOLD_LOW, TURN_THRESHOLD_MEDIUM, TURN_THRESHOLD_HIGH;
     private int OSM_REQUEST_RATE;
 
     private int rawDataDelay;
@@ -49,13 +49,13 @@ public class DrivingBehaviourProcessor extends EventProcessor implements IOSMRes
         setting_prefs = a.getSharedPreferences(a.getString(R.string.settings_preferences_key), Context.MODE_PRIVATE);
         sensor_prefs = a.getSharedPreferences(a.getString(R.string.sensor_preferences_key), Context.MODE_PRIVATE);
 
-        ACC_THRESHOLD_NORMAL = Preferences.getNormalAccelerometerThreshold(setting_prefs);
-        ACC_THRESHOLD_RISKY = Preferences.getRiskyAccelerometerThreshold(setting_prefs);
-        ACC_THRESHOLD_DANGEROUS= Preferences.getDangerousAccelerometerThreshold(setting_prefs);
+        ACC_THRESHOLD_LOW = Preferences.getNormalAccelerometerThreshold(setting_prefs);
+        ACC_THRESHOLD_MEDIUM = Preferences.getRiskyAccelerometerThreshold(setting_prefs);
+        ACC_THRESHOLD_HIGH = Preferences.getDangerousAccelerometerThreshold(setting_prefs);
 
-        TURN_THRESHOLD_NORMAL = Preferences.getNormalTurnThreshold(setting_prefs);
-        TURN_THRESHOLD_RISKY = Preferences.getRiskyTurnThreshold(setting_prefs);
-        TURN_THRESHOLD_DANGEROUS = Preferences.getDangerousTurnThreshold(setting_prefs);
+        TURN_THRESHOLD_LOW = Preferences.getNormalTurnThreshold(setting_prefs);
+        TURN_THRESHOLD_MEDIUM = Preferences.getRiskyTurnThreshold(setting_prefs);
+        TURN_THRESHOLD_HIGH = Preferences.getDangerousTurnThreshold(setting_prefs);
 
         OSM_REQUEST_RATE = Preferences.getOSMRequestRate(setting_prefs);
 
@@ -70,7 +70,7 @@ public class DrivingBehaviourProcessor extends EventProcessor implements IOSMRes
             currentVector = data.get(data.size()-1);
             previousVector = data.get(data.size()-2);
 
-            int no_of_items = 3000/rawDataDelay;
+            int no_of_items = 2000/rawDataDelay;
             // minimum of 3 items
             //no_of_items = no_of_items >= 3 ? no_of_items : 3;
 
@@ -102,12 +102,12 @@ public class DrivingBehaviourProcessor extends EventProcessor implements IOSMRes
             if(Math.abs(accelerationZ) > max_abs) {
                 max_abs = Math.abs(accelerationZ);
                 time = next.timestamp;
-                //max = accelerationZ;
+                max = accelerationZ;
             }
         }
 
-        //double avg = max;
-        double avg = MathFunctions.getAccEMASingle(acc, 2/(acc.size()+1) );
+        double avg = max;
+        //double avg = MathFunctions.getAccEMASingle(acc, 2/(acc.size()+1) );
         //double avg = MathFunctions.getAccEMASingle(acc, 1);
 
         // we already looked at this data or last detected was not long ago
@@ -115,34 +115,34 @@ public class DrivingBehaviourProcessor extends EventProcessor implements IOSMRes
             return;
 
         if(avg > 0) {
-            if(avg > ACC_THRESHOLD_DANGEROUS) {
+            if(avg > ACC_THRESHOLD_HIGH) {
                 EventVector ev = new EventVector(EventVector.LEVEL.HIGH_RISK, time, "Brake", avg/9.81);
                 lastAccDetected = time;
                 callback.onEventDetected(ev);
 
-            } else if(avg > ACC_THRESHOLD_RISKY) {
+            } else if(avg > ACC_THRESHOLD_MEDIUM) {
                 EventVector ev = new EventVector(EventVector.LEVEL.MEDIUM_RISK, time, "Brake", avg/9.81);
                 lastAccDetected = time;
                 callback.onEventDetected(ev);
 
-            } else if(avg > ACC_THRESHOLD_NORMAL) {
+            } else if(avg > ACC_THRESHOLD_LOW) {
                 EventVector ev = new EventVector(EventVector.LEVEL.LOW_RISK, time, "Brake", avg/9.81);
                 lastAccDetected = time;
                 callback.onEventDetected(ev);
 
             }
         } else {
-            if(avg < -ACC_THRESHOLD_DANGEROUS) {
+            if(avg < -ACC_THRESHOLD_HIGH) {
                 EventVector ev = new EventVector(EventVector.LEVEL.HIGH_RISK, time, "Acceleration", avg/9.81);
                 lastAccDetected = time;
                 callback.onEventDetected(ev);
 
-            } else if(avg < -ACC_THRESHOLD_RISKY) {
+            } else if(avg < -ACC_THRESHOLD_MEDIUM) {
                 EventVector ev = new EventVector(EventVector.LEVEL.MEDIUM_RISK, time, "Acceleration", avg/9.81);
                 lastAccDetected = time;
                 callback.onEventDetected(ev);
 
-            } else if(avg < -ACC_THRESHOLD_NORMAL) {
+            } else if(avg < -ACC_THRESHOLD_LOW) {
                 EventVector ev = new EventVector(EventVector.LEVEL.LOW_RISK, time, "Acceleration", avg/9.81);
                 lastAccDetected = time;
                 callback.onEventDetected(ev);
@@ -210,7 +210,7 @@ public class DrivingBehaviourProcessor extends EventProcessor implements IOSMRes
          * Did the data include a turn?
          */
 
-        if(leftDelta <= -TURN_THRESHOLD_DANGEROUS) {
+        if(leftDelta <= -TURN_THRESHOLD_HIGH) {
             EventVector ev;
             if(Preferences.isReverseOrientation(setting_prefs)) {
                 ev = new EventVector(EventVector.LEVEL.HIGH_RISK, time, "Left Turn", leftDelta);
@@ -218,7 +218,7 @@ public class DrivingBehaviourProcessor extends EventProcessor implements IOSMRes
                 ev = new EventVector(EventVector.LEVEL.HIGH_RISK, time, "Right Turn", leftDelta);
             }
             callback.onEventDetected(ev);
-        } else if(leftDelta <= -TURN_THRESHOLD_RISKY) {
+        } else if(leftDelta <= -TURN_THRESHOLD_MEDIUM) {
             EventVector ev;
             if(Preferences.isReverseOrientation(setting_prefs)) {
                 ev = new EventVector(EventVector.LEVEL.MEDIUM_RISK, time, "Left Turn", leftDelta);
@@ -226,7 +226,7 @@ public class DrivingBehaviourProcessor extends EventProcessor implements IOSMRes
                 ev = new EventVector(EventVector.LEVEL.MEDIUM_RISK, time, "Right Turn", leftDelta);
             }
             callback.onEventDetected(ev);
-        } else if(leftDelta <= -TURN_THRESHOLD_NORMAL) {
+        } else if(leftDelta <= -TURN_THRESHOLD_LOW) {
             EventVector ev;
             if(Preferences.isReverseOrientation(setting_prefs)) {
                 ev = new EventVector(EventVector.LEVEL.LOW_RISK, time, "Left Turn", leftDelta);
@@ -236,7 +236,7 @@ public class DrivingBehaviourProcessor extends EventProcessor implements IOSMRes
             callback.onEventDetected(ev);
         }
 
-        if(rightDelta >= TURN_THRESHOLD_DANGEROUS) {
+        if(rightDelta >= TURN_THRESHOLD_HIGH) {
             EventVector ev;
             if(Preferences.isReverseOrientation(setting_prefs)) {
                 ev = new EventVector(EventVector.LEVEL.HIGH_RISK, time, "Right Turn", rightDelta);
@@ -244,7 +244,7 @@ public class DrivingBehaviourProcessor extends EventProcessor implements IOSMRes
                 ev = new EventVector(EventVector.LEVEL.HIGH_RISK, time, "Left Turn", rightDelta);
             }
             callback.onEventDetected(ev);
-        } else if(rightDelta >= TURN_THRESHOLD_RISKY) {
+        } else if(rightDelta >= TURN_THRESHOLD_MEDIUM) {
             EventVector ev;
             if(Preferences.isReverseOrientation(setting_prefs)) {
                 ev = new EventVector(EventVector.LEVEL.MEDIUM_RISK, time, "Right Turn", rightDelta);
@@ -252,7 +252,7 @@ public class DrivingBehaviourProcessor extends EventProcessor implements IOSMRes
                 ev = new EventVector(EventVector.LEVEL.MEDIUM_RISK, time, "Left Turn", rightDelta);
             }
             callback.onEventDetected(ev);
-        } else if(rightDelta >= TURN_THRESHOLD_NORMAL) {
+        } else if(rightDelta >= TURN_THRESHOLD_LOW) {
             EventVector ev;
             if(Preferences.isReverseOrientation(setting_prefs)) {
                 ev = new EventVector(EventVector.LEVEL.LOW_RISK, time, "Right Turn", rightDelta);
@@ -268,7 +268,7 @@ public class DrivingBehaviourProcessor extends EventProcessor implements IOSMRes
          * Did the data include a any turn (safe OR sharp)?
          * If so, request new information on road and speed limits
          */
-        if(leftDelta <= -TURN_THRESHOLD_NORMAL || rightDelta >= TURN_THRESHOLD_NORMAL) {
+        if(leftDelta <= -TURN_THRESHOLD_LOW || rightDelta >= TURN_THRESHOLD_LOW) {
             turned = true;
             lastTurn = System.currentTimeMillis();
             checkForSpeedingInstant(currentVector);

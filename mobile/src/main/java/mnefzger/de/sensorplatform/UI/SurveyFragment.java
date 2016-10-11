@@ -2,6 +2,7 @@ package mnefzger.de.sensorplatform.UI;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -128,10 +129,16 @@ public class SurveyFragment extends Fragment {
 
     private void loadSurvey() {
         String surveyJson = loadJSONFromFile("survey.json");
-        if(surveyJson != "")
+        if( !surveyJson.equals("") && surveyJson != null)
             this.survey = new Gson().fromJson(surveyJson, SurveyModel.class);
-        else
+        else {
+            Toast t = new Toast(getActivity());
+            t.setText("Could not load survey.");
+            t.setDuration(Toast.LENGTH_SHORT);
+            t.show();
             leaveSurvey();
+        }
+
 
     }
 

@@ -12,6 +12,8 @@ import android.os.Handler;
 import android.os.Message;
 import android.util.Log;
 
+import com.google.gson.Gson;
+
 import java.io.IOException;
 import java.io.OutputStream;
 import java.util.UUID;
@@ -20,6 +22,7 @@ import mnefzger.de.sensorplatform.Core.EventVector;
 import mnefzger.de.sensorplatform.Core.IEventCallback;
 import mnefzger.de.sensorplatformshared.BluetoothListener;
 import mnefzger.de.sensorplatformshared.InteractionEvents;
+import mnefzger.de.sensorplatformshared.InteractionObject;
 
 public class UserPhoneBluetoothServer {
 
@@ -159,16 +162,20 @@ public class UserPhoneBluetoothServer {
 
         private void processMessage(String m){
             Log.d("BLUETOOTH_SERVER", "Received: " +  m);
+            InteractionObject obj = new Gson().fromJson(m, InteractionObject.class);
             String description = "";
-            switch (m) {
+            switch (obj.message) {
                 case InteractionEvents.TOUCH:
-                    description = m;
+                    description = obj.message;
+                    String application = obj.extra.split("/")[0];
+                    application = application.substring(1);
+                    description += ", " + application;
                     break;
                 case InteractionEvents.NOTIFICATION:
-                    description = m;
+                    description = obj.message;
                     break;
                 case InteractionEvents.SCREEN_ON:
-                    description = m;
+                    description = obj.message;
                     break;
                 default:
                     break;

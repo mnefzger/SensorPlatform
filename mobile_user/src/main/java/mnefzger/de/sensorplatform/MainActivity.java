@@ -80,11 +80,11 @@ public class MainActivity extends AppCompatActivity {
 
     private void requestNotifications() {
         if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.M && !Settings.canDrawOverlays(this)) {
-            Intent overlay_p=new Intent("android.settings.ACTION_MANAGE_OVERLAY_PERMISSION");
+            Intent overlay_p=new Intent(Settings.ACTION_MANAGE_OVERLAY_PERMISSION);
             startActivityForResult(overlay_p,1337);
         } else {
             Intent notifications_p=new Intent("android.settings.ACTION_NOTIFICATION_LISTENER_SETTINGS");
-            startActivityForResult(notifications_p, 1338);
+            startActivityForResult(notifications_p, 1339);
             setup();
         }
     }
@@ -92,11 +92,18 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         if (requestCode == 1337) {
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M && Settings.canDrawOverlays(this)) {
-                Intent notifications_p=new Intent("android.settings.ACTION_NOTIFICATION_LISTENER_SETTINGS");
-                startActivityForResult(notifications_p, 1338);
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M ) {
+                Intent ustats = new Intent(Settings.ACTION_USAGE_ACCESS_SETTINGS);
+                startActivityForResult(ustats, 1338);
             }
+
         } else if(requestCode == 1338) {
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M && Settings.canDrawOverlays(this)) {
+                Intent notifications_p=new Intent(Settings.ACTION_NOTIFICATION_LISTENER_SETTINGS);
+                startActivityForResult(notifications_p, 1339);
+            }
+
+        } else if(requestCode == 1339) {
             firstLayout.setVisibility(View.INVISIBLE);
             setupLayout.setVisibility(View.VISIBLE);
             next.setVisibility(View.INVISIBLE);

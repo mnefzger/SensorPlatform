@@ -3,6 +3,7 @@ package mnefzger.de.sensorplatform.Logger;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.os.Environment;
+import android.os.StatFs;
 import android.util.Log;
 
 import com.opencsv.CSVWriter;
@@ -21,20 +22,21 @@ import mnefzger.de.sensorplatform.R;
 
 public class LoggingModule {
 
-    String baseDir = android.os.Environment.getExternalStorageDirectory().getAbsolutePath();
-    String filePath = baseDir + "/SensorPlatform/logs";
+    private String baseDir = android.os.Environment.getExternalStorageDirectory().getAbsolutePath();
+    private String filePath = baseDir + "/SensorPlatform/logs";
 
-    String fileNameRaw = "RawData_";
-    String fileNameEvent = "EventData_";
-    String fileNameSurvey = "SurveyAnswers";
+    private String fileNameRaw = "RawData_";
+    private String fileNameEvent = "EventData_";
+    private String fileNameSurvey = "SurveyAnswers";
 
-    File rawFile;
-    File eventFile;
-    File surveyFile;
+    private File rawFile;
+    private File eventFile;
+    private File surveyFile;
 
-    String tripID;
+    private String tripID;
+    private int counter;
 
-    static LoggingModule instance;
+    private static LoggingModule instance;
 
     public static LoggingModule getInstance() {
         if(instance == null) {
@@ -59,6 +61,11 @@ public class LoggingModule {
     public void createNewTripFileSet() {
         createNewRawFile(fileNameRaw + tripID + ".csv");
         createNewEventFile(fileNameEvent + tripID + ".csv");
+
+        long space = getAvailableInternalMemorySize();
+        if(space < 1000) {
+            // TODO, less than 1 gb of free space, create warning
+        }
     }
 
     private void createNewRawFile(String name) {
@@ -165,6 +172,14 @@ public class LoggingModule {
         return false;
     }
 
+    private static long getAvailableInternalMemorySize() {
+        StatFs stat = new StatFs(Environment.getExternalStorageDirectory().getPath());
+        long bytesAvailable = stat.getBlockSizeLong() * stat.getAvailableBlocksLong();
+        long megAvailable = bytesAvailable / 1048576;
+        System.out.println("Megs :"+megAvailable);
+
+        return megAvailable;
+    }
 
 
 }

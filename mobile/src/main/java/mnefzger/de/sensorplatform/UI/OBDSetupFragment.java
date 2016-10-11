@@ -105,7 +105,7 @@ public class OBDSetupFragment extends Fragment {
                 app.registerReceiver(mReceiver, filter);
                 receiverRegistered = true;
 
-                if(app != null)
+                if(app.getService() != null)
                     app.getService().initiateOBDConnection();
             } else {
                 editor.putBoolean("obd_raw", false);

@@ -10,6 +10,8 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.content.pm.PackageInfo;
+import android.content.pm.PackageManager;
 import android.graphics.PixelFormat;
 import android.os.Build;
 import android.os.Handler;
@@ -122,18 +124,26 @@ public class PhoneInteractionService extends Service implements View.OnTouchList
 
     @Override
     public boolean onTouch(View view, MotionEvent motionEvent) {
-        String app = null;
+        String foregroundTaskAppName = null;
 
-        if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.M ) {
-            app = UStats.getForegroundApp(getApplicationContext());
+        if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP ) {
+            foregroundTaskAppName = UStats.getForegroundApp(getApplicationContext());
         } else {
             final ActivityManager activityManager = (ActivityManager) getSystemService(Context.ACTIVITY_SERVICE);
             final List<ActivityManager.RunningTaskInfo> recentTasks = activityManager.getRunningTasks(Integer.MAX_VALUE);
-            app = recentTasks.get(0).baseActivity.toShortString();
+            String app = recentTasks.get(0).topActivity.getPackageName();
+            PackageManager pm = PhoneInteractionService.this.getPackageManager();
+            try {
+                PackageInfo foregroundAppPackageInfo = pm.getPackageInfo(app, 0);
+                foregroundTaskAppName = foregroundAppPackageInfo.applicationInfo.loadLabel(pm).toString();
+            } catch (Exception e) {
+
+            }
+
         }
 
-        Log.d(TAG, "Touched! " + app);
-        sendDataToPairedDevice(InteractionEvents.TOUCH, app);
+        Log.d(TAG, "Touched! " + foregroundTaskAppName);
+        sendDataToPairedDevice(InteractionEvents.TOUCH, foregroundTaskAppName);
         return false;
     }
 
@@ -207,7 +217,6 @@ public class PhoneInteractionService extends Service implements View.OnTouchList
             return;
         }
 
-        // TODO add extra
         InteractionObject obj = new InteractionObject(message, extra);
         String json = new Gson().toJson(obj);
 
@@ -219,8 +228,10 @@ public class PhoneInteractionService extends Service implements View.OnTouchList
             Log.d("Sent to: ", socket.getRemoteDevice().getName() + ", " + message);
         } catch (IOException e) {
             Log.e("BluetoothSend", "Exception during write", e);
-            if(e.getMessage().contains("Broken pipe"))
-                reconnect();
+            if(e.getMessage().contains("Broken pipe")) {
+                if(deviceAddress != null)
+                    reconnect();
+            }
         }
 
     }

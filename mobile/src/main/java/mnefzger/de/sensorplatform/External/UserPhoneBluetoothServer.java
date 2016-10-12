@@ -167,9 +167,10 @@ public class UserPhoneBluetoothServer {
             switch (obj.message) {
                 case InteractionEvents.TOUCH:
                     description = obj.message;
-                    String application = obj.extra.split("/")[0];
-                    application = application.substring(1);
-                    description += ", " + application;
+                    if(obj.extra != null) {
+                        String application = obj.extra.split("/")[0];
+                        description += ", " + application;
+                    }
                     break;
                 case InteractionEvents.NOTIFICATION:
                     description = obj.message;

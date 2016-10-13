@@ -2,16 +2,18 @@ package mnefzger.de.sensorplatform.Core;
 
 import android.Manifest;
 import android.app.Activity;
+import android.app.AlertDialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
+import android.graphics.Camera;
 import android.graphics.ImageFormat;
 import android.graphics.Rect;
 import android.graphics.YuvImage;
 import android.hardware.camera2.CameraAccessException;
 import android.hardware.camera2.CameraCaptureSession;
+import android.hardware.camera2.CameraCharacteristics;
 import android.hardware.camera2.CameraDevice;
 import android.hardware.camera2.CameraManager;
 import android.hardware.camera2.CaptureRequest;
@@ -101,6 +103,31 @@ public class ImageModule implements IEventCallback{
         setPrefs();
 
         h = new Handler();
+
+        try{
+            CameraCharacteristics cc_b = cameraManager.getCameraCharacteristics("0");
+            CameraCharacteristics cc_f = cameraManager.getCameraCharacteristics("1");
+            int level_b = cc_b.get(CameraCharacteristics.INFO_SUPPORTED_HARDWARE_LEVEL);
+            int level_f = cc_f.get(CameraCharacteristics.INFO_SUPPORTED_HARDWARE_LEVEL);
+            Log.d("CAMERA", "LEVEL FRONT: " + level_f  + ", LEVEL BACK: " + level_b);
+            if (level_f == CameraCharacteristics.INFO_SUPPORTED_HARDWARE_LEVEL_LEGACY ||
+                    level_b == CameraCharacteristics.INFO_SUPPORTED_HARDWARE_LEVEL_LEGACY) {
+                new AlertDialog.Builder(context)
+                        .setTitle("Camera Support")
+                        .setMessage("Your smartphone camera does not support all features.")
+                        .setPositiveButton(android.R.string.ok, new DialogInterface.OnClickListener() {
+                            public void onClick(DialogInterface dialog, int which) {
+                                // continue with delete
+                            }
+                        })
+                        .setIcon(android.R.drawable.ic_dialog_alert)
+                        .show();
+            }
+        } catch (CameraAccessException e) {
+            Log.e("CAMERA", "Cannot access camera");
+            e.printStackTrace();
+        }
+
     }
 
     private void setPrefs() {
@@ -156,12 +183,12 @@ public class ImageModule implements IEventCallback{
             int permission = ActivityCompat.checkSelfPermission(context, Manifest.permission.CAMERA);
             if(permission == PackageManager.PERMISSION_GRANTED) {
                 if(id.equals("0")) {
-                    imageReader_back = ImageReader.newInstance(RES_H, RES_W, ImageFormat.YUV_420_888, 15);
+                    imageReader_back = ImageReader.newInstance(RES_W, RES_H, ImageFormat.YUV_420_888, 15);
                     imageReader_back.setOnImageAvailableListener(onBackImageAvailableListener, mBackgroundHandler);
                     cameraManager.openCamera(id, backCameraStateCallback, null );
                 }
                 if(id.equals("1")) {
-                    imageReader_front = ImageReader.newInstance(RES_H, RES_W, ImageFormat.YUV_420_888, 15);
+                    imageReader_front = ImageReader.newInstance(RES_W, RES_H, ImageFormat.YUV_420_888, 15);
                     imageReader_front.setOnImageAvailableListener(onFrontImageAvailableListener, mBackgroundHandler);
                     cameraManager.openCamera(id, frontCameraStateCallback, null );
                 }
@@ -305,7 +332,7 @@ public class ImageModule implements IEventCallback{
     private int frontIt = 0;
     private void handleImageFront(Image i) {
         double now = System.currentTimeMillis();
-
+        //Log.d("IMAGE FORMAT", i.getFormat()+"");
         if(i != null) {
             final byte[] bytes = getBytes(i);
             final int w = i.getWidth();
@@ -324,9 +351,9 @@ public class ImageModule implements IEventCallback{
                         imgProc.processImageFront(bytes, w, h);
                     }
                 });
-                //byte[] processedImg = imgProc.processImage(bytes, img.getWidth(), img.getHeight());
-                //yuvimage = new YuvImage(processedImg, ImageFormat.NV21, img.getWidth(), img.getHeight(), null);
-                //mBackgroundHandler.post( new ImageSaver(yuvimage, "front") );
+                /*byte[] processedImg = imgProc.processImageFront(bytes, img.getWidth(), img.getHeight());
+                yuvimage = new YuvImage(processedImg, ImageFormat.NV21, img.getWidth(), img.getHeight(), null);
+                mBackgroundHandler.post( new ImageSaver(yuvimage, "front") ); */
                 lastFrontProc = now;
             }
 
@@ -361,7 +388,7 @@ public class ImageModule implements IEventCallback{
             final int w = i.getWidth();
             final int h = i.getHeight();
             i.close();
-            //YuvImage yuvimage = new YuvImage(bytes, ImageFormat.NV21, w, h, null);
+            final YuvImage yuvimage;
 
             /**
              * Decide if frame is to be processed or not
@@ -375,9 +402,9 @@ public class ImageModule implements IEventCallback{
                     }
                 });
                 /*byte[] processedImg = imgProc.processImageBack(bytes.clone(), w, h);
-                  yuvimage = new YuvImage(processedImg, ImageFormat.NV21, 320, 240, null);
-                  mBackgroundHandler.post( new ImageSaver(yuvimage, "back") );*/
-                  lastBackProc = now;
+                yuvimage = new YuvImage(processedImg, ImageFormat.NV21, 320, 240, null);
+                mBackgroundHandler.post( new ImageSaver(yuvimage, "back") );*/
+                lastBackProc = now;
             }
 
             double latestFPS = 1000 / (now - lastBack);
@@ -391,7 +418,6 @@ public class ImageModule implements IEventCallback{
             backImagesCV.put(backIt, bytes);
             backIt++;
             lastBack = now;
-
 
             /**
              * Only store the last ten seconds in the image buffer, 30 FPS
@@ -485,12 +511,12 @@ public class ImageModule implements IEventCallback{
                         double start = System.currentTimeMillis();
                         for (int i = 0; i < images.size(); i++) {
                             byte[] image = images.get(i);
+                            Log.d("IMAGE LENGTH", image.length + "");
                             Mat imgMat = new Mat(h + h/2, w, CvType.CV_8UC1);
                             imgMat.put(0,0,image);
-                            Mat gray = new Mat(imgMat.height(), imgMat.width(), imgMat.depth());
-                            Imgproc.cvtColor(imgMat, gray, Imgproc.COLOR_YUV2GRAY_I420);
+
                             Mat rgbMat = new Mat(h,w,CvType.CV_8UC3);
-                            Imgproc.cvtColor(gray, rgbMat, Imgproc.COLOR_GRAY2RGB);
+                            Imgproc.cvtColor(imgMat, rgbMat, Imgproc.COLOR_YUV2RGB_NV12);
 
                             // rotate the image 180 degrees if phone orientation requires it
                             if( (mode.equals("back") && reverseOrientation) ||
@@ -499,7 +525,6 @@ public class ImageModule implements IEventCallback{
 
                             videoWriter.write(rgbMat);
                             rgbMat.release();
-                            gray.release();
                             imgMat.release();
                             Log.d("VIDEO", "save image " + rgbMat);
                         }

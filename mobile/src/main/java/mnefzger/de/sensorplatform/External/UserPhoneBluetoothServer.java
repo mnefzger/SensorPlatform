@@ -37,6 +37,8 @@ public class UserPhoneBluetoothServer {
 
     private IEventCallback callback;
 
+    private BluetoothDevice phone;
+
     public UserPhoneBluetoothServer(IEventCallback callback, Context c) {
         this.callback = callback;
         this.c = c;
@@ -84,9 +86,12 @@ public class UserPhoneBluetoothServer {
             final BluetoothDevice device = intent.getParcelableExtra( BluetoothDevice.EXTRA_DEVICE );
             Log.d("Bluetooth", intent.getAction());
             if (intent.getAction().equals(BluetoothDevice.ACTION_ACL_DISCONNECTED)) {
-                Log.d("Bluetooth", "Disconnect detected, start new accept thread.");
-                AcceptThread acceptThread = new AcceptThread();
-                acceptThread.start();
+                if(device.equals(phone)) {
+                    Log.d("Bluetooth", "Disconnect detected, start new accept thread.");
+                    AcceptThread acceptThread = new AcceptThread();
+                    acceptThread.start();
+                }
+
             }
         }
     }
@@ -148,6 +153,7 @@ public class UserPhoneBluetoothServer {
             c.sendBroadcast(new Intent("PHONE_CONNECTED"));
             BluetoothListener listener = new BluetoothListener();
             listener.listen(socket, handler);
+            phone = socket.getRemoteDevice();
         }
 
         private final Handler handler = new Handler() {

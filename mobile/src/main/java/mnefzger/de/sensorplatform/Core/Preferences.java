@@ -5,6 +5,7 @@ import android.content.SharedPreferences;
 import android.content.pm.ActivityInfo;
 import android.util.Log;
 
+import java.util.HashSet;
 import java.util.Set;
 
 import mnefzger.de.sensorplatform.R;
@@ -552,7 +553,10 @@ public class Preferences {
     }
 
     public static int[] getLogLevel(SharedPreferences prefs) {
-        Set<String> valueString = prefs.getStringSet(LOG_LEVEL, null);
+        Set<String> def = new HashSet<String>();
+        def.add(EventVector.LEVEL.ALL.toString());
+
+        Set<String> valueString = prefs.getStringSet(LOG_LEVEL, def);
         String[] a = valueString.toArray(new String[] {});
 
         int[] value = new int[a.length];

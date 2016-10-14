@@ -205,7 +205,7 @@ public class Preferences {
      * ACCELEROMETER
      */
     public static int getAccelerometerDelay(SharedPreferences prefs) {
-        String valueString = prefs.getString(FREQUENCY_ACCELEROMETER, "60000");
+        String valueString = prefs.getString(FREQUENCY_ACCELEROMETER, "20000");
 
         int value = context.getResources().getInteger(R.integer.accelerometer_delay_default);
 

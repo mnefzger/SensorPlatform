@@ -106,16 +106,16 @@ public class ImageProcessor{
     }
 
     private void detectFace(Mat imgMat, Mat output) {
-        // the native code writes the processing results to the output adress
+        // the native code writes the processing results to the output address
         int[] faces = findFaceInImage(imgMat.getNativeObjAddr(), output.getNativeObjAddr());
     }
 
     private void detectCars(Mat imgMat, Mat output) {
-        // the native code writes the processing results to the output adress
+        // the native code writes the processing results to the output address
         int[] cars = findCarsInImage(imgMat.getNativeObjAddr(), output.getNativeObjAddr());
     }
 
-    long lastFaceDetect = System.currentTimeMillis();
+    long lastFaceDetect = -1;
     private int[] findFaceInImage(long adress1, long adress2) {
         double time = System.currentTimeMillis();
         int[] faces = nAsmFindFace(adress1, adress2, flip_front);
@@ -126,6 +126,9 @@ public class ImageProcessor{
             lastFaceDetect = System.currentTimeMillis();
         } else {
             callback.onEventDetected(new EventVector(EventVector.LEVEL.DEBUG, System.currentTimeMillis(), "No Face detected", 0));
+
+            if(lastFaceDetect == -1)
+                lastFaceDetect = System.currentTimeMillis();
 
             long distractionTime = System.currentTimeMillis()-lastFaceDetect;
             if(distractionTime > 3000)

@@ -10,7 +10,7 @@
         <CheckBoxPreference
             android:key="location_raw"
             android:title="Location Data (GPS)"
-            android:summary="Activates data collection of the vehicle location. Event detection: speeding (requires internet connection)"
+            android:summary="Activates data collection of the vehicle location"
             android:defaultValue="true"/>
         <CheckBoxPreference
             android:key="rotation_raw"
@@ -33,13 +33,20 @@
             android:summary="Activates video capture with the phone's back camera"
             android:defaultValue="true"/>
         <CheckBoxPreference
+            android:key="map_active"
+            android:title="Open Street Map Data"
+            android:summary="Activates queries to OpenStreetMap to detect speeding. Requires internet connection"
+            android:defaultValue="true"
+            android:dependency="location_raw"/>
+        <CheckBoxPreference
             android:key="weather_active"
             android:title="Weather Conditions"
             android:summary="Activates updates on the current weather conditions. Requires internet connection"
-            android:defaultValue="true"/>
+            android:defaultValue="true"
+            android:dependency="location_raw"/>
     </PreferenceCategory>
 
-    <PreferenceCategory android:title="External Sensor">
+    <PreferenceCategory android:title="External Sensors">
         <CheckBoxPreference
             android:key="heartRate_raw"
             android:title="Heart Rate"

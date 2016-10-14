@@ -34,6 +34,8 @@ public class Preferences {
 
     public static final String BACK_CAMERA = "back_active";
 
+    public static final String OSM = "map_active";
+
     public static final String WEATHER = "weather_active";
 
 
@@ -146,6 +148,12 @@ public class Preferences {
 
     public static boolean backCameraActivated(SharedPreferences prefs) {
         boolean value = prefs.getBoolean(BACK_CAMERA, true);
+
+        return value;
+    }
+
+    public static boolean osmActivated(SharedPreferences prefs) {
+        boolean value = prefs.getBoolean(OSM, true);
 
         return value;
     }

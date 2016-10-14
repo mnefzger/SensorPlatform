@@ -74,9 +74,14 @@ public class DrivingBehaviourProcessor extends EventProcessor implements IOSMRes
             // minimum of 3 items
             //no_of_items = no_of_items >= 3 ? no_of_items : 3;
 
-            checkForHardAcc(getLastDataItems(no_of_items));
-            checkForSharpTurn(getLastDataItems(no_of_items));
-            checkForSpeeding(currentVector);
+            if(Preferences.accelerometerActivated(sensor_prefs) )
+                checkForHardAcc(getLastDataItems(no_of_items));
+
+            if(Preferences.rotationActivated(sensor_prefs) )
+                checkForSharpTurn(getLastDataItems(no_of_items));
+
+            if(Preferences.locationActivated(sensor_prefs) && Preferences.osmActivated(sensor_prefs))
+                checkForSpeeding(currentVector);
 
         }
 

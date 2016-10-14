@@ -24,6 +24,15 @@
             android:summary="Write all events to a csv file"
             android:defaultValue="false"/>
 
+        <!--
+        <Preference
+            android:summary="The local path where the logfiles and videos are stored"
+            android:defaultValue="/"
+            android:key="log_file_path"
+            android:persistent="true"
+            android:title="Log file location" />
+            -->
+
         <MultiSelectListPreference
             android:summary="The log level specifies which events will be written to log"
             android:defaultValue="@array/log_level_default"

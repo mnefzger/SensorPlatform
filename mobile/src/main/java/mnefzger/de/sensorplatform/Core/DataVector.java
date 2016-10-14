@@ -52,21 +52,21 @@ public class DataVector {
     /**
      * vehicle speed in km/h
      */
-    public Double speed = null;
+    public Double speed = -1.0;
 
     public String weather;
 
     /**
      * OBD data values
      */
-    public Double obdSpeed = null;
-    public Double rpm = null;
-    public Double fuel = null;
+    public Double obdSpeed = -1.0;
+    public Double rpm = -1.0;
+    public Double fuel = -1.0;
 
     /**
      * Heart rate coming from Android Wear device
      */
-    public Double heartRate = null;
+    public Double heartRate = -1.0;
 
 
     public DataVector() {

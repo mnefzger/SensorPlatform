@@ -319,12 +319,12 @@ public class SensorModule implements ISensorCallback, IEventCallback{
         /**
          * Replace the current value only if the new value is more extreme.
          * This guarantees that the same value is stored independent of the <code>RawDataSampling</code> setting.
-         *
+         */
         if(Math.abs(dataValues[2]) > Math.abs(current.accZ))
             current.setAcc( dataValues[0], dataValues[1], dataValues[2] );
-         */
 
-        current.setAcc( dataValues[0], dataValues[1], dataValues[2] );
+
+        //current.setAcc( dataValues[0], dataValues[1], dataValues[2] );
 
     }
 

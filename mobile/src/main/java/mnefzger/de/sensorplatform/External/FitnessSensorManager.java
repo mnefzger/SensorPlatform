@@ -22,6 +22,7 @@ public class FitnessSensorManager extends DataProvider{
 
     private static FitnessSensorManager instance;
     private ISensorCallback callback;
+    public static boolean wearAvailable = false;
 
     static final String TAG = "SENSORPLATFORM_FITNESS";
     private GoogleApiClient googleApiClient;
@@ -51,6 +52,7 @@ public class FitnessSensorManager extends DataProvider{
             @Override
             public void run() {
                 ConnectionResult result = googleApiClient.blockingConnect();
+                wearAvailable = true;
                 Log.d("WEAR CONNECT", result.isSuccess()+"");
             }
         }).start();

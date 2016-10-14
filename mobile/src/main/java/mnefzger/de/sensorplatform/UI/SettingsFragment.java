@@ -2,12 +2,16 @@ package mnefzger.de.sensorplatform.UI;
 
 
 import android.app.Activity;
+import android.app.AlertDialog;
+import android.app.Dialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.preference.CheckBoxPreference;
 import android.preference.EditTextPreference;
 import android.preference.ListPreference;
+import android.preference.Preference;
 import android.preference.PreferenceFragment;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -16,6 +20,8 @@ import android.view.ViewGroup;
 import android.widget.FrameLayout;
 import android.widget.TextView;
 
+import java.io.File;
+import java.io.FilenameFilter;
 import java.util.List;
 
 import mnefzger.de.sensorplatform.Core.MainActivity;
@@ -77,6 +83,20 @@ public class SettingsFragment extends PreferenceFragment
 
         }
 
+        /**
+         * Not fully integrated yet.
+         */
+        /*Preference filepath = (Preference) findPreference("log_file_path");
+        filepath.setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
+            @Override
+            public boolean onPreferenceClick(Preference preference) {
+                loadFileList();
+                onCreateDialog();
+                return false;
+            }
+        });
+        */
+
         return v;
     }
 
@@ -93,6 +113,52 @@ public class SettingsFragment extends PreferenceFragment
             ((MainActivity)getActivity()).goToCameraPreviewFragment(true);
         else
             startApplication();
+    }
+
+    private String[] mFileList;
+    private File mPath = new File(android.os.Environment.getExternalStorageDirectory().getAbsolutePath());
+    private String mChosenDir;
+    private void loadFileList() {
+        try {
+            mPath.mkdirs();
+        }
+        catch(SecurityException e) {
+            Log.e("FILEPATH", "unable to write on the sd card " + e.toString());
+        }
+        if(mPath.exists()) {
+            FilenameFilter filter = new FilenameFilter() {
+                @Override
+                public boolean accept(File dir, String filename) {
+                    File sel = new File(dir, filename);
+                    return sel.isDirectory();
+                }
+
+            };
+            mFileList = mPath.list(filter);
+        }
+        else {
+            mFileList= new String[0];
+        }
+    }
+
+    private Dialog onCreateDialog() {
+        Dialog dialog = null;
+        AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
+
+        builder.setTitle("Choose your filepath");
+        if(mFileList == null) {
+            Log.e("FILEPATH", "Showing file picker before loading the file list");
+            dialog = builder.create();
+            return dialog;
+        }
+        builder.setItems(mFileList, new DialogInterface.OnClickListener() {
+            public void onClick(DialogInterface dialog, int which) {
+                mChosenDir = mFileList[which];
+                Log.d("FilePATH", mPath + "/" + mChosenDir);
+            }
+        });
+        dialog = builder.show();
+        return dialog;
     }
 
     @Override

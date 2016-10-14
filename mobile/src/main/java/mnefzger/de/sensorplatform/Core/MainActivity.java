@@ -221,7 +221,7 @@ public class MainActivity extends AppCompatActivity {
 
     private void handleSurveyIntent() {
         Intent intent = getIntent();
-        if(intent.getAction().equals("mnefzger.de.sensorplatform.survey")) {
+        if(intent.getAction() != null && intent.getAction().equals("mnefzger.de.sensorplatform.survey")) {
             Log.d("INTENT", "Going to survey");
             goToSurveyFragment();
         }

@@ -334,12 +334,18 @@ public class CameraPreviewFragment extends Fragment {
         final FrameLayout first = (FrameLayout) view.findViewById(R.id.cameraSetupFirst);
         final FrameLayout preview = (FrameLayout) view.findViewById(R.id.cameraSetupPreview);
 
+        final SharedPreferences sensor_prefs = getActivity().getSharedPreferences(getActivity().getString(R.string.sensor_preferences_key), Context.MODE_PRIVATE);
         FrameLayout nextButton = (FrameLayout) view.findViewById(R.id.phoneMountedButton);
         nextButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                first.setVisibility(View.INVISIBLE);
-                preview.setVisibility(View.VISIBLE);
+                if(Preferences.frontCameraActivated(sensor_prefs) || Preferences.backCameraActivated(sensor_prefs)) {
+                    first.setVisibility(View.INVISIBLE);
+                    preview.setVisibility(View.VISIBLE);
+                } else {
+                    startStudy();
+                }
+
             }
         });
 
@@ -398,11 +404,15 @@ public class CameraPreviewFragment extends Fragment {
         previewComplete.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                closeCamera();
-                ((MainActivity) getActivity()).startMeasuring();
+                startStudy();
             }
         });
 
+    }
+
+    private void startStudy() {
+        closeCamera();
+        ((MainActivity) getActivity()).startMeasuring();
     }
 
     @Override

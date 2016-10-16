@@ -109,10 +109,7 @@ public class SettingsFragment extends PreferenceFragment
 
     @Override
     public void onClick(View v) {
-        if(Preferences.frontCameraActivated(sensor_prefs) || Preferences.backCameraActivated(sensor_prefs))
-            ((MainActivity)getActivity()).goToCameraPreviewFragment(true);
-        else
-            startApplication();
+        ((MainActivity)getActivity()).goToCameraPreviewFragment(true);
     }
 
     private String[] mFileList;

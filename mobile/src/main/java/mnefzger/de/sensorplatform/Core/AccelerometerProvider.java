@@ -81,6 +81,7 @@ public class AccelerometerProvider extends SensorProvider {
          * report back unfiltered values (only gravity influence eliminated)
          */
         //sensorCallback.onAccelerometerData(linear_acceleration);
+        //reportKalmanValues(linear_acceleration);
     }
 
     /**
@@ -97,10 +98,26 @@ public class AccelerometerProvider extends SensorProvider {
         double[] emaValues = MathFunctions.getAccEMA(lastValues);
         */
 
-        double[] emaValues = MathFunctions.getEMA(newest, lastValue, 0.25);
+        double[] emaValues = MathFunctions.getEMA(newest, lastValue, 0.9);
         lastValue = emaValues;
 
         sensorCallback.onAccelerometerData(emaValues);
+    }
+
+    private double q = 0.125;
+    private double r = 4;
+    private double p = 1023;
+    private double x = 0;
+    private void reportKalmanValues(double[] values) {
+        double lastZAcc = values[2];
+
+        p = p + q;
+        double k = p / (p+r);
+        x = x + k * (lastZAcc - x);
+        p = (1-k) * p;
+
+        values[2] = x;
+        sensorCallback.onAccelerometerData(values);
     }
 
 

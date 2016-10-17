@@ -6,6 +6,9 @@ import android.hardware.SensorManager;
 import android.util.Log;
 import android.util.SparseArray;
 
+import org.opencv.core.Point;
+import org.opencv.video.KalmanFilter;
+
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
@@ -16,6 +19,7 @@ import mnefzger.de.sensorplatform.Core.Preferences;
 import mnefzger.de.sensorplatform.Core.SensorModule;
 import mnefzger.de.sensorplatform.R;
 import mnefzger.de.sensorplatform.Utilities.IOSMResponse;
+import mnefzger.de.sensorplatform.Utilities.Kalman;
 import mnefzger.de.sensorplatform.Utilities.MathFunctions;
 import mnefzger.de.sensorplatform.Utilities.OSMQueryAdapter;
 import mnefzger.de.sensorplatform.Utilities.OSMRespone;
@@ -61,6 +65,9 @@ public class DrivingBehaviourProcessor extends EventProcessor implements IOSMRes
 
         rawDataDelay = Preferences.getRawDataDelay(setting_prefs);
 
+        currentVector = new DataVector();
+        currentVector.timestamp = 0;
+
     }
 
     public void processData(List<DataVector> data) {
@@ -75,7 +82,7 @@ public class DrivingBehaviourProcessor extends EventProcessor implements IOSMRes
             //no_of_items = no_of_items >= 3 ? no_of_items : 3;
 
             if(Preferences.accelerometerActivated(sensor_prefs) )
-                checkForHardAcc(getLastDataItems(no_of_items));
+                //checkForHardAcc(getLastDataItems(no_of_items));
 
             if(Preferences.rotationActivated(sensor_prefs) )
                 checkForSharpTurn(getLastDataItems(no_of_items));
@@ -157,13 +164,72 @@ public class DrivingBehaviourProcessor extends EventProcessor implements IOSMRes
 
     }
 
+
+    public void processRaw(List<double[]> values) {
+        int countG_l = 0;
+        int countG_m = 0;
+        int countG_h = 0;
+        int countH_l = 0;
+        int countH_m = 0;
+        int countH_h = 0;
+        for(double[] v : values) {
+            double accZ = v[2];
+            if(accZ > ACC_THRESHOLD_HIGH) {
+                countG_h++;
+            } else if(accZ > ACC_THRESHOLD_MEDIUM) {
+                countG_m++;
+            } else if(accZ > ACC_THRESHOLD_LOW) {
+                countG_l++;
+            } else if(accZ < -ACC_THRESHOLD_HIGH) {
+                countH_h++;
+            } else if(accZ < -ACC_THRESHOLD_MEDIUM) {
+                countH_m++;
+            } else if(accZ < -ACC_THRESHOLD_LOW) {
+                countH_l++;
+            }
+        }
+
+        if( (System.currentTimeMillis()-lastAccDetected) < 1000 )
+            return;
+
+        Log.d("RAW", countG_h + ", " + countG_m + ", " + countG_l + ", " + countH_h + ", " + countH_m + ", " + countH_l);
+
+        if(countG_h >= values.size()-20) {
+            EventVector ev = new EventVector(EventVector.LEVEL.HIGH_RISK, currentVector.timestamp, "Brake", currentVector.accZ / 9.81);
+            callback.onEventDetected(ev);
+            lastAccDetected = currentVector.timestamp;
+        } else if( (countG_m+countG_h) >= values.size()-20) {
+            EventVector ev = new EventVector(EventVector.LEVEL.MEDIUM_RISK, currentVector.timestamp, "Brake", currentVector.accZ / 9.81);
+            callback.onEventDetected(ev);
+            lastAccDetected = currentVector.timestamp;
+        } else if( (countG_l+countG_m+countG_h) >= values.size()-20) {
+            EventVector ev = new EventVector(EventVector.LEVEL.LOW_RISK, currentVector.timestamp, "Brake", currentVector.accZ / 9.81);
+            callback.onEventDetected(ev);
+            lastAccDetected = currentVector.timestamp;
+        }
+
+        if(countH_h >= values.size()-20) {
+            EventVector ev = new EventVector(EventVector.LEVEL.HIGH_RISK, currentVector.timestamp, "Acceleration", currentVector.accZ / 9.81);
+            callback.onEventDetected(ev);
+            lastAccDetected = currentVector.timestamp;
+        } else if( (countH_m+countH_h) >= values.size()-20) {
+            EventVector ev = new EventVector(EventVector.LEVEL.MEDIUM_RISK, currentVector.timestamp, "Acceleration", currentVector.accZ / 9.81);
+            callback.onEventDetected(ev);
+            lastAccDetected = currentVector.timestamp;
+        } else if( (countH_l+countH_m+countH_h) >= values.size()-20) {
+            EventVector ev = new EventVector(EventVector.LEVEL.LOW_RISK, currentVector.timestamp, "Acceleration", currentVector.accZ / 9.81);
+            callback.onEventDetected(ev);
+            lastAccDetected = currentVector.timestamp;
+        }
+
+    }
+
     private long lastTurn = System.currentTimeMillis();
     private void checkForSharpTurn(List<DataVector> lastData) {
         double leftDelta = 0.0;
         double rightDelta = 0.0;
         float[] prevMatrix = null;
         DataVector prevVector = null;
-        int index = 0;
 
         long time = lastData.get(0).timestamp;;
 

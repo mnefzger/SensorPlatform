@@ -309,6 +309,7 @@ public class SensorModule implements ISensorCallback, IEventCallback{
         obd2.stop();
     }
 
+    List<double[]> lastValues = new ArrayList<>();
     /**
      * This method is the accelerometer callback function.
      * It receives raw data values and stores them in the current DataVector
@@ -323,8 +324,12 @@ public class SensorModule implements ISensorCallback, IEventCallback{
         if(Math.abs(dataValues[2]) > Math.abs(current.accZ))
             current.setAcc( dataValues[0], dataValues[1], dataValues[2] );
 
+        lastValues.add(dataValues);
+        if(lastValues.size() > 40) {
+            lastValues.remove(0);
+        }
+        drivingBehProc.processRaw(lastValues);
 
-        //current.setAcc( dataValues[0], dataValues[1], dataValues[2] );
 
     }
 

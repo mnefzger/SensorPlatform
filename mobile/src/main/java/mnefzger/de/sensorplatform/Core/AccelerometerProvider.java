@@ -5,8 +5,6 @@ import android.hardware.Sensor;
 import android.hardware.SensorEvent;
 import android.util.Log;
 
-import org.opencv.core.Mat;
-
 import java.util.ArrayList;
 
 import mnefzger.de.sensorplatform.Utilities.MathFunctions;

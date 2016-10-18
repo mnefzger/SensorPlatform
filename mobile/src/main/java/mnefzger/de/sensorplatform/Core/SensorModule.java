@@ -14,7 +14,6 @@ import mnefzger.de.sensorplatform.External.FitnessSensorManager;
 import mnefzger.de.sensorplatform.External.OBD2Provider;
 import mnefzger.de.sensorplatform.Processors.DrivingBehaviourProcessor;
 import mnefzger.de.sensorplatform.R;
-import mnefzger.de.sensorplatform.Utilities.MathFunctions;
 
 /**
  * This class is the central unit of data collection (except image data).

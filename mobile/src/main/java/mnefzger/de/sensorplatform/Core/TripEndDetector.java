@@ -5,7 +5,6 @@ import android.content.SharedPreferences;
 import android.util.Log;
 
 import mnefzger.de.sensorplatform.External.OBD2Connection;
-import mnefzger.de.sensorplatform.External.OBD2Connector;
 import mnefzger.de.sensorplatform.R;
 
 /**

@@ -1,7 +1,6 @@
 package mnefzger.de.sensorplatform.Utilities;
 
 import android.app.Activity;
-import android.content.Context;
 import android.os.Environment;
 import android.os.StatFs;
 import android.util.Log;
@@ -17,7 +16,6 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.io.OutputStreamWriter;
 
 
 public class IO {

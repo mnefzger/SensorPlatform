@@ -7,7 +7,6 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
-import android.graphics.Camera;
 import android.graphics.ImageFormat;
 import android.graphics.Rect;
 import android.graphics.YuvImage;
@@ -29,6 +28,7 @@ import org.opencv.core.Core;
 import org.opencv.core.CvType;
 import org.opencv.core.Mat;
 import org.opencv.core.Size;
+import org.opencv.imgcodecs.Imgcodecs;
 import org.opencv.imgproc.Imgproc;
 import org.opencv.videoio.VideoWriter;
 
@@ -522,6 +522,7 @@ public class ImageModule implements IEventCallback{
                             if( (mode.equals("back") && reverseOrientation) ||
                                     (mode.equals("front") && !reverseOrientation ) )
                                 Core.flip(rgbMat, rgbMat, -1);
+
 
                             videoWriter.write(rgbMat);
                             rgbMat.release();

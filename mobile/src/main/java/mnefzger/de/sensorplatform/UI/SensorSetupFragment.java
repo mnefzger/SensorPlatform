@@ -1,7 +1,6 @@
 package mnefzger.de.sensorplatform.UI;
 
 import android.os.Bundle;
-import android.preference.CheckBoxPreference;
 import android.preference.Preference;
 import android.preference.PreferenceCategory;
 import android.preference.PreferenceFragment;
@@ -11,7 +10,6 @@ import android.view.ViewGroup;
 import android.widget.FrameLayout;
 
 import mnefzger.de.sensorplatform.Core.MainActivity;
-import mnefzger.de.sensorplatform.External.FitnessSensorManager;
 import mnefzger.de.sensorplatform.R;
 
 public class SensorSetupFragment extends PreferenceFragment implements View.OnClickListener{

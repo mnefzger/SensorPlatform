@@ -8,9 +8,7 @@ import org.opencv.core.CvType;
 import org.opencv.core.Mat;
 
 import java.io.BufferedReader;
-import java.io.BufferedWriter;
 import java.io.File;
-import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;

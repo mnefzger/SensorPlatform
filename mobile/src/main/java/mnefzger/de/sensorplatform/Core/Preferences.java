@@ -2,8 +2,6 @@ package mnefzger.de.sensorplatform.Core;
 
 import android.content.Context;
 import android.content.SharedPreferences;
-import android.content.pm.ActivityInfo;
-import android.util.Log;
 
 import java.util.HashSet;
 import java.util.Set;

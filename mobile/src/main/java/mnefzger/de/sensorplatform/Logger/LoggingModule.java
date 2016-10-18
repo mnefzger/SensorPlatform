@@ -1,15 +1,8 @@
 package mnefzger.de.sensorplatform.Logger;
 
-import android.content.Context;
-import android.content.SharedPreferences;
-import android.os.Environment;
-import android.os.StatFs;
 import android.util.Log;
 
-import com.opencsv.CSVWriter;
-
 import java.io.File;
-import java.io.FileWriter;
 import java.io.IOException;
 
 import mnefzger.de.sensorplatform.Core.DataVector;

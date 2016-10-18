@@ -20,8 +20,6 @@ import android.widget.TextView;
 
 import com.google.gson.Gson;
 
-import org.w3c.dom.Text;
-
 import java.text.DecimalFormat;
 
 import mnefzger.de.sensorplatform.Core.ActiveSubscriptions;

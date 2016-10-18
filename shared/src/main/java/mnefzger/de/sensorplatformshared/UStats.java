@@ -14,8 +14,6 @@ import java.util.List;
 import java.util.SortedMap;
 import java.util.TreeMap;
 
-import static java.lang.System.in;
-
 public class UStats {
     private static final SimpleDateFormat dateFormat = new SimpleDateFormat("M-d-yyyy HH:mm:ss");
 

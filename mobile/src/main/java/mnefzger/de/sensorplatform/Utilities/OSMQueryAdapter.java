@@ -91,7 +91,7 @@ public class OSMQueryAdapter {
                         temp = temp.replace("maxspeed:backward", "maxspeed_backward");
 
                         Gson gson = new Gson();
-                        OSMRespone osmR = gson.fromJson(temp, OSMRespone.class);
+                        OSMResponse osmR = gson.fromJson(temp, OSMResponse.class);
                         if(mode == "Road") callback.onOSMRoadResponseReceived(osmR);
                         if(mode == "Speed") callback.onOSMSpeedResponseReceived(osmR);
                     }

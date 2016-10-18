@@ -2,7 +2,6 @@ package mnefzger.de.sensorplatform.UI;
 
 import android.content.Intent;
 import android.os.Bundle;
-import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -17,15 +16,11 @@ import android.widget.Toast;
 
 import com.google.gson.Gson;
 
-import java.io.BufferedReader;
-import java.io.FileReader;
-import java.io.IOException;
-import java.io.InputStream;
-
 import mnefzger.de.sensorplatform.Core.MainActivity;
 import mnefzger.de.sensorplatform.Core.SurveyModel;
 import mnefzger.de.sensorplatform.Logger.LoggingModule;
 import mnefzger.de.sensorplatform.R;
+import mnefzger.de.sensorplatform.Utilities.IO;
 
 public class SurveyFragment extends Fragment {
 
@@ -128,7 +123,7 @@ public class SurveyFragment extends Fragment {
     }
 
     private void loadSurvey() {
-        String surveyJson = loadJSONFromFile("survey.json");
+        String surveyJson = IO.loadJSONFromFile("survey.json");
         if( !surveyJson.equals("") && surveyJson != null)
             this.survey = new Gson().fromJson(surveyJson, SurveyModel.class);
         else {
@@ -138,8 +133,6 @@ public class SurveyFragment extends Fragment {
             t.show();
             leaveSurvey();
         }
-
-
     }
 
     private void showQuestion(int index) {
@@ -152,56 +145,7 @@ public class SurveyFragment extends Fragment {
         group.clearCheck();
     }
 
-    private String loadJSONFromAsset(String filename) {
-        String json = null;
-        try {
-            InputStream is = getActivity().getAssets().open(filename);
-            int size = is.available();
-            byte[] buffer = new byte[size];
-            is.read(buffer);
-            is.close();
-            json = new String(buffer, "UTF-8");
-        } catch (IOException ex) {
-            ex.printStackTrace();
-            return null;
-        }
-        return json;
-    }
 
-    private String loadJSONFromFile(String filename) {
-        String json = "";
 
-        String baseDir = android.os.Environment.getExternalStorageDirectory().getAbsolutePath();
-        String filePath = baseDir + "/SensorPlatform/";
 
-        BufferedReader buffered_reader=null;
-        try
-        {
-            buffered_reader = new BufferedReader(new FileReader(filePath+filename));
-            String line;
-
-            while ((line = buffered_reader.readLine()) != null)
-            {
-                json += line;
-            }
-        }
-        catch (IOException e)
-        {
-            e.printStackTrace();
-        }
-        finally
-        {
-            try
-            {
-                if (buffered_reader != null)
-                    buffered_reader.close();
-            }
-            catch (IOException ex)
-            {
-                ex.printStackTrace();
-            }
-        }
-
-        return json;
-    }
 }

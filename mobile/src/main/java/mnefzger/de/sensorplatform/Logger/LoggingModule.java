@@ -14,7 +14,7 @@ import java.io.IOException;
 
 import mnefzger.de.sensorplatform.Core.DataVector;
 import mnefzger.de.sensorplatform.Core.EventVector;
-import mnefzger.de.sensorplatform.R;
+import mnefzger.de.sensorplatform.Utilities.IO;
 
 /**
  * This class writes Raw Data and Event Data to csv files on the phone
@@ -62,7 +62,7 @@ public class LoggingModule {
         createNewRawFile(fileNameRaw + tripID + ".csv");
         createNewEventFile(fileNameEvent + tripID + ".csv");
 
-        long space = getAvailableInternalMemorySize();
+        long space = IO.getAvailableInternalMemorySize();
         if(space < 1000) {
             // TODO, less than 1 gb of free space, create warning
         }
@@ -109,13 +109,13 @@ public class LoggingModule {
     public void writeRawToCSV(DataVector v) {
         String[] line = { tripID + ";" + v.toCSVString() };
 
-        write(rawFile, line);
+        IO.writeCSV(rawFile, line);
     }
 
     public void writeEventToCSV(EventVector v) {
         String[] line = { tripID + ";" + v.toCSVString() };
 
-        write(eventFile, line);
+        IO.writeCSV(eventFile, line);
     }
 
     public void writeSurveyToFile(String answers, int items) {
@@ -124,19 +124,19 @@ public class LoggingModule {
 
         String[] line = { tripID + ";" + answers };
 
-        write(surveyFile, line);
+        IO.writeCSV(surveyFile, line);
     }
 
     private void createHeadersRaw() {
         String[] line = { "tripID;s_id;s_name;p_id;p_age;p_gender;timestamp;dateTime;accelerationX;accelerationY;accelerationZ;rotationX;rotationY;rotationZ;light;latitude;longitude;gps_speed;obd_speed;obd_rpm;obd_fuel;heart_rate;weather" };
 
-        write(rawFile, line);
+        IO.writeCSV(rawFile, line);
     }
 
     private void createHeadersEvent() {
         String[] line = { "tripID;timestamp;level;description;value;extra;videoFront;videoBack" };
 
-        write(eventFile, line);
+        IO.writeCSV(eventFile, line);
     }
 
     public void createHeadersSurvey(int noOfQuestions) {
@@ -147,39 +147,13 @@ public class LoggingModule {
             line[i+1] = "q"+(i+1)+";";
         }
 
-        write(eventFile, line);
+        IO.writeCSV(eventFile, line);
     }
 
-    private void write(File file, String[] line) {
-        try {
-            if(!isExternalStorageWritable())  {
-                throw new IOException("External storage not writable!");
-            }
-            CSVWriter writer = new CSVWriter(new FileWriter(file, true), CSVWriter.DEFAULT_SEPARATOR, CSVWriter.NO_QUOTE_CHARACTER,CSVWriter.DEFAULT_LINE_END);
-            writer.writeNext(line);
-            writer.close();
-        } catch (IOException e) {
-            System.err.println("Caught IOException: " +  e.getMessage());
-        }
-    }
 
-    /* Checks if external storage is available for read and write */
-    private boolean isExternalStorageWritable() {
-        String state = Environment.getExternalStorageState();
-        if (Environment.MEDIA_MOUNTED.equals(state)) {
-            return true;
-        }
-        return false;
-    }
 
-    private static long getAvailableInternalMemorySize() {
-        StatFs stat = new StatFs(Environment.getExternalStorageDirectory().getPath());
-        long bytesAvailable = stat.getBlockSizeLong() * stat.getAvailableBlocksLong();
-        long megAvailable = bytesAvailable / 1048576;
-        System.out.println("Megs :"+megAvailable);
 
-        return megAvailable;
-    }
+
 
 
 }

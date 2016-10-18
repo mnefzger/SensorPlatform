@@ -2,7 +2,7 @@ package mnefzger.de.sensorplatform.Utilities;
 
 import java.util.ArrayList;
 
-public class OSMRespone {
+public class OSMResponse {
     public ArrayList<Element> elements;
 
     public class Element {

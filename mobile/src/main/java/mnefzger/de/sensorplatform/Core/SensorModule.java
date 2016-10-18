@@ -324,11 +324,14 @@ public class SensorModule implements ISensorCallback, IEventCallback{
         if(Math.abs(dataValues[2]) > Math.abs(current.accZ))
             current.setAcc( dataValues[0], dataValues[1], dataValues[2] );
 
+        /**
+         * Do event processing on the raw accelerometer data
+         */
         lastValues.add(dataValues);
         if(lastValues.size() > 40) {
             lastValues.remove(0);
         }
-        drivingBehProc.processRaw(lastValues);
+        drivingBehProc.checkForHardAccRaw(lastValues);
 
 
     }

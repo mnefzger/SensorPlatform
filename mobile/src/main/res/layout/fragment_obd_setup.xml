@@ -100,7 +100,7 @@
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="Turn on your car's engine.\nPlease wait while the connection to the OBD-II adapter is established."
+                        android:text="Turn on the car's engine.\nPlease wait while the connection to the OBD-II adapter is established."
                         android:id="@+id/textView4"
                         android:textColor="#fff"
                         android:textSize="19sp" />

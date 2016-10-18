@@ -1,7 +1,6 @@
 package mnefzger.de.sensorplatform.UI;
 
 
-import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.Dialog;
 import android.content.Context;
@@ -9,24 +8,21 @@ import android.content.DialogInterface;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.preference.CheckBoxPreference;
-import android.preference.EditTextPreference;
 import android.preference.ListPreference;
-import android.preference.Preference;
 import android.preference.PreferenceFragment;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.FrameLayout;
-import android.widget.TextView;
 
 import java.io.File;
 import java.io.FilenameFilter;
-import java.util.List;
 
 import mnefzger.de.sensorplatform.Core.MainActivity;
 import mnefzger.de.sensorplatform.Core.Preferences;
 import mnefzger.de.sensorplatform.R;
+import mnefzger.de.sensorplatform.Utilities.IO;
 
 
 public class SettingsFragment extends PreferenceFragment
@@ -81,6 +77,11 @@ public class SettingsFragment extends PreferenceFragment
             back_proc.setEnabled(false);
             back_proc.setSelectable(false);
 
+        }
+
+        CheckBoxPreference survey = (CheckBoxPreference) findPreference("survey_active");
+        if(survey.isChecked()) {
+            writeSurveyFile();
         }
 
         /**
@@ -175,6 +176,18 @@ public class SettingsFragment extends PreferenceFragment
             SharedPreferences.Editor editor = sharedPreferences.edit();
             editor.putBoolean("obd_raw", obd);
             editor.apply();
+        } else if(key.equals("survey_active")) {
+            CheckBoxPreference survey = (CheckBoxPreference) findPreference("survey_active");
+            if(survey.isChecked()) {
+                writeSurveyFile();
+            }
         }
+    }
+
+    private void writeSurveyFile() {
+        String survey = IO.loadJSONFromAsset(getActivity(), "survey.json");
+        File f = new File(android.os.Environment.getExternalStorageDirectory().getAbsolutePath() + "/SensorPlatform/survey.json");
+        if(!f.exists())
+            IO.writeFile(f, survey);
     }
 }

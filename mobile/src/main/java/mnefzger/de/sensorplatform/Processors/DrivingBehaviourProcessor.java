@@ -6,9 +6,6 @@ import android.hardware.SensorManager;
 import android.util.Log;
 import android.util.SparseArray;
 
-import org.opencv.core.Point;
-import org.opencv.video.KalmanFilter;
-
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
@@ -19,20 +16,19 @@ import mnefzger.de.sensorplatform.Core.Preferences;
 import mnefzger.de.sensorplatform.Core.SensorModule;
 import mnefzger.de.sensorplatform.R;
 import mnefzger.de.sensorplatform.Utilities.IOSMResponse;
-import mnefzger.de.sensorplatform.Utilities.Kalman;
 import mnefzger.de.sensorplatform.Utilities.MathFunctions;
 import mnefzger.de.sensorplatform.Utilities.OSMQueryAdapter;
-import mnefzger.de.sensorplatform.Utilities.OSMRespone;
+import mnefzger.de.sensorplatform.Utilities.OSMResponse;
 
 public class DrivingBehaviourProcessor extends EventProcessor implements IOSMResponse {
     private SharedPreferences setting_prefs;
     private SharedPreferences sensor_prefs;
     private OSMQueryAdapter qAdapter;
     private boolean turned = false;
-    private OSMRespone lastResponse;
-    private OSMRespone.Element lastRecognizedRoad;
-    private OSMRespone.Element nextSpeedSign;
-    private OSMRespone.Element passedSpeedSign;
+    private OSMResponse lastResponse;
+    private OSMResponse.Element lastRecognizedRoad;
+    private OSMResponse.Element nextSpeedSign;
+    private OSMResponse.Element passedSpeedSign;
     private int currentSpeedLimit;
     private DataVector currentVector;
     private DataVector previousVector;
@@ -164,8 +160,11 @@ public class DrivingBehaviourProcessor extends EventProcessor implements IOSMRes
 
     }
 
-
-    public void processRaw(List<double[]> values) {
+    /**
+     * Matches raw Z acceleration values against thresholds. If more than half of the provided values exceed the threshold, an event is triggered
+     * @param values
+     */
+    public void checkForHardAccRaw(List<double[]> values) {
         int countG_l = 0;
         int countG_m = 0;
         int countG_h = 0;
@@ -388,7 +387,7 @@ public class DrivingBehaviourProcessor extends EventProcessor implements IOSMRes
     }
 
     @Override
-    public void onOSMRoadResponseReceived(OSMRespone response) {
+    public void onOSMRoadResponseReceived(OSMResponse response) {
         if(response == null) {
             lastRecognizedRoad = null;
             callback.onEventDetected(new EventVector(EventVector.LEVEL.DEBUG, System.currentTimeMillis(), "ROAD: No road detected, empty response.", 0));
@@ -397,13 +396,13 @@ public class DrivingBehaviourProcessor extends EventProcessor implements IOSMRes
 
         lastResponse = response;
 
-        OSMRespone.Element road = getCurrentRoad(response);
+        OSMResponse.Element road = getCurrentRoad(response);
 
         if(road != null) {
             // we successfully extracted the current road
             lastRecognizedRoad = road;
 
-            OSMRespone.TagContainer tags = lastRecognizedRoad.tags;
+            OSMResponse.TagContainer tags = lastRecognizedRoad.tags;
             if(tags != null) {
 
                 if(tags.maxspeed != null) {
@@ -430,13 +429,13 @@ public class DrivingBehaviourProcessor extends EventProcessor implements IOSMRes
     }
 
     @Override
-    public void onOSMSpeedResponseReceived(OSMRespone response) {
+    public void onOSMSpeedResponseReceived(OSMResponse response) {
         if(response.elements.size() == 0) return;
 
         // get only the speed limits for the current road
-        SparseArray<OSMRespone.Element> speedLimits = new SparseArray<>();
+        SparseArray<OSMResponse.Element> speedLimits = new SparseArray<>();
         for(long id : lastRecognizedRoad.nodes) {
-            for(OSMRespone.Element e : response.elements) {
+            for(OSMResponse.Element e : response.elements) {
                 if(e.id == id) {
                     if(e.tags.maxspeed_forward != null && currentDirection == DIRECTION.FORWARD ||
                        e.tags.maxspeed_backward != null && currentDirection == DIRECTION.BACKWARD ||
@@ -447,7 +446,7 @@ public class DrivingBehaviourProcessor extends EventProcessor implements IOSMRes
         }
 
         // TODO make less ugly
-        OSMRespone.Element[] relevantSigns = findRelevantSpeedSign(speedLimits);
+        OSMResponse.Element[] relevantSigns = findRelevantSpeedSign(speedLimits);
 
         nextSpeedSign = relevantSigns[0];
         passedSpeedSign = relevantSigns[1];
@@ -495,11 +494,11 @@ public class DrivingBehaviourProcessor extends EventProcessor implements IOSMRes
      * If only one road is detected, we assume that it is the correct one.
      * If two or more roads are detected, we check which road is closest
      */
-    private OSMRespone.Element getCurrentRoad(OSMRespone response) {
-        SparseArray<OSMRespone.Element> roads = new SparseArray<>();
-        OSMRespone.Element currentRoad = null;
+    private OSMResponse.Element getCurrentRoad(OSMResponse response) {
+        SparseArray<OSMResponse.Element> roads = new SparseArray<>();
+        OSMResponse.Element currentRoad = null;
 
-        for(OSMRespone.Element e : response.elements) {
+        for(OSMResponse.Element e : response.elements) {
             if(e.tags != null) {
                 if (e.tags.name != null && e.tags.highway != null) {
                     roads.put(roads.size(), e);
@@ -536,13 +535,13 @@ public class DrivingBehaviourProcessor extends EventProcessor implements IOSMRes
      * Returns the distance from current position to a given OpenStreetMap road
      * @param element   The road we want to calculate the distance
      */
-    private double getDistanceToRoad(OSMRespone.Element element) {
+    private double getDistanceToRoad(OSMResponse.Element element) {
         double distance;
 
         // First, we have to find the two nearest nodes of this street (element)
-        OSMRespone.Element[] closest = get2ClosestNodes(element, false);
-        OSMRespone.Element near_node1 = closest[0];
-        OSMRespone.Element near_node2 = closest[1];
+        OSMResponse.Element[] closest = get2ClosestNodes(element, false);
+        OSMResponse.Element near_node1 = closest[0];
+        OSMResponse.Element near_node2 = closest[1];
 
         // now, we calculate the distance between our position and the line between the two nearest nodes
         distance = MathFunctions.calculateDistanceToLine(near_node1.lat, near_node1.lon, near_node2.lat, near_node2.lon, currentVector.lat, currentVector.lon);
@@ -557,17 +556,17 @@ public class DrivingBehaviourProcessor extends EventProcessor implements IOSMRes
      * @param orderByIndex: defines if the result should be ordered by index instead of distance
      * @return
      */
-    private OSMRespone.Element[] get2ClosestNodes(OSMRespone.Element element, boolean orderByIndex) {
+    private OSMResponse.Element[] get2ClosestNodes(OSMResponse.Element element, boolean orderByIndex) {
         double min_dist1 = 10000;
-        OSMRespone.Element near_node1 = null;
+        OSMResponse.Element near_node1 = null;
         int index1 = -1;
         double min_dist2 = 10000;
-        OSMRespone.Element near_node2 = null;
+        OSMResponse.Element near_node2 = null;
         int index2 = -1;
         for(int r=0; r<element.nodes.size(); r++) {
             long id = element.nodes.get(r);
-            OSMRespone.Element el = null;
-            for(OSMRespone.Element e : lastResponse.elements) {
+            OSMResponse.Element el = null;
+            for(OSMResponse.Element e : lastResponse.elements) {
                 if(e.id == id) {
                     el = e;
                     break;
@@ -594,7 +593,7 @@ public class DrivingBehaviourProcessor extends EventProcessor implements IOSMRes
             }
         }
 
-        OSMRespone.Element[] closest = {near_node1, near_node2};
+        OSMResponse.Element[] closest = {near_node1, near_node2};
 
         // if orderByIndex == true, node with the smaller index should come first
         if(orderByIndex && index2 < index1) {
@@ -611,9 +610,9 @@ public class DrivingBehaviourProcessor extends EventProcessor implements IOSMRes
      * @return the OSM direction the vehicle is travelling
      */
     private DIRECTION getDirectionOfMovement() {
-        OSMRespone.Element[] closest = get2ClosestNodes(lastRecognizedRoad, true);
-        OSMRespone.Element near_node1 = closest[0];
-        OSMRespone.Element near_node2 = closest[1];
+        OSMResponse.Element[] closest = get2ClosestNodes(lastRecognizedRoad, true);
+        OSMResponse.Element near_node1 = closest[0];
+        OSMResponse.Element near_node2 = closest[1];
 
         //Log.d("CLOSE", near_node1.lat + "," + near_node1.lon + "; " + near_node2.lat + "," + near_node2.lon);
         //Log.d("CLOSE", currentVector.location.getLatitude() + "," + currentVector.location.getLongitude() + "; " + previousVector.location.getLatitude() + "," + previousVector.location.getLongitude());
@@ -643,13 +642,13 @@ public class DrivingBehaviourProcessor extends EventProcessor implements IOSMRes
      * Returns the closest SpeedSign in the direction of driving
      */
 
-    private OSMRespone.Element[] findRelevantSpeedSign(SparseArray<OSMRespone.Element> speedLimits) {
+    private OSMResponse.Element[] findRelevantSpeedSign(SparseArray<OSMResponse.Element> speedLimits) {
         // Helper class to combine an index and the Speedsign element
         class InfoWrapper {
             int index;
-            OSMRespone.Element speedSign;
+            OSMResponse.Element speedSign;
 
-            InfoWrapper(int index, OSMRespone.Element sign) {
+            InfoWrapper(int index, OSMResponse.Element sign) {
                 this.index = index;
                 this.speedSign = sign;
             }
@@ -664,7 +663,7 @@ public class DrivingBehaviourProcessor extends EventProcessor implements IOSMRes
 
         // get the index of the closest node and the indices of the speedsigns
         for(int i=0; i<lastResponse.elements.size(); i++) {
-            OSMRespone.Element node = lastResponse.elements.get(i);
+            OSMResponse.Element node = lastResponse.elements.get(i);
             if(node.lat != 0 && node.lon != 0) {
                 double temp = MathFunctions.calculateDistance(node.lat, node.lon, lat, lon);
                 if(temp < minDist) {
@@ -674,7 +673,7 @@ public class DrivingBehaviourProcessor extends EventProcessor implements IOSMRes
             }
 
             for(int s=0; s<speedLimits.size(); s++) {
-                OSMRespone.Element sign = speedLimits.get(s);
+                OSMResponse.Element sign = speedLimits.get(s);
                 if(sign.id == node.id) {
                     signs.add(new InfoWrapper(i,sign));
                 }
@@ -682,8 +681,8 @@ public class DrivingBehaviourProcessor extends EventProcessor implements IOSMRes
         }
 
         // Separate Signs into ahead and passed categories
-        ArrayList<OSMRespone.Element> signsAhead = new ArrayList<>();
-        ArrayList<OSMRespone.Element> signsPassed = new ArrayList<>();
+        ArrayList<OSMResponse.Element> signsAhead = new ArrayList<>();
+        ArrayList<OSMResponse.Element> signsPassed = new ArrayList<>();
         for(InfoWrapper sign : signs) {
             if(currentDirection == DIRECTION.FORWARD) {
                 if(sign.index < index)
@@ -703,8 +702,8 @@ public class DrivingBehaviourProcessor extends EventProcessor implements IOSMRes
 
         // calculate the distances to the speed signs ahead to find the closest
         double aheadDist = 10000;
-        OSMRespone.Element closestSignAhead = null;
-        for(OSMRespone.Element ahead : signsAhead) {
+        OSMResponse.Element closestSignAhead = null;
+        for(OSMResponse.Element ahead : signsAhead) {
             double tempDist =  MathFunctions.calculateDistance(ahead.lat, ahead.lon, lat, lon);
             if(tempDist < aheadDist) {
                 aheadDist = tempDist;
@@ -714,8 +713,8 @@ public class DrivingBehaviourProcessor extends EventProcessor implements IOSMRes
 
         // calculate the distances to the speed signs passed to find the closest
         double passedDist = 10000;
-        OSMRespone.Element closestSignPassed = null;
-        for(OSMRespone.Element ahead : signsAhead) {
+        OSMResponse.Element closestSignPassed = null;
+        for(OSMResponse.Element ahead : signsAhead) {
             double tempDist =  MathFunctions.calculateDistance(ahead.lat, ahead.lon, lat, lon);
             if(tempDist < passedDist) {
                 passedDist = tempDist;
@@ -723,7 +722,7 @@ public class DrivingBehaviourProcessor extends EventProcessor implements IOSMRes
             }
         }
 
-        OSMRespone.Element[] aheadPassed = {closestSignAhead, closestSignPassed};
+        OSMResponse.Element[] aheadPassed = {closestSignAhead, closestSignPassed};
         return aheadPassed;
     }
 

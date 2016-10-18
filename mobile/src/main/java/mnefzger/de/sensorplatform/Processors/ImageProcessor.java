@@ -20,6 +20,7 @@ import mnefzger.de.sensorplatform.Core.IEventCallback;
 import mnefzger.de.sensorplatform.Core.ImageModule;
 import mnefzger.de.sensorplatform.Core.Preferences;
 import mnefzger.de.sensorplatform.R;
+import mnefzger.de.sensorplatform.Utilities.IO;
 
 /**
  * This class includes all image analysis functions for
@@ -236,32 +237,11 @@ public class ImageProcessor{
             InputStream inStream = c.getAssets().open(filename);
             BufferedReader br = new BufferedReader(new InputStreamReader(inStream));
             File toFile = new File(toPath, filename);
-            copyAssetFile(br, toFile);
+            IO.copyAssetFile(br, toFile);
         } catch (IOException e) {
             e.printStackTrace();
         }
     }
 
-    private void copyAssetFile(BufferedReader br, File toFile) throws IOException {
-        BufferedWriter bw = null;
-        try {
-            bw = new BufferedWriter(new FileWriter(toFile));
 
-            int in;
-            while ((in = br.read()) != -1) {
-                bw.write(in);
-            }
-        } finally {
-            Log.d("CASCADES", "Writing finished");
-            try{
-                if (bw != null) {
-                    bw.close();
-                }
-                br.close();
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-
-        }
-    }
 }

@@ -16,9 +16,9 @@ using namespace cv;
 using namespace std;
 
 extern "C" {
-    JNIEXPORT jintArray Java_mnefzger_de_sensorplatform_Processors_ImageProcessor_nAsmFindFace(JNIEnv *env, jobject obj, jlong address, jlong returnadress, jboolean flipped);
-    JNIEXPORT jintArray Java_mnefzger_de_sensorplatform_Processors_ImageProcessor_nAsmFindCars(JNIEnv *env, jobject obj, jlong address, jlong returnadress, jboolean flipped);
-    JNIEXPORT jint Java_mnefzger_de_sensorplatform_Processors_ImageProcessor_nInitCascades(JNIEnv *env, jobject obj);
+    JNIEXPORT jintArray Java_au_carrsq_sensorplatform_Processors_ImageProcessor_nAsmFindFace(JNIEnv *env, jobject obj, jlong address, jlong returnadress, jboolean flipped);
+    JNIEXPORT jintArray Java_au_carrsq_sensorplatform_Processors_ImageProcessor_nAsmFindCars(JNIEnv *env, jobject obj, jlong address, jlong returnadress, jboolean flipped);
+    JNIEXPORT jint Java_au_carrsq_sensorplatform_Processors_ImageProcessor_nInitCascades(JNIEnv *env, jobject obj);
     cv::Mat getIPMImage( const Mat& _inputImg );
 }
 
@@ -28,7 +28,7 @@ CascadeClassifier faceCascadeLBP2;
 
 CascadeClassifier vehicleCascadeHaar;
 
-JNIEXPORT jint Java_mnefzger_de_sensorplatform_Processors_ImageProcessor_nInitCascades(JNIEnv *env, jobject obj) {
+JNIEXPORT jint Java_au_carrsq_sensorplatform_Processors_ImageProcessor_nInitCascades(JNIEnv *env, jobject obj) {
     //string haarFaceCascadePath = "/storage/emulated/0/SensorPlatform/haarcascade_frontalface_alt.xml";
     string lbpFaceCascadePath = "/storage/emulated/0/SensorPlatform/lbpcascade_frontalface.xml";
     //string lbpFaceCascadePath2 = "/storage/emulated/0/SensorPlatform/visionary_FACES_01_LBP.xml";
@@ -44,7 +44,7 @@ JNIEXPORT jint Java_mnefzger_de_sensorplatform_Processors_ImageProcessor_nInitCa
 	return 1;
 }
 
-JNIEXPORT jintArray Java_mnefzger_de_sensorplatform_Processors_ImageProcessor_nAsmFindFace(JNIEnv *env, jobject obj, jlong address, jlong returnadress, jboolean flipped) {
+JNIEXPORT jintArray Java_au_carrsq_sensorplatform_Processors_ImageProcessor_nAsmFindFace(JNIEnv *env, jobject obj, jlong address, jlong returnadress, jboolean flipped) {
 	jintArray result;
 	Mat image = *((Mat*) address);
 
@@ -98,7 +98,7 @@ JNIEXPORT jintArray Java_mnefzger_de_sensorplatform_Processors_ImageProcessor_nA
     return result;
 }
 
-JNIEXPORT jintArray Java_mnefzger_de_sensorplatform_Processors_ImageProcessor_nAsmFindCars(JNIEnv *env, jobject obj, jlong address, jlong returnadress, jboolean flipped) {
+JNIEXPORT jintArray Java_au_carrsq_sensorplatform_Processors_ImageProcessor_nAsmFindCars(JNIEnv *env, jobject obj, jlong address, jlong returnadress, jboolean flipped) {
 	jintArray result;
 	Mat image = *((Mat*) address);
 

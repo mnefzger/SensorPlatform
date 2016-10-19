@@ -4,7 +4,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
-    tools:context="mnefzger.de.sensorplatform.Core.MainActivity"
+    tools:context="au.carrsq.sensorplatform.Core.MainActivity"
     tools:deviceIds="wear_square">
 
     <TextView

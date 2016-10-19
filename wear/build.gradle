@@ -6,7 +6,7 @@ android {
     buildToolsVersion "23.0.2"
 
     defaultConfig {
-        applicationId "mnefzger.de.sensorplatform"
+        applicationId "au.carrsq.sensorplatform"
         minSdkVersion 23
         targetSdkVersion 23
         versionCode 1

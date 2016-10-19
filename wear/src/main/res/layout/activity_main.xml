@@ -7,7 +7,7 @@
     android:layout_height="match_parent"
     app:rectLayout="@layout/rect_activity_main"
     app:roundLayout="@layout/round_activity_main"
-    tools:context="mnefzger.de.sensorplatform.Core.MainActivity"
+    tools:context="au.carrsq.sensorplatform.Core.MainActivity"
     tools:deviceIds="wear">
 
 </android.support.wearable.view.WatchViewStub>

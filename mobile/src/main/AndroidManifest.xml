@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="mnefzger.de.sensorplatform">
+    package="au.carrsq.sensorplatform">
 
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
@@ -23,7 +23,7 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
         <activity
-            android:name=".Core.SplashActivity"
+            android:name="au.carrsq.sensorplatform.Core.SplashActivity"
             android:theme="@style/SplashTheme">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -32,7 +32,7 @@
             </intent-filter>
         </activity>
         <activity
-            android:name=".Core.MainActivity"
+            android:name="au.carrsq.sensorplatform.Core.MainActivity"
             android:launchMode="singleTask"
             android:theme="@style/AppTheme">
             <intent-filter>
@@ -41,13 +41,13 @@
                 <data android:mimeType="text/plain" />
             </intent-filter>
             <intent-filter>
-                <action android:name="mnefzger.de.sensorplatform.survey" />
+                <action android:name="au.carrsq.sensorplatform.survey" />
                 <category android:name="android.intent.category.DEFAULT" />
             </intent-filter>
         </activity>
 
-        <service android:name=".Core.SensorPlatformService" />
-        <service android:name=".External.FitnessSensorReceiverService">
+        <service android:name="au.carrsq.sensorplatform.Core.SensorPlatformService" />
+        <service android:name="au.carrsq.sensorplatform.External.FitnessSensorReceiverService">
             <intent-filter>
                 <action android:name="com.google.android.gms.wearable.BIND_LISTENER" />
             </intent-filter>

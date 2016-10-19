@@ -84,14 +84,14 @@
                     android:orientation="horizontal"
                     android:id="@+id/lickertGroup">
 
-                    <mnefzger.de.sensorplatform.Utilities.RadioButtonCenter
+                    <au.carrsq.sensorplatform.Utilities.RadioButtonCenter
                         android:layout_width="wrap_content"
                         android:layout_height="35dp"
                         android:text=""
                         android:id="@+id/stronglyDisagree"
                         android:layout_weight="0.2" />
 
-                    <mnefzger.de.sensorplatform.Utilities.RadioButtonCenter
+                    <au.carrsq.sensorplatform.Utilities.RadioButtonCenter
                         android:layout_width="wrap_content"
                         android:layout_height="35dp"
                         android:text=""
@@ -99,7 +99,7 @@
                         android:layout_weight="0.2"
                         android:gravity="center_vertical" />
 
-                    <mnefzger.de.sensorplatform.Utilities.RadioButtonCenter
+                    <au.carrsq.sensorplatform.Utilities.RadioButtonCenter
                         android:layout_width="wrap_content"
                         android:layout_height="35dp"
                         android:text=""
@@ -107,7 +107,7 @@
                         android:layout_weight="0.2"
                         android:gravity="center_vertical" />
 
-                    <mnefzger.de.sensorplatform.Utilities.RadioButtonCenter
+                    <au.carrsq.sensorplatform.Utilities.RadioButtonCenter
                         android:layout_width="wrap_content"
                         android:layout_height="35dp"
                         android:text=""
@@ -115,7 +115,7 @@
                         android:layout_weight="0.2"
                         android:gravity="center_vertical" />
 
-                    <mnefzger.de.sensorplatform.Utilities.RadioButtonCenter
+                    <au.carrsq.sensorplatform.Utilities.RadioButtonCenter
                         android:layout_width="wrap_content"
                         android:layout_height="35dp"
                         android:text=""

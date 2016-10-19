@@ -96,7 +96,7 @@
             android:summary="Processed frames per second for the back camera"
             android:defaultValue="@integer/back_processing_fps"
             android:dependency="image_back_processing"/>
-        <mnefzger.de.sensorplatform.Utilities.SeekBarPreference
+        <au.carrsq.sensorplatform.Utilities.SeekBarPreference
             android:key="following_distance_normal"
             android:title="Low Risk TTC"
             android:summary="The time-to-collision for a normal following distance in seconds"
@@ -105,7 +105,7 @@
             android:defaultValue="@string/following_distance_normal_default"
             android:text="seconds"
             android:dependency="image_back_processing"/>
-        <mnefzger.de.sensorplatform.Utilities.SeekBarPreference
+        <au.carrsq.sensorplatform.Utilities.SeekBarPreference
             android:key="following_distance_risky"
             android:title="Medium Risk TTC"
             android:summary="The time-to-collision for a risky following distance in seconds"
@@ -114,7 +114,7 @@
             android:defaultValue="@string/following_distance_risky_default"
             android:text="seconds"
             android:dependency="image_back_processing"/>
-        <mnefzger.de.sensorplatform.Utilities.SeekBarPreference
+        <au.carrsq.sensorplatform.Utilities.SeekBarPreference
             android:key="following_distance_dangerous"
             android:title="High Risk TTC"
             android:summary="The time-to-collision for a dangerous following distance in seconds"
@@ -138,7 +138,7 @@
             android:persistent="true"
             android:title="Accelerometer Sampling Rate"/>-->
 
-        <mnefzger.de.sensorplatform.Utilities.SeekBarPreference
+        <au.carrsq.sensorplatform.Utilities.SeekBarPreference
             android:key="acceleration_threshold_normal"
             android:title="Low Risk Acceleration Threshold"
             android:summary="Threshold for a normal acceleration or brake in g-force"
@@ -146,7 +146,7 @@
             app:stringDefault="@string/acceleration_threshold_normal_default"
             android:defaultValue="@string/acceleration_threshold_normal_default"
             android:text="g"/>
-        <mnefzger.de.sensorplatform.Utilities.SeekBarPreference
+        <au.carrsq.sensorplatform.Utilities.SeekBarPreference
             android:key="acceleration_threshold_risky"
             android:title="Medium Risk Acceleration Threshold"
             android:summary="Threshold for a risky acceleration or brake in g-force"
@@ -154,7 +154,7 @@
             app:stringDefault="@string/acceleration_threshold_risky_default"
             android:defaultValue="@string/acceleration_threshold_risky_default"
             android:text="g"/>
-        <mnefzger.de.sensorplatform.Utilities.SeekBarPreference
+        <au.carrsq.sensorplatform.Utilities.SeekBarPreference
             android:key="accelerometer_threshold_dangerous"
             android:title="High Risk Acceleration Threshold"
             android:summary="Threshold for a dangerous acceleration or brake in g-force"
@@ -177,7 +177,7 @@
             android:title="Rotation Sampling Rate" />
             -->
 
-        <mnefzger.de.sensorplatform.Utilities.SeekBarPreference
+        <au.carrsq.sensorplatform.Utilities.SeekBarPreference
             android:key="rotation_threshold_normal"
             android:title="Low Risk Turn Threshold"
             android:summary="Threshold for a normal turn in rad/s"
@@ -186,7 +186,7 @@
             android:defaultValue="@string/rotation_threshold_normal_default"
             android:text="rad/s"/>
 
-        <mnefzger.de.sensorplatform.Utilities.SeekBarPreference
+        <au.carrsq.sensorplatform.Utilities.SeekBarPreference
             android:key="rotation_threshold_risky"
             android:title="Medium Risk Turn Threshold"
             android:summary="Threshold for a risky turn in rad/s"
@@ -195,7 +195,7 @@
             android:defaultValue="@string/rotation_threshold_risky_default"
             android:text="rad/s"/>
 
-        <mnefzger.de.sensorplatform.Utilities.SeekBarPreference
+        <au.carrsq.sensorplatform.Utilities.SeekBarPreference
             android:key="rotation_threshold_dangerous"
             android:title="High Risk Turn Threshold"
             android:summary="Threshold for a dangerous turn in rad/s"

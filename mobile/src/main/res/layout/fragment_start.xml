@@ -2,7 +2,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context="mnefzger.de.sensorplatform.UI.StartFragment"
+    tools:context="au.carrsq.sensorplatform.UI.StartFragment"
     android:theme="@android:style/Theme.NoTitleBar.Fullscreen"
     android:background="@drawable/gradient"
     android:orientation="vertical"

@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="mnefzger.de.sensorplatform">
+    package="au.carrsq.sensorplatform">
     <uses-permission android:name="android.permission.BODY_SENSORS" />
     <uses-feature android:name="android.hardware.type.watch" />
 
@@ -11,7 +11,7 @@
         android:supportsRtl="true"
         android:theme="@android:style/Theme.DeviceDefault">
         <activity
-            android:name=".MainActivity"
+            android:name="au.carrsq.sensorplatform.MainActivity"
             android:label="@string/title_activity_main"
             >
             <intent-filter>
@@ -20,14 +20,14 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <service android:name=".MessageReceiverService" >
+        <service android:name="au.carrsq.sensorplatform.MessageReceiverService" >
             <intent-filter>
                 <action
                     android:name="com.google.android.gms.wearable.BIND_LISTENER" />
             </intent-filter>
         </service>
 
-        <service android:name=".SensorService" />
+        <service android:name="au.carrsq.sensorplatform.SensorService" />
     </application>
 
 </manifest>

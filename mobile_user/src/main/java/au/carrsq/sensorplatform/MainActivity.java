@@ -87,7 +87,7 @@ public class MainActivity extends AppCompatActivity {
                 Intent ustats = new Intent(Settings.ACTION_USAGE_ACCESS_SETTINGS);
                 startActivityForResult(ustats, 1338);
             } else {
-                Intent notifications_p=new Intent();
+                Intent notifications_p=new Intent("android.settings.ACTION_NOTIFICATION_LISTENER_SETTINGS");
                 startActivityForResult(notifications_p, 1339);
                 setup();
             }

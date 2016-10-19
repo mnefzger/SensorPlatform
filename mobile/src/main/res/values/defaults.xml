@@ -37,11 +37,11 @@
 
     <integer name="front_max_fps">15</integer>
 
-    <integer name="front_processing_fps">5</integer>
+    <integer name="front_processing_fps">3</integer>
 
     <integer name="back_max_fps">15</integer>
 
-    <integer name="back_processing_fps">5</integer>
+    <integer name="back_processing_fps">2</integer>
 
     <integer name="video_resolution">320</integer>
 

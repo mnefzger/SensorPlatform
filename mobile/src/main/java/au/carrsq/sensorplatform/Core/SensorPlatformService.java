@@ -44,7 +44,7 @@ public class SensorPlatformService extends Service implements IDataCallback, ITr
     private final IBinder mBinder = new LocalBinder();
 
     public static boolean serviceRunning = false;
-    private boolean waiting;
+    private boolean waiting = true;
 
     /**
      * Class used for the client Binder.  Because we know this service always
@@ -265,14 +265,15 @@ public class SensorPlatformService extends Service implements IDataCallback, ITr
         if(waiting)
             return;
 
+        Log.d("EVENT", "Still waiting?" + waiting+"");
         // check if the log level is active
         if( levels.contains(EventVector.LEVEL.ALL) || levels.contains(ev.getLevel()) ) {
             // save a video of this event
             if(Preferences.videoSavingActivated(setting_prefs) && !(ev.getLevel() == EventVector.LEVEL.DEBUG) ) {
                 long now = System.currentTimeMillis();
 
-                // Check if a video is currently being saved or the last save was less than 5 second ago
-                if(!im.isSaving() && (now - lastSave) > 5000) {
+                // Check if a video is currently being saved or the last save was less than 4 second ago
+                if(!im.isSaving() && (now - lastSave) > 4000) {
                     im.saveVideoAfterEvent(ev);
                     ev.setVideoNames(ev.getTimestamp());
                     lastSave = now;

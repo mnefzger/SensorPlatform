@@ -57,7 +57,7 @@
 
     </PreferenceCategory>
 
-    <PreferenceCategory android:title="Image Processing">
+    <PreferenceCategory android:title="Video Settings">
 
         <CheckBoxPreference
             android:key="image_saving"
@@ -72,12 +72,6 @@
             android:key="video_resolution"
             android:persistent="true"
             android:title="Video Resolution" />
-
-        <CheckBoxPreference
-            android:key="image_front_processing"
-            android:title="Front Camera Processing"
-            android:summary="Enable driver distraction detection"
-            android:defaultValue="true"/>
         <EditTextPreference
             android:key="front_processing_fps"
             android:title="Front camera processing FPS"
@@ -85,17 +79,27 @@
             android:defaultValue="@integer/front_processing_fps"
             android:dependency="image_front_processing"/>
 
-        <CheckBoxPreference
-            android:key="image_back_processing"
-            android:title="Back Camera Processing"
-            android:summary="Enable tailgating detection"
-            android:defaultValue="true"/>
         <EditTextPreference
             android:key="back_processing_fps"
             android:title="Back camera processing FPS"
             android:summary="Processed frames per second for the back camera"
             android:defaultValue="@integer/back_processing_fps"
             android:dependency="image_back_processing"/>
+    </PreferenceCategory>
+
+    <PreferenceCategory android:title="Video Analysis">
+        <CheckBoxPreference
+            android:key="image_front_processing"
+            android:title="Driver Distraction Detection"
+            android:summary="Enable front camera video processing"
+            android:defaultValue="false"/>
+
+        <CheckBoxPreference
+            android:key="image_back_processing"
+            android:title="Tailgating Detection"
+            android:summary="Enable back camera video processing"
+            android:defaultValue="false"/>
+
         <au.carrsq.sensorplatform.Utilities.SeekBarPreference
             android:key="following_distance_normal"
             android:title="Low Risk TTC"
@@ -123,7 +127,6 @@
             android:defaultValue="@string/following_distance_dangerous_default"
             android:text="seconds"
             android:dependency="image_back_processing"/>
-
 
     </PreferenceCategory>
 

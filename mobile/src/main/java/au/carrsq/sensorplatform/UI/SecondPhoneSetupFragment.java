@@ -1,6 +1,7 @@
 package au.carrsq.sensorplatform.UI;
 
 
+import android.bluetooth.BluetoothAdapter;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
@@ -18,6 +19,7 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import au.carrsq.sensorplatform.Core.MainActivity;
+import au.carrsq.sensorplatform.External.BluetoothManager;
 import au.carrsq.sensorplatform.R;
 
 /**
@@ -29,6 +31,7 @@ public class SecondPhoneSetupFragment extends Fragment {
     TextView hint;
     LinearLayout phone_setup_details;
 
+    TextView instruction;
     TextView waiting;
     TextView connecting;
     TextView ready;
@@ -48,6 +51,8 @@ public class SecondPhoneSetupFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         View v = inflater.inflate(R.layout.fragment_second_phone_setup, container, false);
+
+        instruction = (TextView) v.findViewById(R.id.instructionPhoneText);
 
         phoneActive = (AppCompatCheckBox) v.findViewById(R.id.phone_checkbox);
         hint = (TextView) v.findViewById(R.id.phone_hint);
@@ -87,6 +92,7 @@ public class SecondPhoneSetupFragment extends Fragment {
             if(checked) {
                 hint.setVisibility(View.INVISIBLE);
                 phone_setup_details.setVisibility(View.VISIBLE);
+                instruction.append(BluetoothAdapter.getDefaultAdapter().getName());
 
                 app.getService().initiatePhoneConnection();
 

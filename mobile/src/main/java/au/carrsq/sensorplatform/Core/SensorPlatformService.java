@@ -96,9 +96,10 @@ public class SensorPlatformService extends Service implements IDataCallback, ITr
         teDetector.reset();
         this.onEventData(new EventVector(EventVector.LEVEL.DEBUG, System.currentTimeMillis(), "Trip Start detected", 0));
 
-        if(ActiveSubscriptions.isEmpty())
+        if(ActiveSubscriptions.isEmpty())   // this is the first start, we need to subscribe
             subscribe();
-        else {
+
+        else {                              // data collection was only paused, restart it
             prepareTripLogging();
             restartDataCollection();
         }
@@ -110,6 +111,7 @@ public class SensorPlatformService extends Service implements IDataCallback, ITr
     public void onTripEnd() {
         this.onEventData(new EventVector(EventVector.LEVEL.DEBUG, System.currentTimeMillis(), "Trip End detected", 0));
 
+        // send out Intent to make sure the survey is displayed to the user even if the application was closed
         if(Preferences.surveyActivated(setting_prefs)) {
             Intent i = new Intent("au.carrsq.sensorplatform.survey");
             i.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
@@ -117,10 +119,14 @@ public class SensorPlatformService extends Service implements IDataCallback, ITr
             startActivity(i);
         }
 
+        // go into hibernation ...
         pauseDataCollection();
         startWaitBehaviour();
     }
 
+    /**
+     * Creates a new ID for the trip, new files for logging
+     */
     private void prepareTripLogging() {
         SharedPreferences studyPrefs = getApplication().getSharedPreferences(getApplication().getString(R.string.study_preferences_key), Context.MODE_PRIVATE);
         lm.generateNewLoggingID(studyPrefs.getString("p_ID", "empty"));
@@ -203,6 +209,7 @@ public class SensorPlatformService extends Service implements IDataCallback, ITr
         Subscription s = new Subscription(type);
         Log.d("Subscribe To", "New: " + type);
 
+        // start data collection of this sensor
         if(type == DataType.CAMERA_RAW) {
             im.startCapture();
         } else {
@@ -236,12 +243,17 @@ public class SensorPlatformService extends Service implements IDataCallback, ITr
         ActiveSubscriptions.setLogEvent(log);
     }
 
+    /**
+     * This method receives the raw data vectors coming from the SensorModule
+     * @param dv
+     */
     @Override
     public void onRawData(DataVector dv) {
         // ignore any incoming data if we are in waiting behaviour
         if(waiting)
             return;
 
+        // does the data indicate the end of a trip?
         teDetector.checkForTripEnd(dv);
 
         // the time-to-collision calculation needs info about the current speed
@@ -249,10 +261,12 @@ public class SensorPlatformService extends Service implements IDataCallback, ITr
                 Preferences.backImagesProcessingActivated(setting_prefs))
             im.updateSpeed(dv.speed, dv.obdSpeed);
 
+        // broadcast raw data so that a frontend can display it
         Intent raw = new Intent("au.carrsq.sensorplatform.RawData");
         raw.putExtra("RawData", new Gson().toJson(dv));
         LocalBroadcastManager.getInstance(getApplicationContext()).sendBroadcast(raw);
 
+        // Log the raw data to file
         if(ActiveSubscriptions.rawLoggingActive()) {
             lm.writeRawToCSV(dv);
         }
@@ -265,7 +279,6 @@ public class SensorPlatformService extends Service implements IDataCallback, ITr
         if(waiting)
             return;
 
-        Log.d("EVENT", "Still waiting?" + waiting+"");
         // check if the log level is active
         if( levels.contains(EventVector.LEVEL.ALL) || levels.contains(ev.getLevel()) ) {
             // save a video of this event
@@ -280,19 +293,21 @@ public class SensorPlatformService extends Service implements IDataCallback, ITr
                 }
             }
 
+            // broadcast event data
+            Intent event = new Intent("au.carrsq.sensorplatform.EventData");
+            event.putExtra("EventData", new Gson().toJson(ev));
+            LocalBroadcastManager.getInstance(getApplicationContext()).sendBroadcast(event);
+
             // write to log files
             if( ActiveSubscriptions.eventLoggingActive() && !(ev.getLevel() == EventVector.LEVEL.DEBUG) ) {
                 lm.writeEventToCSV(ev);
             }
 
-            // broadcast event data
-            Intent event = new Intent("au.carrsq.sensorplatform.EventData");
-            event.putExtra("EventData", new Gson().toJson(ev));
-            LocalBroadcastManager.getInstance(getApplicationContext()).sendBroadcast(event);
         }
 
     }
 
+    // provides an access point for the activity to start/stop the OBD setup
     public void initiateOBDConnection() {
         this.sm.initiateOBDSetup();
     }
@@ -300,31 +315,40 @@ public class SensorPlatformService extends Service implements IDataCallback, ITr
         this.sm.cancelOBDSetup();
     }
 
+    // provides an access point for the activity to start/stop the user phone setup
     public void initiatePhoneConnection() {
         this.server.setupServer(getApplicationContext());
     }
-
     public void cancelPhoneConnection() {
         this.server.cancel();
     }
 
+    /**
+     *  This method receives the intents started by activites/fragments ...
+     *  Can start, pause, resume, stop the service
+     */
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
         String message = "Data Collection running.";
         if(intent != null && intent.getAction() != null) {
             Log.d("INTENT", intent.getAction());
+
             if(intent.getAction().equals("SERVICE_STOP")) {
                 stopService();
                 return START_NOT_STICKY;
             }
+
             if(intent.getAction().equals("SERVICE_PAUSE")) {
                 pauseDataCollection();
                 message = "Data Collection Paused.";
             }
+
             if(intent.getAction().equals("SERVICE_RESUME")) {
                 restartDataCollection();
             }
+
             if(intent.getAction().equals("SERVICE_DATA_START")) {
+                // create a foreground notification
                 Notification note = new NotificationCompat.Builder(getApplicationContext())
                         .setContentTitle("Sensor Platform")
                         .setContentText(message)
@@ -366,6 +390,10 @@ public class SensorPlatformService extends Service implements IDataCallback, ITr
         super.onDestroy();
     }
 
+    /**
+     * Stops the service.
+     * Makes sure everything is shut down correctly before destroying itself.
+     */
     public void stopService() {
         Log.d("SENSOR PLATFORM SERVICE", "Stop Service");
         Iterator<Subscription> it = ActiveSubscriptions.get().iterator();

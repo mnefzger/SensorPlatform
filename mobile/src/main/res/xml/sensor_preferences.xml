@@ -34,7 +34,7 @@
             android:defaultValue="true"/>
         <CheckBoxPreference
             android:key="map_active"
-            android:title="Open Street Map Data"
+            android:title="Speed Limit Data"
             android:summary="Activates queries to OpenStreetMap to detect speeding. Requires internet connection"
             android:defaultValue="true"
             android:dependency="location_raw"/>

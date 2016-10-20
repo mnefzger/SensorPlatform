@@ -37,6 +37,9 @@ import au.carrsq.sensorplatform.Utilities.PermissionManager;
 
 public class MainActivity extends AppCompatActivity {
 
+    /**
+     * Load native libraries for OpenCV and image processing
+     */
     static {
         try {
             System.loadLibrary("opencv_java3");
@@ -46,6 +49,9 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
+    /**
+     * Fragments
+     */
     StartFragment startFragment;
     SetupFirstFragment setupFragment;
     SensorSetupFragment sensorsFragment;
@@ -55,13 +61,13 @@ public class MainActivity extends AppCompatActivity {
     AppFragment appFragment;
     SurveyFragment surveyFragment;
     CameraPreviewFragment cameraFragment;
+    private boolean inAppFragment, inSensorFragment, inSettingsFragment,
+            inOBDFragment, inCameraFragment, inPhoneFragment = false;
 
     SensorPlatformService sPS;
     public static boolean mBound = false;
     public static boolean started = false;
 
-    private boolean inAppFragment, inSensorFragment, inSettingsFragment,
-                    inOBDFragment, inCameraFragment, inPhoneFragment = false;
     private boolean studySetupComplete = false;
     private boolean setupStarted = false;
 
@@ -72,10 +78,13 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+        // make sure all the required permissions are granted
         PermissionManager.verifyPermissions(this);
 
+        // populate the preference files
         setupPreferences();
 
+        // Check if this is the first start or just a re-instantiation
         if(savedInstanceState == null) {
             Log.d("CREATE", "New activity");
 
@@ -88,7 +97,7 @@ public class MainActivity extends AppCompatActivity {
 
                 goToStartFragment(0, true);
 
-            } else if(studySetupComplete || !setupStarted){
+            } else if(checkIfServiceRunning() && (studySetupComplete || !setupStarted) ){ // new activity but service is already running
                 started = true;
 
                 Log.d("CREATE", "Service running, binding it and changing fragment");
@@ -100,8 +109,7 @@ public class MainActivity extends AppCompatActivity {
 
             }
 
-        } else {
-            // if the data collection was already started, set reference to the UI fragment that shows live data
+        } else { // activity was destroyed (e.g. for orientation change)
             started = savedInstanceState.getBoolean("started");
 
             if(!mBound) {
@@ -112,6 +120,7 @@ public class MainActivity extends AppCompatActivity {
 
             Log.d("RECREATE", "started:"+started+", bound:"+mBound);
 
+            // if the data collection was already started, switch to fragment that shows live data
             if(started)
                 goToAppFragment();
         }
@@ -148,6 +157,9 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
+    /**
+     *  changes to the live data fragment and notifies service to start data collection
+     */
     public void startMeasuring() {
         goToAppFragment();
 
@@ -156,8 +168,10 @@ public class MainActivity extends AppCompatActivity {
         startService(startIntent);
         started = true;
 
-        //sPS.startWaitBehaviour();
-        sPS.subscribe();
+        // trip start detection
+        sPS.startWaitBehaviour();
+        // start data collection immediately
+        //sPS.subscribe();
     }
 
     private void doUnbindService() {
@@ -169,6 +183,10 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
+    /**
+     * The connection to the background service
+     * Even if this connection disconnects, the service continues running
+     */
     private ServiceConnection mConnection = new ServiceConnection() {
         @Override
         public void onServiceConnected(ComponentName className, IBinder service) {
@@ -205,6 +223,7 @@ public class MainActivity extends AppCompatActivity {
     @Override
     public void onSaveInstanceState(Bundle savedInstanceState) {
         super.onSaveInstanceState(savedInstanceState);
+        // save whether the data collection was already started
         savedInstanceState.putBoolean("started", started);
     }
 
@@ -215,6 +234,10 @@ public class MainActivity extends AppCompatActivity {
         Log.d("OnNewIntent", intent.getAction());
     }
 
+    /**
+     * Allows to wake up phone and start activity at the end of a trip to show the survey.
+     * The intent is triggered in the background service
+     */
     private void handleSurveyIntent() {
         Intent intent = getIntent();
         if(intent.getAction() != null && intent.getAction().equals("au.carrsq.sensorplatform.survey")) {
@@ -259,6 +282,7 @@ public class MainActivity extends AppCompatActivity {
     public void onDestroy() {
         super.onDestroy();
 
+        // Only kill the service if data collection was not yet started
         if(!studySetupComplete && checkIfServiceRunning() && !started && !SensorPlatformService.serviceRunning) {
             Intent intent = new Intent(this, SensorPlatformService.class);
             intent.setAction("SERVICE_STOP");
@@ -309,7 +333,7 @@ public class MainActivity extends AppCompatActivity {
     public void goToNewStudyFragment(boolean forward) {
         setupFragment = new SetupFirstFragment();
         changeFragment(setupFragment, true, true, forward);
-        this.setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_UNSPECIFIED);
+        this.setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
         setupStarted = true;
     }
 
@@ -323,14 +347,14 @@ public class MainActivity extends AppCompatActivity {
         transaction.addToBackStack(sensorsFragment.getClass().getName());
         transaction.replace(R.id.fragment_container, sensorsFragment).commit();
 
-        this.setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_UNSPECIFIED);
+        this.setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
         inSensorFragment = true;
     }
 
     public void goToOBDSetupFragment(boolean forward) {
         obdFragment = new OBDSetupFragment();
         changeFragment(obdFragment, true, true, forward);
-        this.setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_UNSPECIFIED);
+        this.setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
 
         inOBDFragment = true;
     }
@@ -338,7 +362,7 @@ public class MainActivity extends AppCompatActivity {
     public void goToPhoneSetupFragment(boolean forward) {
         phoneFragment = new SecondPhoneSetupFragment();
         changeFragment(phoneFragment, true, true, forward);
-        this.setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_UNSPECIFIED);
+        this.setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
 
         inPhoneFragment = true;
     }
@@ -352,7 +376,7 @@ public class MainActivity extends AppCompatActivity {
             transaction.setCustomAnimations(R.animator.slide_in_left_animator, R.animator.slide_out_right_animator);
         transaction.addToBackStack(settings.getClass().getName());
         transaction.replace(R.id.fragment_container, settings).commit();
-        this.setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_UNSPECIFIED);
+        this.setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
 
         inSettingsFragment = true;
     }
@@ -456,6 +480,10 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
+    /**
+     * Start activity when the OS forwards an intent triggered by a NFC tag.
+     * Prevents second activity to start if application is already running
+     */
     public static void setupForegroundDispatch(final Activity activity, NfcAdapter adapter) {
         final Intent intent = new Intent(activity.getApplicationContext(), activity.getClass());
         intent.setFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP);

@@ -8,6 +8,7 @@ import android.content.DialogInterface;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.preference.CheckBoxPreference;
+import android.preference.EditTextPreference;
 import android.preference.ListPreference;
 import android.preference.PreferenceFragment;
 import android.util.Log;
@@ -69,6 +70,10 @@ public class SettingsFragment extends PreferenceFragment
             front_proc.setEnabled(false);
             front_proc.setSelectable(false);
 
+            EditTextPreference front_proc_fps = (EditTextPreference) findPreference("front_processing_fps");
+            front_proc_fps.setEnabled(false);
+            front_proc_fps.setSelectable(false);
+
         }
 
         if(!Preferences.backCameraActivated(sensor_prefs) ) {
@@ -77,6 +82,9 @@ public class SettingsFragment extends PreferenceFragment
             back_proc.setEnabled(false);
             back_proc.setSelectable(false);
 
+            EditTextPreference back_proc_fps = (EditTextPreference) findPreference("back_processing_fps");
+            back_proc_fps.setEnabled(false);
+            back_proc_fps.setSelectable(false);
         }
 
         CheckBoxPreference survey = (CheckBoxPreference) findPreference("survey_active");
@@ -171,11 +179,13 @@ public class SettingsFragment extends PreferenceFragment
                 findPreference("image_saving").setEnabled(true);
                 findPreference("image_saving").setSelectable(true);
             }
+
         } else if(key.equals("obd_raw")) {
             boolean obd = sharedPreferences.getBoolean("obd_raw", false);
             SharedPreferences.Editor editor = sharedPreferences.edit();
             editor.putBoolean("obd_raw", obd);
             editor.apply();
+
         } else if(key.equals("survey_active")) {
             CheckBoxPreference survey = (CheckBoxPreference) findPreference("survey_active");
             if(survey.isChecked()) {

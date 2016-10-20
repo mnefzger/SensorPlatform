@@ -76,15 +76,13 @@
             android:key="front_processing_fps"
             android:title="Front camera processing FPS"
             android:summary="Processed frames per second for the front camera"
-            android:defaultValue="@integer/front_processing_fps"
-            android:dependency="image_front_processing"/>
+            android:defaultValue="@integer/front_processing_fps"/>
 
         <EditTextPreference
             android:key="back_processing_fps"
             android:title="Back camera processing FPS"
             android:summary="Processed frames per second for the back camera"
-            android:defaultValue="@integer/back_processing_fps"
-            android:dependency="image_back_processing"/>
+            android:defaultValue="@integer/back_processing_fps" />
     </PreferenceCategory>
 
     <PreferenceCategory android:title="Video Analysis">

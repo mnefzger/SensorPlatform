@@ -8,9 +8,6 @@ import java.io.IOException;
 import java.lang.reflect.Method;
 import java.util.UUID;
 
-/**
- * Created by matthias on 05/09/16.
- */
 public class BluetoothConnection {
     private static final String TAG = "BLUETOOTH_CONNECTION";
 

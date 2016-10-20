@@ -75,9 +75,14 @@ public class OBD2Provider extends DataProvider implements OBD2Connector.IConnect
                 OBD2Connection.sock.getOutputStream().close();
                 OBD2Connection.sock.close();
                 OBD2Connection.sock = null;
+                OBD2Connection.connector.stopTimeout();
             }catch (Exception e) {
                 e.printStackTrace();
             }
+        }
+
+        if(OBD2Connection.connector != null) {
+            OBD2Connection.connector.stopTimeout();
         }
 
         collecting = false;

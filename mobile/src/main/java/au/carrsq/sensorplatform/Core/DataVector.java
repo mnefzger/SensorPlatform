@@ -4,6 +4,9 @@ import org.threeten.bp.Instant;
 import org.threeten.bp.LocalDateTime;
 import org.threeten.bp.ZoneId;
 
+/**
+ * Each instance of this class contains the raw data values of a given time interval
+ */
 public class DataVector {
     /**
      * Study parameters

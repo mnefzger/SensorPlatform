@@ -74,12 +74,12 @@ public class AccelerometerProvider extends SensorProvider {
         /**
          * report back smoothed values
          */
-        reportEMAValues(linear_acceleration);
+        //reportEMAValues(linear_acceleration);
         /**
          * report back unfiltered values (only gravity influence eliminated)
          */
         //sensorCallback.onAccelerometerData(linear_acceleration);
-        //reportKalmanValues(linear_acceleration);
+        reportKalmanValues(linear_acceleration);
     }
 
     /**

@@ -23,7 +23,7 @@ public enum DataType {
      */
     LIGHT,
     /**
-     * includes lat, lon, current speed
+     *
      */
     LOCATION_RAW,
     /**

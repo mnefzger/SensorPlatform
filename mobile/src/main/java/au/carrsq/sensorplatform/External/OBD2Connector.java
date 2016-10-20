@@ -76,28 +76,34 @@ public class OBD2Connector {
         Log.d(TAG, "Start discovery...");
         btAdapter.startDiscovery();
 
-        startTimeout(15000);
+        startTimeout(18000);
     }
 
-    private void startTimeout(int milliseconds) {
-        Handler h = new Handler(Looper.getMainLooper());
-        h.postDelayed(new Runnable() {
-            @Override
-            public void run() {
-                if(!found) {
-                    app.sendBroadcast(new Intent("OBD_NOT_FOUND"));
-                    try{
-                        app.unregisterReceiver(mReceiver);
-                    } catch (Exception e) {
-                        Log.e("OBD RECEIVER", e.toString());
-                    }
-                    receiverRegistered = false;
-                    btAdapter.cancelDiscovery();
+    Handler h = new Handler(Looper.getMainLooper());
+    Runnable r = new Runnable() {
+        @Override
+        public void run() {
+            if(!found) {
+                app.sendBroadcast(new Intent("OBD_NOT_FOUND"));
+                try{
+                    app.unregisterReceiver(mReceiver);
+                } catch (Exception e) {
+                    Log.e("OBD RECEIVER", e.toString());
                 }
+                receiverRegistered = false;
+                btAdapter.cancelDiscovery();
             }
-        }, milliseconds);
+        }
+    };
+    private void startTimeout(int milliseconds) {
+        h.postDelayed(r, milliseconds);
+
     }
 
+    public void stopTimeout() {
+        h.removeCallbacks(r);
+        Log.d(TAG, "Stop timeout");
+    }
     public void unregisterReceiver() {
         if(receiverRegistered)
             app.unregisterReceiver(mReceiver);

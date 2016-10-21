@@ -48,21 +48,17 @@ JNIEXPORT jintArray Java_au_carrsq_sensorplatform_Processors_ImageProcessor_nAsm
 	jintArray result;
 	Mat image = *((Mat*) address);
 
-    /*
-    * Resizing leads to weird behaviour
-    *
-    Mat mini;
-    Size small( 200 , 150 );
-    resize(image, mini, small);
-    */
-
     Mat gray(image.rows, image.cols, image.depth());
     cvtColor(image, gray, COLOR_YUV2GRAY_I420);
     if(flipped == true) flip(gray, gray, -1);
 
+    Size size(320, 240);
+    Mat gray_small(240, 320, gray.depth());
+    resize(gray, gray_small, size);
+
     vector< Rect > faces;
     //faceCascadeHaar.detectMultiScale(gray, faces, 1.1, 2, 0 | CV_HAAR_SCALE_IMAGE, Size(30, 30));
-    faceCascadeLBP.detectMultiScale( gray, faces, 1.1, 2, 0, Size(30, 30) );
+    faceCascadeLBP.detectMultiScale( gray_small, faces, 1.1, 2, 0, Size(30, 30) );
     //faceCascadeLBP2.detectMultiScale( gray, faces, 1.1, 2, 0, Size(30, 30) );
 
 
@@ -77,15 +73,15 @@ JNIEXPORT jintArray Java_au_carrsq_sensorplatform_Processors_ImageProcessor_nAsm
 
 		env->SetIntArrayRegion(result, 0, 4, tmp_array);
 
-        rectangle(gray, faces[0], CV_RGB(255, 255, 255), 1);
+        rectangle(gray_small, faces[0], CV_RGB(255, 255, 255), 1);
 
     } else {
         result = env->NewIntArray(0);
     }
 
     /*
-    Mat bgr(gray.rows, gray.cols, CV_8UC3);
-    cvtColor(gray, bgr, COLOR_GRAY2BGR);
+    Mat bgr(gray_small.rows, gray_small.cols, CV_8UC3);
+    cvtColor(gray_small, bgr, COLOR_GRAY2BGR);
 
     Mat yuv;
     cvtColor(bgr, yuv, COLOR_BGR2YUV_I420);

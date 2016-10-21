@@ -237,8 +237,13 @@ public class MainActivity extends AppCompatActivity {
 
     @Override
     public void onDestroy() {
-        unregisterReceiver(mReceiver);
-        unregisterReceiver(stopReceiver);
+        try {
+            unregisterReceiver(mReceiver);
+            unregisterReceiver(stopReceiver);
+        } catch (Exception e) {
+            Log.e("On Destroy", "Receiver was not registered: " + e.toString());
+        }
+
 
         super.onDestroy();
     }

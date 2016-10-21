@@ -20,7 +20,7 @@
             android:layout_weight="1"
             android:textColor="#fff"
             android:textSize="19sp"
-            android:text="On the next screen, please allow the application to read incoming notifications. " />
+            android:text="On the next screen, please activate the checkbox for the application 'SensorPlatform'.\n\nAfter that, press the Back-Button to return to this screen." />
     </LinearLayout>
 
     <LinearLayout

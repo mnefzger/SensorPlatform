@@ -40,7 +40,7 @@ public class SensorSetupFragment extends PreferenceFragment implements View.OnCl
         // do not show obd option since obd comes in the next step of setup, but is still in the same preference file
         Preference obd = findPreference("obd_raw");
         hiddenOBD = obd;
-        PreferenceCategory sensors = (PreferenceCategory) findPreference("sensors");
+        PreferenceCategory sensors = (PreferenceCategory) findPreference("external");
         sensors.removePreference(obd);
 
         /**

@@ -52,8 +52,8 @@ public class WeatherProvider extends DataProvider{
     public void updateLocation(double lat, double lon) {
         this.currentLat = lat;
         this.currentLon = lon;
-        if(first){
-            //queryWeather();
+        if(first){ // first valid location -> query weather
+            queryWeather();
             first = false;
         }
     }
@@ -90,7 +90,6 @@ public class WeatherProvider extends DataProvider{
                         Log.d("WEATHER", "Trying to parse..." + response);
                         Gson gson = new Gson();
                         WeatherResponse weatherResponse = gson.fromJson(response, WeatherResponse.class);
-                        Log.d("WEATHER", "Successfully parsed weather :((( ");
                         processResponse(weatherResponse);
                     }
                 }, new Response.ErrorListener() {

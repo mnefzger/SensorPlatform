@@ -46,7 +46,7 @@
             android:dependency="location_raw"/>
     </PreferenceCategory>
 
-    <PreferenceCategory android:title="External Sensors">
+    <PreferenceCategory android:title="External Sensors" android:key="external">
         <CheckBoxPreference
             android:key="heartRate_raw"
             android:title="Heart Rate"

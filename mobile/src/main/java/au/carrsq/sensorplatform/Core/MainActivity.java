@@ -169,9 +169,9 @@ public class MainActivity extends AppCompatActivity {
         started = true;
 
         // trip start detection
-        sPS.startWaitBehaviour();
+        //sPS.startWaitBehaviour();
         // start data collection immediately
-        //sPS.subscribe();
+        sPS.subscribe();
     }
 
     private void doUnbindService() {

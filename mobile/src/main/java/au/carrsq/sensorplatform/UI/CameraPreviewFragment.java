@@ -349,18 +349,19 @@ public class CameraPreviewFragment extends Fragment {
             }
         });
 
-        final SharedPreferences setting_prefs = getActivity().getSharedPreferences(getActivity().getString(R.string.settings_preferences_key), Context.MODE_PRIVATE);
+
         Button switchOrientation = (Button) view.findViewById(R.id.orientationButton);
         switchOrientation.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                SharedPreferences setting_prefs = getActivity().getSharedPreferences(getActivity().getString(R.string.settings_preferences_key), Context.MODE_PRIVATE);
                 boolean reversed = Preferences.isReverseOrientation(setting_prefs);
+
                 reversed = !reversed;
 
                 SharedPreferences.Editor editor = setting_prefs.edit();
                 editor.putBoolean("reverse_orientation", reversed);
-                editor.apply();
-
+                editor.commit();
 
                 if(reversed)
                     getActivity().setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_REVERSE_LANDSCAPE);

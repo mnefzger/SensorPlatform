@@ -12,6 +12,18 @@ import com.github.pires.obd.commands.ObdCommand;
 import com.github.pires.obd.commands.SpeedCommand;
 import com.github.pires.obd.commands.engine.RPMCommand;
 import com.github.pires.obd.commands.fuel.ConsumptionRateCommand;
+import com.github.pires.obd.commands.protocol.AvailablePidsCommand;
+import com.github.pires.obd.commands.protocol.AvailablePidsCommand_01_20;
+import com.github.pires.obd.commands.protocol.EchoOffCommand;
+import com.github.pires.obd.commands.protocol.HeadersOffCommand;
+import com.github.pires.obd.commands.protocol.LineFeedOffCommand;
+import com.github.pires.obd.commands.protocol.ObdResetCommand;
+import com.github.pires.obd.commands.protocol.ObdWarmstartCommand;
+import com.github.pires.obd.commands.protocol.SelectProtocolCommand;
+import com.github.pires.obd.commands.protocol.SpacesOffCommand;
+import com.github.pires.obd.commands.protocol.TimeoutCommand;
+import com.github.pires.obd.commands.temperature.AmbientAirTemperatureCommand;
+import com.github.pires.obd.enums.ObdProtocols;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -120,26 +132,52 @@ public class OBD2Provider extends DataProvider implements OBD2Connector.IConnect
      */
     private void setup() {
         setupRunning = true;
-        // allow small wait for connection to be stable
-        try { Thread.sleep(500); } catch (InterruptedException e) { e.printStackTrace(); }
+
+        //runCommand(OBD2Connection.sock, "ATD");
+        //try { Thread.sleep(500); } catch (InterruptedException e) { e.printStackTrace(); }
+
+        //AvailablePidsCommand_01_20 start = new AvailablePidsCommand_01_20();
+        //runCommand(OBD2Connection.sock, start);
+        //Log.d("OBD START", start.getResult());
+        //runCommand(OBD2Connection.sock, "01 00");
+
+        //try { Thread.sleep(1000); } catch (InterruptedException e) { e.printStackTrace(); }
 
         /* Setup */
-        runCommand(OBD2Connection.sock, "ATD");
-        runCommand(OBD2Connection.sock, "ATZ");
-        runCommand(OBD2Connection.sock, "ATZ");
-        runCommand(OBD2Connection.sock, "ATZ");
-        runCommand(OBD2Connection.sock, "ATZ");
-        runCommand(OBD2Connection.sock, "AT E0");
-        runCommand(OBD2Connection.sock, "AT L0");
-        runCommand(OBD2Connection.sock, "AT S0");
-        runCommand(OBD2Connection.sock, "AT H0");
+        ObdResetCommand reset = new ObdResetCommand();
+        runCommand(OBD2Connection.sock, reset);
+        //runCommand(OBD2Connection.sock, "ATZ");
+
+        // allow small wait for reset
+        try { Thread.sleep(500); } catch (InterruptedException e) { e.printStackTrace(); }
+
+        EchoOffCommand e0 = new EchoOffCommand();
+        runCommand(OBD2Connection.sock, e0);
+        //runCommand(OBD2Connection.sock, "AT E0");
+
+        runCommand(OBD2Connection.sock, e0);
+
+        LineFeedOffCommand l0 = new LineFeedOffCommand();
+        runCommand(OBD2Connection.sock, l0);
+        //runCommand(OBD2Connection.sock, "AT L0");
+
+        SpacesOffCommand s0 = new SpacesOffCommand();
+        runCommand(OBD2Connection.sock, s0);
+        //runCommand(OBD2Connection.sock, "AT S0");
+
+        HeadersOffCommand h0 = new HeadersOffCommand();
+        runCommand(OBD2Connection.sock, h0);
+        //runCommand(OBD2Connection.sock, "AT H0");
+
+        TimeoutCommand t0 = new TimeoutCommand(62);
+        runCommand(OBD2Connection.sock, t0);
+
+        SelectProtocolCommand select = new SelectProtocolCommand(ObdProtocols.AUTO);
+        runCommand(OBD2Connection.sock, select);
 
         // try to run a command
-        SpeedCommand cmd = new SpeedCommand();
+        AmbientAirTemperatureCommand cmd = new AmbientAirTemperatureCommand();
         runCommand(OBD2Connection.sock, cmd);
-
-        RPMCommand rpm_cmd = new RPMCommand();
-        runCommand(OBD2Connection.sock, rpm_cmd);
 
         app.sendBroadcast(new Intent("OBD_SETUP_COMPLETE"));
 
@@ -215,6 +253,7 @@ public class OBD2Provider extends DataProvider implements OBD2Connector.IConnect
     public void runCommand(BluetoothSocket s, ObdCommand cmd) {
         if(OBD2Connection.obd2Device != null) {
             try {
+                Log.d("CMD", cmd.getCommandPID());
                 cmd.run(s.getInputStream(), s.getOutputStream());
 
             } catch (IOException io) {

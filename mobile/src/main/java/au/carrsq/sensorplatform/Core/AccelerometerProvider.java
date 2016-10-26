@@ -70,16 +70,15 @@ public class AccelerometerProvider extends SensorProvider {
         linear_acceleration[1] = event.values[1] - gravity[1];
         linear_acceleration[2] = event.values[2] - gravity[2];
 
-
         /**
          * report back smoothed values
          */
-        reportEMAValues(linear_acceleration);
+        //reportEMAValues(linear_acceleration);
         /**
          * report back unfiltered values (only gravity influence eliminated)
          */
         //sensorCallback.onAccelerometerData(linear_acceleration);
-        //reportKalmanValues(linear_acceleration);
+        reportKalmanValues(linear_acceleration);
     }
 
     /**
@@ -88,28 +87,28 @@ public class AccelerometerProvider extends SensorProvider {
      * @param newest The most recent accelerometer reading
      */
     private void reportEMAValues(double[] newest) {
-        /*
-        lastValues.add(newest);
-        if(lastValues.size() > WINDOW) {
-            lastValues.remove(0);
-        }
-        double[] emaValues = MathFunctions.getAccEMA(lastValues);
-        */
-
         double[] emaValues = MathFunctions.getEMA(newest, lastValue, 0.9);
         lastValue = emaValues;
 
         sensorCallback.onAccelerometerData(emaValues);
     }
 
-    private double q = 0.125;
-    private double r = 4;
-    private double p = 1023;
-    private double x = 0;
+    /**
+     * One-dimensional Kalman Filter
+     * http://interactive-matter.eu/blog/2009/12/18/filtering-sensor-data-with-a-kalman-filter/
+     */
+    private double q = 0.125; // process noise covariance
+    private double r = 4; // measurement noise covariance
+    private double p = 1023; // estimation error covariance
+    private double x = 0; // initial value
+
     private void reportKalmanValues(double[] values) {
         double lastZAcc = values[2];
 
+        // prediction step
         p = p + q;
+
+        // measurement update
         double k = p / (p+r);
         x = x + k * (lastZAcc - x);
         p = (1-k) * p;

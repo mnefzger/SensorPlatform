@@ -12,13 +12,10 @@ import com.github.pires.obd.commands.ObdCommand;
 import com.github.pires.obd.commands.SpeedCommand;
 import com.github.pires.obd.commands.engine.RPMCommand;
 import com.github.pires.obd.commands.fuel.ConsumptionRateCommand;
-import com.github.pires.obd.commands.protocol.AvailablePidsCommand;
-import com.github.pires.obd.commands.protocol.AvailablePidsCommand_01_20;
 import com.github.pires.obd.commands.protocol.EchoOffCommand;
 import com.github.pires.obd.commands.protocol.HeadersOffCommand;
 import com.github.pires.obd.commands.protocol.LineFeedOffCommand;
 import com.github.pires.obd.commands.protocol.ObdResetCommand;
-import com.github.pires.obd.commands.protocol.ObdWarmstartCommand;
 import com.github.pires.obd.commands.protocol.SelectProtocolCommand;
 import com.github.pires.obd.commands.protocol.SpacesOffCommand;
 import com.github.pires.obd.commands.protocol.TimeoutCommand;
@@ -38,10 +35,11 @@ import au.carrsq.sensorplatform.R;
 
 
 public class OBD2Provider extends DataProvider implements OBD2Connector.IConnectionEstablished{
-    SharedPreferences setting_prefs;
-    SharedPreferences sensor_prefs;
-    ISensorCallback callback;
+    private SharedPreferences setting_prefs;
+    private SharedPreferences sensor_prefs;
+    private ISensorCallback callback;
     private int OBD_DELAY;
+    private OBD2Connector connector;
 
     private boolean setupComplete = false;
     private boolean setupRunning = false;
@@ -52,7 +50,6 @@ public class OBD2Provider extends DataProvider implements OBD2Connector.IConnect
     private int outOfBoundsCounter = 0;
 
     private final String TAG = "OBD_BLUETOOTH";
-
 
     public OBD2Provider(Context app, ISensorCallback callback) {
         this.callback = callback;
@@ -87,14 +84,13 @@ public class OBD2Provider extends DataProvider implements OBD2Connector.IConnect
                 OBD2Connection.sock.getOutputStream().close();
                 OBD2Connection.sock.close();
                 OBD2Connection.sock = null;
-                OBD2Connection.connector.stopTimeout();
             }catch (Exception e) {
                 e.printStackTrace();
             }
         }
 
-        if(OBD2Connection.connector != null) {
-            OBD2Connection.connector.stopTimeout();
+        if(connector != null) {
+            connector.stopTimeout();
         }
 
         collecting = false;
@@ -103,11 +99,13 @@ public class OBD2Provider extends DataProvider implements OBD2Connector.IConnect
     }
 
     /*
-     * Sets up a new connection to the OBDII device.
-     * Is called for initial setup and in case of IOException with broken pipe
+     * Resets any existing connection and sets up a new connection to the OBD-II device.
+     * Is called for initial setup and in case of an IOException with a broken pipe
      */
     public void reset() {
         Log.d(TAG, "reset");
+
+        // set up broadcast receiver
         IntentFilter f = new IntentFilter();
         f.addAction("OBD_CONNECTED");
         f.addAction("OBD_NOT_FOUND");
@@ -118,7 +116,8 @@ public class OBD2Provider extends DataProvider implements OBD2Connector.IConnect
         OBD2Connection.sock = null;
         OBD2Connection.connected = false;
         setupComplete = false;
-        OBD2Connection.connector = new OBD2Connector(app, this);
+
+        connector = new OBD2Connector(app, this);
     }
 
     @Override
@@ -132,16 +131,6 @@ public class OBD2Provider extends DataProvider implements OBD2Connector.IConnect
      */
     private void setup() {
         setupRunning = true;
-
-        //runCommand(OBD2Connection.sock, "ATD");
-        //try { Thread.sleep(500); } catch (InterruptedException e) { e.printStackTrace(); }
-
-        //AvailablePidsCommand_01_20 start = new AvailablePidsCommand_01_20();
-        //runCommand(OBD2Connection.sock, start);
-        //Log.d("OBD START", start.getResult());
-        //runCommand(OBD2Connection.sock, "01 00");
-
-        //try { Thread.sleep(1000); } catch (InterruptedException e) { e.printStackTrace(); }
 
         /* Setup */
         ObdResetCommand reset = new ObdResetCommand();
@@ -175,7 +164,7 @@ public class OBD2Provider extends DataProvider implements OBD2Connector.IConnect
         SelectProtocolCommand select = new SelectProtocolCommand(ObdProtocols.AUTO);
         runCommand(OBD2Connection.sock, select);
 
-        // try to run a command
+        // try to run a 'real' command
         AmbientAirTemperatureCommand cmd = new AmbientAirTemperatureCommand();
         runCommand(OBD2Connection.sock, cmd);
 
@@ -202,8 +191,11 @@ public class OBD2Provider extends DataProvider implements OBD2Connector.IConnect
                     }).start();
 
                 } else if(collecting && !tryingToReconnect) {     // connection is lost, try reconnecting...
+                    // send -1 as indicator that no real data is coming through
                     double[] resp = {-1,-1,-1};
                     callback.onOBD2Data(resp);
+
+                    // reset connection
                     Log.d("OBD", "Connection lost, reconnecting.");
                     reset();
                 }
@@ -275,7 +267,6 @@ public class OBD2Provider extends DataProvider implements OBD2Connector.IConnect
                     callback.onOBD2Data(resp);
                     outOfBoundsCounter = 0;
                     reset();
-
                 }
 
             } catch(Exception e) {
@@ -284,6 +275,9 @@ public class OBD2Provider extends DataProvider implements OBD2Connector.IConnect
         }
     }
 
+    /**
+     * Run the command manually, not with the obd-java-api
+     */
     public void mRun(String cmd, InputStream in, OutputStream out) throws IOException,
             InterruptedException {
         Log.d("CMD", cmd);

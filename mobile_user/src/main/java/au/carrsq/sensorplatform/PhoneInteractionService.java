@@ -81,11 +81,12 @@ public class PhoneInteractionService extends Service implements View.OnTouchList
         }
 
         socket = BluetoothConnection.socket;
-        deviceAddress = socket.getRemoteDevice().getAddress();
-        Log.d(TAG, "Service created");
 
-        if(socket != null)
+        if(socket != null) {
+            deviceAddress = socket.getRemoteDevice().getAddress();
             setupListener(socket);
+        }
+        Log.d(TAG, "Service created");
     }
 
     private void setupListener(BluetoothSocket socket) {
@@ -206,7 +207,7 @@ public class PhoneInteractionService extends Service implements View.OnTouchList
     public void sendDataToPairedDevice(String message, String extra){
         if( socket == null && BluetoothConnection.socket != null ) {
             Log.d("BluetoothSend", "First time assignment");
-
+            socket = BluetoothConnection.socket;
         }  else if( !BluetoothConnection.connected && deviceAddress != null ) {
             Log.d("BluetoothSend", "Socket dead, reconnect.");
             reconnect();
@@ -225,7 +226,7 @@ public class PhoneInteractionService extends Service implements View.OnTouchList
             OutputStream mmOutStream = socket.getOutputStream();
             mmOutStream.write(toSend);
             Log.d("Sent to: ", socket.getRemoteDevice().getName() + ", " + message);
-        } catch (IOException e) {
+        } catch (Exception e) {
             Log.e("BluetoothSend", "Exception during write", e);
             if(e.getMessage().contains("Broken pipe")) {
                 if(deviceAddress != null)

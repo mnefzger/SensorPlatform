@@ -267,11 +267,6 @@ public class MainActivity extends AppCompatActivity {
     public void onPause() {
         super.onPause();
 
-        // don't forget to unregister the receiver
-        if(OBD2Connection.connector != null)
-            OBD2Connection.connector.unregisterReceiver();
-
-
         if(checkIfServiceRunning()) {
             doUnbindService();
         }

@@ -41,6 +41,7 @@ public class OBD2Connector {
 
                 Log.d(TAG, device.getName() + "");
 
+                // TODO do not hardcode device name, show list of possible options
                 if(device.getName() != null && device.getName().equals("OBDII")) {
                     app.sendBroadcast(new Intent("OBD_FOUND"));
                     found = true;
@@ -76,6 +77,7 @@ public class OBD2Connector {
         Log.d(TAG, "Start discovery...");
         btAdapter.startDiscovery();
 
+        // after this timeout, cancel the discovery
         startTimeout(18000);
     }
 
@@ -95,22 +97,24 @@ public class OBD2Connector {
             }
         }
     };
+
     private void startTimeout(int milliseconds) {
         h.postDelayed(r, milliseconds);
-
     }
 
-    public void stopTimeout() {
+    void stopTimeout() {
         h.removeCallbacks(r);
+        unregisterReceiver();
         Log.d(TAG, "Stop timeout");
     }
+
     public void unregisterReceiver() {
         if(receiverRegistered)
             app.unregisterReceiver(mReceiver);
         receiverRegistered = false;
     }
 
-    public void registerReceiver() {
+    private void registerReceiver() {
         IntentFilter filter = new IntentFilter(BluetoothDevice.ACTION_FOUND);
         if(!receiverRegistered && (OBD2Connection.sock == null || !OBD2Connection.sock.isConnected()) ) {
             app.registerReceiver(mReceiver, filter);
@@ -119,7 +123,9 @@ public class OBD2Connector {
         }
     }
 
-
+    /**
+     * Once the correct device is found, establish the connection
+     */
     private void connectToOBD2Device() {
         try{
             OBD2Connection.sock = BluetoothManager.connect(OBD2Connection.obd2Device);
@@ -127,7 +133,6 @@ public class OBD2Connector {
             Log.d(TAG, "Connected to: " + OBD2Connection.obd2Device.getName() + "-> " + OBD2Connection.sock.isConnected());
             app.sendBroadcast(new Intent("OBD_CONNECTED"));
             callback.onConnectionEstablished();
-
 
         } catch (IOException e) {
             e.printStackTrace();

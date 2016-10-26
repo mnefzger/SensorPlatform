@@ -189,7 +189,7 @@ public class UserPhoneBluetoothServer {
             }
 
             if(!description.equals(""))
-                callback.onEventDetected(new EventVector(EventVector.LEVEL.HIGH_RISK, System.currentTimeMillis(), description, 1));
+                callback.onEventDetectedWithoutTimestamp(new EventVector(EventVector.LEVEL.HIGH_RISK, System.currentTimeMillis(), description, 1));
         }
 
         private void cancel() {

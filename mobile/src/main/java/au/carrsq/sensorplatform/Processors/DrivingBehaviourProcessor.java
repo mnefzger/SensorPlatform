@@ -95,6 +95,7 @@ public class DrivingBehaviourProcessor extends EventProcessor implements IOSMRes
      * @param lastData
      */
     private long lastAccDetected = 0;
+    private EventVector.LEVEL lastLevel;
     private void checkForHardAcc(List<DataVector> lastData) {
         List<Double> acc = new ArrayList<Double>();
         Iterator<DataVector> it = lastData.iterator();
@@ -161,69 +162,75 @@ public class DrivingBehaviourProcessor extends EventProcessor implements IOSMRes
     }
 
     /**
-     * Matches raw Z acceleration values against thresholds. If more than half of the provided values exceed the threshold, an event is triggered
+     * Matches raw Z acceleration values against thresholds. If more than a specified percentage of the provided values exceed the threshold, an event is triggered
      * @param values
      */
     public void checkForHardAccRaw(List<double[]> values) {
-        int countG_l = 0;
-        int countG_m = 0;
-        int countG_h = 0;
-        int countH_l = 0;
-        int countH_m = 0;
-        int countH_h = 0;
+        int countBrake_l = 0;
+        int countBrake_m = 0;
+        int countBrake_h = 0;
+        int countAcc_l = 0;
+        int countAcc_m = 0;
+        int countAcc_h = 0;
+
+        double max = 0;
         for(double[] v : values) {
             double accZ = v[2];
             if(accZ > ACC_THRESHOLD_HIGH) {
-                countG_h++;
+                countBrake_h++;
             } else if(accZ > ACC_THRESHOLD_MEDIUM) {
-                countG_m++;
+                countBrake_m++;
             } else if(accZ > ACC_THRESHOLD_LOW) {
-                countG_l++;
+                countBrake_l++;
             } else if(accZ < -ACC_THRESHOLD_HIGH) {
-                countH_h++;
+                countAcc_h++;
             } else if(accZ < -ACC_THRESHOLD_MEDIUM) {
-                countH_m++;
+                countAcc_m++;
             } else if(accZ < -ACC_THRESHOLD_LOW) {
-                countH_l++;
+                countAcc_l++;
             }
+
+            if(Math.abs(accZ) > Math.abs(max))
+                max = accZ;
         }
 
-        // last detected event was less than a minute ago
-        if( (System.currentTimeMillis()-lastAccDetected) < 1000 )
+        // last detected event was less than a second ago
+        if( (System.currentTimeMillis()-lastAccDetected) < 1000)
             return;
 
         // check if enough data was collected
-        if( values.size() < 30)
+        if( values.size() < 20)
             return;
 
-        Log.d("RAW", countG_h + ", " + countG_m + ", " + countG_l + ", " + countH_h + ", " + countH_m + ", " + countH_l);
+        //Log.d("RAW", countBrake_h + ", " + countBrake_m + ", " + countBrake_l + ", " + countAcc_h + ", " + countAcc_m + ", " + countAcc_l);
 
+        // the count of data points that have to be above the threshold, based on the initial sample size
         int frac = (int)(values.size()*0.5);
 
-        if(countG_h >= values.size() - frac) {
-            EventVector ev = new EventVector(EventVector.LEVEL.HIGH_RISK, currentVector.timestamp, "Brake", currentVector.accZ / 9.81);
+        if(countBrake_h >= values.size() - frac) {
+            EventVector ev = new EventVector(EventVector.LEVEL.HIGH_RISK, currentVector.timestamp, "Brake", max / 9.81);
             callback.onEventDetected(ev);
             lastAccDetected = currentVector.timestamp;
-        } else if( (countG_m+countG_h) >= values.size()-frac) {
-            EventVector ev = new EventVector(EventVector.LEVEL.MEDIUM_RISK, currentVector.timestamp, "Brake", currentVector.accZ / 9.81);
+        } else if( (countBrake_m+countBrake_h) >= values.size()-frac) {
+            EventVector ev = new EventVector(EventVector.LEVEL.MEDIUM_RISK, currentVector.timestamp, "Brake", max / 9.81);
             callback.onEventDetected(ev);
             lastAccDetected = currentVector.timestamp;
-        } else if( (countG_l+countG_m+countG_h) >= values.size()-frac) {
-            EventVector ev = new EventVector(EventVector.LEVEL.LOW_RISK, currentVector.timestamp, "Brake", currentVector.accZ / 9.81);
+        } else if( (countBrake_l+countBrake_m+countBrake_h) >= values.size()-frac) {
+            EventVector ev = new EventVector(EventVector.LEVEL.LOW_RISK, currentVector.timestamp, "Brake", max / 9.81);
             callback.onEventDetected(ev);
             lastAccDetected = currentVector.timestamp;
         }
 
-        if(countH_h >= values.size()-frac) {
-            EventVector ev = new EventVector(EventVector.LEVEL.HIGH_RISK, currentVector.timestamp, "Acceleration", currentVector.accZ / 9.81);
+        if(countAcc_h >= values.size()-frac) {
+            EventVector ev = new EventVector(EventVector.LEVEL.HIGH_RISK, currentVector.timestamp, "Acceleration", max / 9.81);
             callback.onEventDetected(ev);
             lastAccDetected = currentVector.timestamp;
-        } else if( (countH_m+countH_h) >= values.size()-frac) {
-            EventVector ev = new EventVector(EventVector.LEVEL.MEDIUM_RISK, currentVector.timestamp, "Acceleration", currentVector.accZ / 9.81);
+        } else if( (countAcc_m+countAcc_h) >= values.size()-frac) {
+            EventVector ev = new EventVector(EventVector.LEVEL.MEDIUM_RISK, currentVector.timestamp, "Acceleration", max / 9.81);
             callback.onEventDetected(ev);
             lastAccDetected = currentVector.timestamp;
-        } else if( (countH_l+countH_m+countH_h) >= values.size()-frac) {
-            EventVector ev = new EventVector(EventVector.LEVEL.LOW_RISK, currentVector.timestamp, "Acceleration", currentVector.accZ / 9.81);
+        } else if( (countAcc_l+countAcc_m+countAcc_h) >= values.size()-frac) {
+            EventVector ev = new EventVector(EventVector.LEVEL.LOW_RISK, currentVector.timestamp, "Acceleration", max / 9.81);
             callback.onEventDetected(ev);
             lastAccDetected = currentVector.timestamp;
         }

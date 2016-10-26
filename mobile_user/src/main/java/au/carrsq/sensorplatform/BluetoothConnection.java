@@ -13,11 +13,11 @@ public class BluetoothConnection {
 
     private static final String uuid = "00001101-0000-1000-8000-00805F9B34FB";
 
-    public static boolean connected = false;
-    public static BluetoothDevice device = null;
-    public static BluetoothSocket socket = null;
+    static boolean connected = false;
+    static BluetoothDevice device = null;
+    static BluetoothSocket socket = null;
 
-    public static BluetoothSocket connect(BluetoothDevice dev) throws IOException {
+    static BluetoothSocket connect(BluetoothDevice dev) throws IOException {
         BluetoothSocket sock = null;
         BluetoothSocket sockFallback = null;
 

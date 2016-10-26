@@ -305,6 +305,12 @@ public class ImageModule implements IEventCallback{
         callback.onEventData(v);
     }
 
+    @Override
+    public void onEventDetectedWithoutTimestamp(EventVector v) {
+        // empty, not in use
+        Log.e("ImageModule", "Used onEventDetectedWithoutTimestamp(), not implemented");
+    }
+
     public void saveVideoAfterEvent(EventVector ev) {
         final EventVector v = ev;
         if(!isSaving()) {

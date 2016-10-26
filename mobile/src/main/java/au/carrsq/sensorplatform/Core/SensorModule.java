@@ -327,7 +327,7 @@ public class SensorModule implements ISensorCallback, IEventCallback{
          * Do event processing on the raw accelerometer data
          */
         lastValues.add(dataValues);
-        if(lastValues.size() > 30) {
+        if(lastValues.size() > 20) {
             lastValues.remove(0);
         }
         drivingBehProc.checkForHardAccRaw(lastValues);
@@ -381,6 +381,17 @@ public class SensorModule implements ISensorCallback, IEventCallback{
      */
     @Override
     public void onEventDetected(EventVector v) {
+        callback.onEventData(v);
+    }
+
+    /**
+    * Hands the EventVector to the SensorPlatformService after adding the current timestamp
+    * @param v: the EventVector containing the event
+    */
+    @Override
+    public void onEventDetectedWithoutTimestamp(EventVector v) {
+        if(current.timestamp != 0)
+            v.setTimestamp(current.timestamp);
         callback.onEventData(v);
     }
 

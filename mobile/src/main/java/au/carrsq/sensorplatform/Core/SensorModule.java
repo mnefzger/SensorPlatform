@@ -338,7 +338,8 @@ public class SensorModule implements ISensorCallback, IEventCallback{
     public void onRotationData(float[][] values) {
         current.setRot( values[0][0], values[0][1], values[0][2] );
         current.setRotMatrix( values[1] );
-        current.setRotRad(values[2][0], values[2][1], values[2][2]);
+        // order is y,z,x coming from the OrientationProvider
+        current.setRotRad(values[2][2], values[2][0], values[2][1]);
     }
 
     @Override

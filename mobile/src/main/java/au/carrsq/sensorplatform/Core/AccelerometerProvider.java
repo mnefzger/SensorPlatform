@@ -101,8 +101,12 @@ public class AccelerometerProvider extends SensorProvider {
     private double r = 4; // measurement noise covariance
     private double p = 1023; // estimation error covariance
     private double x = 0; // initial value
+    private double y = 0; // initial value
+    private double z = 0; // initial value
 
     private void reportKalmanValues(double[] values) {
+        double lastXAcc = values[0];
+        double lastYAcc = values[1];
         double lastZAcc = values[2];
 
         // prediction step
@@ -110,11 +114,21 @@ public class AccelerometerProvider extends SensorProvider {
 
         // measurement update
         double k = p / (p+r);
-        x = x + k * (lastZAcc - x);
+        x = x + k * (lastXAcc - x);
+        y = y + k * (lastYAcc - y);
+        z = z + k * (lastZAcc - z);
         p = (1-k) * p;
 
-        values[2] = x;
-        sensorCallback.onAccelerometerData(values);
+        double[] merge = new double[6];
+        merge[0] = x;
+        merge[1] = y;
+        merge[2] = z;
+
+        // add raw data
+        merge[3] = lastXAcc;
+        merge[4] = lastYAcc;
+        merge[5] = lastZAcc;
+        sensorCallback.onAccelerometerData(merge);
     }
 
 

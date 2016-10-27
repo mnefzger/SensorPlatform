@@ -205,34 +205,34 @@ public class DrivingBehaviourProcessor extends EventProcessor implements IOSMRes
         //Log.d("RAW", countBrake_h + ", " + countBrake_m + ", " + countBrake_l + ", " + countAcc_h + ", " + countAcc_m + ", " + countAcc_l);
 
         // the count of data points that have to be above the threshold, based on the initial sample size
-        int frac = (int)(values.size()*0.5);
+        int frac = (int)(values.size()*0.75);
 
         if(countBrake_h >= values.size() - frac) {
             EventVector ev = new EventVector(EventVector.LEVEL.HIGH_RISK, currentVector.timestamp, "Brake", max / 9.81);
             callback.onEventDetected(ev);
-            lastAccDetected = currentVector.timestamp;
+            lastAccDetected = System.currentTimeMillis();
         } else if( (countBrake_m+countBrake_h) >= values.size()-frac) {
             EventVector ev = new EventVector(EventVector.LEVEL.MEDIUM_RISK, currentVector.timestamp, "Brake", max / 9.81);
             callback.onEventDetected(ev);
-            lastAccDetected = currentVector.timestamp;
+            lastAccDetected = System.currentTimeMillis();
         } else if( (countBrake_l+countBrake_m+countBrake_h) >= values.size()-frac) {
             EventVector ev = new EventVector(EventVector.LEVEL.LOW_RISK, currentVector.timestamp, "Brake", max / 9.81);
             callback.onEventDetected(ev);
-            lastAccDetected = currentVector.timestamp;
+            lastAccDetected = System.currentTimeMillis();
         }
 
         if(countAcc_h >= values.size()-frac) {
             EventVector ev = new EventVector(EventVector.LEVEL.HIGH_RISK, currentVector.timestamp, "Acceleration", max / 9.81);
             callback.onEventDetected(ev);
-            lastAccDetected = currentVector.timestamp;
+            lastAccDetected = System.currentTimeMillis();
         } else if( (countAcc_m+countAcc_h) >= values.size()-frac) {
             EventVector ev = new EventVector(EventVector.LEVEL.MEDIUM_RISK, currentVector.timestamp, "Acceleration", max / 9.81);
             callback.onEventDetected(ev);
-            lastAccDetected = currentVector.timestamp;
+            lastAccDetected = System.currentTimeMillis();
         } else if( (countAcc_l+countAcc_m+countAcc_h) >= values.size()-frac) {
             EventVector ev = new EventVector(EventVector.LEVEL.LOW_RISK, currentVector.timestamp, "Acceleration", max / 9.81);
             callback.onEventDetected(ev);
-            lastAccDetected = currentVector.timestamp;
+            lastAccDetected = System.currentTimeMillis();
         }
 
     }
@@ -250,10 +250,6 @@ public class DrivingBehaviourProcessor extends EventProcessor implements IOSMRes
         while(it.hasNext()) {
 
             DataVector v = it.next();
-            if(prevMatrix == null) {
-                prevMatrix = v.rotMatrix;
-                prevVector = v;
-            }
 
             if(prevMatrix != null && v.rotMatrix != null) {
                 float[] angleChange = new float[3];
@@ -261,28 +257,28 @@ public class DrivingBehaviourProcessor extends EventProcessor implements IOSMRes
                 SensorManager.getAngleChange(angleChange, prevMatrix, v.rotMatrix);
 
                 // convert to radian
-                float[] rad = MathFunctions.calculateRadAngles(angleChange);
+                //float[] rad = MathFunctions.calculateRadAngles(angleChange);
+                float[] rad = angleChange;
 
                 // normalize to radians per second
-                long t = (v.timestamp-prevVector.timestamp);
+                float t = (float) (v.timestamp - prevVector.timestamp);
                 if(t > 0) {
-                    float factor = 1000 / t;
-                    rad[2] = factor*rad[2];
+                    float factor = 1000.0f / t;
+                    rad[1] = factor*rad[1];
                 }
 
-
-                if(rad[2] < leftDelta)  {
-                    leftDelta = rad[2];
+                if(rad[1] < leftDelta)  {
+                    leftDelta = rad[1];
                     time = v.timestamp;
                 }
-                if(rad[2] > rightDelta) {
-                    rightDelta = rad[2];
+                if(rad[1] > rightDelta) {
+                    rightDelta = rad[1];
                     time = v.timestamp;
                 }
-
-                prevVector = v;
-                prevMatrix = prevVector.rotMatrix;
             }
+
+            prevVector = v;
+            prevMatrix = prevVector.rotMatrix;
 
         }
 

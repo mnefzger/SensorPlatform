@@ -42,16 +42,19 @@ public class OrientationProvider extends SensorProvider {
     public void onSensorChanged(SensorEvent event) {
         float[] values = event.values.clone();
 
-        float[] eulerValues = MathFunctions.calculateEulerAngles(values);
-
         // get the rotation matrix
         float[] temp_matrix = new float[9];
         SensorManager.getRotationMatrixFromVector(temp_matrix, values);
 
+        float[] orientationVals = new float[3];
+        SensorManager.getOrientation(temp_matrix, orientationVals);
+
+        float[] eulerValues = MathFunctions.calculateEulerAngles(orientationVals);
+
         float[][] result = new float[3][];
         result[0] = eulerValues;
         result[1] = temp_matrix;
-        result[2] = values;
+        result[2] = orientationVals;
 
         sensorCallback.onRotationData(result);
     }

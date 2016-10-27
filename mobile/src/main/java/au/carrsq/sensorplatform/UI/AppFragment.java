@@ -239,6 +239,7 @@ public class AppFragment extends Fragment {
                     rotZ.setText("RotZ: " + df.format(v.rotZ_rad));
                 }
 
+
                 if(Preferences.lightActivated(sensor_prefs)) {
                     light.setText("Light: " + df.format(v.light) + " lumen");
                 }

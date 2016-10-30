@@ -43,7 +43,7 @@ public class OSMQueryAdapter {
     }
 
     private String generateSearchStringBounding(double lat_w, double lon_s, double lat_e, double lon_n) {
-        String url ="http://overpass-api.carrsq/api/interpreter?data=[out:json][timeout:5];";
+        String url ="http://overpass-api.de/api/interpreter?data=[out:json][timeout:5];";
         url += "(way";
         url += "[\"highway\"~\"^motorway|motorway_link|primary|primary_link|secondary|tertiary|residential|service\"]";
         //url += "[\"name\"]";
@@ -54,7 +54,7 @@ public class OSMQueryAdapter {
     }
 
     private String generateSearchStringRadius(double rad, double lat, double lon) {
-        String url ="http://overpass-api.carrsq/api/interpreter?data=[out:json][timeout:8];";
+        String url ="http://overpass-api.de/api/interpreter?data=[out:json][timeout:8];";
         url += "(way";
         url += "[\"highway\"~\"^motorway|motorway_link|primary|primary_link|secondary|tertiary|residential|service\"]";
         //url += "[\"name\"]";
@@ -65,7 +65,7 @@ public class OSMQueryAdapter {
     }
 
     private String generateSearchStringSpeed(double rad, double lat, double lon) {
-        String url ="http://overpass-api.carrsq/api/interpreter?data=[out:json][timeout:8];";
+        String url ="http://overpass-api.de/api/interpreter?data=[out:json][timeout:8];";
         url += "(node";
         url += "[\"traffic_sign\"=\"maxspeed\"]";
         url += "(around:"+ rad +"," + lat + "," + lon + ");";

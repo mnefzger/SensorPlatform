@@ -14,7 +14,7 @@
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Please mount the phone on the dashboard.\nThe back camera must point at the road ahead, the front camera at the driver."
+            android:text="Please mount the phone on the windshield.\nThe back camera must point at the road ahead, the front camera at the driver."
             android:id="@+id/textView6"
             android:textColor="#fff"
             android:textSize="22sp"

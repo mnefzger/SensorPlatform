@@ -52,8 +52,7 @@
             android:key="reverse_orientation"
             android:title="Reverse phone orientation"
             android:summary="Switches landscape orientation so that the camera is on the right"
-            android:defaultValue="false"
-            android:visibility="gone"/>
+            android:defaultValue="false"/>
 
     </PreferenceCategory>
 

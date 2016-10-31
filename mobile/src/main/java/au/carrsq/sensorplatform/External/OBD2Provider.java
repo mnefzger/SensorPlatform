@@ -13,9 +13,13 @@ import com.github.pires.obd.commands.ObdCommand;
 import com.github.pires.obd.commands.SpeedCommand;
 import com.github.pires.obd.commands.engine.RPMCommand;
 import com.github.pires.obd.commands.fuel.ConsumptionRateCommand;
+import com.github.pires.obd.commands.protocol.AvailablePidsCommand;
+import com.github.pires.obd.commands.protocol.AvailablePidsCommand_01_20;
+import com.github.pires.obd.commands.protocol.CloseCommand;
 import com.github.pires.obd.commands.protocol.EchoOffCommand;
 import com.github.pires.obd.commands.protocol.HeadersOffCommand;
 import com.github.pires.obd.commands.protocol.LineFeedOffCommand;
+import com.github.pires.obd.commands.protocol.ObdRawCommand;
 import com.github.pires.obd.commands.protocol.ObdResetCommand;
 import com.github.pires.obd.commands.protocol.SelectProtocolCommand;
 import com.github.pires.obd.commands.protocol.SpacesOffCommand;
@@ -134,57 +138,73 @@ public class OBD2Provider extends DataProvider implements OBD2Connector.IConnect
         setupRunning = true;
 
         /* Setup */
-        /**
-         * This setup procedure leads to unwanted behaviour...
-         *
-        //ObdResetCommand reset = new ObdResetCommand();
-        //runCommand(OBD2Connection.sock, reset);
-        //runCommand(OBD2Connection.sock, "ATZ");
 
-        // allow small wait for reset
-        //try { Thread.sleep(1000); } catch (InterruptedException e) { e.printStackTrace(); }
-        //Log.d("SETUP", "ATZ: " + reset.getResult());
+        ObdRawCommand a = new ObdRawCommand("ATZ");
+        runCommand(OBD2Connection.sock, a);
+        Log.d("SETUP", "ATZ: " + a.getResult());
 
-        EchoOffCommand e0 = new EchoOffCommand();
-        runCommand(OBD2Connection.sock, e0);
-        Log.d("SETUP", "AT E0: " + e0.getResult());
-        //runCommand(OBD2Connection.sock, "AT E0");
+        ObdRawCommand b = new ObdRawCommand("ATZ");
+        runCommand(OBD2Connection.sock, b);
+        Log.d("SETUP", "ATZ: " + b.getResult());
 
-        runCommand(OBD2Connection.sock, e0);
-        Log.d("SETUP", "AT E0: " + e0.getResult());
+        ObdRawCommand c = new ObdRawCommand("ATD");
+        runCommand(OBD2Connection.sock, c);
+        Log.d("SETUP", "ATD: " + c.getResult());
 
-        LineFeedOffCommand l0 = new LineFeedOffCommand();
-        runCommand(OBD2Connection.sock, l0);
-        Log.d("SETUP", "AT L0: " + l0.getFormattedResult());
-        //runCommand(OBD2Connection.sock, "AT L0");
+        ObdRawCommand d = new ObdRawCommand("ATH0");
+        runCommand(OBD2Connection.sock, d);
+        Log.d("SETUP", "ATH0: " + a.getResult());
 
-        SpacesOffCommand s0 = new SpacesOffCommand();
-        runCommand(OBD2Connection.sock, s0);
-        Log.d("SETUP", "AT S0: " + s0.getFormattedResult());
-        //runCommand(OBD2Connection.sock, "AT S0");
+        ObdRawCommand e = new ObdRawCommand("ATE0");
+        runCommand(OBD2Connection.sock, e);
+        Log.d("SETUP", "Air Temp: " + e.getResult());
 
-        HeadersOffCommand h0 = new HeadersOffCommand();
-        runCommand(OBD2Connection.sock, h0);
-        Log.d("SETUP", "AT H0: " + h0.getFormattedResult());
-        //runCommand(OBD2Connection.sock, "AT H0");
+        ObdRawCommand f = new ObdRawCommand("ATST FF");
+        runCommand(OBD2Connection.sock, f);
+        Log.d("SETUP", "ATST FF: " + f.getResult());
 
-        //TimeoutCommand t0 = new TimeoutCommand(62);
-        //runCommand(OBD2Connection.sock, t0);
+        ObdRawCommand g = new ObdRawCommand("ATSP6");
+        runCommand(OBD2Connection.sock, g);
+        Log.d("SETUP", "ATSP6: " + g.getResult());
 
-        SelectProtocolCommand select = new SelectProtocolCommand(ObdProtocols.ISO_15765_4_CAN);
-        runCommand(OBD2Connection.sock, select);
-        Log.d("SETUP", "Protocol: " + select.getFormattedResult());
+        AvailablePidsCommand h = new AvailablePidsCommand_01_20();
+        runCommand(OBD2Connection.sock, h);
+        Log.d("SETUP", "ATST FF: " + h.getResult());
 
-        // try to run a 'real' command
-        AmbientAirTemperatureCommand cmd = new AmbientAirTemperatureCommand();
-        runCommand(OBD2Connection.sock, cmd);
-        Log.d("SETUP", "Air Temp: " + cmd.getCalculatedResult());
-        */
+        AvailablePidsCommand i = new AvailablePidsCommand_01_20();
+        runCommand(OBD2Connection.sock, i);
+        Log.d("SETUP", "ATST FF: " + i.getResult());
+
+        ObdRawCommand j = new ObdRawCommand("ATDPN");
+        runCommand(OBD2Connection.sock, j);
+        Log.d("SETUP", "ATDPN:  " + j.getResult());
+
+        ObdRawCommand k = new ObdRawCommand("ATDP");
+        runCommand(OBD2Connection.sock, k);
+        Log.d("SETUP", "ATDP: " + k.getResult());
+
+        ObdRawCommand l = new ObdRawCommand("03");
+        runCommand(OBD2Connection.sock, l);
+        Log.d("SETUP", "03: " + l.getResult());
+
+        ObdRawCommand m = new ObdRawCommand("07");
+        runCommand(OBD2Connection.sock, m);
+        Log.d("SETUP", "07: " + m.getResult());
+
+        ObdRawCommand n = new ObdRawCommand("0100");
+        runCommand(OBD2Connection.sock, n);
+        Log.d("SETUP", "0100: " + n.getResult());
+
+        ObdRawCommand o = new ObdRawCommand("0900");
+        runCommand(OBD2Connection.sock, o);
+        Log.d("SETUP", "0900: " + o.getResult());
+
+
 
         /**
          * This setup procedure is working but not as nice to read
          */
-        runCommand(OBD2Connection.sock, "ATD");
+        /*runCommand(OBD2Connection.sock, "ATD");
         runCommand(OBD2Connection.sock, "ATZ");
         runCommand(OBD2Connection.sock, "ATZ");
         runCommand(OBD2Connection.sock, "ATZ");
@@ -192,7 +212,7 @@ public class OBD2Provider extends DataProvider implements OBD2Connector.IConnect
         runCommand(OBD2Connection.sock, "AT E0");
         runCommand(OBD2Connection.sock, "AT L0");
         runCommand(OBD2Connection.sock, "AT S0");
-        runCommand(OBD2Connection.sock, "AT H0");
+        runCommand(OBD2Connection.sock, "AT H0");*/
 
         app.sendBroadcast(new Intent("OBD_SETUP_COMPLETE"));
 
@@ -292,11 +312,24 @@ public class OBD2Provider extends DataProvider implements OBD2Connector.IConnect
                     double[] resp = {-1,-1,-1};
                     callback.onOBD2Data(resp);
                     outOfBoundsCounter = 0;
-                    reset();
+                    CloseCommand close = new CloseCommand();
+                    runCommand(OBD2Connection.sock, close);
+                    AvailablePidsCommand_01_20 pIDs = new AvailablePidsCommand_01_20();
+                    runCommand(OBD2Connection.sock, pIDs);
+                    //reset();
                 }
 
             } catch(Exception e) {
-                e.printStackTrace();
+                if (e.getMessage().contains("STOPPED")) {
+                    ObdResetCommand reset = new ObdResetCommand();
+                    runCommand(OBD2Connection.sock, reset);
+                    try{
+                        Thread.sleep(500);
+                    } catch (Exception ex) {
+                        ex.printStackTrace();
+                    }
+                }
+                //e.printStackTrace();
             }
         }
     }

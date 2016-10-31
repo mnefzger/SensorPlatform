@@ -42,7 +42,7 @@ public class TripEndDetector {
         } else {
             if(location_active && dv.lat != 0 && dv.lon != 0)
                 checkInSpeed(dv);
-            
+
         }
 
 

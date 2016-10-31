@@ -19,4 +19,9 @@ public class NotificationListener extends NotificationListenerService{
         i.putExtra("notification_event","onNotificationPosted :" + sbn.getPackageName() + "\n");
         sendBroadcast(i);
     }
+
+    @Override
+    public void onNotificationRemoved(StatusBarNotification sbn) {
+        // handle notification removed
+    }
 }

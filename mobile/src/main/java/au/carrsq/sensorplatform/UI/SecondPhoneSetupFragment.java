@@ -92,7 +92,9 @@ public class SecondPhoneSetupFragment extends Fragment {
             if(checked) {
                 hint.setVisibility(View.INVISIBLE);
                 phone_setup_details.setVisibility(View.VISIBLE);
-                instruction.append(BluetoothAdapter.getDefaultAdapter().getName());
+                String name = BluetoothAdapter.getDefaultAdapter().getName();
+                if(!instruction.getText().toString().contains(name))
+                    instruction.append(name);
 
                 app.getService().initiatePhoneConnection();
 

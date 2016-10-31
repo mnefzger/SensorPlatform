@@ -35,11 +35,7 @@
     <string name="following_distance_dangerous_default" format="float" type="integer">1</string>
 
 
-    <integer name="front_max_fps">15</integer>
-
     <integer name="front_processing_fps">3</integer>
-
-    <integer name="back_max_fps">15</integer>
 
     <integer name="back_processing_fps">2</integer>
 

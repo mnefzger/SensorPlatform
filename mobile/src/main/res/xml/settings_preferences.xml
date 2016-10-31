@@ -71,17 +71,6 @@
             android:key="video_resolution"
             android:persistent="true"
             android:title="Video Resolution" />
-        <EditTextPreference
-            android:key="front_processing_fps"
-            android:title="Front camera processing FPS"
-            android:summary="Processed frames per second for the front camera"
-            android:defaultValue="@integer/front_processing_fps"/>
-
-        <EditTextPreference
-            android:key="back_processing_fps"
-            android:title="Back camera processing FPS"
-            android:summary="Processed frames per second for the back camera"
-            android:defaultValue="@integer/back_processing_fps" />
     </PreferenceCategory>
 
     <PreferenceCategory android:title="Video Analysis">
@@ -91,11 +80,25 @@
             android:summary="Enable front camera video processing"
             android:defaultValue="false"/>
 
+        <EditTextPreference
+            android:key="front_processing_fps"
+            android:title="Front camera processing FPS"
+            android:summary="Processed frames per second for the front camera"
+            android:defaultValue="@integer/front_processing_fps"
+            android:dependency="image_front_processing"/>
+
         <CheckBoxPreference
             android:key="image_back_processing"
             android:title="Tailgating Detection"
             android:summary="Enable back camera video processing"
             android:defaultValue="false"/>
+
+        <EditTextPreference
+            android:key="back_processing_fps"
+            android:title="Back camera processing FPS"
+            android:summary="Processed frames per second for the back camera"
+            android:defaultValue="@integer/back_processing_fps"
+            android:dependency="image_back_processing"/>
 
         <au.carrsq.sensorplatform.Utilities.SeekBarPreference
             android:key="following_distance_normal"

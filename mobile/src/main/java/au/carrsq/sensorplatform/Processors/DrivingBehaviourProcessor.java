@@ -78,7 +78,7 @@ public class DrivingBehaviourProcessor extends EventProcessor implements IOSMRes
             //no_of_items = no_of_items >= 3 ? no_of_items : 3;
 
             if(Preferences.accelerometerActivated(sensor_prefs) )
-                //checkForHardAcc(getLastDataItems(no_of_items));
+                checkForHardAcc(currentVector);
 
             if(Preferences.rotationActivated(sensor_prefs) )
                 checkForSharpTurn(getLastDataItems(no_of_items));
@@ -115,8 +115,8 @@ public class DrivingBehaviourProcessor extends EventProcessor implements IOSMRes
             }
         }
 
-        double avg = max;
-        //double avg = MathFunctions.getAccEMASingle(acc, 2/(acc.size()+1) );
+        //double avg = max;
+        double avg = MathFunctions.getAccEMASingle(acc, 2/(acc.size()+1) );
         //double avg = MathFunctions.getAccEMASingle(acc, 1);
 
         // we already looked at this data or last detected was not long ago
@@ -153,6 +153,56 @@ public class DrivingBehaviourProcessor extends EventProcessor implements IOSMRes
 
             } else if(avg < -ACC_THRESHOLD_LOW) {
                 EventVector ev = new EventVector(EventVector.LEVEL.LOW_RISK, time, "Acceleration", avg/9.81);
+                lastAccDetected = time;
+                callback.onEventDetected(ev);
+
+            }
+        }
+
+    }
+
+    /**
+     * Only looks at the last value and matches against thresholds
+     * @param lastData
+     */
+    private void checkForHardAcc(DataVector lastData) {
+        double accZ = lastData.accZ;
+        long time = lastData.timestamp;
+
+        // we already looked at this data or last detected was not long ago
+        if(time == lastAccDetected || (time-lastAccDetected) < 1000)
+            return;
+
+        if(accZ > 0) {
+            if(accZ > ACC_THRESHOLD_HIGH) {
+                EventVector ev = new EventVector(EventVector.LEVEL.HIGH_RISK, time, "Brake", accZ/9.81);
+                lastAccDetected = time;
+                callback.onEventDetected(ev);
+
+            } else if(accZ > ACC_THRESHOLD_MEDIUM) {
+                EventVector ev = new EventVector(EventVector.LEVEL.MEDIUM_RISK, time, "Brake", accZ/9.81);
+                lastAccDetected = time;
+                callback.onEventDetected(ev);
+
+            } else if(accZ > ACC_THRESHOLD_LOW) {
+                EventVector ev = new EventVector(EventVector.LEVEL.LOW_RISK, time, "Brake", accZ/9.81);
+                lastAccDetected = time;
+                callback.onEventDetected(ev);
+
+            }
+        } else {
+            if(accZ < -ACC_THRESHOLD_HIGH) {
+                EventVector ev = new EventVector(EventVector.LEVEL.HIGH_RISK, time, "Acceleration", accZ/9.81);
+                lastAccDetected = time;
+                callback.onEventDetected(ev);
+
+            } else if(accZ < -ACC_THRESHOLD_MEDIUM) {
+                EventVector ev = new EventVector(EventVector.LEVEL.MEDIUM_RISK, time, "Acceleration", accZ/9.81);
+                lastAccDetected = time;
+                callback.onEventDetected(ev);
+
+            } else if(accZ < -ACC_THRESHOLD_LOW) {
+                EventVector ev = new EventVector(EventVector.LEVEL.LOW_RISK, time, "Acceleration", accZ/9.81);
                 lastAccDetected = time;
                 callback.onEventDetected(ev);
 
@@ -201,8 +251,6 @@ public class DrivingBehaviourProcessor extends EventProcessor implements IOSMRes
         // check if enough data was collected
         if( values.size() < 20)
             return;
-
-        //Log.d("RAW", countBrake_h + ", " + countBrake_m + ", " + countBrake_l + ", " + countAcc_h + ", " + countAcc_m + ", " + countAcc_l);
 
         // the count of data points that have to be above the threshold, based on the initial sample size
         int frac = (int)(values.size()*0.75);

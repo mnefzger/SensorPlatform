@@ -1,7 +1,10 @@
 package au.carrsq.sensorplatform.Processors;
 
+import android.Manifest;
 import android.content.Context;
 import android.content.SharedPreferences;
+import android.content.pm.PackageManager;
+import android.support.v4.app.ActivityCompat;
 import android.util.Log;
 
 import org.opencv.core.CvType;
@@ -38,6 +41,8 @@ public class ImageProcessor{
     private boolean flip_back = false;
     private boolean flip_front = false;
 
+    private boolean files_written = false;
+
     static{
         System.loadLibrary("opencv_java3");
         System.loadLibrary("imgProc");
@@ -51,10 +56,8 @@ public class ImageProcessor{
 
     public ImageProcessor(ImageModule im, Context c) {
         callback = im;
-        writeCascadeToFileSystem(c, "lbpcascade_frontalface.xml");
-        writeCascadeToFileSystem(c, "haarcascade_vehicles.xml");
-        //writeCascadeToFileSystem(c, "haarcascade_vehicles_alt.xml");
-        nInitCascades();
+
+        persistFiles(c);
 
         SharedPreferences setting_prefs = c.getSharedPreferences(c.getString(R.string.settings_preferences_key), Context.MODE_PRIVATE);
         TTC_NORMAL = Preferences.getNormalTTC(setting_prefs);
@@ -64,6 +67,21 @@ public class ImageProcessor{
         boolean reversed = Preferences.isReverseOrientation(setting_prefs);
         if(reversed) flip_back = true;
         else flip_front = true;
+    }
+
+    public void persistFiles(Context c) {
+        if(files_written)
+            return;
+        else {
+            int permission = ActivityCompat.checkSelfPermission(c, Manifest.permission.WRITE_EXTERNAL_STORAGE);
+            if (permission == PackageManager.PERMISSION_GRANTED) {
+                writeCascadeToFileSystem(c, "lbpcascade_frontalface.xml");
+                writeCascadeToFileSystem(c, "haarcascade_vehicles.xml");
+                //writeCascadeToFileSystem(c, "haarcascade_vehicles_alt.xml");
+                files_written = true;
+                nInitCascades();
+            }
+        }
     }
 
     public void setCurrentSpeed(Double currentSpeed) {

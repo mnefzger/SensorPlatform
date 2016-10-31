@@ -7,6 +7,7 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.os.Handler;
 import android.support.v4.app.Fragment;
 import android.support.v4.content.LocalBroadcastManager;
 import android.util.Log;
@@ -35,6 +36,7 @@ import au.carrsq.sensorplatform.R;
  */
 public class AppFragment extends Fragment {
     SharedPreferences sensor_prefs;
+    SharedPreferences setting_prefs;
 
     RelativeLayout dataLayout;
     TextView waitingText;
@@ -87,6 +89,7 @@ public class AppFragment extends Fragment {
         super.onCreate(savedInstanceState);
         setRetainInstance(true);
         sensor_prefs = getActivity().getSharedPreferences(getActivity().getString(R.string.sensor_preferences_key), Context.MODE_PRIVATE);
+        setting_prefs = getActivity().getSharedPreferences(getActivity().getString(R.string.settings_preferences_key), Context.MODE_PRIVATE);
     }
 
     private void registerReceivers() {
@@ -246,9 +249,9 @@ public class AppFragment extends Fragment {
 
 
                 if(v.lat == 0 && ActiveSubscriptions.usingGPS()) {
-                    lat.setText("Lat: Acquiring position…");
-                    lon.setText("Lon: Acquiring position…");
-                    speed.setText("Speed: Acquiring position…");
+                    lat.setText("Lat: Acquiring signal…");
+                    lon.setText("Lon: Acquiring signal…");
+                    speed.setText("Speed: Acquiring signal…");
                 }
                 if(v.lat != 0 && ActiveSubscriptions.usingGPS()) {
                     lat.setText("Lat: " + df.format( v.lat ));
@@ -263,7 +266,10 @@ public class AppFragment extends Fragment {
                 }
 
                 if(Preferences.heartRateActivated(sensor_prefs)) {
-                    heart.setText("Heart Rate: " + v.heartRate + " bpm");
+                    if(v.heartRate == -1)
+                        heart.setText("Heart Rate: Waiting for heart beat…");
+                    else
+                        heart.setText("Heart Rate: " + v.heartRate + " bpm");
                 }
 
             }
@@ -297,7 +303,7 @@ public class AppFragment extends Fragment {
             Bundle b = intent.getExtras();
             DataVector v = new Gson().fromJson(b.getString("RawData"), DataVector.class);
 
-            Log.d("RawData @ App  ", v.toString());
+            //Log.d("RawData @ App  ", v.toString());
 
             if(waitingText.getVisibility() == View.VISIBLE) {
                 waitingText.setVisibility(View.INVISIBLE);
@@ -332,17 +338,24 @@ public class AppFragment extends Fragment {
     };
 
     private void handleTripEndUI() {
-        waitingText.setVisibility(View.VISIBLE);
-        collectingText.setVisibility(View.INVISIBLE);
-        dataLayout.setVisibility(View.INVISIBLE);
+        // wait for last raw data to arrive before changing UI
+        Handler h = new Handler();
+        h.postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                waitingText.setVisibility(View.VISIBLE);
+                collectingText.setVisibility(View.INVISIBLE);
+                dataLayout.setVisibility(View.INVISIBLE);
 
-        if(isAdded()) {
-            SharedPreferences setting_prefs = getActivity().getSharedPreferences(getString(R.string.settings_preferences_key), Context.MODE_PRIVATE);
-            if(Preferences.surveyActivated(setting_prefs)) {
-                MainActivity app = (MainActivity)getActivity();
-                app.goToSurveyFragment();
+                if(isAdded()) {
+                    if(Preferences.surveyActivated(setting_prefs)) {
+                        MainActivity app = (MainActivity)getActivity();
+                        app.goToSurveyFragment();
+                    }
+                }
             }
-        }
+        }, Preferences.getRawDataDelay(setting_prefs) + 50);
+
 
     }
 

@@ -6,6 +6,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.SharedPreferences;
+import android.os.Handler;
 import android.util.Log;
 
 import com.github.pires.obd.commands.ObdCommand;
@@ -133,40 +134,65 @@ public class OBD2Provider extends DataProvider implements OBD2Connector.IConnect
         setupRunning = true;
 
         /* Setup */
-        ObdResetCommand reset = new ObdResetCommand();
-        runCommand(OBD2Connection.sock, reset);
+        /**
+         * This setup procedure leads to unwanted behaviour...
+         *
+        //ObdResetCommand reset = new ObdResetCommand();
+        //runCommand(OBD2Connection.sock, reset);
         //runCommand(OBD2Connection.sock, "ATZ");
 
         // allow small wait for reset
-        try { Thread.sleep(500); } catch (InterruptedException e) { e.printStackTrace(); }
+        //try { Thread.sleep(1000); } catch (InterruptedException e) { e.printStackTrace(); }
+        //Log.d("SETUP", "ATZ: " + reset.getResult());
 
         EchoOffCommand e0 = new EchoOffCommand();
         runCommand(OBD2Connection.sock, e0);
+        Log.d("SETUP", "AT E0: " + e0.getResult());
         //runCommand(OBD2Connection.sock, "AT E0");
 
         runCommand(OBD2Connection.sock, e0);
+        Log.d("SETUP", "AT E0: " + e0.getResult());
 
         LineFeedOffCommand l0 = new LineFeedOffCommand();
         runCommand(OBD2Connection.sock, l0);
+        Log.d("SETUP", "AT L0: " + l0.getFormattedResult());
         //runCommand(OBD2Connection.sock, "AT L0");
 
         SpacesOffCommand s0 = new SpacesOffCommand();
         runCommand(OBD2Connection.sock, s0);
+        Log.d("SETUP", "AT S0: " + s0.getFormattedResult());
         //runCommand(OBD2Connection.sock, "AT S0");
 
         HeadersOffCommand h0 = new HeadersOffCommand();
         runCommand(OBD2Connection.sock, h0);
+        Log.d("SETUP", "AT H0: " + h0.getFormattedResult());
         //runCommand(OBD2Connection.sock, "AT H0");
 
-        TimeoutCommand t0 = new TimeoutCommand(62);
-        runCommand(OBD2Connection.sock, t0);
+        //TimeoutCommand t0 = new TimeoutCommand(62);
+        //runCommand(OBD2Connection.sock, t0);
 
-        SelectProtocolCommand select = new SelectProtocolCommand(ObdProtocols.AUTO);
+        SelectProtocolCommand select = new SelectProtocolCommand(ObdProtocols.ISO_15765_4_CAN);
         runCommand(OBD2Connection.sock, select);
+        Log.d("SETUP", "Protocol: " + select.getFormattedResult());
 
         // try to run a 'real' command
         AmbientAirTemperatureCommand cmd = new AmbientAirTemperatureCommand();
         runCommand(OBD2Connection.sock, cmd);
+        Log.d("SETUP", "Air Temp: " + cmd.getCalculatedResult());
+        */
+
+        /**
+         * This setup procedure is working but not as nice to read
+         */
+        runCommand(OBD2Connection.sock, "ATD");
+        runCommand(OBD2Connection.sock, "ATZ");
+        runCommand(OBD2Connection.sock, "ATZ");
+        runCommand(OBD2Connection.sock, "ATZ");
+        runCommand(OBD2Connection.sock, "ATZ");
+        runCommand(OBD2Connection.sock, "AT E0");
+        runCommand(OBD2Connection.sock, "AT L0");
+        runCommand(OBD2Connection.sock, "AT S0");
+        runCommand(OBD2Connection.sock, "AT H0");
 
         app.sendBroadcast(new Intent("OBD_SETUP_COMPLETE"));
 
@@ -185,7 +211,8 @@ public class OBD2Provider extends DataProvider implements OBD2Connector.IConnect
                             if(setupComplete)
                                 requestData();
                             else {
-                                if(!setupRunning) setup();
+                                if(!setupRunning)
+                                    setup();
                             }
                         }
                     }).start();
@@ -214,18 +241,17 @@ public class OBD2Provider extends DataProvider implements OBD2Connector.IConnect
     private void requestData() {
         SpeedCommand sp_cmd = new SpeedCommand();
         runCommand(OBD2Connection.sock, sp_cmd);
+        double speed = Double.valueOf( sp_cmd.getCalculatedResult() );
 
         RPMCommand rpm_cmd = new RPMCommand();
         runCommand(OBD2Connection.sock, rpm_cmd);
+        double rpm = Double.valueOf( rpm_cmd.getCalculatedResult() );
 
         ConsumptionRateCommand cr_cmd = new ConsumptionRateCommand();
         runCommand(OBD2Connection.sock, cr_cmd);
-
-        try { Thread.sleep(10); } catch (InterruptedException e) { e.printStackTrace(); }
-
-        double speed = Double.valueOf( sp_cmd.getCalculatedResult() );
-        double rpm = Double.valueOf( rpm_cmd.getCalculatedResult() );
         double cr = Double.valueOf( cr_cmd.getCalculatedResult() );
+
+        //try { Thread.sleep(10); } catch (InterruptedException e) { e.printStackTrace(); }
 
         double[] response = {speed, rpm, cr};
 
@@ -245,7 +271,7 @@ public class OBD2Provider extends DataProvider implements OBD2Connector.IConnect
     public void runCommand(BluetoothSocket s, ObdCommand cmd) {
         if(OBD2Connection.obd2Device != null) {
             try {
-                Log.d("CMD", cmd.getCommandPID());
+                //Log.d("CMD", cmd.getCommandPID());
                 cmd.run(s.getInputStream(), s.getOutputStream());
 
             } catch (IOException io) {

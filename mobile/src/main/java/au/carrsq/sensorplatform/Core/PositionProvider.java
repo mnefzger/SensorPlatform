@@ -61,11 +61,12 @@ public class PositionProvider extends DataProvider implements LocationListener{
         double speed = calculateSpeed(location);
 
         callback.onLocationData(location.getLatitude(), location.getLongitude(), speed);
+        h.removeCallbacksAndMessages(null);
         startTimeout();
     }
 
+    Handler h = new Handler();
     private void startTimeout() {
-        Handler h = new Handler();
         h.postDelayed(new Runnable() {
             @Override
             public void run() {

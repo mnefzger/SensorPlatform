@@ -51,6 +51,7 @@ import java.util.List;
 
 import au.carrsq.sensorplatform.Core.MainActivity;
 import au.carrsq.sensorplatform.Core.Preferences;
+import au.carrsq.sensorplatform.External.OBD2Connection;
 import au.carrsq.sensorplatform.R;
 import au.carrsq.sensorplatform.Utilities.AutoFitTextureView;
 
@@ -367,6 +368,7 @@ public class CameraPreviewFragment extends Fragment {
                     getActivity().setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_REVERSE_LANDSCAPE);
                 else
                     getActivity().setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);
+
             }
         });
 

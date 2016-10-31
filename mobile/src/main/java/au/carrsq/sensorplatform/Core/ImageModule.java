@@ -140,6 +140,10 @@ public class ImageModule implements IEventCallback{
     }
 
     public void startCapture() {
+        // check again if cascade files are ready
+        imgProc.persistFiles(context);
+
+        // open cameras
         startBackgroundThread();
         if( Preferences.backCameraActivated(sensor_prefs) ) open("0");
         if( Preferences.frontCameraActivated(sensor_prefs) ) open("1");

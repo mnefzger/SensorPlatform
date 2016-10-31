@@ -67,7 +67,7 @@ public class FitnessSensorManager extends DataProvider{
         new Thread(new Runnable() {
             @Override
             public void run() {
-                controlMeasurementInBackground("/start_heart");
+                controlMeasurementInBackground("/wearable/start_heart");
             }
         }).start();
     }
@@ -76,7 +76,7 @@ public class FitnessSensorManager extends DataProvider{
         new Thread(new Runnable() {
             @Override
             public void run() {
-                controlMeasurementInBackground("/stop_heart");
+                controlMeasurementInBackground("/wearable/stop_heart");
             }
         }).start();
     }

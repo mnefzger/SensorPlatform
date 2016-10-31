@@ -74,8 +74,6 @@ public class SensorService extends Service implements SensorEventListener {
                         new Runnable() {
                             @Override
                             public void run() {
-
-
                                 try {
                                     Thread.sleep(measurementDuration * 1000);
                                 } catch (InterruptedException e) {

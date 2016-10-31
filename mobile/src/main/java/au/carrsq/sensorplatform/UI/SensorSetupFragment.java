@@ -1,6 +1,7 @@
 package au.carrsq.sensorplatform.UI;
 
 import android.os.Bundle;
+import android.preference.CheckBoxPreference;
 import android.preference.Preference;
 import android.preference.PreferenceCategory;
 import android.preference.PreferenceFragment;
@@ -10,6 +11,7 @@ import android.view.ViewGroup;
 import android.widget.FrameLayout;
 
 import au.carrsq.sensorplatform.Core.MainActivity;
+import au.carrsq.sensorplatform.External.FitnessSensorManager;
 import au.carrsq.sensorplatform.R;
 
 public class SensorSetupFragment extends PreferenceFragment implements View.OnClickListener{
@@ -45,12 +47,12 @@ public class SensorSetupFragment extends PreferenceFragment implements View.OnCl
 
         /**
          * Disables the Android Wear Watch option if no watch is connected
-         *
+         */
         if(!FitnessSensorManager.wearAvailable) {
             CheckBoxPreference fitness = (CheckBoxPreference) findPreference("heartRate_raw");
             fitness.setEnabled(false);
             fitness.setChecked(false);
-        }*/
+        }
 
 
         return v;

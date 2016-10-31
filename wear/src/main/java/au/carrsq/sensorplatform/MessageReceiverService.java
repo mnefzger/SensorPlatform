@@ -41,11 +41,11 @@ public class MessageReceiverService extends WearableListenerService {
     public void onMessageReceived(MessageEvent messageEvent) {
         Log.d(TAG, "Received message: " + messageEvent.getPath());
 
-        if (messageEvent.getPath().equals("/start_heart")) {
+        if (messageEvent.getPath().equals("/wearable/start_heart")) {
             startService(new Intent(this, SensorService.class));
         }
 
-        if (messageEvent.getPath().equals("/stop_heart")) {
+        if (messageEvent.getPath().equals("/wearable/stop_heart")) {
             stopService(new Intent(this, SensorService.class));
         }
     }

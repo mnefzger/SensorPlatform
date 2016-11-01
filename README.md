@@ -1,9 +1,8 @@
-# SensorPlatform
+![Sensor Platform](https://github.com/mnefzger/SensorPlatform/blob/master/mobile/src/main/res/drawable/app_icon_small.png "Sensor Platform")
+# Sensor Platform
 
 The Sensor Platform is a research tool designed to collect naturalistic driving data. In close cooperation with road safety experts, requirements were identified through user-centered design. 
 The tool runs as an app on Android smartphones and collects raw driving data, critical driving events and videos.
-
-![alt text](https://github.com/mnefzger/SensorPlatform/blob/master/mobile/src/main/res/drawable/app_icon_small.png "Sensor Platform")
 
 Features
 -----

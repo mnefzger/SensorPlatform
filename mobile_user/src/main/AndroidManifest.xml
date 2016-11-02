@@ -18,7 +18,8 @@
         android:label="@string/app_name"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-        <activity android:name="au.carrsq.sensorplatform.MainActivity">
+        <activity android:name="au.carrsq.sensorplatform.MainActivity"
+            android:screenOrientation="portrait">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
@@ -27,7 +28,7 @@
         </activity>
         <service android:name="au.carrsq.sensorplatform.PhoneInteractionService" />
         <service android:name="au.carrsq.sensorplatform.NotificationListener"
-            android:label="NotificationListenerService"
+            android:label="Sensor Platform"
             android:permission="android.permission.BIND_NOTIFICATION_LISTENER_SERVICE">
             <intent-filter>
                 <action android:name="android.service.notification.NotificationListenerService" />

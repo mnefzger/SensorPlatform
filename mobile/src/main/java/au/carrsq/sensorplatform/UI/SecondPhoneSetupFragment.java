@@ -30,13 +30,13 @@ public class SecondPhoneSetupFragment extends Fragment {
     AppCompatCheckBox phoneActive;
     TextView hint;
     LinearLayout phone_setup_details;
+    LinearLayout instruction_layout;
+    LinearLayout connection_layout;
 
     TextView instruction;
-    TextView waiting;
     TextView connecting;
-    TextView ready;
 
-    ImageView done_wait, done_phone_connect;
+    ImageView done;
 
     FrameLayout setup_next;
 
@@ -57,13 +57,12 @@ public class SecondPhoneSetupFragment extends Fragment {
         phoneActive = (AppCompatCheckBox) v.findViewById(R.id.phone_checkbox);
         hint = (TextView) v.findViewById(R.id.phone_hint);
         phone_setup_details = (LinearLayout) v.findViewById(R.id.phone_setup_details);
+        connection_layout = (LinearLayout) v.findViewById(R.id.connection_layout);
+        instruction_layout = (LinearLayout) v.findViewById(R.id.instruction_layout);
 
-        waiting = (TextView) v.findViewById(R.id.waitingPhoneText);
         connecting = (TextView) v.findViewById(R.id.connectingPhoneText);
-        ready = (TextView) v.findViewById(R.id.readyPhoneText);
 
-        done_wait = (ImageView)v.findViewById(R.id.done_wait);
-        done_phone_connect = (ImageView) v.findViewById(R.id.done_phone_connect);
+        done = (ImageView) v.findViewById(R.id.done_phone);
 
         phoneActive.setOnClickListener(listener);
 
@@ -86,8 +85,6 @@ public class SecondPhoneSetupFragment extends Fragment {
         public void onClick(View view) {
             boolean checked = phoneActive.isChecked();
             MainActivity app = (MainActivity) getActivity();
-            SharedPreferences sensor_prefs = getActivity().getSharedPreferences(getString(R.string.sensor_preferences_key), Context.MODE_PRIVATE);
-            SharedPreferences.Editor editor = sensor_prefs.edit();
 
             if(checked) {
                 hint.setVisibility(View.INVISIBLE);
@@ -118,15 +115,12 @@ public class SecondPhoneSetupFragment extends Fragment {
     };
 
     private void searchComplete() {
-        done_wait.setVisibility(View.VISIBLE);
-        connecting.setText("Trying to connect …");
+        // intermediate step...
     }
 
     private void connectionComplete() {
-        done_wait.setVisibility(View.VISIBLE);
-        connecting.setText("Trying to connect …");
-        done_phone_connect.setVisibility(View.VISIBLE);
-        ready.setText("Ready.");
+        instruction_layout.setVisibility(View.GONE);
+        connection_layout.setVisibility(View.VISIBLE);
     }
 
     BroadcastReceiver mReceiver = new BroadcastReceiver() {

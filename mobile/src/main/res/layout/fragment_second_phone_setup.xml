@@ -1,4 +1,6 @@
 <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@color/colorPrimary">
@@ -72,7 +74,8 @@
                 android:id="@+id/phone_hint"
                 android:layout_marginTop="60dp"
                 android:textSize="19sp"
-                android:textColor="@color/colorAccent" />
+                android:textColor="@color/colorAccent"
+                android:visibility="invisible" />
 
             <LinearLayout
                 android:orientation="vertical"
@@ -80,7 +83,8 @@
                 android:layout_height="match_parent"
                 android:layout_marginTop="50dp"
                 android:id="@+id/phone_setup_details"
-                android:visibility="invisible">
+                android:visibility="visible"
+                android:weightSum="1">
 
                 <LinearLayout
                     android:orientation="horizontal"
@@ -92,89 +96,68 @@
 
 
                 <LinearLayout
-                    android:orientation="horizontal"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="5dp"
+                    android:weightSum="1"
+                    android:layout_weight="1.5">
+
+                    <ImageView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        app:srcCompat="@drawable/phone_switch"
+                        android:id="@+id/imageView7" />
+                </LinearLayout>
+
+                <LinearLayout
+                    android:orientation="vertical"
                     android:layout_width="match_parent"
-                    android:layout_height="wrap_content">
+                    android:layout_height="wrap_content"
+                    android:weightSum="1"
+                    android:layout_gravity="center_horizontal"
+                    android:id="@+id/instruction_layout"
+                    android:visibility="visible">
 
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="Please start the app 'SensorPlatform Helper' on the participant's phone and follow the instructions.\nThis phone is called: "
+                        android:text="Switch to the participant's phone.\n\nOn there, please start the app 'SensorPlatform Helper'.\n\nThis phone is called: "
                         android:id="@+id/instructionPhoneText"
                         android:textColor="#fff"
-                        android:textSize="19sp" />
-                </LinearLayout>
-
-                <LinearLayout
-                    android:orientation="horizontal"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="20dp"
-                    android:layout_marginBottom="10dp"
-                    android:layout_marginLeft="25dp" >
-
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="Waiting for connection … "
-                        android:id="@+id/waitingPhoneText"
                         android:textSize="19sp"
-                        android:textColor="@color/colorAccent" />
+                        android:textAlignment="center" />
 
-                    <ImageView
-                        android:layout_width="18dp"
-                        android:layout_height="18dp"
-                        android:id="@+id/done_wait"
-                        android:src="@drawable/done"
-                        android:visibility="invisible"/>
                 </LinearLayout>
 
                 <LinearLayout
-                    android:orientation="horizontal"
+                    android:orientation="vertical"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="10dp"
-                    android:layout_marginBottom="10dp"
-                    android:layout_marginStart="25dp">
+                    android:layout_marginBottom="20dp"
+                    android:layout_gravity="center_horizontal"
+                    android:id="@+id/connection_layout"
+                    android:visibility="gone">
+
+                    <ImageView
+                        android:id="@+id/done_phone"
+                        android:src="@drawable/done_big"
+                        android:layout_width="64dp"
+                        android:layout_height="64dp"
+                        android:layout_gravity="center_horizontal|center"
+                        android:layout_marginTop="10dp"
+                        android:layout_marginBottom="5dp" />
 
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text=""
+                        android:text="Connection established."
                         android:id="@+id/connectingPhoneText"
                         android:textSize="19sp"
-                        android:textColor="@color/colorAccent"/>
-
-                    <ImageView
-                        android:layout_width="18dp"
-                        android:layout_height="18dp"
-                        android:id="@+id/done_phone_connect"
-                        android:src="@drawable/done"
-                        android:visibility="invisible"/>
-                </LinearLayout>
-
-                <LinearLayout
-                    android:orientation="horizontal"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="10dp"
-                    android:layout_marginBottom="15dp"
-                    android:layout_marginStart="25dp">
-
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text=""
-                        android:id="@+id/readyPhoneText"
-                        android:textSize="19sp"
-                        android:textColor="@color/colorAccent"/>
-
-                    <ImageView
-                        android:layout_width="18dp"
-                        android:layout_height="18dp"
-                        android:id="@+id/done_phone"
-                        android:src="@drawable/done"
-                        android:visibility="invisible"/>
+                        android:textColor="@color/colorAccent"
+                        android:layout_weight="1"
+                        android:layout_gravity="center_horizontal|center"
+                        android:textAlignment="center"/>
                 </LinearLayout>
 
 

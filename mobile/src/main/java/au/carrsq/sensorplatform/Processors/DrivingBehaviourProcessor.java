@@ -78,7 +78,7 @@ public class DrivingBehaviourProcessor extends EventProcessor implements IOSMRes
             //no_of_items = no_of_items >= 3 ? no_of_items : 3;
 
             if(Preferences.accelerometerActivated(sensor_prefs) )
-                checkForHardAcc(currentVector);
+                checkForHardAcc();
 
             if(Preferences.rotationActivated(sensor_prefs) )
                 checkForSharpTurn(getLastDataItems(no_of_items));
@@ -95,8 +95,14 @@ public class DrivingBehaviourProcessor extends EventProcessor implements IOSMRes
      * @param lastData
      */
     private long lastAccDetected = 0;
-    private EventVector.LEVEL lastLevel;
-    private void checkForHardAcc(List<DataVector> lastData) {
+    private void checkForHardAcc() {
+        if(Preferences.OBDActivated(sensor_prefs))
+            checkForHardAccOBD(currentVector, previousVector);
+
+        checkForHardAccSingle(currentVector);
+    }
+
+    private void checkForHardAccAccelerometer(List<DataVector> lastData) {
         List<Double> acc = new ArrayList<Double>();
         Iterator<DataVector> it = lastData.iterator();
         double max_abs = 0;
@@ -158,14 +164,13 @@ public class DrivingBehaviourProcessor extends EventProcessor implements IOSMRes
 
             }
         }
-
     }
 
     /**
      * Only looks at the last value and matches against thresholds
      * @param lastData
      */
-    private void checkForHardAcc(DataVector lastData) {
+    private void checkForHardAccSingle(DataVector lastData) {
         double accZ = lastData.accZ;
         long time = lastData.timestamp;
 
@@ -173,41 +178,7 @@ public class DrivingBehaviourProcessor extends EventProcessor implements IOSMRes
         if(time == lastAccDetected || (time-lastAccDetected) < 1000)
             return;
 
-        if(accZ > 0) {
-            if(accZ > ACC_THRESHOLD_HIGH) {
-                EventVector ev = new EventVector(EventVector.LEVEL.HIGH_RISK, time, "Brake", accZ/9.81);
-                lastAccDetected = time;
-                callback.onEventDetected(ev);
-
-            } else if(accZ > ACC_THRESHOLD_MEDIUM) {
-                EventVector ev = new EventVector(EventVector.LEVEL.MEDIUM_RISK, time, "Brake", accZ/9.81);
-                lastAccDetected = time;
-                callback.onEventDetected(ev);
-
-            } else if(accZ > ACC_THRESHOLD_LOW) {
-                EventVector ev = new EventVector(EventVector.LEVEL.LOW_RISK, time, "Brake", accZ/9.81);
-                lastAccDetected = time;
-                callback.onEventDetected(ev);
-
-            }
-        } else {
-            if(accZ < -ACC_THRESHOLD_HIGH) {
-                EventVector ev = new EventVector(EventVector.LEVEL.HIGH_RISK, time, "Acceleration", accZ/9.81);
-                lastAccDetected = time;
-                callback.onEventDetected(ev);
-
-            } else if(accZ < -ACC_THRESHOLD_MEDIUM) {
-                EventVector ev = new EventVector(EventVector.LEVEL.MEDIUM_RISK, time, "Acceleration", accZ/9.81);
-                lastAccDetected = time;
-                callback.onEventDetected(ev);
-
-            } else if(accZ < -ACC_THRESHOLD_LOW) {
-                EventVector ev = new EventVector(EventVector.LEVEL.LOW_RISK, time, "Acceleration", accZ/9.81);
-                lastAccDetected = time;
-                callback.onEventDetected(ev);
-
-            }
-        }
+        matchAccAgainstThresholds(accZ, time);
 
     }
 
@@ -283,6 +254,68 @@ public class DrivingBehaviourProcessor extends EventProcessor implements IOSMRes
             lastAccDetected = System.currentTimeMillis();
         }
 
+    }
+
+    /**
+     * Performs a acceleration/braking detection based on changes in speed
+     */
+    private void checkForHardAccOBD(DataVector cur, DataVector prev)  {
+        double previousSpeed = prev.obdSpeed;
+        double currentSpeed = cur.obdSpeed;
+
+        long timeDiff = cur.timestamp - prev.timestamp; // in ms
+        timeDiff = timeDiff/1000; // in s
+
+        if(previousSpeed != -1 && currentSpeed != -1) {
+            double diff = currentSpeed - previousSpeed; // in km/h
+            diff = diff / 3.6; // in m/s
+
+            // calculate the acceleration
+            double acc = diff/timeDiff;
+            // inverse it to match orientation of the accelerometer data
+            acc *= -1;
+
+            matchAccAgainstThresholds(acc, cur.timestamp);
+
+        }
+    }
+
+    private void matchAccAgainstThresholds(double accZ, long time) {
+        if(accZ > 0) {
+            if(accZ > ACC_THRESHOLD_HIGH) {
+                EventVector ev = new EventVector(EventVector.LEVEL.HIGH_RISK, time, "Brake", accZ/9.81);
+                lastAccDetected = time;
+                callback.onEventDetected(ev);
+
+            } else if(accZ > ACC_THRESHOLD_MEDIUM) {
+                EventVector ev = new EventVector(EventVector.LEVEL.MEDIUM_RISK, time, "Brake", accZ/9.81);
+                lastAccDetected = time;
+                callback.onEventDetected(ev);
+
+            } else if(accZ > ACC_THRESHOLD_LOW) {
+                EventVector ev = new EventVector(EventVector.LEVEL.LOW_RISK, time, "Brake", accZ/9.81);
+                lastAccDetected = time;
+                callback.onEventDetected(ev);
+
+            }
+        } else {
+            if(accZ < -ACC_THRESHOLD_HIGH) {
+                EventVector ev = new EventVector(EventVector.LEVEL.HIGH_RISK, time, "Acceleration", accZ/9.81);
+                lastAccDetected = time;
+                callback.onEventDetected(ev);
+
+            } else if(accZ < -ACC_THRESHOLD_MEDIUM) {
+                EventVector ev = new EventVector(EventVector.LEVEL.MEDIUM_RISK, time, "Acceleration", accZ/9.81);
+                lastAccDetected = time;
+                callback.onEventDetected(ev);
+
+            } else if(accZ < -ACC_THRESHOLD_LOW) {
+                EventVector ev = new EventVector(EventVector.LEVEL.LOW_RISK, time, "Acceleration", accZ/9.81);
+                lastAccDetected = time;
+                callback.onEventDetected(ev);
+
+            }
+        }
     }
 
     private long lastTurn = System.currentTimeMillis();

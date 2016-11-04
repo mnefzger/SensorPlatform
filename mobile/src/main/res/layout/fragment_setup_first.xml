@@ -166,13 +166,13 @@
                 </LinearLayout>
 
                 <LinearLayout
-                    android:orientation="horizontal"
+                    android:orientation="vertical"
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
                     android:layout_weight="0.2"
-                    android:paddingLeft="28dp"
+                    android:paddingLeft="30dp"
                     android:paddingRight="25dp"
-                    android:paddingTop="10dp"
+                    android:paddingTop="15dp"
                     android:paddingBottom="15dp">
 
                     <TextView
@@ -187,26 +187,27 @@
                     <RadioGroup xmlns:android="http://schemas.android.com/apk/res/android"
                         android:layout_width="fill_parent"
                         android:layout_height="match_parent"
-                        android:orientation="horizontal">
+                        android:orientation="horizontal"
+                        android:layout_marginTop="10dp">
                         <RadioButton
-                            android:layout_width="100dp"
                             android:layout_height="wrap_content"
                             android:paddingLeft="5dp"
                             android:text="Male"
                             android:textColor="#fff"
                             android:id="@+id/male_button"
                             android:backgroundTint="#fff"
-                            android:checked="true"/>
+                            android:checked="true"
+                            android:layout_width="100dp" />
 
                         <RadioButton
-                            android:layout_width="100dp"
                             android:layout_height="wrap_content"
                             android:paddingLeft="5dp"
                             android:text="Female"
                             android:textColor="#fff"
                             android:textColorHint="#fff"
                             android:id="@+id/female_button"
-                            android:backgroundTint="#fff"/>
+                            android:backgroundTint="#fff"
+                            android:layout_width="90dp" />
                     </RadioGroup>
                 </LinearLayout>
             </LinearLayout>

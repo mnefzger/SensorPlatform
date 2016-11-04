@@ -3,7 +3,8 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/colorPrimary">
+    android:background="@color/colorPrimary"
+    android:animateLayoutChanges="true">
 
 
     <LinearLayout
@@ -75,7 +76,7 @@
                 android:layout_marginTop="60dp"
                 android:textSize="19sp"
                 android:textColor="@color/colorAccent"
-                android:visibility="invisible" />
+                android:visibility="visible" />
 
             <LinearLayout
                 android:orientation="vertical"
@@ -83,8 +84,7 @@
                 android:layout_height="match_parent"
                 android:layout_marginTop="50dp"
                 android:id="@+id/phone_setup_details"
-                android:visibility="visible"
-                android:weightSum="1">
+                android:visibility="invisible">
 
                 <LinearLayout
                     android:orientation="horizontal"
@@ -97,10 +97,9 @@
 
                 <LinearLayout
                     android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
+                    android:layout_height="0dp"
                     android:layout_marginBottom="5dp"
-                    android:weightSum="1"
-                    android:layout_weight="1.5">
+                    android:layout_weight="1">
 
                     <ImageView
                         android:layout_width="wrap_content"
@@ -112,11 +111,11 @@
                 <LinearLayout
                     android:orientation="vertical"
                     android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:weightSum="1"
+                    android:layout_height="0dp"
                     android:layout_gravity="center_horizontal"
                     android:id="@+id/instruction_layout"
-                    android:visibility="visible">
+                    android:visibility="visible"
+                    android:layout_weight="1">
 
                     <TextView
                         android:layout_width="wrap_content"
@@ -125,19 +124,20 @@
                         android:id="@+id/instructionPhoneText"
                         android:textColor="#fff"
                         android:textSize="19sp"
-                        android:textAlignment="center" />
+                        android:textAlignment="center"
+                        android:layout_marginTop="10dp"/>
 
                 </LinearLayout>
 
                 <LinearLayout
                     android:orientation="vertical"
                     android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="10dp"
-                    android:layout_marginBottom="20dp"
+                    android:layout_height="0dp"
                     android:layout_gravity="center_horizontal"
                     android:id="@+id/connection_layout"
-                    android:visibility="gone">
+                    android:visibility="gone"
+                    android:alpha="0"
+                    android:layout_weight="1">
 
                     <ImageView
                         android:id="@+id/done_phone"

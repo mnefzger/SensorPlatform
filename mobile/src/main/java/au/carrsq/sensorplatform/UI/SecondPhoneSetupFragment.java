@@ -87,7 +87,9 @@ public class SecondPhoneSetupFragment extends Fragment {
             MainActivity app = (MainActivity) getActivity();
 
             if(checked) {
+                hint.animate().alpha(0).setDuration(500);
                 hint.setVisibility(View.INVISIBLE);
+                phone_setup_details.animate().alpha(1).setDuration(500);
                 phone_setup_details.setVisibility(View.VISIBLE);
                 String name = BluetoothAdapter.getDefaultAdapter().getName();
                 if(!instruction.getText().toString().contains(name))
@@ -104,9 +106,12 @@ public class SecondPhoneSetupFragment extends Fragment {
             } else {
                 app.getService().cancelPhoneConnection();
 
+                phone_setup_details.animate().alpha(0).setDuration(500);
                 phone_setup_details.setVisibility(View.INVISIBLE);
                 hint.setVisibility(View.VISIBLE);
-                //resetText();
+                hint.animate().alpha(1).setDuration(500);
+
+                resetText();
 
                 if(receiverRegistered)
                     app.unregisterReceiver(mReceiver);
@@ -114,13 +119,23 @@ public class SecondPhoneSetupFragment extends Fragment {
         }
     };
 
+    private void resetText() {
+        instruction_layout.setAlpha(1);
+        instruction_layout.setVisibility(View.VISIBLE);
+        connection_layout.setAlpha(0);
+        connection_layout.setVisibility(View.GONE);
+    }
+
     private void searchComplete() {
         // intermediate step...
     }
 
     private void connectionComplete() {
+        instruction_layout.animate().alpha(0).setDuration(750);
         instruction_layout.setVisibility(View.GONE);
         connection_layout.setVisibility(View.VISIBLE);
+        connection_layout.animate().alpha(1).setDuration(750);
+
     }
 
     BroadcastReceiver mReceiver = new BroadcastReceiver() {

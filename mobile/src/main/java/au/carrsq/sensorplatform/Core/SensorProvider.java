@@ -11,11 +11,11 @@ import au.carrsq.sensorplatform.R;
 
 public abstract class SensorProvider extends DataProvider implements SensorEventListener{
     private Context context;
-    protected ISensorCallback sensorCallback;
+    ISensorCallback sensorCallback;
     protected SharedPreferences setting_prefs;
     protected SharedPreferences sensor_prefs;
 
-    protected SensorManager sensorManager;
+    SensorManager sensorManager;
 
     SensorProvider(Context app, SensorModule m) {
         this.context = app.getApplicationContext();

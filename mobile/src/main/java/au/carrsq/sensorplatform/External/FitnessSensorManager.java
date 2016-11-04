@@ -1,6 +1,8 @@
 package au.carrsq.sensorplatform.External;
 
 import android.content.Context;
+import android.os.Handler;
+import android.support.annotation.NonNull;
 import android.util.Log;
 
 import com.google.android.gms.common.ConnectionResult;
@@ -8,9 +10,11 @@ import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.common.api.ResultCallback;
 import com.google.android.gms.wearable.MessageApi;
 import com.google.android.gms.wearable.Node;
+import com.google.android.gms.wearable.NodeApi;
 import com.google.android.gms.wearable.Wearable;
 
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 import au.carrsq.sensorplatform.Core.DataProvider;
 import au.carrsq.sensorplatform.Core.ISensorCallback;
@@ -47,13 +51,51 @@ public class FitnessSensorManager extends DataProvider{
         this.callback = callback;
     }
 
+    private interface Callback {
+        public void success(final String nodeId);
+        public void failed();
+    }
+
     private void connect() {
+        retrieveDeviceNode(new Callback() {
+            @Override
+            public void success(String nodeId) {
+                wearAvailable = true;
+
+                new Thread(new Runnable() {
+                    @Override
+                    public void run() {
+                        ConnectionResult result = googleApiClient.blockingConnect();
+                        Log.d("WEAR CONNECT", result.isSuccess()+"");
+                    }
+                }).start();
+            }
+
+            @Override
+            public void failed() {
+               wearAvailable = false;
+            }
+        });
+    }
+
+    // check if a Android Wear watch is there and connected
+    private void retrieveDeviceNode(final Callback callback) {
+        final GoogleApiClient client = googleApiClient;
         new Thread(new Runnable() {
+
             @Override
             public void run() {
-                ConnectionResult result = googleApiClient.blockingConnect();
-                wearAvailable = true;
-                Log.d("WEAR CONNECT", result.isSuccess()+"");
+                client.blockingConnect(1000, TimeUnit.MILLISECONDS);
+                NodeApi.GetConnectedNodesResult result =
+                        Wearable.NodeApi.getConnectedNodes(client).await();
+                List<Node> nodes = result.getNodes();
+                if (nodes.size() > 0) {
+                    String nodeId = nodes.get(0).getId();
+                    callback.success(nodeId);
+                } else {
+                    callback.failed();
+                }
+                client.disconnect();
             }
         }).start();
     }

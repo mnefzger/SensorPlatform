@@ -99,7 +99,6 @@ public class ImageModule implements IEventCallback{
 
         setting_prefs = app.getSharedPreferences(app.getString(R.string.settings_preferences_key), Context.MODE_PRIVATE);
         sensor_prefs = app.getSharedPreferences(app.getString(R.string.sensor_preferences_key), Context.MODE_PRIVATE);
-        setPrefs();
 
         h = new Handler();
 
@@ -140,6 +139,9 @@ public class ImageModule implements IEventCallback{
     }
 
     public void startCapture() {
+        // set most recent settings
+        setPrefs();
+
         // check again if cascade files are ready
         imgProc.persistFiles(context);
 

@@ -26,19 +26,21 @@ public class PositionProvider extends DataProvider implements LocationListener{
     private double lastTimestamp = System.currentTimeMillis();
     private List<Double> lastSpeedValues = new ArrayList<>();
 
-    private final int LOCATION_REFRESH_TIME;
+    SharedPreferences setting_prefs;
+
+    private int LOCATION_REFRESH_TIME = 0;
     private final int LOCATION_REFRESH_DISTANCE = 0;
 
     public PositionProvider(Context app, ISensorCallback m) {
         context = app;
         callback = m;
-        SharedPreferences setting_prefs = app.getSharedPreferences(app.getString(R.string.settings_preferences_key), Context.MODE_PRIVATE);
-
-        LOCATION_REFRESH_TIME = Preferences.getGPSRequestRate(setting_prefs);
+        setting_prefs = app.getSharedPreferences(app.getString(R.string.settings_preferences_key), Context.MODE_PRIVATE);
     }
 
     @Override
     public void start() {
+        LOCATION_REFRESH_TIME = Preferences.getGPSRequestRate(setting_prefs);
+
         locationManager = (LocationManager) context.getSystemService(Context.LOCATION_SERVICE);
         int permission = ContextCompat.checkSelfPermission(context, Manifest.permission.ACCESS_FINE_LOCATION);
         if(permission == PackageManager.PERMISSION_GRANTED) {

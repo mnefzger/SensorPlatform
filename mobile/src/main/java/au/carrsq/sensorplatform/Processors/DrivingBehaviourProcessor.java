@@ -42,6 +42,8 @@ public class DrivingBehaviourProcessor extends EventProcessor implements IOSMRes
 
     private int rawDataDelay;
 
+    private boolean firstTime = true;
+
     public DrivingBehaviourProcessor(SensorModule m, Context a) {
         super(m);
         qAdapter = new OSMQueryAdapter(this, a);
@@ -49,6 +51,12 @@ public class DrivingBehaviourProcessor extends EventProcessor implements IOSMRes
         setting_prefs = a.getSharedPreferences(a.getString(R.string.settings_preferences_key), Context.MODE_PRIVATE);
         sensor_prefs = a.getSharedPreferences(a.getString(R.string.sensor_preferences_key), Context.MODE_PRIVATE);
 
+        currentVector = new DataVector();
+        currentVector.timestamp = 0;
+
+    }
+
+    private void setThresholds() {
         ACC_THRESHOLD_LOW = Preferences.getNormalAccelerometerThreshold(setting_prefs);
         ACC_THRESHOLD_MEDIUM = Preferences.getRiskyAccelerometerThreshold(setting_prefs);
         ACC_THRESHOLD_HIGH = Preferences.getDangerousAccelerometerThreshold(setting_prefs);
@@ -60,14 +68,15 @@ public class DrivingBehaviourProcessor extends EventProcessor implements IOSMRes
         OSM_REQUEST_RATE = Preferences.getOSMRequestRate(setting_prefs);
 
         rawDataDelay = Preferences.getRawDataDelay(setting_prefs);
-
-        currentVector = new DataVector();
-        currentVector.timestamp = 0;
-
     }
 
     public void processData(List<DataVector> data) {
         super.processData(data);
+
+        if(firstTime) {
+            setThresholds();
+            firstTime = false;
+        }
 
         if(data.size() >= 3) {
             currentVector = data.get(data.size()-1);

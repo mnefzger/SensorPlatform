@@ -30,15 +30,14 @@ public class AccelerometerProvider extends SensorProvider {
 
     public AccelerometerProvider(Context a, SensorModule m) {
         super(a, m);
-        WINDOW = ( Preferences.getRawDataDelay(setting_prefs) / Preferences.getAccelerometerDelay(setting_prefs) );
     }
 
     public void start() {
         Log.d("ACCELEROMETER", "Started");
-
         super.start();
         if (sensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER) != null){
             accSensor = sensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER);
+            WINDOW = ( Preferences.getRawDataDelay(setting_prefs) / Preferences.getAccelerometerDelay(setting_prefs) );
 
             sensorManager.registerListener(this, accSensor, Preferences.getAccelerometerDelay(setting_prefs) );
         }
@@ -97,8 +96,8 @@ public class AccelerometerProvider extends SensorProvider {
      * One-dimensional Kalman Filter
      * http://interactive-matter.eu/blog/2009/12/18/filtering-sensor-data-with-a-kalman-filter/
      */
-    private double q = 0.125; // process noise covariance
-    private double r = 4; // measurement noise covariance
+    private double q = 0.25; // process noise covariance
+    private double r = 2; // measurement noise covariance
     private double p = 1023; // estimation error covariance
     private double x = 0; // initial value
     private double y = 0; // initial value

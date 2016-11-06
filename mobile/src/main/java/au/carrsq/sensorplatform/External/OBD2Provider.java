@@ -62,7 +62,6 @@ public class OBD2Provider extends DataProvider implements OBD2Connector.IConnect
 
         setting_prefs = app.getSharedPreferences(app.getString(R.string.settings_preferences_key), Context.MODE_PRIVATE);
         sensor_prefs = app.getSharedPreferences(app.getString(R.string.sensor_preferences_key), Context.MODE_PRIVATE);
-        OBD_DELAY = Preferences.getOBDDelay(setting_prefs);
     }
 
     public void connect() {
@@ -77,6 +76,7 @@ public class OBD2Provider extends DataProvider implements OBD2Connector.IConnect
 
     @Override
     public void start() {
+        OBD_DELAY = Preferences.getOBDDelay(setting_prefs);
         collecting = true;
         collectOBDData();
     }

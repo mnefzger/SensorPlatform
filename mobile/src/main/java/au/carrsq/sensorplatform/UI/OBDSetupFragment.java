@@ -29,7 +29,7 @@ public class OBDSetupFragment extends Fragment {
 
     AppCompatCheckBox obdActive;
     TextView hint;
-    LinearLayout obd_setup_details;
+    LinearLayout obd_setup_details, connection_layout;
 
     TextView searching;
     TextView connecting;
@@ -62,12 +62,14 @@ public class OBDSetupFragment extends Fragment {
         searching = (TextView) v.findViewById(R.id.searchingOBDText);
         connecting = (TextView) v.findViewById(R.id.connectingOBDText);
         setup = (TextView) v.findViewById(R.id.setupOBDText);
-        ready = (TextView) v.findViewById(R.id.readyOBDText);
+        //ready = (TextView) v.findViewById(R.id.readyOBDText);
 
         done_searching = (ImageView) v.findViewById(R.id.done_search);
         done_connect = (ImageView) v.findViewById(R.id.done_connect);
         done_setup = (ImageView) v.findViewById(R.id.done_setup);
-        done_ready = (ImageView) v.findViewById(R.id.done_ready);
+        //done_ready = (ImageView) v.findViewById(R.id.done_ready);
+
+        connection_layout = (LinearLayout) v.findViewById(R.id.connection_layout_obd);
 
         obdActive.setOnClickListener(listener);
 
@@ -154,7 +156,10 @@ public class OBDSetupFragment extends Fragment {
     }
 
     public void readyComplete() {
-        ready.setText("Ready.");
+        obd_setup_details.animate().alpha(0).setDuration(500);
+        obd_setup_details.setVisibility(View.GONE);
+        connection_layout.setVisibility(View.VISIBLE);
+        connection_layout.animate().alpha(1).setDuration(750);
         //done_ready.setVisibility(View.VISIBLE);
     }
 
@@ -162,7 +167,11 @@ public class OBDSetupFragment extends Fragment {
         searching.setText("Looking for nearby OBD-II …");
         connecting.setText("");
         setup.setText("");
-        ready.setText("");
+
+        connection_layout.setAlpha(0);
+        connection_layout.setVisibility(View.GONE);
+
+        obd_setup_details.setAlpha(1);
 
         done_searching.setVisibility(View.INVISIBLE);
         done_connect.setVisibility(View.INVISIBLE);

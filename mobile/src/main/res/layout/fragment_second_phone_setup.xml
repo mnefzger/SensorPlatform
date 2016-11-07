@@ -105,7 +105,7 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         app:srcCompat="@drawable/phone_switch"
-                        android:id="@+id/imageView7" />
+                        android:id="@+id/phone_figure" />
                 </LinearLayout>
 
                 <LinearLayout

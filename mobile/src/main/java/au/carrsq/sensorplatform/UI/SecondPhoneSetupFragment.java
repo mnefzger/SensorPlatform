@@ -7,6 +7,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.SharedPreferences;
+import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.AppCompatCheckBox;
@@ -36,6 +37,7 @@ public class SecondPhoneSetupFragment extends Fragment {
     TextView instruction;
     TextView connecting;
 
+    ImageView phones;
     ImageView done;
 
     FrameLayout setup_next;
@@ -62,6 +64,7 @@ public class SecondPhoneSetupFragment extends Fragment {
 
         connecting = (TextView) v.findViewById(R.id.connectingPhoneText);
 
+        phones = (ImageView) v.findViewById(R.id.phone_figure);
         done = (ImageView) v.findViewById(R.id.done_phone);
 
         phoneActive.setOnClickListener(listener);
@@ -131,10 +134,14 @@ public class SecondPhoneSetupFragment extends Fragment {
     }
 
     private void connectionComplete() {
-        instruction_layout.animate().alpha(0).setDuration(750);
+        phones.animate().alpha(0).setDuration(500);
+        phones.setImageResource(R.drawable.phone_switch_complete);
+        instruction_layout.animate().alpha(0).setDuration(500);
         instruction_layout.setVisibility(View.GONE);
         connection_layout.setVisibility(View.VISIBLE);
+        phones.animate().alpha(1).setDuration(750);
         connection_layout.animate().alpha(1).setDuration(750);
+
 
     }
 

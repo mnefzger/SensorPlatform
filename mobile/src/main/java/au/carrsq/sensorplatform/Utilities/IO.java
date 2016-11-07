@@ -19,7 +19,7 @@ import java.io.OutputStream;
 
 
 public class IO {
-    private final static String baseDir = android.os.Environment.getExternalStorageDirectory().getAbsolutePath() + "/SensorPlatform/";
+    final static String baseDir = android.os.Environment.getExternalStorageDirectory().getAbsolutePath() + "/SensorPlatform/";
 
     public static void writeFile(File file, String content) {
         try {

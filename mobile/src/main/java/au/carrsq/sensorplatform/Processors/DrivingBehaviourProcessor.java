@@ -233,32 +233,32 @@ public class DrivingBehaviourProcessor extends EventProcessor implements IOSMRes
             return;
 
         // the count of data points that have to be above the threshold, based on the initial sample size
-        int frac = (int)(values.size()*0.75);
+        int frac = (int)(values.size()*0.65);
 
         if(countBrake_h >= values.size() - frac) {
-            EventVector ev = new EventVector(EventVector.LEVEL.HIGH_RISK, currentVector.timestamp, "Brake", max / 9.81);
+            EventVector ev = new EventVector(EventVector.LEVEL.HIGH_RISK, currentVector.timestamp, "Brake Raw", max / 9.81);
             callback.onEventDetected(ev);
             lastAccDetected = System.currentTimeMillis();
         } else if( (countBrake_m+countBrake_h) >= values.size()-frac) {
-            EventVector ev = new EventVector(EventVector.LEVEL.MEDIUM_RISK, currentVector.timestamp, "Brake", max / 9.81);
+            EventVector ev = new EventVector(EventVector.LEVEL.MEDIUM_RISK, currentVector.timestamp, "Brake Raw", max / 9.81);
             callback.onEventDetected(ev);
             lastAccDetected = System.currentTimeMillis();
         } else if( (countBrake_l+countBrake_m+countBrake_h) >= values.size()-frac) {
-            EventVector ev = new EventVector(EventVector.LEVEL.LOW_RISK, currentVector.timestamp, "Brake", max / 9.81);
+            EventVector ev = new EventVector(EventVector.LEVEL.LOW_RISK, currentVector.timestamp, "Brake Raw", max / 9.81);
             callback.onEventDetected(ev);
             lastAccDetected = System.currentTimeMillis();
         }
 
         if(countAcc_h >= values.size()-frac) {
-            EventVector ev = new EventVector(EventVector.LEVEL.HIGH_RISK, currentVector.timestamp, "Acceleration", max / 9.81);
+            EventVector ev = new EventVector(EventVector.LEVEL.HIGH_RISK, currentVector.timestamp, "Acceleration Raw", max / 9.81);
             callback.onEventDetected(ev);
             lastAccDetected = System.currentTimeMillis();
         } else if( (countAcc_m+countAcc_h) >= values.size()-frac) {
-            EventVector ev = new EventVector(EventVector.LEVEL.MEDIUM_RISK, currentVector.timestamp, "Acceleration", max / 9.81);
+            EventVector ev = new EventVector(EventVector.LEVEL.MEDIUM_RISK, currentVector.timestamp, "Acceleration Raw", max / 9.81);
             callback.onEventDetected(ev);
             lastAccDetected = System.currentTimeMillis();
         } else if( (countAcc_l+countAcc_m+countAcc_h) >= values.size()-frac) {
-            EventVector ev = new EventVector(EventVector.LEVEL.LOW_RISK, currentVector.timestamp, "Acceleration", max / 9.81);
+            EventVector ev = new EventVector(EventVector.LEVEL.LOW_RISK, currentVector.timestamp, "Acceleration Raw", max / 9.81);
             callback.onEventDetected(ev);
             lastAccDetected = System.currentTimeMillis();
         }

@@ -12,6 +12,7 @@
     <uses-permission android:name="android.permission.BLUETOOTH_ADMIN" />
     <uses-permission android:name="android.permission.BODY_SENSORS" />
     <uses-permission android:name="android.permission.NFC" />
+    <uses-permission android:name="android.permission.READ_LOGS"/>
 
     <uses-feature android:name="android.hardware.camera2" />
     <uses-feature android:name="android.hardware.type.watch" android:required="false"/>

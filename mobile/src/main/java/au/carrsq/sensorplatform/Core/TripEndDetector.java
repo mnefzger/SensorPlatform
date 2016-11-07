@@ -44,12 +44,10 @@ public class TripEndDetector {
                 checkInSpeed(dv);
 
         }
-
-
     }
 
     private void checkInOBD(DataVector dv) {
-        if(dv.rpm != null && dv.rpm == 0 && dv.obdSpeed == 0) {
+        if(dv.rpm != null && dv.rpm == 0.0 && dv.obdSpeed == 0.0) {
             Log.d("TRIP END","Trip end in OBD");
             callback.onTripEnd();
         }
@@ -76,6 +74,7 @@ public class TripEndDetector {
             }
         } else {
             reset();
+
         }
     }
 }

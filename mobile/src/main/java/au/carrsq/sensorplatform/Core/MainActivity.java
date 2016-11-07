@@ -33,6 +33,7 @@ import au.carrsq.sensorplatform.UI.SetupFirstFragment;
 import au.carrsq.sensorplatform.UI.StartFragment;
 import au.carrsq.sensorplatform.UI.SurveyFragment;
 import au.carrsq.sensorplatform.Utilities.PermissionManager;
+import au.carrsq.sensorplatform.Utilities.UncaughtExceptionHandler;
 
 
 public class MainActivity extends AppCompatActivity {
@@ -77,6 +78,9 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+        // relevant for crash logging
+        Thread.setDefaultUncaughtExceptionHandler(new UncaughtExceptionHandler());
 
         // make sure all the required permissions are granted
         PermissionManager.verifyPermissions(this);
@@ -500,7 +504,6 @@ public class MainActivity extends AppCompatActivity {
 
         adapter.enableForegroundDispatch(activity, pendingIntent, filters, techList);
     }
-
 
 
 }

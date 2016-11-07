@@ -96,8 +96,8 @@ public class AccelerometerProvider extends SensorProvider {
      * One-dimensional Kalman Filter
      * http://interactive-matter.eu/blog/2009/12/18/filtering-sensor-data-with-a-kalman-filter/
      */
-    private double q = 0.25; // process noise covariance
-    private double r = 2; // measurement noise covariance
+    private double q = 0.2; // process noise covariance
+    private double r = 3; // measurement noise covariance
     private double p = 1023; // estimation error covariance
     private double x = 0; // initial value
     private double y = 0; // initial value

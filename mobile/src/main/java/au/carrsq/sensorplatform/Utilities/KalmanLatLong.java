@@ -1,9 +1,5 @@
 package au.carrsq.sensorplatform.Utilities;
 
-/**
- * Created by matthias on 07/11/16.
- */
-
 public class KalmanLatLong {
     private final float MinAccuracy = 1;
 
@@ -37,10 +33,12 @@ public class KalmanLatLong {
     /// <returns>new state</returns>
     public void Process(double lat_measurement, double lng_measurement, float accuracy, long TimeStamp_milliseconds) {
         if (accuracy < MinAccuracy) accuracy = MinAccuracy;
+
         if (variance < 0) {
             // if variance < 0, object is unitialised, so initialise with current values
             this.TimeStamp_milliseconds = TimeStamp_milliseconds;
             lat=lat_measurement; lng = lng_measurement; variance = accuracy*accuracy;
+
         } else {
             // else apply Kalman filter methodology
 

@@ -32,6 +32,8 @@ public class UncaughtExceptionHandler implements Thread.UncaughtExceptionHandler
 
         IO.writeFile(output, stacktrace.toString());
 
+        throwable.printStackTrace();
+
         System.exit(1);
     }
 }

@@ -16,6 +16,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import au.carrsq.sensorplatform.R;
+import au.carrsq.sensorplatform.Utilities.KalmanLatLong;
 import au.carrsq.sensorplatform.Utilities.MathFunctions;
 
 public class PositionProvider extends DataProvider implements LocationListener{
@@ -25,6 +26,7 @@ public class PositionProvider extends DataProvider implements LocationListener{
     private Location lastLocation;
     private double lastTimestamp = System.currentTimeMillis();
     private List<Double> lastSpeedValues = new ArrayList<>();
+    private KalmanLatLong kalman;
 
     SharedPreferences setting_prefs;
 
@@ -35,6 +37,7 @@ public class PositionProvider extends DataProvider implements LocationListener{
         context = app;
         callback = m;
         setting_prefs = app.getSharedPreferences(app.getString(R.string.settings_preferences_key), Context.MODE_PRIVATE);
+        kalman = new KalmanLatLong(15);
     }
 
     @Override
@@ -60,9 +63,20 @@ public class PositionProvider extends DataProvider implements LocationListener{
 
     @Override
     public void onLocationChanged(Location location) {
+
+        if(kalman.get_TimeStamp() == 0)
+            kalman.SetState(location.getLatitude(), location.getLongitude(), location.getAccuracy(), location.getTime());
+
+        kalman.Process(location.getLatitude(), location.getLongitude(), location.getAccuracy(), location.getTime());
+        double lat = kalman.get_lat();
+        double lon = kalman.get_lng();
+
+        location.setLatitude(lat);
+        location.setLongitude(lon);
+
         double speed = calculateSpeed(location);
 
-        callback.onLocationData(location.getLatitude(), location.getLongitude(), speed);
+        callback.onLocationData(lat, lon, speed);
         h.removeCallbacksAndMessages(null);
         startTimeout();
     }
@@ -93,7 +107,7 @@ public class PositionProvider extends DataProvider implements LocationListener{
 
             lastSpeedValues.add(speed);
             if(lastSpeedValues.size() >= 3) {
-                speed = MathFunctions.getAccEMASingle(lastSpeedValues, 0.5 );
+                speed = MathFunctions.getAccEMASingle( lastSpeedValues, 0.75 );
                 lastSpeedValues.set(lastSpeedValues.size()-1, speed);
             }
 

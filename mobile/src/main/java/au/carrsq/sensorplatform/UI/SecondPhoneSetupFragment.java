@@ -11,6 +11,7 @@ import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.AppCompatCheckBox;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -75,6 +76,12 @@ public class SecondPhoneSetupFragment extends Fragment {
         return v;
     }
 
+    @Override
+    public void onResume() {
+        super.onResume();
+        checkForEstablishedConnection();
+    }
+
     View.OnClickListener nextStepButtonListener = new View.OnClickListener() {
         @Override
         public void onClick(View v) {
@@ -122,11 +129,22 @@ public class SecondPhoneSetupFragment extends Fragment {
         }
     };
 
+    private void checkForEstablishedConnection() {
+        MainActivity app = (MainActivity)getActivity();
+        Log.d("Connection check", "...");
+        if(app.getService().isPhoneConnected()) {
+            phoneActive.setChecked(true);
+            connectionComplete();
+            Log.d("Connection check", "Connected");
+        }
+    }
+
     private void resetText() {
         instruction_layout.setAlpha(1);
         instruction_layout.setVisibility(View.VISIBLE);
         connection_layout.setAlpha(0);
         connection_layout.setVisibility(View.GONE);
+        phones.setImageResource(R.drawable.phone_switch);
     }
 
     private void searchComplete() {
@@ -134,6 +152,8 @@ public class SecondPhoneSetupFragment extends Fragment {
     }
 
     private void connectionComplete() {
+        hint.setVisibility(View.INVISIBLE);
+        phone_setup_details.setVisibility(View.VISIBLE);
         phones.animate().alpha(0).setDuration(500);
         phones.setImageResource(R.drawable.phone_switch_complete);
         instruction_layout.animate().alpha(0).setDuration(500);

@@ -346,6 +346,7 @@ public class AppFragment extends Fragment {
                 waitingText.setVisibility(View.VISIBLE);
                 collectingText.setVisibility(View.INVISIBLE);
                 dataLayout.setVisibility(View.INVISIBLE);
+                showData.setText("Show Data");
 
                 if(isAdded()) {
                     if(Preferences.surveyActivated(setting_prefs)) {

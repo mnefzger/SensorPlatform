@@ -285,8 +285,8 @@ public class SensorPlatformService extends Service implements IDataCallback, ITr
             if(Preferences.videoSavingActivated(setting_prefs) && !(ev.getLevel() == EventVector.LEVEL.DEBUG) ) {
                 long now = System.currentTimeMillis();
 
-                // Check if a video is currently being saved or the last save was less than 4 second ago
-                if(!im.isSaving() && (now - lastSave) > 4000) {
+                // Check if a video is currently being saved or the last save was less than 3 second ago
+                if(/*!im.isSaving() && */ (now - lastSave) > 3000) {
                     im.saveVideoAfterEvent(ev);
                     ev.setVideoNames(ev.getTimestamp());
                     lastSave = now;
@@ -321,6 +321,9 @@ public class SensorPlatformService extends Service implements IDataCallback, ITr
     }
     public void cancelPhoneConnection() {
         this.server.cancel();
+    }
+    public boolean isPhoneConnected() {
+        return this.server.isConnectedToSecondPhone();
     }
 
     /**

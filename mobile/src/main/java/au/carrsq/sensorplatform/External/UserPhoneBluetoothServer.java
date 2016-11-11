@@ -80,6 +80,13 @@ public class UserPhoneBluetoothServer {
         }
     }
 
+    public boolean isConnectedToSecondPhone() {
+        if(acceptThread != null)
+            return acceptThread.isConnected();
+
+        return false;
+    }
+
     class ConnectionStatusReceiver extends BroadcastReceiver {
         @Override
         public void onReceive(Context context, Intent intent) {
@@ -196,6 +203,11 @@ public class UserPhoneBluetoothServer {
             Log.d("Bluetooth", "cancel()" + this);
             try {
                 mmServerSocket.close();
+                if(socket != null && socket.isConnected()) {
+                    sendStop();
+                    socket.close();
+                }
+
             } catch (IOException e) {
                 Log.e("Bluetooth", "close() of server failed", e);
             }
@@ -219,6 +231,13 @@ public class UserPhoneBluetoothServer {
                 Log.e("BluetoothSend", "Exception during write", e);
             }
 
+        }
+
+        public boolean isConnected() {
+            if(socket != null)
+                return socket.isConnected();
+            else
+                return false;
         }
     }
 }

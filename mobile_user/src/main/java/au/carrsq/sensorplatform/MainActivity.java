@@ -5,12 +5,18 @@ import android.app.Activity;
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
 import android.content.BroadcastReceiver;
+import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.pm.PackageManager;
+import android.database.ContentObserver;
+import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.HandlerThread;
+import android.os.Looper;
 import android.provider.Settings;
 import android.support.v4.app.ActivityCompat;
 import android.support.v7.app.AppCompatActivity;
@@ -32,6 +38,8 @@ public class MainActivity extends AppCompatActivity {
     private LinearLayout successLayout, setupLayout, firstLayout;
     private FrameLayout next;
 
+    private ContentObserver observer;
+
     private static final String TAG = "USER_PHONE_MAIN";
 
     @Override
@@ -51,12 +59,23 @@ public class MainActivity extends AppCompatActivity {
 
         next = (FrameLayout) findViewById(R.id.next_button);
 
-        next.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                requestNotifications();
-            }
-        });
+        ComponentName cn = new ComponentName(getApplicationContext(), NotificationListener.class);
+        String flat = Settings.Secure.getString(getApplicationContext().getContentResolver(), "enabled_notification_listeners");
+        final boolean enabled = flat != null && flat.contains(cn.flattenToString());
+
+        if(enabled) {
+            firstLayout.setVisibility(View.INVISIBLE);
+            setupLayout.setVisibility(View.VISIBLE);
+            next.setVisibility(View.INVISIBLE);
+            setup();
+        } else {
+            next.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    requestNotifications();
+                }
+            });
+        }
 
         deviceList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
@@ -70,7 +89,6 @@ public class MainActivity extends AppCompatActivity {
 
                     }
                 }).start();
-
             }
         });
 
@@ -87,9 +105,22 @@ public class MainActivity extends AppCompatActivity {
                 Intent ustats = new Intent(Settings.ACTION_USAGE_ACCESS_SETTINGS);
                 startActivityForResult(ustats, 1338);
             } else {
+
+                Uri uri = Settings.System.CONTENT_URI;
+                Log.d("URI", uri.toString());
+                HandlerThread thread = new HandlerThread("MyHandlerThread");
+                thread.start();
+                Handler handler = new Handler(thread.getLooper());
+                observer = new NotificationContentObserver(handler);
+                getApplicationContext().getContentResolver().registerContentObserver(
+                        uri,
+                        false,
+                        observer
+                );
+
                 Intent notifications_p=new Intent("android.settings.ACTION_NOTIFICATION_LISTENER_SETTINGS");
                 startActivityForResult(notifications_p, 1339);
-                setup();
+
             }
 
         }
@@ -121,6 +152,8 @@ public class MainActivity extends AppCompatActivity {
             setup();
         }
     }
+
+
 
     public void updateView(int index){
         ListView lView = (ListView) findViewById(R.id.deviceListView);
@@ -172,6 +205,35 @@ public class MainActivity extends AppCompatActivity {
 
         } catch (IOException e) {
             e.printStackTrace();
+        }
+    }
+
+    class NotificationContentObserver extends ContentObserver {
+        NotificationContentObserver(Handler h) {
+            super(h);
+        }
+
+        @Override
+        public boolean deliverSelfNotifications() {
+            return true;
+        }
+
+        @Override
+        public void onChange(boolean selfChange) {
+            Log.d("NOTIFICATION_OBSERVER", "MyContentObserver.onChange("+selfChange+")");
+            super.onChange(selfChange);
+
+            ComponentName cn = new ComponentName(getApplicationContext(), NotificationListener.class);
+            String flat = Settings.Secure.getString(getApplicationContext().getContentResolver(), "enabled_notification_listeners");
+            final boolean enabled = flat != null && flat.contains(cn.flattenToString());
+            if(enabled) {
+                firstLayout.setVisibility(View.INVISIBLE);
+                setupLayout.setVisibility(View.VISIBLE);
+                next.setVisibility(View.INVISIBLE);
+                setup();
+                getApplicationContext().getContentResolver().unregisterContentObserver(observer);
+            }
+
         }
     }
 

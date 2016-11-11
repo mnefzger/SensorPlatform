@@ -2,7 +2,8 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context="au.carrsq.sensorplatform.UI.CameraPreviewFragment">
+    tools:context="au.carrsq.sensorplatform.UI.CameraPreviewFragment"
+    android:clickable="true">
 
     <FrameLayout
         android:layout_width="match_parent"

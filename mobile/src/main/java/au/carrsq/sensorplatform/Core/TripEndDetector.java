@@ -36,14 +36,12 @@ public class TripEndDetector {
         boolean obd_active = Preferences.OBDActivated(sensor_prefs);
         boolean location_active = Preferences.locationActivated(sensor_prefs);
 
-        if(obd_active && OBD2Connection.sock != null && OBD2Connection.sock.isConnected()) {
+        if(obd_active && OBD2Connection.sock != null && OBD2Connection.sock.isConnected())
             checkInOBD(dv);
 
-        } else {
-            if(location_active && dv.lat != 0 && dv.lon != 0)
-                checkInSpeed(dv);
+        if(location_active && dv.lat != 0 && dv.lon != 0)
+            checkInSpeed(dv);
 
-        }
     }
 
     private void checkInOBD(DataVector dv) {
@@ -67,7 +65,7 @@ public class TripEndDetector {
             } else {
                 long duration = dv.timestamp - firstStop;
 
-                if(duration > 30000) {
+                if(duration > 45000) {
                     Log.d("TRIP END","Trip end in Speed");
                     callback.onTripEnd();
                 }

@@ -97,7 +97,8 @@ public class PositionProvider extends DataProvider implements LocationListener{
         double speed = -1;
 
         if(lastLocation != null) {
-            double distance = MathFunctions.calculateDistance(location.getLatitude(), location.getLongitude(), lastLocation.getLatitude(), lastLocation.getLongitude());
+            //double distance = MathFunctions.calculateDistance(location.getLatitude(), location.getLongitude(), lastLocation.getLatitude(), lastLocation.getLongitude());
+            double distance = location.distanceTo(lastLocation);
             // time between updates in seconds
             double timeDelta = (currentTime-lastTimestamp) / 1000.0;
             // speed in m/s

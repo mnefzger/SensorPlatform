@@ -29,6 +29,9 @@ public class DataVector {
     public double accX;
     public double accY;
     public double accZ;
+    public double rawAccX;
+    public double rawAccY;
+    public double rawAccZ;
 
     /**
      * Three axis rotation in euler, matrix, rad/s
@@ -99,6 +102,12 @@ public class DataVector {
         this.accZ = z;
     }
 
+    public void setRawAcc(double x, double y, double z) {
+        this.rawAccX = x;
+        this.rawAccY = y;
+        this.rawAccZ = z;
+    }
+
     public void setRot(double x, double y, double z) {
         this.rotX = x;
         this.rotY = y;
@@ -156,7 +165,7 @@ public class DataVector {
 
     public String toCSVString() {
         return study_id + ";" + study_name + ";" + participant_id + ";" + participant_age + ";" + participant_gender + ";" +
-                timestamp + ";" + dateTime + ";" + accX + ";" + accY + ";" + accZ + ";" +
+                timestamp + ";" + dateTime + ";" + accX + ";" + accY + ";" + accZ + ";" + rawAccX + ";" + rawAccY + ";" + rawAccZ + ";" +
                 rotX_rad + ";" + rotY_rad + ";" + rotZ_rad + ";" + light + ";" +
                 lat + ";" + lon + ";" + speed + ";" + obdSpeed + ";" + rpm + ";" + fuel + ";" + heartRate + ";" + weather;
     }

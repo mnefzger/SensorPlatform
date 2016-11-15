@@ -255,6 +255,7 @@ public class SensorModule implements ISensorCallback, IEventCallback{
             dataBuffer.add(last);
             current.setStudyParams(study_id, study_name, participant_id, participant_age, participant_gender);
             current.setAcc(0,0,0);
+            current.setRawAcc(0,0,0);
             current.setRotMatrix(last.rotMatrix);
             current.setLight(last.light);
             current.setLocation(last.lat, last.lon);
@@ -323,6 +324,8 @@ public class SensorModule implements ISensorCallback, IEventCallback{
         if(Math.abs(dataValues[2]) > Math.abs(current.accZ))
             current.setAcc( dataValues[0], dataValues[1], dataValues[2] );
 
+        if(Math.abs(dataValues[5]) > Math.abs(current.rawAccZ))
+            current.setRawAcc(dataValues[3], dataValues[4], dataValues[5]);
         /**
          * Do event processing on the raw accelerometer data
          */

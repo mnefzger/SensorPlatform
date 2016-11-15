@@ -14,6 +14,7 @@ import android.support.v4.content.LocalBroadcastManager;
 import android.util.Log;
 
 import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 import com.jakewharton.threetenabp.AndroidThreeTen;
 
 import java.util.Iterator;
@@ -263,7 +264,8 @@ public class SensorPlatformService extends Service implements IDataCallback, ITr
 
         // broadcast raw data so that a frontend can display it
         Intent raw = new Intent("au.carrsq.sensorplatform.RawData");
-        raw.putExtra("RawData", new Gson().toJson(dv));
+
+        raw.putExtra("RawData", new GsonBuilder().serializeSpecialFloatingPointValues().create().toJson(dv));
         LocalBroadcastManager.getInstance(getApplicationContext()).sendBroadcast(raw);
 
         // Log the raw data to file
@@ -295,7 +297,7 @@ public class SensorPlatformService extends Service implements IDataCallback, ITr
 
             // broadcast event data
             Intent event = new Intent("au.carrsq.sensorplatform.EventData");
-            event.putExtra("EventData", new Gson().toJson(ev));
+            event.putExtra("EventData", new GsonBuilder().serializeSpecialFloatingPointValues().create().toJson(ev));
             LocalBroadcastManager.getInstance(getApplicationContext()).sendBroadcast(event);
 
             // write to log files

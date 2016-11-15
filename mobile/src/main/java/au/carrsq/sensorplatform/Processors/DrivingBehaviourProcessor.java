@@ -105,8 +105,14 @@ public class DrivingBehaviourProcessor extends EventProcessor implements IOSMRes
      */
     private long lastAccDetected = 0;
     private void checkForHardAcc() {
+        // last detected acceleration event was less than 1.5 seconds ago
+        if( (System.currentTimeMillis()-lastAccDetected) < 1500)
+            return;
+
+        /*
         if(Preferences.OBDActivated(sensor_prefs))
             checkForHardAccOBD(currentVector, previousVector);
+        */
 
         checkForHardAccSingle(currentVector);
     }
@@ -183,10 +189,6 @@ public class DrivingBehaviourProcessor extends EventProcessor implements IOSMRes
         double accZ = lastData.accZ;
         long time = lastData.timestamp;
 
-        // we already looked at this data or last detected was not long ago
-        if(time == lastAccDetected || (time-lastAccDetected) < 1000)
-            return;
-
         matchAccAgainstThresholds(accZ, time);
 
     }
@@ -233,7 +235,7 @@ public class DrivingBehaviourProcessor extends EventProcessor implements IOSMRes
             return;
 
         // the count of data points that have to be above the threshold, based on the initial sample size
-        int frac = (int)(values.size()*0.65);
+        int frac = (int)(values.size()*0.7);
 
         if(countBrake_h >= values.size() - frac) {
             EventVector ev = new EventVector(EventVector.LEVEL.HIGH_RISK, currentVector.timestamp, "Brake Raw", max / 9.81);
@@ -272,10 +274,10 @@ public class DrivingBehaviourProcessor extends EventProcessor implements IOSMRes
         double previousSpeed = prev.obdSpeed;
         double currentSpeed = cur.obdSpeed;
 
-        long timeDiff = cur.timestamp - prev.timestamp; // in ms
+        double timeDiff = cur.timestamp - prev.timestamp; // in ms
         timeDiff = timeDiff/1000; // in s
 
-        if(previousSpeed != -1 && currentSpeed != -1) {
+        if(timeDiff > 0 && previousSpeed != -1 && currentSpeed != -1) {
             double diff = currentSpeed - previousSpeed; // in km/h
             diff = diff / 3.6; // in m/s
 
@@ -283,6 +285,8 @@ public class DrivingBehaviourProcessor extends EventProcessor implements IOSMRes
             double acc = diff/timeDiff;
             // inverse it to match orientation of the accelerometer data
             acc *= -1;
+
+            Log.d("OBD ACC", acc+"");
 
             matchAccAgainstThresholds(acc, cur.timestamp);
 
@@ -637,6 +641,9 @@ public class DrivingBehaviourProcessor extends EventProcessor implements IOSMRes
      */
     private double getDistanceToRoad(OSMResponse.Element element) {
         double distance;
+
+        if(element == null || element.nodes == null)
+            return 10000;
 
         // First, we have to find the two nearest nodes of this street (element)
         OSMResponse.Element[] closest = get2ClosestNodes(element, false);

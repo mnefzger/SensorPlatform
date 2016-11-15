@@ -121,7 +121,7 @@ public class LoggingModule {
     }
 
     private void createHeadersRaw() {
-        String[] line = { "tripID;s_id;s_name;p_id;p_age;p_gender;timestamp;dateTime;accelerationX;accelerationY;accelerationZ;rotationX;rotationY;rotationZ;light;latitude;longitude;gps_speed;obd_speed;obd_rpm;obd_fuel;heart_rate;weather" };
+        String[] line = { "tripID;s_id;s_name;p_id;p_age;p_gender;timestamp;dateTime;accelerationX;accelerationY;accelerationZ;raw_accelerationX;raw_accelerationY;raw_accelerationZ;rotationX;rotationY;rotationZ;light;latitude;longitude;gps_speed;obd_speed;obd_rpm;obd_fuel;heart_rate;weather" };
 
         IO.writeCSV(rawFile, line);
     }

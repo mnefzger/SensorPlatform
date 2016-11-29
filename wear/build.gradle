@@ -9,8 +9,8 @@ android {
         applicationId "au.carrsq.sensorplatform"
         minSdkVersion 21
         targetSdkVersion 25
-        versionCode 2
-        versionName "0.9"
+        versionCode 3
+        versionName "0.91"
     }
     buildTypes {
         release {

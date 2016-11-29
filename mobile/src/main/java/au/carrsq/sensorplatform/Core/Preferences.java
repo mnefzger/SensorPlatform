@@ -221,7 +221,7 @@ public class Preferences {
     }
 
     public static double getNormalAccelerometerThreshold(SharedPreferences prefs) {
-        String valueString = prefs.getString(ACCELEROMETER_THRESHOLD_NORMAL, "0.2");
+        String valueString = prefs.getString(ACCELEROMETER_THRESHOLD_NORMAL, "0.15");
 
         double value = Double.valueOf( context.getResources().getString(R.string.acceleration_threshold_normal_default) );
 
@@ -239,7 +239,7 @@ public class Preferences {
     }
 
     public static double getRiskyAccelerometerThreshold(SharedPreferences prefs) {
-        String valueString = prefs.getString(ACCELEROMETER_THRESHOLD_RISKY, "0.3");
+        String valueString = prefs.getString(ACCELEROMETER_THRESHOLD_RISKY, "0.25");
 
         double value = Double.valueOf( context.getResources().getString(R.string.acceleration_threshold_risky_default) );
 
@@ -257,7 +257,7 @@ public class Preferences {
     }
 
     public static double getDangerousAccelerometerThreshold(SharedPreferences prefs) {
-        String valueString = prefs.getString(ACCELEROMETER_THRESHOLD_DANGEROUS, "0.4");
+        String valueString = prefs.getString(ACCELEROMETER_THRESHOLD_DANGEROUS, "0.35");
 
         double value = Double.valueOf( context.getResources().getString(R.string.acceleration_threshold_dangerous_default) );
 

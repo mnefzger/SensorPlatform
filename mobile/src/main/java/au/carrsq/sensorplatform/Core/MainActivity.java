@@ -173,9 +173,9 @@ public class MainActivity extends AppCompatActivity {
         started = true;
 
         // trip start detection
-        //sPS.startWaitBehaviour();
+        sPS.startWaitBehaviour();
         // start data collection immediately
-        sPS.subscribe();
+        //sPS.subscribe();
     }
 
     private void doUnbindService() {
@@ -258,7 +258,10 @@ public class MainActivity extends AppCompatActivity {
          * It's important that the activity is in the foreground (resumed). Otherwise
          * an IllegalStateException is thrown.
          */
-        setupForegroundDispatch(this, NfcAdapter.getDefaultAdapter(this));
+        NfcAdapter adapter = NfcAdapter.getDefaultAdapter(this);
+        if (adapter != null && adapter.isEnabled()) {
+            setupForegroundDispatch(this, adapter );
+        }
 
         Intent intent = new Intent(this, SensorPlatformService.class);
         bindService(intent, mConnection, Context.BIND_AUTO_CREATE);

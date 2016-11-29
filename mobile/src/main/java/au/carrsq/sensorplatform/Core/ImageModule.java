@@ -110,7 +110,8 @@ public class ImageModule implements IEventCallback{
             Log.d("CAMERA", "LEVEL FRONT: " + level_f  + ", LEVEL BACK: " + level_b);
             if (level_f == CameraCharacteristics.INFO_SUPPORTED_HARDWARE_LEVEL_LEGACY ||
                     level_b == CameraCharacteristics.INFO_SUPPORTED_HARDWARE_LEVEL_LEGACY) {
-                new AlertDialog.Builder(context)
+                Log.d("CAMERA", "Your smartphone camera does not support all of Sensor Platform's features");
+                /*new AlertDialog.Builder(context)
                         .setTitle("Camera Support")
                         .setMessage("Your smartphone camera does not support all features.")
                         .setPositiveButton(android.R.string.ok, new DialogInterface.OnClickListener() {
@@ -119,7 +120,7 @@ public class ImageModule implements IEventCallback{
                             }
                         })
                         .setIcon(android.R.drawable.ic_dialog_alert)
-                        .show();
+                        .show();*/
             }
         } catch (CameraAccessException e) {
             Log.e("CAMERA", "Cannot access camera");
@@ -319,7 +320,7 @@ public class ImageModule implements IEventCallback{
 
     public void saveVideoAfterEvent(EventVector ev) {
         final EventVector v = ev;
-        if(!isSaving()) {
+        if(true /*&& !isSaving()*/ ) {
             h.postDelayed(new Runnable() {
                 @Override
                 public void run() {
@@ -481,7 +482,8 @@ public class ImageModule implements IEventCallback{
         File mFile;
 
         public VideoSaver(SparseArray<byte[]> list, double FPS, int width, int height, String mode, long timestamp) {
-            this.images = copyByteList(list);
+            //this.images = copyByteList(list);
+            this.images = list;
             this.FPS = FPS;
             this.w = width;
             this.h = height;

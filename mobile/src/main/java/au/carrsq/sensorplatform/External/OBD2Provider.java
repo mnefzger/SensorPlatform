@@ -261,19 +261,21 @@ public class OBD2Provider extends DataProvider implements OBD2Connector.IConnect
     private void requestData() {
         SpeedCommand sp_cmd = new SpeedCommand();
         runCommand(OBD2Connection.sock, sp_cmd);
-        double speed = Double.valueOf( sp_cmd.getCalculatedResult() );
 
         RPMCommand rpm_cmd = new RPMCommand();
         runCommand(OBD2Connection.sock, rpm_cmd);
+
+        // not working with Honda, Toyota
+        //ConsumptionRateCommand cr_cmd = new ConsumptionRateCommand();
+        //runCommand(OBD2Connection.sock, cr_cmd);
+
+        try { Thread.sleep(10); } catch (InterruptedException e) { e.printStackTrace(); }
+
+        double speed = Double.valueOf( sp_cmd.getCalculatedResult() );
         double rpm = Double.valueOf( rpm_cmd.getCalculatedResult() );
+        //double cr = Double.valueOf( cr_cmd.getCalculatedResult() );
 
-        ConsumptionRateCommand cr_cmd = new ConsumptionRateCommand();
-        runCommand(OBD2Connection.sock, cr_cmd);
-        double cr = Double.valueOf( cr_cmd.getCalculatedResult() );
-
-        //try { Thread.sleep(10); } catch (InterruptedException e) { e.printStackTrace(); }
-
-        double[] response = {speed, rpm, cr};
+        double[] response = {speed, rpm, -1};
 
         callback.onOBD2Data(response);
     }

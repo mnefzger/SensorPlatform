@@ -3,6 +3,7 @@ package au.carrsq.sensorplatform.Core;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.hardware.Sensor;
+import android.location.Location;
 import android.util.Log;
 
 import java.util.ArrayList;
@@ -240,10 +241,10 @@ public class SensorModule implements ISensorCallback, IEventCallback{
         /*Location mock = new Location("mock");
         mock.setLongitude(lon);
         mock.setLatitude(lat);
-        last.setLocation(mock);
-        lon -= 0.00001;
-        lat += 0.00001;
-        weather.updateLocation(mock);*/
+        last.setLocation(lat, lon);
+        //lon -= 0.00001;
+        //lat += 0.00001;
+        weather.updateLocation(lat,lon);*/
 
         current = new DataVector();
 
@@ -324,8 +325,10 @@ public class SensorModule implements ISensorCallback, IEventCallback{
         if(Math.abs(dataValues[2]) > Math.abs(current.accZ))
             current.setAcc( dataValues[0], dataValues[1], dataValues[2] );
 
-        if(Math.abs(dataValues[5]) > Math.abs(current.rawAccZ))
+        if(current.rawAccZ == 0)
             current.setRawAcc(dataValues[3], dataValues[4], dataValues[5]);
+        else
+            current.setRawAcc( (current.rawAccX+dataValues[3])/2, (current.rawAccY+dataValues[4])/2, (current.rawAccZ+dataValues[5])/2 ) ;
         /**
          * Do event processing on the raw accelerometer data
          */

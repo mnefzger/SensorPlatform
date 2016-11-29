@@ -20,6 +20,7 @@ public class AccelerometerProvider extends SensorProvider {
 
     /**
      * for accelerometer-gravity low-pass filter
+     * time constant from : http://www.kircherelectronics.com/blog/index.php/11-android/sensors/8-low-pass-filter-the-basics
      */
     private float timeConstant = 0.18f;
     private float alpha = 0.5f;
@@ -96,8 +97,8 @@ public class AccelerometerProvider extends SensorProvider {
      * One-dimensional Kalman Filter
      * http://interactive-matter.eu/blog/2009/12/18/filtering-sensor-data-with-a-kalman-filter/
      */
-    private double q = 0.5; // process noise covariance
-    private double r = 2.5; // measurement noise covariance
+    private double q = 0.125; // process noise covariance
+    private double r = 4; // measurement noise covariance
     private double p = 1023; // estimation error covariance
     private double x = 0; // initial value
     private double y = 0; // initial value
